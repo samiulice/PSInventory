@@ -209,7 +209,7 @@ function showSuccessMessage(message) {
     toast: true,
     position: "top-end",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 2000,
     timerProgressBar: true,
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer;
@@ -228,7 +228,7 @@ function showErrorMessage(msg) {
     toast: true,
     position: "top-end",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 2000,
     timerProgressBar: true,
     didOpen: (toast) => {
       toast.onmouseenter = Swal.stopTimer;
@@ -350,8 +350,9 @@ function addNewBrand(page) {
           } else {
             showSuccessMessage(data.message);
             if (page === "purchase"){
-              document.getElementById("brand_id").value =  data.result.id
-              document.getElementById("brand_name").value =  data.result.name
+              document.getElementById("brand").innerHTML =  '';
+              document.getElementById("brand").innerHTML =  `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
+              document.getElementById("brand").disabled =  true;
             }
           }
         });
@@ -467,8 +468,9 @@ function addNewCategory(page) {
           } else {
             showSuccessMessage(data.message);
             if (page === "purchase"){
-              document.getElementById("category_id").value =  data.result.id
-              document.getElementById("category_name").value =  data.result.name
+              document.getElementById("category").innerHTML =  '';
+              document.getElementById("category").innerHTML =  `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
+              document.getElementById("category").disabled =  true;
             }
           }
         });
@@ -476,7 +478,7 @@ function addNewCategory(page) {
   });
 }
 //addNewCustomer show a popup form and then make an api call to insert customer data to the database table
-function addNewCustomer() {
+function addNewCustomer(page) {
   Swal.fire({
     title: 'Add Customer',
     width: 400,
@@ -692,20 +694,22 @@ function addNewCustomer() {
       fetch('http://localhost:4321/api/mis/add-customer', requestOptions)
         .then(response => response.json())
         .then(data => {
-          setTimeout(function () {
-            location.reload();
-          }, 4000); // Adjust the delay as needed 
+          if(page === ""){
+            setTimeout(function () {
+              location.reload();
+            }, 3000); // Adjust the delay as needed 
+          }
           if (data.error === true) {
             showErrorMessage(data.message)
           } else {
-            showSuccessMessage(data.message);
+            showSuccessMessage(data.message);            
           }
         });
     }
   });
 }
 //addNewEmployee show a popup form and then make an api call to insert employee data to the database table
-function addNewEmployee() {
+function addNewEmployee(page) {
   Swal.fire({
     title: 'Add Employee',
     width: 400,
@@ -921,9 +925,11 @@ function addNewEmployee() {
       fetch('http://localhost:4321/api/hr/add-employee', requestOptions)
         .then(response => response.json())
         .then(data => {
-          setTimeout(function () {
-            location.reload();
-          }, 4000); // Adjust the delay as needed 
+          if(page === ""){
+            setTimeout(function () {
+              location.reload();
+            }, 3000); // Adjust the delay as needed 
+          }
           if (data.error === true) {
             showErrorMessage(data.message)
           } else {
@@ -1141,17 +1147,19 @@ function addNewSupplier(page) {
       fetch('http://localhost:4321/api/mis/add-supplier', requestOptions)
         .then(response => response.json())
         .then(data => {
-          setTimeout(function () {
-            location.reload();
-          }, 4000); // Adjust the delay as needed 
+          if(page === ""){
+            setTimeout(function () {
+              location.reload();
+            }, 3000); // Adjust the delay as needed 
+          }
           if (data.error === true) {
             showErrorMessage(data.message)
           } else {
             showSuccessMessage(data.message);
             if (page === "purchase"){
-              document.getElementById("supplier_id").value =  data.result.id;
-              document.getElementById("supplier_account_code").value =  data.result.account_code;
-              document.getElementById("supplier_account_name").value =  data.result.account_name;
+              document.getElementById("supplier").innerHTML =  '';
+              document.getElementById("supplier").innerHTML =  `<option value="${data.result.id}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
+              document.getElementById("supplier").disabled =  true;
             }
           }
         });

@@ -263,9 +263,6 @@
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                     <div class="col-md-8 col-sm-8 col-xs-8">
                       <label for="supplier">Supplier * :</label>
-                      <input type="hidden" value="" id="supplier_id">
-                      <input type="hidden" value="" id="supplier_account_code">
-                      <input type="hidden" value="" id="supplier_account_name">
                       <select id="supplier" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Supplier Account</option>
                         <!--Updated by JS DOM -->
@@ -283,8 +280,6 @@
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                     <div class="col-md-8 col-sm-8 col-xs-8">
                       <label for="category">Item Category * :</label>
-                      <input type="hidden" value="" id="category_id">
-                      <input type="hidden" value="" id="category_name">
                       <select id="category" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Category</option>
                         <!--Updated by JS DOM -->
@@ -302,8 +297,6 @@
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                     <div class="col-md-8 col-sm-8 col-xs-8">
                       <label for="brand">Item Brand * :</label>
-                      <input type="hidden" value="" id="brand_id">
-                      <input type="hidden" value="" id="brand_name">
                       <select id="brand" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Brand</option>
                         <!--Updated by JS DOM -->
@@ -622,15 +615,15 @@
       }
       createSupplierBtn.addEventListener("click", e => {
         addNewSupplier("purchase");
-        supplier.disabled = true
+        // supplier.disabled = true
       });
       createCategoryBtn.addEventListener("click", e => {
         addNewCategory("purchase");
-        category.disabled = true;
+        // category.disabled = true;
       });
       createBrandBtn.addEventListener("click", e => {
         addNewBrand("purchase");
-        brand.disabled = true;
+        // brand.disabled = true;
       });
 
       // document.getElementById("supplier").addEventListener("change", e =>{
