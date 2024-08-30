@@ -1,0 +1,252 @@
+{{template "admin" .}}
+
+{{define "title"}}
+Add New User
+{{end}}
+
+{{define "content"}}
+<div class="row">
+
+  <div class="col d-flex justify-content-center">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>Registration Form</h2>
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+        <div class="row text-center">
+          <div class="h5 badge bg-success d-none" id="alert_msg">This is a test alert</div>
+        </div>
+
+
+        <!-- start form for validation -->
+        <form action="" method="post" id="orderForm" enctype="multipart/form-data" class="needs-validation"
+                    novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="client-name" name="client-name"
+                                    placeholder="Your Name" required>
+                                <label for="client-name">Your Name*</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" id="client-mobile" name="client-mobile" class="form-control"
+                                    placeholder="01XXXXXXXXX" pattern="[0]{1}[1]{1}[3-9]{1}[0-9]{8}" required>
+                                <label for="client-mobile">Your Mobile*</label>
+                            </div>
+                            <label for="client-mobile" id="client-mobile-err" class="text-danger d-none">Enter Valid
+                                Mobile Number</label>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select id="division" name="division" class="form-control form-select" required>
+                                    <option value="" selected disabled>Select Division</option>
+                                    <!-- division list will be implemented using js  -->
+                                </select>
+                                <label for="division">Division*</label>
+                            </div>
+                            <label for="division" id="division-err" class="text-danger d-none">Select Valid
+                                Division</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select id="district" name="district" class="form-control form-select" required>
+                                    <option value="" selected disabled>Select District</option>
+                                    <!-- district list will be implemented using js  -->
+                                </select>
+                                <label for="district">District*</label>
+                            </div>
+                            <label for="district" id="district-err" class="text-danger d-none">Select Valid
+                                District</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select id="upazila" name="upazila" class="form-control form-select" required>
+                                    <option value="" selected disabled>Select Upazila</option>
+                                    <!-- upzaila list will be implemented using js  -->
+                                </select>
+                                <label for="upazila">Upazila*</label>
+                            </div>
+                            <label for="upazila" id="upazila-err" class="text-danger d-none">Select Valid
+                                Upazila</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="Road/House No." id="area"
+                                    name="area"></textarea>
+                                <label for="area">Area(Optional)</label>
+                            </div>
+                        </div>
+
+                        <!-- Date  -->
+                        <div class="col-md-6">
+                            <div class="form-floating" id="reservation-date">
+                                <input type="text" class="form-control" id="date" name="date" placeholder="Select Date"
+                                    autocomplete="off" required>
+                                <label for="date">Select Date*</label>
+                            </div>
+                        </div>
+                        <!-- Date  -->
+
+                        <!-- Time  -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select id="preferredtime" name="preferredtime" class="form-control form-select"
+                                    required>
+                                    <option value="" selected disabled>Select range</option>
+                                    <option value="09AM-10AM">09AM-10AM</option>
+                                    <option value="10AM-11AM">10AM-11AM</option>
+                                    <option value="11AM-12PM">11AM-12PM</option>
+                                    <option value="12PM-01PM">12PM-01PM</option>
+                                    <option value="01PM-02PM">01PM-02PM</option>
+                                    <option value="02PM-03PM">02PM-03PM</option>
+                                    <option value="03PM-04PM">03PM-04PM</option>
+                                    <option value="04PM-05PM">04PM-05PM</option>
+                                    <option value="05PM-06PM">05PM-06PM</option>
+                                    <option value="06PM-07PM">06PM-07PM</option>
+                                    <option value="07PM-08PM">07PM-08PM</option>
+                                    <option value="08PM-09PM">08PM-09PM</option>
+                                </select>
+                                <label for="categorySelect">Preferred Time*</label>
+                            </div>
+                            <label for="preferredtime" id="preferredtime-err" class="text-danger d-none">Please select
+                                enlisted time range</label>
+                        </div>
+                        <!-- Time  -->
+
+                        <!-- Service dropdown -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select id="category" name="category" class="form-control form-select" required>
+                                    <option value="" selected disabled>Select Category</option>
+                                    <!-- Add more options as needed -->
+                                </select>
+                                <label for="category">Service Category*</label>
+                            </div>
+                            <label for="category" id="category-err" class="text-danger d-none">Select Valid
+                                Category</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select id="service" name="service" class="form-control form-select" required>
+                                    <option selected disabled>Select Service</option>
+                                    <!-- Add more options as needed -->
+                                </select>
+                                <label for="service">Service Name*</label>
+                            </div>
+                            <label for="service" id="service-err" class="text-danger d-none">Select Valid
+                                Service Name</label>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="Special Request" id="problem-summary"
+                                    style="height: 100px"></textarea>
+                                <label for="problem-summary">Problem Summary(Optional)</label>
+                            </div>
+                        </div>
+                        <!-- Service dropdown -->
+
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100 py-3" type="submit" id="submitBtn">Book Now</button>
+                            <a class="btn btn-dark w-100 py-3 d-none" href="javascript:void(0);"
+                                id="processingBtn">Please wait...
+                            </a>
+                        </div>
+                    </div>
+                </form>
+        <!-- end form for validations -->
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{{end}}
+
+{{define "js"}}
+<script>
+  let token = localStorage.getItem("token")
+  let alert_msg = document.getElementById('alert_msg');
+  let btns = document.getElementById('btns');
+
+
+  document.getElementById('submitBtn').addEventListener('click', function (event) {
+    const firstName = document.getElementById("first_name").value;
+    const lastName = document.getElementById("last_name").value;
+    const userEmail = document.getElementById("user_email").value;
+    const userContact = document.getElementById("user_contact").value;
+    const otpMethod = document.getElementById("EVerify").checked;
+    const userBtn = document.getElementById("userBtn").checked;
+    const empBtn = document.getElementById("empBtn").checked;
+    if (userBtn) {
+      userType = "customers"
+    } else  if (empBtn) {
+      userType = "employees"
+    } else {
+      userType = "users"
+    }
+
+    let userInput = {
+      first_name: firstName,
+      last_name: lastName,
+      email: userEmail,
+      mobile: userContact,
+      user_type: userType,
+      otp_method: otpMethod,
+    }
+
+    const requestOptions = {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify(userInput),
+    }
+
+    fetch('{{.API}}/api/admin/general/user/add', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error === true) {
+          showError(data.message)   
+          // setTimeout(function() {
+          //   location.reload();
+          // }, 5000); // Adjust the delay as needed       
+        } else {
+          showSuccess(data.message);
+        }
+      })
+  });
+
+  function showError(msg) {
+    alert_msg.classList.remove('d-none');
+    alert_msg.classList.add('d-flex');
+
+    alert_msg.classList.add('bg-danger')
+    alert_msg.classList.remove('bg-success')
+    alert_msg.innerText = msg 
+  }
+
+  function showSuccess(msg) {
+    alert_msg.classList.remove('d-none');
+    alert_msg.classList.add('d-flex');
+
+    alert_msg.classList.add('bg-success')
+    alert_msg.classList.remove('bg-danger')
+    alert_msg.innerText = msg
+
+    btns.style.display = 'none';
+  }
+
+
+</script>
+
+
+{{end}}

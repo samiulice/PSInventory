@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>PSINVENTORY</title>
+
+  <!-- Bootstrap -->
+  <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <!-- NProgress -->
+  <link href="assets/vendors/nprogress/nprogress.css" rel="stylesheet">
+  <!-- iCheck -->
+  <link href="assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link href="assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+  <!-- JQVMap -->
+  <link href="assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+  <!-- bootstrap-daterangepicker -->
+  <link href="assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+  <!-- Custom Theme Style -->
+  <link href="assets/css/custom.min.css" rel="stylesheet">
+  <script src="assets/js/app.js"></script>
+</head>
+
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+          <div class="navbar nav_title" style="border: 0;">
+            <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Company Name</span></a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- menu profile quick info -->
+          <div class="profile clearfix">
+            <div class="profile_pic">
+              <img src="assets/images/samiul-photo.jpg" alt="..." class="img-circle profile_img">
+            </div>
+            <div class="profile_info">
+              <span>Welcome,</span>
+              <h2>John Doe</h2>
+            </div>
+          </div>
+          <!-- /menu profile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+              <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="open.html">Open</a></li>
+                    <li><a href="#company-profile.html">Company Profile</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-group"></i>HR Management<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="employee-list.html">Employee List</a></li>
+                    <li><a href="#manage-employee.html">Manage Employee</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="customer-list.html">Customer List</a></li>
+                    <li><a href="supplier-list.html">Supplier List</a></li>
+                    <li><a href="#customer_supplier-list.html">Customer & Supplier List</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-table"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="#sale.html">Sale</a></li>
+                    <li><a href="#sale-return.html">Sale Return</a></li>
+                    <li><a href="#sale-replace.html">Sale Replace</a></li>
+                    <li><a href="purchase.html">Purchase</a></li>
+                    <li><a href="#purchase-return.html">Purchase Return</a></li>
+                    <li><a href="#warranty-check.html">Warranty Check</a></li>
+                    <li><a href="#repair.html">Repair</a></li>
+                    <li><a href="#delivary.html">Delivary</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-bar-chart-o"></i> Accounts <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="#receive-collection.html">Receive & Collection</a></li>
+                    <li><a href="#payment.html">Payment</a></li>
+                    <li><a href="#cash-transfer.html">Cash Transfer</a></li>
+                    <li><a href="#amount-receivable.html">Amount Receivable</a></li>
+                    <li><a href="#amount-payable.html">Amount Payable</a></li>
+                    <li><a href="#expenses.html">Expenses</a></li>
+                    <li><a href="#adjustment.html">Adjustment</a></li>
+                    <li><a href="#bank-reconciliation.html">Bank Reconciliation</a></li>
+                    <li><a href="#transaction-posting.html">Transaction Posting</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="inventory-reports.html">Inventory Reports</a></li>
+                    <li><a href="account-reports.html">Account Reports</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+          <!-- /sidebar menu -->
+
+
+          <!-- /menu footer buttons -->
+          <div class="sidebar-footer hidden-small">
+            <a data-toggle="tooltip" data-placement="top" title="Settings">
+              <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+              <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Lock">
+              <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+            </a>
+          </div>
+          <!-- /menu footer buttons -->
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      <div class="top_nav">
+        <div class="nav_menu">
+          <nav>
+            <div class="nav toggle">
+              <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right">
+              <li class="">
+                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+                  aria-expanded="false">
+                  <img src="assets/images/samiul-photo.jpg" alt="">John Doe
+                  <span class=" fa fa-angle-down"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-usermenu pull-right">
+                  <li><a href="javascript:;"> Profile</a></li>
+                  <li>
+                    <a href="javascript:;">
+                      <span class="badge bg-red pull-right">50%</span>
+                      <span>App Settings</span>
+                    </a>
+                  </li>
+                  <li><a href="javascript:;">Help</a></li>
+                  <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                </ul>
+              </li>
+
+              <li role="presentation" class="dropdown">
+                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-envelope-o"></i>
+                  <span class="badge bg-green">6</span>
+                </a>
+                <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <div class="text-center">
+                      <a>
+                        <strong>See All Alerts</strong>
+                        <i class="fa fa-angle-right"></i>
+                      </a>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div id="page-content" class="right_col" role="main">
+
+        <!-- Page content here -->
+        <form action="#" id="purchase_form" data-parsley-validate="">
+          <!-- Purchase Details Secetion  -->
+          <div class="x_panel" style="width: 720px;">
+            <div class="x_title">
+              <h2>Puschase Details</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="row">
+                <div class="col">
+                  <!-- Purchase Date -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-8 col-sm-8 col-xs-8">
+                      <label for="single_cal4">Purchase Date * :</label>
+                      <input type="text" class="form-control has-feedback-left" id="single_cal4"
+                        placeholder="Select date" aria-describedby="inputSuccess2Status4">
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true"></span>
+                    </div>
+                  </div>
+                  <!-- Supplier Account -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-8 col-sm-8 col-xs-8">
+                      <label for="supplier">Supplier * :</label>
+                      <input type="hidden" value="" id="supplier_id">
+                      <input type="hidden" value="" id="supplier_account_code">
+                      <input type="hidden" value="" id="supplier_account_name">
+                      <select id="supplier" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Supplier Account</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
+                        aria-hidden="true"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
+                      <a class="btn btn-xs btn-primary" id="createSupplierBtn" style="color: white;">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Supplier</a>
+                    </div>
+                  </div>
+
+                  <!-- Category Info -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-8 col-sm-8 col-xs-8">
+                      <label for="category">Item Category * :</label>
+                      <input type="hidden" value="" id="category_id">
+                      <input type="hidden" value="" id="category_name">
+                      <select id="category" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Category</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1);"
+                        class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
+                      <a class="btn btn-xs btn-primary" id="createCategoryBtn" style="color: white;">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Category
+                      </a>
+                    </div>
+                  </div>
+                  <!-- Brand Info -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-8 col-sm-8 col-xs-8">
+                      <label for="brand">Item Brand * :</label>
+                      <input type="hidden" value="" id="brand_id">
+                      <input type="hidden" value="" id="brand_name">
+                      <select id="brand" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Brand</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1);"
+                        class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
+                      <a class="btn btn-xs btn-primary" id="createBrandBtn" style="color: white;">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Brand
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Item Info -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-8 col-sm-8 col-xs-8">
+                      <label for="item">Item Name * :</label>
+                      <select id="item" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Item</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1);"
+                        class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
+                      <a class="btn btn-xs btn-primary" id="createItemBtn" style="color: white;">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Item
+                      </a>
+                    </div>
+                  </div>
+                  <!-- </form> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Item Code Section -->
+          <div class="x_panel" style="width: 720px;">
+            <div class="x_title">
+              <h2>Item Code</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <a class="btn btn-dark" id="scanCodesBtn">Scan Item Code</a>
+              <a class="btn btn-dark" id="genRandomCodesBtn">Generate Random Code</a>
+            </div>
+          </div>
+          <br>
+          <!-- Payment Details  -->
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Payment Details</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="row">
+                <div class="col-md-6">
+                  <!-- Transaction Account -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="account">Account * :</label>
+                      <select id="account" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Account</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Chalan No -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="chalan_no">Chalan No * :</label>
+                      <input type="text" class="form-control has-feedback-left" id="chalan_no" placeholder="Chalan No">
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Memo No -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="memo_no">Memo No * :</label>
+                      <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No">
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Note -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="note">Note * :</label>
+                      <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+
+                  <!-- Bill Amount -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="bill_amount">Bill Amount * :</label>
+                      <input type="number" class="form-control has-feedback-left" id="bill_amount"
+                        placeholder="Bill Amount" required>
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Discount -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="discount">Discount * :</label>
+                      <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Total Amount -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="total_amount">Total Amount * :</label>
+                      <input type="number" class="form-control has-feedback-left" id="total_amount"
+                        placeholder="Total Amount">
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+                  <!-- Paid Amount -->
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                    <div class="col-md-9 col-sm-12 col-xs-12">
+                      <label for="paid_amount">Paid Amount * :</label>
+                      <input type="number" class="form-control has-feedback-left" id="paid_amount"
+                        placeholder="Paid Amount">
+                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                        aria-hidden="true">
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
+              <br>
+              <a id="submitBtn" class="btn btn-success">Save</a>
+              <a id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
+            </div>
+          </div>
+        </form>
+        <!-- /page content -->
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="assets/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="assets/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="assets/vendors/nprogress/nprogress.js"></script>
+    <!-- Chart.js -->
+    <script src="assets/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="assets/vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="assets/vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="assets/vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="assets/vendors/Flot/jquery.flot.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="assets/vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="assets/vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="assets/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="assets/vendors/moment/min/moment.min.js"></script>
+    <script src="assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="assets/js/custom.min.js"></script>
+    <script src="assets/js/app.js"></script>
+
+    <!-- sweetalert2 script -->
+    <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+
+    <script>
+
+
+      window.addEventListener("DOMContentLoaded", () => {
+        supplier = document.getElementById("supplier");
+        // TODO: Get the a list of supplier id , name and populate supplier div 
+        createSupplierBtn = document.getElementById("createSupplierBtn");
+        // TODO: Onclick ==> show a popup form to register new supplier
+        //for a successful registraion, autofill the the "supplier" field by current supplier id and name
+
+        category = document.getElementById("category");
+        // TODO: Get the a list of item category id , name and populate category div 
+        createCategoryBtn = document.getElementById("createCategoryBtn");
+        // TODO: Onclick ==> show a popup form to register new category
+        //for a successful registraion, autofill the the "category" field by current category id and name
+        brand = document.getElementById("brand");
+        // TODO: Get the a list of nramd id , name and populate category div 
+        createBrandBtn = document.getElementById("createBrandBtn");
+        // TODO: Onclick ==> show a popup form to register new category
+        //for a successful registraion, autofill the the "category" field by current category id and name
+
+        item = document.getElementById("item");
+        // TODO: Get the a list of item id , name and populate item div 
+        createItemBtn = document.getElementById("createItemBtn");
+        // TODO: Onclick ==> show a popup form to register new item
+        //for a successful registraion, autofill the the "item" field by current item id and name
+
+        scanCodesBtn = document.getElementById("scanCodesBtn");
+        //TODO: scan bar code for serial number or enter serial number manually
+        genRandomCodesBtn = document.getElementById("genRandomCodesBtn")
+        //TODO: show a popup, take two value :"numberOfItem", "codeLength" ==> generate random codes of lenght "codeLenght"
+
+        account = document.getElementById("account");
+        discount = document.getElementById("discount");
+        // TODO: Get the a list account info and populate account, discount div 
+
+
+        const requestOptions = {
+          method: 'post',
+        }
+        fetch('http://localhost:4321/api/inventory/purchase/getPageDetails', requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            if (data.error === true) {
+              document.getElementById("page-content").innerHTML = `
+                              <h4 class="text-info">Please contact to the app provider</h4>
+                              <br>
+                              <h4 class="text-danger">${data.error}</h4>
+                              `
+            } else {
+              console.log(data)
+              updateSupplierDiv(data.suppliers)
+              updateCategoryDiv(data.categories)
+              updateBrandDiv(data.brands)
+              //supplier
+              //category
+              //item
+              //account 
+
+            }
+          })
+
+
+
+      })
+
+
+      //updateSupplierDiv updates supplier selection options with the fetched data
+      function updateSupplierDiv(suppliers) {
+        supplier.innerHTML = '';
+
+        if (suppliers) {
+          supplier.innerHTML = `<option value="" selected disabled>Select Supplier Account</option>`;
+          suppliers.forEach(s => {
+            supplier.innerHTML += `<option value="${s.id}">${s.account_name}(${s.account_code})</option>`;
+          });
+        } else {
+          supplier.innerHTML = `<option value="" selected disabled>No Supplier Available. Create One</option>`;
+        }
+      }
+      //updateCategoryDiv updates category selection options with the fetched data 
+      function updateCategoryDiv(categories) {
+        category.innerHTML = '';
+
+        if (categories) {
+          category.innerHTML = `<option value="" selected disabled>Select Category</option>`;
+          categories.forEach(c => {
+            category.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+          });
+        } else {
+          category.innerHTML = `<option value="" selected disabled>No Category Available. Create One</option>`;
+        }
+      }
+      //updateBrandDiv updates category selection options with the fetched data 
+      function updateBrandDiv(brands) {
+        brand.innerHTML = '';
+
+        if (brands) {
+          brand.innerHTML = `<option value="" selected disabled>Select Brand</option>`;
+          brands.forEach(b => {
+            brand.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+          });
+          brand.innerHTML += `<option value="0">Non-Brand</option>`;
+        } else {
+          brand.innerHTML = `<option value="" selected disabled>No Brand Available. Create One</option>`;
+        }
+      }
+      createSupplierBtn.addEventListener("click", e => {
+        addNewSupplier("purchase");
+        supplier.disabled = true
+      });
+      createCategoryBtn.addEventListener("click", e => {
+        addNewCategory("purchase");
+        category.disabled = true;
+      });
+      createBrandBtn.addEventListener("click", e => {
+        addNewBrand("purchase");
+        brand.disabled = true;
+      });
+
+      // document.getElementById("supplier").addEventListener("change", e =>{
+      //   console.log(document.getElementById("supplier").value)
+      // })
+    </script>
+
+</body>
+
+</html>

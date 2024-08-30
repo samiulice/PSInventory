@@ -1,0 +1,157 @@
+package models
+
+import (
+	"time"
+)
+
+const (
+	// AustraliaRegex matches Australian mobile numbers with or without country code (+61)
+	AustraliaRegex = `^(\+?61|0)4\d{8}$`
+
+	// BangladeshRegex matches Bangladeshi mobile numbers with or without country code (+880)
+	BangladeshRegex = `^\+?(880)?1[3-9]\d{8}$`
+
+	// CanadaRegex matches Canadian phone numbers in various formats
+	CanadaRegex = `^(\+?1)?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$`
+
+	// FranceRegex matches French phone numbers with or without country code (+33)
+	FranceRegex = `^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$`
+
+	// GermanyRegex matches German phone numbers with or without country code (+49)
+	GermanyRegex = `^(\+?49|0)(\d{3,4})?[ -]?(\d{3,4})?[ -]?(\d{4,6})$`
+
+	// IndiaRegex matches Indian mobile numbers with or without country code (+91)
+	IndiaRegex = `^\+?(91)?\d{10}$`
+
+	// JapanRegex matches Japanese phone numbers with or without country code (+81)
+	JapanRegex = `^\+?81[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{4}$`
+
+	// PakistanRegex matches Pakistani mobile numbers with or without country code (+92)
+	PakistanRegex = `^\+?(92)?\d{10}$`
+
+	// SriLankaRegex matches Sri Lankan mobile numbers with or without country code (+94)
+	SriLankaRegex = `^\+?(94)?\d{9}$`
+
+	// UKRegex matches UK phone numbers including landline, mobile, and toll-free numbers
+	UKRegex = `^(?:(?:\+44\s?|0)(?:\d{5}\s?\d{5}|\d{4}\s?\d{4}\s?\d{4}|\d{3}\s?\d{3}\s?\d{4}|\d{2}\s?\d{4}\s?\d{4}|\d{4}\s?\d{4}|\d{4}\s?\d{3})|\d{5}\s?\d{4}\s?\d{4}|0800\s?\d{3}\s?\d{4})$`
+
+	// USRegex matches US phone numbers in various formats
+	USRegex = `^\+?1?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$`
+)
+
+// Employee is the type for employees
+type Employee struct {
+	ID            int    `json:"id,omitempty"`
+	AccountCode   string `json:"account_code,omitempty"`
+	AccountName   string `json:"account_name,omitempty"`
+	ContactPerson string `json:"contact_person,omitempty"`
+	// Gender                string         `json:"gender,omitempty"`
+	// DateOfBith            time.Time      `json:"date_of_birth,omitempty"`
+	// Experties        string         `json:"exparties,omitempty"`
+	Division string `json:"division,omitempty"`
+	District string `json:"district,omitempty"`
+	Upazila  string `json:"upazila,omitempty"`
+	Area     string `json:"area,omitempty"`
+	Mobile   string `json:"mobile,omitempty"`
+	Email    string `json:"email,omitempty"`
+	// ImageLink             string         `json:"image_link,omitempty"`        //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
+	MonthlySalary  int  `json:"monthly_salary,omitempty"`
+	OpeningBalance int  `json:"opening_balance,omitempty"`
+	// CVLink               string         `json:"cv_link,omitempty"`
+	// NIDLink               string         `json:"nid_link,omitempty"`
+	// KYCUploadStatus       string         `json:"kyc_upload_status,omitempty"`       // incomplete // completed
+	// KYCVerificationStatus string         `json:"kyc_verification_status,omitempty"` //unchecked;Verified; Info Mismatch
+	JoiningDate time.Time `json:"joining_date,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+// Brand is the type for Brand
+type Brand struct {
+	ID            int    `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+// Category is the type for Category
+type Category struct {
+	ID            int    `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+// Customer is the type for customers
+type Customer struct {
+	ID            int    `json:"id,omitempty"`
+	AccountCode   string `json:"account_code,omitempty"`
+	AccountName   string `json:"account_name,omitempty"`
+	ContactPerson string `json:"contact_person,omitempty"`
+	Division string `json:"division,omitempty"`
+	District string `json:"district,omitempty"`
+	Upazila  string `json:"upazila,omitempty"`
+	Area     string `json:"area,omitempty"`
+	Mobile   string `json:"mobile,omitempty"`
+	Email    string `json:"email,omitempty"`
+	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
+	Discount       int  `json:"discount,omitempty"`
+	OpeningBalance int  `json:"opening_balance,omitempty"`
+	JoiningDate time.Time `json:"joining_date,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+
+// Supplier is the type for suppliers
+type Supplier struct {
+	ID            int    `json:"id,omitempty"`
+	AccountCode   string `json:"account_code,omitempty"`
+	AccountName   string `json:"account_name,omitempty"`
+	ContactPerson string `json:"contact_person,omitempty"`
+	Division string `json:"division,omitempty"`
+	District string `json:"district,omitempty"`
+	Upazila  string `json:"upazila,omitempty"`
+	Area     string `json:"area,omitempty"`
+	Mobile   string `json:"mobile,omitempty"`
+	Email    string `json:"email,omitempty"`
+	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
+	Discount       int  `json:"discount,omitempty"`
+	JoiningDate time.Time `json:"joining_date,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+
+//................................................................
+
+// Order is the type for all orders
+type Order struct {
+	ID            int         `json:"id,omitempty"`
+	DatesID       int         `json:"dates_id,omitempty"`
+	TransactionID int         `json:"transaction_id,omitempty"`
+	CustomerID    int         `json:"customer_id,omitempty"`
+	StatusID      int         `json:"status_id,omitempty"` //Processing=1, Completed=2, Cancelled = 3
+	Quantity      int         `json:"quantity,omitempty"`
+	Amount        int         `json:"amount,omitempty"`
+	CreatedAt     time.Time   `json:"created_at,omitempty"`
+	UpdatedAt     time.Time   `json:"updated_at,omitempty"`
+	// Transaction   Transaction `json:"transaction,omitempty"`
+	Customer      Customer    `json:"customer,omitempty"`
+}
+
+
+// ................JSON Response model for invoice microservice........................
+// Order holds the necessary info to build invoice
+type Invoice struct {
+	ID        int              `json:"id,omitempty"`
+	FirstName string           `json:"first_name,omitempty"`
+	LastName  string           `json:"last_name,omitempty"`
+	Email     string           `json:"email,omitempty"`
+	CreatedAt time.Time        `json:"created_at,omitempty"`
+	Items     []InvoiceProduct `json:"items,omitempty"`
+}
+type InvoiceProduct struct {
+	ID       int    `json:"product_id,omitempty"`
+	Name     string `json:"product_name,omitempty"`
+	Quantity int    `json:"quantity,omitempty"`
+	Amount   int    `json:"amount,omitempty"`
+}
+
+//........................................................................................
