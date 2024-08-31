@@ -271,7 +271,7 @@ func (app *application) GetSuppliers(w http.ResponseWriter, r *http.Request) {
 
 // .....................Inventory Handlers......................
 
-//AddBrand Handles category adding process
+// AddBrand Handles category adding process
 func (app *application) AddBrand(w http.ResponseWriter, r *http.Request) {
 
 	var brand models.Brand
@@ -295,7 +295,7 @@ func (app *application) AddBrand(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-//AddCategory Handles category adding process
+// AddCategory Handles category adding process
 func (app *application) AddCategory(w http.ResponseWriter, r *http.Request) {
 
 	var category models.Category
@@ -319,6 +319,38 @@ func (app *application) AddCategory(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// AddCategory Handles category adding process
+func (app *application) AddItem(w http.ResponseWriter, r *http.Request) {
+
+	var item models.Item
+	err := app.readJSON(w, r, &item)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	//sanitize blank variables
+	code, err := app.DB.CountRows("items")
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	item.ItemCode = fmt.Sprintf("i-%06d", code)
+	item.ItemStatus = true
+
+	id, err := app.DB.AddItem(item)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	item.ID = id
+	var resp = JSONResponse{
+		Error:   false,
+		Message: "Category Added Succesfully",
+		Result:  item,
+	}
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // GetPageDetails scrape data from the database for init purchase page
 func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 	//supplier
@@ -330,31 +362,61 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 		Message    string             `json:"message,omitempty"`
 		Suppliers  []*models.Supplier `json:"suppliers,omitempty"`
 		Categories []*models.Category `json:"categories,omitempty"`
-		Brands []*models.Brand `json:"brands,omitempty"`
-		Items      []*models.Supplier `json:"items,omitempty"`
-		Accounts   []*models.Supplier `json:"account,omitempty"`
+		Brands     []*models.Brand    `json:"brands,omitempty"`
+		Items      []*models.Item     `json:"items,omitempty"`
+
+		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
 	}
 
+	//retrive suppliers from the database
 	suppliers, err := app.DB.GetSuppliersIDAndName()
-	if err != nil && err != sql.ErrNoRows {
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Supplier Available||"
+	} else if err != nil {
 		app.badRequest(w, err) //send error response
 		return
 	}
-	categories, err := app.DB.GetCategoryList()
-	if err != nil && err != sql.ErrNoRows {
-		resp.Error = true
-		resp.Message += err.Error()
+	//retrive categories from the database
+	categories, err := app.DB.GetAvailableCategories()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Category Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
 	}
-	brands, err := app.DB.GetBrandList()
-	if err != nil && err != sql.ErrNoRows {
-		resp.Error = true
-		resp.Message += err.Error()
+	//retrive brands from the database
+	brands, err := app.DB.GetAvailableBrands()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Brand Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
 	}
+	//retrive items from the database
+	items, err := app.DB.GetAvailableItems()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Item Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+	//retrive accounts from the database
+	headAccounts, err := app.DB.GetAvailableHeadAccounts()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Accounts Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//TODO: Retrive accounts and send to frontend
 	resp.Error = false
-	resp.Message = "data Succesfully fetched"
+	resp.Message += "||data Succesfully fetched||"
 	resp.Suppliers = suppliers
 	resp.Categories = categories
 	resp.Brands = brands
+	resp.Items = items
+	resp.HeadAccounts = headAccounts
 
 	app.writeJSON(w, http.StatusOK, resp)
 }

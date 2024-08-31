@@ -241,7 +241,7 @@
         <!-- Page content here -->
         <form action="#" id="purchase_form" data-parsley-validate="">
           <!-- Purchase Details Secetion  -->
-          <div class="x_panel" style="width: 720px;">
+          <div class="x_panel" style="width: 720px; height: 360px;">
             <div class="x_title">
               <h2>Puschase Details</h2>
               <div class="clearfix"></div>
@@ -293,23 +293,6 @@
                       </a>
                     </div>
                   </div>
-                  <!-- Brand Info -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-8 col-sm-8 col-xs-8">
-                      <label for="brand">Item Brand * :</label>
-                      <select id="brand" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Brand</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <span style="color: rgba(0, 0, 0, 1);"
-                        class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
-                    </div>
-                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
-                      <a class="btn btn-xs btn-primary" id="createBrandBtn" style="color: white;">
-                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Brand
-                      </a>
-                    </div>
-                  </div>
 
                   <!-- Item Info -->
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
@@ -334,14 +317,47 @@
             </div>
           </div>
           <!-- Item Code Section -->
-          <div class="x_panel" style="width: 720px;">
+          <div class="x_panel" style="width: 720px; height: 360px;">
             <div class="x_title">
-              <h2>Item Code</h2>
+              <h2>Items Serial No.</h2>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
-              <a class="btn btn-dark" id="scanCodesBtn">Scan Item Code</a>
-              <a class="btn btn-dark" id="genRandomCodesBtn">Generate Random Code</a>
+              <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="col-md-12 col-sm-12 col-xs-12">
+                    <label>Choose an option:</label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="btn btn-xs btn-dark" id="scanCodesBtn">
+                      <span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;Manual Input
+                    </a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a class="btn btn-xs btn-dark" id="genRandomCodesBtn">
+                      <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random
+                    </a>
+                    <input type="number" min="1" max="100" name="quantity" id="quantity" value="4">
+                    <a class="btn btn-xs btn-dark" id="quantityBtn">Confirm</a>
+                  </div>
+                </div>
+              </div>
+              <div class="clearfix"><br></div>
+              <!-- items serials no. input fields -->
+              <div id="items_serialNo">
+                <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback"></div>
+                <div class="col-md-3 col-sm-3 col-xs-3">
+                  <input type="text" class="form-control has-feedback-left" id="serialNo1" placeholder="">
+                </div>
+                <div class="col-md-3 col-sm-3 col-xs-3">
+                  <input type="text" class="form-control has-feedback-left" id="serialNo2" placeholder="">
+                </div>
+                <div class="col-md-3 col-sm-3 col-xs-3">
+                  <input type="text" class="form-control has-feedback-left" id="serialNo3" placeholder="">
+                </div>
+                <div class="col-md-3 col-sm-3 col-xs-3">
+                  <input type="text" class="form-control has-feedback-left" id="serialNo4" placeholder="">
+                </div>
+                <!-- More field will be added by DOM JS if needed  -->
+              </div>
             </div>
           </div>
           <br>
@@ -456,6 +472,13 @@
               <a id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
             </div>
           </div>
+
+          <!-- Warning: Delete this section after completing all the task -->
+          <div class="form-group">
+            <div class="row">
+              <div class="col" id="purchase_info"></div>
+            </div>
+          </div>
         </form>
         <!-- /page content -->
       </div>
@@ -508,6 +531,7 @@
 
     <script>
 
+      let items, brands;
 
       window.addEventListener("DOMContentLoaded", () => {
         supplier = document.getElementById("supplier");
@@ -521,11 +545,6 @@
         createCategoryBtn = document.getElementById("createCategoryBtn");
         // TODO: Onclick ==> show a popup form to register new category
         //for a successful registraion, autofill the the "category" field by current category id and name
-        brand = document.getElementById("brand");
-        // TODO: Get the a list of nramd id , name and populate category div 
-        createBrandBtn = document.getElementById("createBrandBtn");
-        // TODO: Onclick ==> show a popup form to register new category
-        //for a successful registraion, autofill the the "category" field by current category id and name
 
         item = document.getElementById("item");
         // TODO: Get the a list of item id , name and populate item div 
@@ -537,11 +556,17 @@
         //TODO: scan bar code for serial number or enter serial number manually
         genRandomCodesBtn = document.getElementById("genRandomCodesBtn")
         //TODO: show a popup, take two value :"numberOfItem", "codeLength" ==> generate random codes of lenght "codeLenght"
+        items_serialNo = document.getElementById("items_serialNo");
+        quantity = document.getElementById("quantity");
+        quantityBtn = document.getElementById("quantityBtn");
 
         account = document.getElementById("account");
         discount = document.getElementById("discount");
         // TODO: Get the a list account info and populate account, discount div 
 
+        submitBtn = document.getElementById("submitBtn");
+
+        invoiceBtn = document.getElementById("invoiceBtn");
 
         const requestOptions = {
           method: 'post',
@@ -553,25 +578,67 @@
               document.getElementById("page-content").innerHTML = `
                               <h4 class="text-info">Please contact to the app provider</h4>
                               <br>
-                              <h4 class="text-danger">${data.error}</h4>
+                              <h4 class="text-danger">${data.message}</h4>
                               `
             } else {
               console.log(data)
               updateSupplierDiv(data.suppliers)
               updateCategoryDiv(data.categories)
-              updateBrandDiv(data.brands)
-              //supplier
-              //category
-              //item
-              //account 
+              updateAccoutnsDiv(data.head_accounts)
+              //update item list based on selected category
+              category.addEventListener("change", e => {
+                item.innerHTML = '';
+                let isEmpty = true;
+                data.items.forEach(i => {
+                  if (i.category_id == category.value) {
+                    item.innerHTML += `<option value="${i.id}">${i.item_name}</option>`;
+                    isEmpty = false;
+                  }
+                })
 
+                if (isEmpty === true) {
+                  let text = category.options[category.selectedIndex].text;
+                  item.innerHTML = `<option value="" selected disabled>No ${text} Available.</option>`;
+                  item.discount = true;
+                }
+
+              });
+              createSupplierBtn.addEventListener("click", e => {
+                addNewSupplier("purchase");
+              });
+              createCategoryBtn.addEventListener("click", e => {
+                addNewCategory("purchase");
+              });
+              createItemBtn.addEventListener("click", e => {
+                addNewItem("purchase", data.brands, data.categories);
+              });
+              quantity.addEventListener("change", e => {
+                let q = parseInt(quantity.value);
+                updateItemSerialField(q);
+              });
+
+              //Warning: Delete this section after completing all task in this page
+              submitBtn.addEventListener("click", e => {
+                let purchase_details = {
+                  purchase_date: single_cal4.value,
+                  supplier: supplier.value,
+                  category: category.value,
+                  item: item.value,
+                }
+                let text1 = supplier.options[supplier.selectedIndex].text;
+                let text2 = category.options[category.selectedIndex].text;
+                let text3 = item.options[item.selectedIndex].text;
+
+                document.getElementById('purchase_info').innerText =
+                  `${purchase_details.purchase_date}
+                                                                      ${text1}
+                                                                      ${text2}
+                                                                      ${text3}`;
+              })
+              //account 
             }
           })
-
-
-
       })
-
 
       //updateSupplierDiv updates supplier selection options with the fetched data
       function updateSupplierDiv(suppliers) {
@@ -586,6 +653,7 @@
           supplier.innerHTML = `<option value="" selected disabled>No Supplier Available. Create One</option>`;
         }
       }
+      
       //updateCategoryDiv updates category selection options with the fetched data 
       function updateCategoryDiv(categories) {
         category.innerHTML = '';
@@ -593,38 +661,44 @@
         if (categories) {
           category.innerHTML = `<option value="" selected disabled>Select Category</option>`;
           categories.forEach(c => {
-            category.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            category.innerHTML += `<option value=${c.id}>${c.name}</option>`;
           });
         } else {
           category.innerHTML = `<option value="" selected disabled>No Category Available. Create One</option>`;
         }
       }
-      //updateBrandDiv updates category selection options with the fetched data 
-      function updateBrandDiv(brands) {
-        brand.innerHTML = '';
 
-        if (brands) {
-          brand.innerHTML = `<option value="" selected disabled>Select Brand</option>`;
-          brands.forEach(b => {
-            brand.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+      //updateAccoutnsDiv updates account selection options with the fetched data 
+      function updateAccoutnsDiv(accoutns) {
+        account.innerHTML = '';
+
+        if (accoutns) {
+          account.innerHTML = `<option value="" selected disabled>Select Account</option>`;
+          accoutns.forEach(ac => {
+            account.innerHTML += `<option value=${ac.id}>${ac.account_name}</option>`;
           });
-          brand.innerHTML += `<option value="0">Non-Brand</option>`;
         } else {
-          brand.innerHTML = `<option value="" selected disabled>No Brand Available. Create One</option>`;
+          account.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
         }
       }
-      createSupplierBtn.addEventListener("click", e => {
-        addNewSupplier("purchase");
-        // supplier.disabled = true
-      });
-      createCategoryBtn.addEventListener("click", e => {
-        addNewCategory("purchase");
-        // category.disabled = true;
-      });
-      createBrandBtn.addEventListener("click", e => {
-        addNewBrand("purchase");
-        // brand.disabled = true;
-      });
+
+      //updateItemSerialField adds input field as needed
+      function updateItemSerialField(quantity) {
+        if (quantity > 0) {
+          items_serialNo.innerHTML = `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
+          for (let i = 0; i < quantity; i++) {
+            items_serialNo.innerHTML += `
+                  <div class="col-md-3 col-sm-3 col-xs-3">
+                    <input type="text" class="form-control" id="serialNo-${i}" placeholder="">
+                  </div>
+                `
+            if (i % 4 === 3) {
+              items_serialNo.innerHTML += `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
+            }
+          } 
+        }
+      }
+
 
       // document.getElementById("supplier").addEventListener("change", e =>{
       //   console.log(document.getElementById("supplier").value)

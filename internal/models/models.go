@@ -39,33 +39,6 @@ const (
 	USRegex = `^\+?1?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$`
 )
 
-// Employee is the type for employees
-type Employee struct {
-	ID            int    `json:"id,omitempty"`
-	AccountCode   string `json:"account_code,omitempty"`
-	AccountName   string `json:"account_name,omitempty"`
-	ContactPerson string `json:"contact_person,omitempty"`
-	// Gender                string         `json:"gender,omitempty"`
-	// DateOfBith            time.Time      `json:"date_of_birth,omitempty"`
-	// Experties        string         `json:"exparties,omitempty"`
-	Division string `json:"division,omitempty"`
-	District string `json:"district,omitempty"`
-	Upazila  string `json:"upazila,omitempty"`
-	Area     string `json:"area,omitempty"`
-	Mobile   string `json:"mobile,omitempty"`
-	Email    string `json:"email,omitempty"`
-	// ImageLink             string         `json:"image_link,omitempty"`        //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
-	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
-	MonthlySalary  int  `json:"monthly_salary,omitempty"`
-	OpeningBalance int  `json:"opening_balance,omitempty"`
-	// CVLink               string         `json:"cv_link,omitempty"`
-	// NIDLink               string         `json:"nid_link,omitempty"`
-	// KYCUploadStatus       string         `json:"kyc_upload_status,omitempty"`       // incomplete // completed
-	// KYCVerificationStatus string         `json:"kyc_verification_status,omitempty"` //unchecked;Verified; Info Mismatch
-	JoiningDate time.Time `json:"joining_date,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
-}
 // Brand is the type for Brand
 type Brand struct {
 	ID            int    `json:"id,omitempty"`
@@ -98,6 +71,59 @@ type Customer struct {
 	JoiningDate time.Time `json:"joining_date,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+// Employee is the type for employees
+type Employee struct {
+	ID            int    `json:"id,omitempty"`
+	AccountCode   string `json:"account_code,omitempty"`
+	AccountName   string `json:"account_name,omitempty"`
+	ContactPerson string `json:"contact_person,omitempty"`
+	// Gender                string         `json:"gender,omitempty"`
+	// DateOfBith            time.Time      `json:"date_of_birth,omitempty"`
+	// Experties        string         `json:"exparties,omitempty"`
+	Division string `json:"division,omitempty"`
+	District string `json:"district,omitempty"`
+	Upazila  string `json:"upazila,omitempty"`
+	Area     string `json:"area,omitempty"`
+	Mobile   string `json:"mobile,omitempty"`
+	Email    string `json:"email,omitempty"`
+	// ImageLink             string         `json:"image_link,omitempty"`        //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
+	MonthlySalary  int  `json:"monthly_salary,omitempty"`
+	OpeningBalance int  `json:"opening_balance,omitempty"`
+	// CVLink               string         `json:"cv_link,omitempty"`
+	// NIDLink               string         `json:"nid_link,omitempty"`
+	// KYCUploadStatus       string         `json:"kyc_upload_status,omitempty"`       // incomplete // completed
+	// KYCVerificationStatus string         `json:"kyc_verification_status,omitempty"` //unchecked;Verified; Info Mismatch
+	JoiningDate time.Time `json:"joining_date,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+
+//Item is the type for items
+type HeadAccount struct{
+	ID int `json:"id,omitempty"`
+	AccountCode   string `json:"account_code,omitempty"`
+	AccountName   string `json:"account_name,omitempty"`
+	AccoutnStatus bool `json:"account_status,omitempty"`
+	CurrentAmount int `json:"current_amount,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+}
+//Item is the type for items
+type Item struct{
+	ID int `json:"id,omitempty"`
+	ItemCode string `json:"item_code,omitempty"`
+	ItemName string `json:"item_name,omitempty"`
+	ItemDescription string `json:"item_description,omitempty"`
+	ItemStatus bool `json:"item_status,omitempty"`
+	Quantity int `json:"quantity,omitempty"`
+	CategoryID int `json:"category_id,omitempty"`
+	BrandID int `json:"brand_id,omitempty"`
+	Discount int `json:"discount,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	Brand Brand `json:"brand,omitempty"`
 }
 
 // Supplier is the type for suppliers

@@ -223,7 +223,7 @@ function showSuccessMessage(message) {
 }
 
 // Show error message function
-function showErrorMessage(msg) {
+function showErrorMessage(message) {
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -237,7 +237,7 @@ function showErrorMessage(msg) {
   });
   Toast.fire({
     icon: "error",
-    title: msg,
+    title: message,
   });
 }
 
@@ -349,10 +349,177 @@ function addNewBrand(page) {
             showErrorMessage(data.message)
           } else {
             showSuccessMessage(data.message);
-            if (page === "purchase"){
-              document.getElementById("brand").innerHTML =  '';
-              document.getElementById("brand").innerHTML =  `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
-              document.getElementById("brand").disabled =  true;
+            if (page === "purchase") {
+              document.getElementById("brand").innerHTML = '';
+              document.getElementById("brand").innerHTML = `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
+              document.getElementById("brand").disabled = true;
+            }
+          }
+        });
+    }
+  });
+}
+//addNewItem show a popup form and then make an api call to insert iten data to the database table
+function addNewItem(page, brands, categories) {
+  let brandList = '';
+  let categoryList = '';
+  if (brands) {
+    brandList += `<select id="brand" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select brand</option>`
+    brands.forEach(b => {
+      brandList += `<option value="${b.id}">${b.name}</option>`;
+    })
+    brandList += '</select>';
+  }
+  if (categories) {
+    categoryList += `<select id="category" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select category</option>`
+    categories.forEach(c => {
+      categoryList += `<option value="${c.id}">${c.name}</option>`;
+    })
+    categoryList += '</select>';
+  }
+  let htmlContent = `
+      <div class="x_panel">
+          <div class="x_content">
+              <form id="add-item" class="needs-validation" novalidate>
+                  <!-- Item Name -->
+                  <div class="col-6 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" id="name" name="name"
+                          placeholder="Item Name" autocomplete="off" required>
+                      <div class="invalid-feedback d-none text-danger">Please enter the item name.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                  </div>
+                  <div class="col-6 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" id="description" name="description"
+                          placeholder="Item Description(Optional)" autocomplete="off">
+                      <div class="invalid-feedback d-none text-danger">Please enter the item name.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                  </div>
+                  <div class="col-6 form-group has-feedback">` + categoryList +
+    `<span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-list" aria-hidden="true"></span>
+                  </div>
+                  <div class="col-6 form-group has-feedback">` + brandList +
+    `<span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-tags" aria-hidden="true"></span>
+                  </div>
+                  <!-- Sale Discount -->
+                  <div class="col-4 form-group has-feedback">
+                      <input type="number" class="form-control has-feedback-left" id="discount" name="discount"
+                          placeholder="discount(%)" min="0" max="100" autocomplete="off">
+                      <div class="invalid-feedback d-none text-danger">Enter value between 0 to 100.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-gift" aria-hidden="true"></span>
+                  </div>
+                  <div class="form-group">
+                    <div id="btns" class="col-4">
+                        <br>
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+        `;
+  Swal.fire({
+    title: 'Add New item',
+    width: 600,
+    html: htmlContent,
+    showCloseButton: true,
+    showConfirmButton: false,
+    showCancelButton: false,
+    allowOutsideClick: false,
+    preConfirm: () => {
+      return new Promise((resolve) => {
+        const form = document.getElementById('add-item');
+        const formFields = form.querySelectorAll('.form-control, .form-select');
+        let isValid = true;
+
+        // Reset all feedback messages
+        form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+          feedback.classList.add('d-none');
+        });
+
+        // Check each field
+        formFields.forEach(field => {
+          if (!field.checkValidity()) {
+            isValid = false;
+            const feedback = field.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+              feedback.classList.remove('d-none');
+            }
+          }
+        });
+
+        if (isValid) {
+          resolve({
+            name: form.name.value,
+            description: form.description.value,
+            brand_id: form.brand.value,
+            category_id: form.category.value,
+            discount: form.discount.value,
+          });
+        } else {
+          Swal.showValidationMessage('Please correct the errors in the form.');
+        }
+      });
+    },
+    willOpen: () => {
+      const form = document.getElementById('add-item');
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+          feedback.classList.add('d-none');
+        });
+        let isValid = true;
+        form.querySelectorAll('.form-control, .form-select').forEach(field => {
+          if (!field.checkValidity()) {
+            isValid = false;
+            const feedback = field.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+              feedback.classList.remove('d-none');
+            }
+          }
+        });
+        if (isValid) {
+          Swal.getConfirmButton().click();
+        } else {
+          Swal.showValidationMessage('Please correct the errors in the form.');
+        }
+      });
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const data = result.value;
+      let item = {
+        item_name: data.name,
+        item_description: data.description,
+        brand_id: parseInt(data.brand_id),
+        category_id: parseInt(data.category_id),
+        discount: parseInt(data.discount),
+      }
+      const requestOptions = {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(item),
+      }
+      console.log(item)
+
+      fetch('http://localhost:4321/api/inventory/add-item', requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          if (data.error === true) {
+            showErrorMessage(data.message)
+          } else {
+            showSuccessMessage(data.message);
+
+            if (page === "purchase") {
+              document.getElementById("item").innerHTML = '';
+              document.getElementById("item").innerHTML = `<option value="${data.result.id}" selected>${data.result.item_name}</option>`;;
+              document.getElementById("item").disabled = true;
             }
           }
         });
@@ -467,10 +634,10 @@ function addNewCategory(page) {
             showErrorMessage(data.message)
           } else {
             showSuccessMessage(data.message);
-            if (page === "purchase"){
-              document.getElementById("category").innerHTML =  '';
-              document.getElementById("category").innerHTML =  `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
-              document.getElementById("category").disabled =  true;
+            if (page === "purchase") {
+              document.getElementById("category").innerHTML = '';
+              document.getElementById("category").innerHTML = `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
+              document.getElementById("category").disabled = true;
             }
           }
         });
@@ -694,7 +861,7 @@ function addNewCustomer(page) {
       fetch('http://localhost:4321/api/mis/add-customer', requestOptions)
         .then(response => response.json())
         .then(data => {
-          if(page === ""){
+          if (page === "") {
             setTimeout(function () {
               location.reload();
             }, 3000); // Adjust the delay as needed 
@@ -702,7 +869,7 @@ function addNewCustomer(page) {
           if (data.error === true) {
             showErrorMessage(data.message)
           } else {
-            showSuccessMessage(data.message);            
+            showSuccessMessage(data.message);
           }
         });
     }
@@ -925,7 +1092,7 @@ function addNewEmployee(page) {
       fetch('http://localhost:4321/api/hr/add-employee', requestOptions)
         .then(response => response.json())
         .then(data => {
-          if(page === ""){
+          if (page === "") {
             setTimeout(function () {
               location.reload();
             }, 3000); // Adjust the delay as needed 
@@ -1147,7 +1314,7 @@ function addNewSupplier(page) {
       fetch('http://localhost:4321/api/mis/add-supplier', requestOptions)
         .then(response => response.json())
         .then(data => {
-          if(page === ""){
+          if (page === "") {
             setTimeout(function () {
               location.reload();
             }, 3000); // Adjust the delay as needed 
@@ -1156,10 +1323,10 @@ function addNewSupplier(page) {
             showErrorMessage(data.message)
           } else {
             showSuccessMessage(data.message);
-            if (page === "purchase"){
-              document.getElementById("supplier").innerHTML =  '';
-              document.getElementById("supplier").innerHTML =  `<option value="${data.result.id}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
-              document.getElementById("supplier").disabled =  true;
+            if (page === "purchase") {
+              document.getElementById("supplier").innerHTML = '';
+              document.getElementById("supplier").innerHTML = `<option value="${data.result.id}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
+              document.getElementById("supplier").disabled = true;
             }
           }
         });

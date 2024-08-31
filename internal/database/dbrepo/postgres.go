@@ -8,6 +8,77 @@ import (
 	"time"
 )
 
+
+
+//.......................HR Management.......................
+
+// AddHeadAccount inserts new head account information to the database
+func (p *postgresDBRepo) AddHeadAccount(ha models.HeadAccount) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var id int
+
+	stmt := `INSERT INTO public.head_accounts (account_code,account_name,account_status,current_amount,created_at,updated_at) 
+				VALUES($1, $2, $3, $4, $5, $6) RETURNING id
+	`
+	err := p.DB.QueryRowContext(ctx, stmt,
+		ha.AccountCode,
+		ha.AccountName,
+		ha.AccoutnStatus,
+		ha.CurrentAmount,
+		time.Now(),
+		time.Now(),
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+// GetAvailableBrands returns a list of active brands from the database
+func (p *postgresDBRepo) GetAvailableHeadAccounts()([]*models.HeadAccount, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var headAccounts []*models.HeadAccount
+
+	query := `
+		SELECT 
+			id, account_code, account_name, current_amount, created_at, updated_at
+		FROM
+			public.head_accounts
+		WHERE 
+			account_status = true
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return headAccounts, errors.New("100: " + err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var ha models.HeadAccount
+		err = rows.Scan(
+			&ha.ID,
+			&ha.AccountCode,
+			&ha.AccountName,
+			&ha.CurrentAmount,
+			&ha.CreatedAt,
+			&ha.UpdatedAt,
+		)
+		if err != nil {
+			return headAccounts, err
+		}
+		headAccounts = append(headAccounts, &ha)
+	}
+	return headAccounts, nil
+}
+
+
 //.......................HR Management.......................
 
 // AddEmployee inserts new employee information to the database
@@ -42,7 +113,6 @@ func (p *postgresDBRepo) AddEmployee(employee models.Employee) (int, error) {
 	}
 
 	return id, nil
-
 }
 
 // GetEmployeeDetails retrive detailed info about an employee
@@ -461,7 +531,7 @@ func (p *postgresDBRepo) AddBrand(b models.Brand) (int, error) {
 	var id int
 
 	stmt := `INSERT INTO public.brands (name,created_at,updated_at) 
-				VALUES($1, $2, $3) RETURNING id
+				VALUES($1, $2, $3, $4) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		b.Name,
@@ -485,7 +555,43 @@ func (p *postgresDBRepo) GetBrandList()([]*models.Brand, error) {
 		SELECT 
 			id, name, created_at, updated_at
 		FROM
-			brands
+			public.brands
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return brands, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var b models.Brand
+		err = rows.Scan(
+			&b.ID,
+			&b.Name,
+			&b.CreatedAt,
+			&b.UpdatedAt,
+		)
+		if err != nil {
+			return brands, err
+		}
+		brands = append(brands, &b)
+	}
+	return brands, nil
+}
+// GetAvailableBrands returns a list of active brands from the database
+func (p *postgresDBRepo) GetAvailableBrands()([]*models.Brand, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var brands []*models.Brand
+
+	query := `
+		SELECT 
+			id, name, created_at, updated_at
+		FROM
+			public.brands
 		WHERE 
 			status = '1'
 		`
@@ -547,6 +653,42 @@ func (p *postgresDBRepo) GetCategoryList()([]*models.Category, error) {
 			id, name, created_at, updated_at
 		FROM
 			categories
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return categories, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c models.Category
+		err = rows.Scan(
+			&c.ID,
+			&c.Name,
+			&c.CreatedAt,
+			&c.UpdatedAt,
+		)
+		if err != nil {
+			return categories, err
+		}
+		categories = append(categories, &c)
+	}
+	return categories, nil
+}
+// GetAvailableCategories returns a list of active categories from the database
+func (p *postgresDBRepo) GetAvailableCategories()([]*models.Category, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var categories []*models.Category
+
+	query := `
+		SELECT 
+			id, name, created_at, updated_at
+		FROM
+			categories
 		WHERE 
 			status = '1'
 		`
@@ -573,6 +715,220 @@ func (p *postgresDBRepo) GetCategoryList()([]*models.Category, error) {
 		categories = append(categories, &c)
 	}
 	return categories, nil
+}
+
+// AddCategory inserts new product category to the database
+func (p *postgresDBRepo) AddItem(i models.Item) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var id int
+
+	stmt := `INSERT INTO public.items (item_code, item_name, item_description, item_status, quantity, category_id, brand_id, discount, created_at, updated_at) 
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id
+	`
+	err := p.DB.QueryRowContext(ctx, stmt,
+		i.ItemCode,
+		i.ItemName,
+		i.ItemDescription,
+		i.ItemStatus,
+		i.Quantity,
+		i.CategoryID,
+		i.BrandID,
+		i.Discount,
+		time.Now(),
+		time.Now(),
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+// GetItemList returns a list of all items from the database
+func (p *postgresDBRepo) GetItemList()([]*models.Item, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var items []*models.Item
+
+	query := `
+		SELECT 
+			i.id, i.item_code, i.item_name, i.item_description, i.item_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+		FROM 
+			public.items i
+			INNER JOIN brands b ON (b.id = i.category_id); 
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.Item
+		err = rows.Scan(
+			&i.ID,
+			&i.ItemCode,
+			&i.ItemName,
+			&i.ItemDescription,
+			&i.ItemStatus,
+			&i.Quantity,
+			&i.CategoryID,
+			&i.BrandID,
+			&i.Discount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Brand.ID,
+			&i.Brand.Name,
+		)
+		if err != nil {
+			return items, err
+		}
+		items = append(items, &i)
+	}
+	return items, nil
+}
+// GetAvailableItems returns a list of in-stock and active item from the database
+func (p *postgresDBRepo)GetAvailableItems()([]*models.Item, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var items []*models.Item
+
+	query := `
+		SELECT 
+			i.id, i.item_code, i.item_name, i.quantity, i.category_id, i.discount, b.id, b.name
+		FROM 
+			public.items i
+			INNER JOIN brands b ON (b.id = i.category_id)
+		WHERE 
+			item_status = true AND quantity > 0; 
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.Item
+		err = rows.Scan(
+			&i.ID,
+			&i.ItemCode,
+			&i.ItemName,
+			&i.Quantity,
+			&i.CategoryID,
+			&i.Discount,
+			&i.Brand.ID,
+			&i.Brand.Name,
+		)
+		if err != nil {
+			return items, err
+		}
+		items = append(items, &i)
+	}
+	return items, nil
+}
+// GetAvailableItems returns a list of details info in-stock and active item from the database
+func (p *postgresDBRepo)GetAvailableItemsDetails()([]*models.Item, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var items []*models.Item
+
+	query := `
+		SELECT 
+			i.id, i.item_code, i.item_name, i.item_description, i.item_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+		FROM 
+			public.items i
+			INNER JOIN brands b ON (b.id = i.category_id)
+		WHERE 
+			item_status = true AND quantity > 0; 
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.Item
+		err = rows.Scan(
+			&i.ID,
+			&i.ItemCode,
+			&i.ItemName,
+			&i.ItemDescription,
+			&i.ItemStatus,
+			&i.Quantity,
+			&i.CategoryID,
+			&i.BrandID,
+			&i.Discount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Brand.ID,
+			&i.Brand.Name,
+		)
+		if err != nil {
+			return items, err
+		}
+		items = append(items, &i)
+	}
+	return items, nil
+}
+// GetAvailableItemsByCategoryID returns a list of in-stock and active item that related to category ID from the database
+func (p *postgresDBRepo)GetAvailableItemsByCategoryID(cat_id int)([]*models.Item, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var items []*models.Item
+
+	query := `
+		SELECT 
+			i.id, i.item_code, i.item_name, i.item_description, i.item_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+		FROM 
+			public.items i
+			INNER JOIN brands b ON (b.id = i.category_id)
+		WHERE 
+			item_status = true AND quantity > 0 AND category_id = $1; 
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query, cat_id)
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.Item
+		err = rows.Scan(
+			&i.ID,
+			&i.ItemCode,
+			&i.ItemName,
+			&i.ItemDescription,
+			&i.ItemStatus,
+			&i.Quantity,
+			&i.CategoryID,
+			&i.BrandID,
+			&i.Discount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Brand.ID,
+			&i.Brand.Name,
+		)
+		if err != nil {
+			return items, err
+		}
+		items = append(items, &i)
+	}
+	return items, nil
 }
 
 // Helper functions
