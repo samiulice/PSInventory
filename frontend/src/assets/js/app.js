@@ -360,7 +360,7 @@ function addNewBrand(page) {
   });
 }
 //addNewItem show a popup form and then make an api call to insert iten data to the database table
-function addNewItem(page, brands, categories) {
+function addNewItem(page, brands, categories, items) {
   let brandList = '';
   let categoryList = '';
   if (brands) {
@@ -520,6 +520,7 @@ function addNewItem(page, brands, categories) {
               document.getElementById("item").innerHTML = '';
               document.getElementById("item").innerHTML = `<option value="${data.result.id}" selected>${data.result.item_name}</option>`;;
               document.getElementById("item").disabled = true;
+              items.push(data.result);
             }
           }
         });
@@ -527,7 +528,7 @@ function addNewItem(page, brands, categories) {
   });
 }
 //addNewCategory show a popup form and then make an api call to insert category data to the database table
-function addNewCategory(page) {
+function addNewCategory(page, categories) {
   Swal.fire({
     title: 'Add Product Category',
     width: 600,
@@ -638,6 +639,7 @@ function addNewCategory(page) {
               document.getElementById("category").innerHTML = '';
               document.getElementById("category").innerHTML = `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
               document.getElementById("category").disabled = true;
+              categories.push(data.result);
             }
           }
         });

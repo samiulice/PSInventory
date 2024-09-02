@@ -345,7 +345,7 @@ func (app *application) AddItem(w http.ResponseWriter, r *http.Request) {
 	item.ID = id
 	var resp = JSONResponse{
 		Error:   false,
-		Message: "Category Added Succesfully",
+		Message: "Item Added Succesfully",
 		Result:  item,
 	}
 	app.writeJSON(w, http.StatusOK, resp)

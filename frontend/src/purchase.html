@@ -34,7 +34,7 @@
 <body class="nav-md">
   <div class="container body">
     <div class="main_container">
-      <div class="col-md-3 left_col">
+      <div class="col-md-3 left_col menu_fixed">
         <div class="left_col scroll-view">
           <div class="navbar nav_title" style="border: 0;">
             <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Company Name</span></a>
@@ -241,17 +241,17 @@
         <!-- Page content here -->
         <form action="#" id="purchase_form" data-parsley-validate="">
           <!-- Purchase Details Secetion  -->
-          <div class="x_panel" style="width: 720px; height: 360px;">
-            <div class="x_title">
-              <h2>Puschase Details</h2>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <div class="row">
-                <div class="col">
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <div class="x_panel" style="min-width: 420px; min-height: 360px;">
+              <div class="x_title">
+                <h2>Puschase Details</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div class="row">
                   <!-- Purchase Date -->
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-8 col-sm-8 col-xs-8">
+                    <div class="col-md-9 col-sm-8 col-xs-8">
                       <label for="single_cal4">Purchase Date * :</label>
                       <input type="text" class="form-control has-feedback-left" id="single_cal4"
                         placeholder="Select date" aria-describedby="inputSuccess2Status4">
@@ -261,7 +261,7 @@
                   </div>
                   <!-- Supplier Account -->
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-8 col-sm-8 col-xs-8">
+                    <div class="col-md-9 col-sm-8 col-xs-8">
                       <label for="supplier">Supplier * :</label>
                       <select id="supplier" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Supplier Account</option>
@@ -270,7 +270,7 @@
                       <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
                         aria-hidden="true"></span>
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
+                    <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
                       <a class="btn btn-xs btn-primary" id="createSupplierBtn" style="color: white;">
                         <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Supplier</a>
                     </div>
@@ -278,7 +278,7 @@
 
                   <!-- Category Info -->
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-8 col-sm-8 col-xs-8">
+                    <div class="col-md-9 col-sm-8 col-xs-8">
                       <label for="category">Item Category * :</label>
                       <select id="category" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Category</option>
@@ -287,7 +287,7 @@
                       <span style="color: rgba(0, 0, 0, 1);"
                         class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
+                    <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
                       <a class="btn btn-xs btn-primary" id="createCategoryBtn" style="color: white;">
                         <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Category
                       </a>
@@ -296,7 +296,7 @@
 
                   <!-- Item Info -->
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-8 col-sm-8 col-xs-8">
+                    <div class="col-md-9 col-sm-8 col-xs-8">
                       <label for="item">Item Name * :</label>
                       <select id="item" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Item</option>
@@ -305,166 +305,173 @@
                       <span style="color: rgba(0, 0, 0, 1);"
                         class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-top: 28px;">
+                    <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
                       <a class="btn btn-xs btn-primary" id="createItemBtn" style="color: white;">
                         <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Item
                       </a>
                     </div>
                   </div>
-                  <!-- </form> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Payment Details  -->
+          <div class="col-md-8 col-sm-8 col-xs-8">
+            <div class="x_panel" style="min-width: 600px; min-height: 360px;">
+              <div class="x_title">
+                <h2>Payment Details</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div class="row">
+                  <div class="col-md-6 col-sm-6 col-xs-6">
+                    <div class="row">
+                      <!-- Transaction Account -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="account">Account * :</label>
+                          <select id="account" class="form-control form-select has-feedback-left" required>
+                            <option value="" selected disabled>Select Account</option>
+                            <!--Updated by JS DOM -->
+                          </select>
+                          <span style="color: rgba(0, 0, 0, 1);"
+                            class="form-control-feedback left glyphicon glyphicon-user" aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Chalan No -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="chalan_no">Chalan No * :</label>
+                          <input type="text" class="form-control has-feedback-left" id="chalan_no"
+                            placeholder="Chalan No">
+                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                            aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+                      <!-- Memo No -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="memo_no">Memo No * :</label>
+                          <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No">
+                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                            aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+                      <!-- Note -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="note">Note * :</label>
+                          <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
+                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                            aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-sm-6 col-xs-6">
+                    <div class="row">
+                      <!-- Bill Amount -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="bill_amount">Bill Amount * :</label>
+                          <input type="number" class="form-control has-feedback-left" id="bill_amount"
+                            placeholder="Bill Amount" required>
+                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                            aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+                      <!-- Discount -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="discount">Discount * :</label>
+                          <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
+                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                            aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+                      <!-- Total Amount -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="total_amount">Total Amount * :</label>
+                          <input type="number" class="form-control has-feedback-left" id="total_amount"
+                            placeholder="Total Amount">
+                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                            aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+                      <!-- Paid Amount -->
+                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                        <div class="col-md-10 col-sm-12 col-xs-12">
+                          <label for="paid_amount">Paid Amount * :</label>
+                          <input type="number" class="form-control has-feedback-left" id="paid_amount"
+                            placeholder="Paid Amount">
+                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                            aria-hidden="true">
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <!-- Item Code Section -->
-          <div class="x_panel" style="width: 720px; height: 360px;">
-            <div class="x_title">
-              <h2>Items Serial No.</h2>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel" style="min-width: 720px;">
+              <div class="x_title">
+                <h2>Items Serial No.</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div class="row">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label>Choose an option:</label>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <a class="btn btn-xs btn-dark" id="scanCodesBtn">
-                      <span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;Manual Input
-                    </a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <a class="btn btn-xs btn-dark" id="genRandomCodesBtn">
-                      <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random
-                    </a>
-                    <input type="number" min="1" max="100" name="quantity" id="quantity" value="4">
-                    <a class="btn btn-xs btn-dark" id="quantityBtn">Confirm</a>
-                  </div>
-                </div>
-              </div>
-              <div class="clearfix"><br></div>
-              <!-- items serials no. input fields -->
-              <div id="items_serialNo">
-                <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback"></div>
-                <div class="col-md-3 col-sm-3 col-xs-3">
-                  <input type="text" class="form-control has-feedback-left" id="serialNo1" placeholder="">
-                </div>
-                <div class="col-md-3 col-sm-3 col-xs-3">
-                  <input type="text" class="form-control has-feedback-left" id="serialNo2" placeholder="">
-                </div>
-                <div class="col-md-3 col-sm-3 col-xs-3">
-                  <input type="text" class="form-control has-feedback-left" id="serialNo3" placeholder="">
-                </div>
-                <div class="col-md-3 col-sm-3 col-xs-3">
-                  <input type="text" class="form-control has-feedback-left" id="serialNo4" placeholder="">
-                </div>
-                <!-- More field will be added by DOM JS if needed  -->
-              </div>
-            </div>
-          </div>
-          <br>
-          <!-- Payment Details  -->
-          <div class="x_panel">
-            <div class="x_title">
-              <h2>Payment Details</h2>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <div class="row">
-                <div class="col-md-6">
-                  <!-- Transaction Account -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="account">Account * :</label>
-                      <select id="account" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Account</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
-                        aria-hidden="true">
-                      </span>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                      <label for="quantity">Total items:</label>
+                      <input type="number" min="1" max="100" name="quantity" id="quantity" value="4">
+                      <a class="btn btn-xs btn-danger d-none" id="resetQuantityBtn"><span
+                          class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;reset</a>
+                      <br><label id="err-exceed-quantity-limit" class="text-danger">(max 100)</label>
                     </div>
-                  </div>
-
-                  <!-- Chalan No -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="chalan_no">Chalan No * :</label>
-                      <input type="text" class="form-control has-feedback-left" id="chalan_no" placeholder="Chalan No">
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true">
-                      </span>
-                    </div>
-                  </div>
-                  <!-- Memo No -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="memo_no">Memo No * :</label>
-                      <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No">
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true">
-                      </span>
-                    </div>
-                  </div>
-                  <!-- Note -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="note">Note * :</label>
-                      <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true">
-                      </span>
+                    <div class="col-md-6 col-sm-6 col-xs-6 text-center">
+                      <a class="btn btn-xs btn-dark" id="genRandomCodesBtn">
+                        <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random Serial No.
+                      </a>
+                      <a class="btn btn-xs btn-primary d-none" id="printRandomCodesBtn">
+                        <span class="glyphicon glyphicon-print"></span>&nbsp;&nbsp;Save Serial No.
+                      </a>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-
-                  <!-- Bill Amount -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="bill_amount">Bill Amount * :</label>
-                      <input type="number" class="form-control has-feedback-left" id="bill_amount"
-                        placeholder="Bill Amount" required>
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true">
-                      </span>
-                    </div>
+                <div class="clearfix"><br></div>
+                <!-- items serials no. input fields -->
+                <div id="items_serialNo">
+                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback"></div>
+                  <div class="col-md-3 col-sm-3 col-xs-3">
+                    <input type="text" class="form-control" id="serialNo-0" placeholder="">
                   </div>
-                  <!-- Discount -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="discount">Discount * :</label>
-                      <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true">
-                      </span>
-                    </div>
+                  <div class="col-md-3 col-sm-3 col-xs-3">
+                    <input type="text" class="form-control" id="serialNo-1" placeholder="">
                   </div>
-                  <!-- Total Amount -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="total_amount">Total Amount * :</label>
-                      <input type="number" class="form-control has-feedback-left" id="total_amount"
-                        placeholder="Total Amount">
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true">
-                      </span>
-                    </div>
+                  <div class="col-md-3 col-sm-3 col-xs-3">
+                    <input type="text" class="form-control" id="serialNo-2" placeholder="">
                   </div>
-                  <!-- Paid Amount -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-12 col-xs-12">
-                      <label for="paid_amount">Paid Amount * :</label>
-                      <input type="number" class="form-control has-feedback-left" id="paid_amount"
-                        placeholder="Paid Amount">
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true">
-                      </span>
-                    </div>
+                  <div class="col-md-3 col-sm-3 col-xs-3">
+                    <input type="text" class="form-control" id="serialNo-3" placeholder="">
                   </div>
+                  <!-- More field will be added by DOM JS if needed  -->
                 </div>
               </div>
             </div>
           </div>
-
           <div class="form-group">
             <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
               <br>
@@ -552,13 +559,15 @@
         // TODO: Onclick ==> show a popup form to register new item
         //for a successful registraion, autofill the the "item" field by current item id and name
 
-        scanCodesBtn = document.getElementById("scanCodesBtn");
-        //TODO: scan bar code for serial number or enter serial number manually
         genRandomCodesBtn = document.getElementById("genRandomCodesBtn")
-        //TODO: show a popup, take two value :"numberOfItem", "codeLength" ==> generate random codes of lenght "codeLenght"
+        printRandomCodesBtn = document.getElementById("printRandomCodesBtn");
+        //TODO: print the generated random codes
+
         items_serialNo = document.getElementById("items_serialNo");
         quantity = document.getElementById("quantity");
-        quantityBtn = document.getElementById("quantityBtn");
+        resetQuantityBtn = document.getElementById("resetQuantityBtn");
+        exceedQuantityLimit = document.getElementById("err-exceed-quantity-limit");
+
 
         account = document.getElementById("account");
         discount = document.getElementById("discount");
@@ -607,15 +616,38 @@
                 addNewSupplier("purchase");
               });
               createCategoryBtn.addEventListener("click", e => {
-                addNewCategory("purchase");
+                addNewCategory("purchase", data.categories);
               });
               createItemBtn.addEventListener("click", e => {
-                addNewItem("purchase", data.brands, data.categories);
+                addNewItem("purchase", data.brands, data.categories, data.items);
               });
               quantity.addEventListener("change", e => {
                 let q = parseInt(quantity.value);
-                updateItemSerialField(q);
+                if (q > 100) {
+                  // alert("Max 100 Item");
+                  Swal.fire({
+                    icon: "error",
+                    title: "Max 100 Items",
+                    showConfirmButton:true,
+                  });
+                  quantity.value = 100;
+                  quantity.text = 100;
+                  updateItemSerialField(100);
+                } else {
+                  updateItemSerialField(q);
+                }
               });
+              genRandomCodesBtn.addEventListener("click", e => {
+                insertRandomSerial(parseInt(quantity.value))
+              });
+              resetQuantityBtn.addEventListener("click", e => {
+                updateItemSerialField(4);
+                document.getElementById("quantity").value = 4;
+                document.getElementById("quantity").disabled = false;
+                genRandomCodesBtn.classList.remove("d-none");
+                printRandomCodesBtn.classList.add("d-none");
+                resetQuantityBtn.classList.add("d-none");
+              })
 
               //Warning: Delete this section after completing all task in this page
               submitBtn.addEventListener("click", e => {
@@ -653,7 +685,7 @@
           supplier.innerHTML = `<option value="" selected disabled>No Supplier Available. Create One</option>`;
         }
       }
-      
+
       //updateCategoryDiv updates category selection options with the fetched data 
       function updateCategoryDiv(categories) {
         category.innerHTML = '';
@@ -695,11 +727,24 @@
             if (i % 4 === 3) {
               items_serialNo.innerHTML += `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
             }
-          } 
+          }
         }
       }
 
-
+      //insertRandomSerial inserts random serial number for the items 
+      function insertRandomSerial(quantity) {
+        for (let i = 0; i < quantity; i++) {
+          let id = "serialNo-" + i;
+          let uuid = crypto.randomUUID();
+          document.getElementById(id).value = uuid;
+          document.getElementById(id).text = uuid;
+          document.getElementById(id).disabled = true;
+        }
+        document.getElementById("quantity").disabled = true;
+        genRandomCodesBtn.classList.add("d-none");
+        printRandomCodesBtn.classList.remove("d-none");
+        resetQuantityBtn.classList.remove("d-none");
+      }
       // document.getElementById("supplier").addEventListener("change", e =>{
       //   console.log(document.getElementById("supplier").value)
       // })
