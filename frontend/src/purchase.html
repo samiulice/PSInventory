@@ -242,7 +242,7 @@
         <form action="#" id="purchase_form" data-parsley-validate="">
           <!-- Purchase Details Secetion  -->
           <div class="col-md-4 col-sm-4 col-xs-4">
-            <div class="x_panel" style="min-width: 420px; min-height: 360px;">
+            <div class="x_panel">
               <div class="x_title">
                 <h2>Puschase Details</h2>
                 <div class="clearfix"></div>
@@ -255,8 +255,8 @@
                       <label for="single_cal4">Purchase Date * :</label>
                       <input type="text" class="form-control has-feedback-left" id="single_cal4"
                         placeholder="Select date" aria-describedby="inputSuccess2Status4">
-                      <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
-                        aria-hidden="true"></span>
+                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
+                        aria-hidden="true"></i>
                     </div>
                   </div>
                   <!-- Supplier Account -->
@@ -284,8 +284,8 @@
                         <option value="" selected disabled>Select Category</option>
                         <!--Updated by JS DOM -->
                       </select>
-                      <span style="color: rgba(0, 0, 0, 1);"
-                        class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
+                        aria-hidden="true"></i>
                     </div>
                     <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
                       <a class="btn btn-xs btn-primary" id="createCategoryBtn" style="color: white;">
@@ -302,8 +302,8 @@
                         <option value="" selected disabled>Select Item</option>
                         <!--Updated by JS DOM -->
                       </select>
-                      <span style="color: rgba(0, 0, 0, 1);"
-                        class="form-control-feedback left glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
+                        aria-hidden="true"></i>
                     </div>
                     <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
                       <a class="btn btn-xs btn-primary" id="createItemBtn" style="color: white;">
@@ -334,9 +334,9 @@
                             <option value="" selected disabled>Select Account</option>
                             <!--Updated by JS DOM -->
                           </select>
-                          <span style="color: rgba(0, 0, 0, 1);"
-                            class="form-control-feedback left glyphicon glyphicon-user" aria-hidden="true">
-                          </span>
+                          <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-bank"
+                            aria-hidden="true">
+                          </i>
                         </div>
                       </div>
 
@@ -346,9 +346,9 @@
                           <label for="chalan_no">Chalan No * :</label>
                           <input type="text" class="form-control has-feedback-left" id="chalan_no"
                             placeholder="Chalan No">
-                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
                             aria-hidden="true">
-                          </span>
+                          </i>
                         </div>
                       </div>
                       <!-- Memo No -->
@@ -356,9 +356,9 @@
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="memo_no">Memo No * :</label>
                           <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No">
-                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
                             aria-hidden="true">
-                          </span>
+                          </i>
                         </div>
                       </div>
                       <!-- Note -->
@@ -366,9 +366,9 @@
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="note">Note * :</label>
                           <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
-                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-comment form-control-feedback left"
                             aria-hidden="true">
-                          </span>
+                          </i>
                         </div>
                       </div>
                     </div>
@@ -381,9 +381,9 @@
                           <label for="bill_amount">Bill Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="bill_amount"
                             placeholder="Bill Amount" required>
-                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
-                          </span>
+                          </i>
                         </div>
                       </div>
                       <!-- Discount -->
@@ -391,9 +391,9 @@
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="discount">Discount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
-                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
                             aria-hidden="true">
-                          </span>
+                          </i>
                         </div>
                       </div>
                       <!-- Total Amount -->
@@ -402,9 +402,9 @@
                           <label for="total_amount">Total Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="total_amount"
                             placeholder="Total Amount">
-                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
-                          </span>
+                          </i>
                         </div>
                       </div>
                       <!-- Paid Amount -->
@@ -413,9 +413,9 @@
                           <label for="paid_amount">Paid Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="paid_amount"
                             placeholder="Paid Amount">
-                          <span style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar-o form-control-feedback left"
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
-                          </span>
+                          </i>
                         </div>
                       </div>
                     </div>
@@ -541,42 +541,43 @@
       let items, brands;
 
       window.addEventListener("DOMContentLoaded", () => {
-        supplier = document.getElementById("supplier");
+        let supplier = document.getElementById("supplier");
         // TODO: Get the a list of supplier id , name and populate supplier div 
-        createSupplierBtn = document.getElementById("createSupplierBtn");
+        let createSupplierBtn = document.getElementById("createSupplierBtn");
         // TODO: Onclick ==> show a popup form to register new supplier
         //for a successful registraion, autofill the the "supplier" field by current supplier id and name
 
-        category = document.getElementById("category");
+        let category = document.getElementById("category");
         // TODO: Get the a list of item category id , name and populate category div 
-        createCategoryBtn = document.getElementById("createCategoryBtn");
+        let createCategoryBtn = document.getElementById("createCategoryBtn");
         // TODO: Onclick ==> show a popup form to register new category
         //for a successful registraion, autofill the the "category" field by current category id and name
 
-        item = document.getElementById("item");
+        let item = document.getElementById("item");
         // TODO: Get the a list of item id , name and populate item div 
-        createItemBtn = document.getElementById("createItemBtn");
+        let createItemBtn = document.getElementById("createItemBtn");
         // TODO: Onclick ==> show a popup form to register new item
         //for a successful registraion, autofill the the "item" field by current item id and name
 
-        genRandomCodesBtn = document.getElementById("genRandomCodesBtn")
-        printRandomCodesBtn = document.getElementById("printRandomCodesBtn");
+        let genRandomCodesBtn = document.getElementById("genRandomCodesBtn")
+        let printRandomCodesBtn = document.getElementById("printRandomCodesBtn");
         //TODO: print the generated random codes
 
-        items_serialNo = document.getElementById("items_serialNo");
-        quantity = document.getElementById("quantity");
-        resetQuantityBtn = document.getElementById("resetQuantityBtn");
-        exceedQuantityLimit = document.getElementById("err-exceed-quantity-limit");
+        let items_serialNo = document.getElementById("items_serialNo");
+        let quantity = document.getElementById("quantity");
+        let resetQuantityBtn = document.getElementById("resetQuantityBtn");
+        let exceedQuantityLimit = document.getElementById("err-exceed-quantity-limit");
 
 
-        account = document.getElementById("account");
-        discount = document.getElementById("discount");
+        let account = document.getElementById("account");
+        let discount = document.getElementById("discount");
         // TODO: Get the a list account info and populate account, discount div 
 
-        submitBtn = document.getElementById("submitBtn");
+        let submitBtn = document.getElementById("submitBtn");
 
-        invoiceBtn = document.getElementById("invoiceBtn");
+        let invoiceBtn = document.getElementById("invoiceBtn");
 
+        //Fetch page data from server
         const requestOptions = {
           method: 'post',
         }
@@ -612,15 +613,20 @@
                 }
 
               });
+
+              //show popup form for adding new supplier
               createSupplierBtn.addEventListener("click", e => {
                 addNewSupplier("purchase");
               });
+              //show popup form for adding new item category
               createCategoryBtn.addEventListener("click", e => {
                 addNewCategory("purchase", data.categories);
               });
+              //show popup form for adding new item type
               createItemBtn.addEventListener("click", e => {
                 addNewItem("purchase", data.brands, data.categories, data.items);
               });
+
               quantity.addEventListener("change", e => {
                 let q = parseInt(quantity.value);
                 if (q > 100) {
@@ -628,7 +634,7 @@
                   Swal.fire({
                     icon: "error",
                     title: "Max 100 Items",
-                    showConfirmButton:true,
+                    showConfirmButton: true,
                   });
                   quantity.value = 100;
                   quantity.text = 100;
@@ -648,7 +654,6 @@
                 printRandomCodesBtn.classList.add("d-none");
                 resetQuantityBtn.classList.add("d-none");
               })
-
               //Warning: Delete this section after completing all task in this page
               submitBtn.addEventListener("click", e => {
                 let purchase_details = {
@@ -656,22 +661,20 @@
                   supplier: supplier.value,
                   category: category.value,
                   item: item.value,
+                  account: account.value,
+                  chalan_no: chalan_no.value,
+                  memo_no: memo_no.value,
+                  note: note.value,
+                  bill_amount: bill_amount.value,
+                  discount: discount.value,
+                  total_amount: total_amount.value,
+                  paid_amount: paid_amount.value,
                 }
-                let text1 = supplier.options[supplier.selectedIndex].text;
-                let text2 = category.options[category.selectedIndex].text;
-                let text3 = item.options[item.selectedIndex].text;
-
-                document.getElementById('purchase_info').innerText =
-                  `${purchase_details.purchase_date}
-                                                                      ${text1}
-                                                                      ${text2}
-                                                                      ${text3}`;
               })
               //account 
             }
           })
       })
-
       //updateSupplierDiv updates supplier selection options with the fetched data
       function updateSupplierDiv(suppliers) {
         supplier.innerHTML = '';
@@ -685,7 +688,6 @@
           supplier.innerHTML = `<option value="" selected disabled>No Supplier Available. Create One</option>`;
         }
       }
-
       //updateCategoryDiv updates category selection options with the fetched data 
       function updateCategoryDiv(categories) {
         category.innerHTML = '';
@@ -699,7 +701,6 @@
           category.innerHTML = `<option value="" selected disabled>No Category Available. Create One</option>`;
         }
       }
-
       //updateAccoutnsDiv updates account selection options with the fetched data 
       function updateAccoutnsDiv(accoutns) {
         account.innerHTML = '';
@@ -713,7 +714,6 @@
           account.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
         }
       }
-
       //updateItemSerialField adds input field as needed
       function updateItemSerialField(quantity) {
         if (quantity > 0) {
@@ -730,7 +730,6 @@
           }
         }
       }
-
       //insertRandomSerial inserts random serial number for the items 
       function insertRandomSerial(quantity) {
         for (let i = 0; i < quantity; i++) {
@@ -745,9 +744,6 @@
         printRandomCodesBtn.classList.remove("d-none");
         resetQuantityBtn.classList.remove("d-none");
       }
-      // document.getElementById("supplier").addEventListener("change", e =>{
-      //   console.log(document.getElementById("supplier").value)
-      // })
     </script>
 
 </body>
