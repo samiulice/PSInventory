@@ -336,6 +336,7 @@ func (app *application) AddItem(w http.ResponseWriter, r *http.Request) {
 	}
 	item.ItemCode = fmt.Sprintf("i-%06d", code)
 	item.ItemStatus = true
+	item.Quantity = 1
 
 	id, err := app.DB.AddItem(item)
 	if err != nil {

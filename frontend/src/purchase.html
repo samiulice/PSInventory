@@ -577,6 +577,9 @@
 
         let invoiceBtn = document.getElementById("invoiceBtn");
 
+        //array of item codes
+        let itemCodes = [];
+
         //Fetch page data from server
         const requestOptions = {
           method: 'post',
@@ -661,6 +664,7 @@
                   supplier: supplier.value,
                   category: category.value,
                   item: item.value,
+                  item_codes: itemCodes,
                   account: account.value,
                   chalan_no: chalan_no.value,
                   memo_no: memo_no.value,
@@ -668,8 +672,9 @@
                   bill_amount: bill_amount.value,
                   discount: discount.value,
                   total_amount: total_amount.value,
-                  paid_amount: paid_amount.value,
+                  paid_amount: paid_amount.value,   
                 }
+                console.log(purchase_details);
               })
               //account 
             }
@@ -732,12 +737,14 @@
       }
       //insertRandomSerial inserts random serial number for the items 
       function insertRandomSerial(quantity) {
+        itemCodes = []; //reset length to 0
         for (let i = 0; i < quantity; i++) {
           let id = "serialNo-" + i;
           let uuid = crypto.randomUUID();
           document.getElementById(id).value = uuid;
           document.getElementById(id).text = uuid;
           document.getElementById(id).disabled = true;
+          itemCodes.push(uuid);
         }
         document.getElementById("quantity").disabled = true;
         genRandomCodesBtn.classList.add("d-none");
