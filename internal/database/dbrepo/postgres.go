@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-
-
 //.......................HR Management.......................
 
 // AddHeadAccount inserts new head account information to the database
@@ -38,7 +36,7 @@ func (p *postgresDBRepo) AddHeadAccount(ha models.HeadAccount) (int, error) {
 }
 
 // GetAvailableBrands returns a list of active brands from the database
-func (p *postgresDBRepo) GetAvailableHeadAccounts()([]*models.HeadAccount, error) {
+func (p *postgresDBRepo) GetAvailableHeadAccounts() ([]*models.HeadAccount, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var headAccounts []*models.HeadAccount
@@ -77,7 +75,6 @@ func (p *postgresDBRepo) GetAvailableHeadAccounts()([]*models.HeadAccount, error
 	}
 	return headAccounts, nil
 }
-
 
 //.......................HR Management.......................
 
@@ -523,7 +520,6 @@ func (p *postgresDBRepo) GetSupplierListPaginated(accountType string, pageSize, 
 
 //.......................Inventory.......................
 
-
 // AddBrand inserts new brand information to the database
 func (p *postgresDBRepo) AddBrand(b models.Brand) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -545,8 +541,9 @@ func (p *postgresDBRepo) AddBrand(b models.Brand) (int, error) {
 
 	return id, nil
 }
+
 // GetBrandList returns a list of all brands from the database
-func (p *postgresDBRepo) GetBrandList()([]*models.Brand, error) {
+func (p *postgresDBRepo) GetBrandList() ([]*models.Brand, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var brands []*models.Brand
@@ -581,8 +578,9 @@ func (p *postgresDBRepo) GetBrandList()([]*models.Brand, error) {
 	}
 	return brands, nil
 }
-// GetAvailableBrands returns a list of active brands from the database
-func (p *postgresDBRepo) GetAvailableBrands()([]*models.Brand, error) {
+
+// GetActiveBrands returns a list of active brands from the database
+func (p *postgresDBRepo) GetActiveBrands() ([]*models.Brand, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var brands []*models.Brand
@@ -643,7 +641,7 @@ func (p *postgresDBRepo) AddCategory(c models.Category) (int, error) {
 }
 
 // GetCategoryList returns a list of all categories from the database
-func (p *postgresDBRepo) GetCategoryList()([]*models.Category, error) {
+func (p *postgresDBRepo) GetCategoryList() ([]*models.Category, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var categories []*models.Category
@@ -678,8 +676,9 @@ func (p *postgresDBRepo) GetCategoryList()([]*models.Category, error) {
 	}
 	return categories, nil
 }
+
 // GetAvailableCategories returns a list of active categories from the database
-func (p *postgresDBRepo) GetAvailableCategories()([]*models.Category, error) {
+func (p *postgresDBRepo) GetActiveCategoryList() ([]*models.Category, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var categories []*models.Category
@@ -745,8 +744,9 @@ func (p *postgresDBRepo) AddItem(i models.Item) (int, error) {
 
 	return id, nil
 }
+
 // GetItemList returns a list of all items from the database
-func (p *postgresDBRepo) GetItemList()([]*models.Item, error) {
+func (p *postgresDBRepo) GetItemList() ([]*models.Item, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var items []*models.Item
@@ -791,8 +791,9 @@ func (p *postgresDBRepo) GetItemList()([]*models.Item, error) {
 	}
 	return items, nil
 }
+
 // GetAvailableItems returns a list of in-stock and active item from the database
-func (p *postgresDBRepo)GetAvailableItems()([]*models.Item, error) {
+func (p *postgresDBRepo) GetActiveItems() ([]*models.Item, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var items []*models.Item
@@ -804,7 +805,7 @@ func (p *postgresDBRepo)GetAvailableItems()([]*models.Item, error) {
 			public.items i
 			INNER JOIN brands b ON (b.id = i.category_id)
 		WHERE 
-			item_status = true AND quantity > 0; 
+			item_status = true; 
 		`
 	var rows *sql.Rows
 	var err error
@@ -834,8 +835,9 @@ func (p *postgresDBRepo)GetAvailableItems()([]*models.Item, error) {
 	}
 	return items, nil
 }
+
 // GetAvailableItems returns a list of details info in-stock and active item from the database
-func (p *postgresDBRepo)GetAvailableItemsDetails()([]*models.Item, error) {
+func (p *postgresDBRepo) GetAvailableItemsDetails() ([]*models.Item, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var items []*models.Item
@@ -882,8 +884,9 @@ func (p *postgresDBRepo)GetAvailableItemsDetails()([]*models.Item, error) {
 	}
 	return items, nil
 }
+
 // GetAvailableItemsByCategoryID returns a list of in-stock and active item that related to category ID from the database
-func (p *postgresDBRepo)GetAvailableItemsByCategoryID(cat_id int)([]*models.Item, error) {
+func (p *postgresDBRepo) GetAvailableItemsByCategoryID(cat_id int) ([]*models.Item, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var items []*models.Item

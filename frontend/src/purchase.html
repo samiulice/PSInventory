@@ -239,7 +239,7 @@
       <div id="page-content" class="right_col" role="main">
 
         <!-- Page content here -->
-        <form action="#" id="purchase_form" data-parsley-validate="">
+        <form action="#" id="purchase_form">
           <!-- Purchase Details Secetion  -->
           <div class="col-md-4 col-sm-4 col-xs-4">
             <div class="x_panel">
@@ -254,7 +254,7 @@
                     <div class="col-md-9 col-sm-8 col-xs-8">
                       <label for="single_cal4">Purchase Date * :</label>
                       <input type="text" class="form-control has-feedback-left" id="single_cal4"
-                        placeholder="Select date" aria-describedby="inputSuccess2Status4">
+                        placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
                       <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
                         aria-hidden="true"></i>
                     </div>
@@ -401,7 +401,7 @@
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="total_amount">Total Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="total_amount"
-                            placeholder="Total Amount">
+                            placeholder="Total Amount" required>
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
                           </i>
@@ -412,7 +412,7 @@
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="paid_amount">Paid Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="paid_amount"
-                            placeholder="Paid Amount">
+                            placeholder="Paid Amount" required>
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
                           </i>
@@ -475,15 +475,9 @@
           <div class="form-group">
             <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
               <br>
-              <a id="submitBtn" class="btn btn-success">Save</a>
-              <a id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
-            </div>
-          </div>
-
-          <!-- Warning: Delete this section after completing all the task -->
-          <div class="form-group">
-            <div class="row">
-              <div class="col" id="purchase_info"></div>
+              <button type="submit" id="submitBtn" class="btn btn-success">Save</button>
+              <a href="javascript:void(0);" id="processingBtn" class="btn btn-success d-none">Processing...</a>
+              <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
             </div>
           </div>
         </form>
@@ -572,13 +566,13 @@
         let account = document.getElementById("account");
         let discount = document.getElementById("discount");
         // TODO: Get the a list account info and populate account, discount div 
-
+        let form = document.getElementById('purchase_form');
         let submitBtn = document.getElementById("submitBtn");
-
+        let processingBtn = document.getElementById("processingBtn");
         let invoiceBtn = document.getElementById("invoiceBtn");
 
         //array of item codes
-        let itemCodes = [];
+        let itemCodes = new Array();
 
         //Fetch page data from server
         const requestOptions = {
@@ -647,7 +641,7 @@
                 }
               });
               genRandomCodesBtn.addEventListener("click", e => {
-                insertRandomSerial(parseInt(quantity.value))
+                itemCodes = insertRandomSerial(parseInt(quantity.value))
               });
               resetQuantityBtn.addEventListener("click", e => {
                 updateItemSerialField(4);
@@ -657,24 +651,48 @@
                 printRandomCodesBtn.classList.add("d-none");
                 resetQuantityBtn.classList.add("d-none");
               })
-              //Warning: Delete this section after completing all task in this page
-              submitBtn.addEventListener("click", e => {
+              //submit data to backend
+              form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
                 let purchase_details = {
                   purchase_date: single_cal4.value,
-                  supplier: supplier.value,
-                  category: category.value,
-                  item: item.value,
-                  item_codes: itemCodes,
-                  account: account.value,
+                  supplier_id: parseInt(supplier.value),
+                  item_id: parseInt(item.value),
+                  quantity: parseInt(quantity.value),
+                  items_serial_no: itemCodes,
+                  account_id: parseInt(account.value),
                   chalan_no: chalan_no.value,
                   memo_no: memo_no.value,
                   note: note.value,
-                  bill_amount: bill_amount.value,
-                  discount: discount.value,
-                  total_amount: total_amount.value,
-                  paid_amount: paid_amount.value,   
+                  bill_amount: parseInt(bill_amount.value),
+                  discount: parseInt(discount.value),
+                  total_amount: parseInt(total_amount.value),
+                  paid_amount: parseInt(paid_amount.value),
                 }
                 console.log(purchase_details);
+                submitBtn.classList.add("d-none");
+                const requestOptions = {
+                  method: 'post',
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(purchase_details),
+                }
+
+                fetch('http://localhost:4321/api/inventory/restock-item', requestOptions)
+                  .then(response => response.json())
+                  .then(data => {
+                    console.log(data)
+                    if (data.error === true) {
+                      showErrorMessage(data.message)
+                    } else {
+                      showSuccessMessage(data.message);
+                    }
+                    form.reset();
+                    submitBtn.classList.remove("d-none");
+                  });
               })
               //account 
             }
@@ -737,7 +755,7 @@
       }
       //insertRandomSerial inserts random serial number for the items 
       function insertRandomSerial(quantity) {
-        itemCodes = []; //reset length to 0
+        let itemCodes = []; //reset length to 0
         for (let i = 0; i < quantity; i++) {
           let id = "serialNo-" + i;
           let uuid = crypto.randomUUID();
@@ -750,7 +768,9 @@
         genRandomCodesBtn.classList.add("d-none");
         printRandomCodesBtn.classList.remove("d-none");
         resetQuantityBtn.classList.remove("d-none");
+        return itemCodes;
       }
+
     </script>
 
 </body>

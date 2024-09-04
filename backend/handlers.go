@@ -13,7 +13,7 @@ import (
 type JSONResponse struct {
 	Error   bool        `json:"error,omitempty"`
 	Message string      `json:"message,omitempty"`
-	Result  interface{} `json:"result,omitempty,omitempty"`
+	Result  interface{} `json:"result,omitempty"`
 }
 
 // .....................HR Management Panel Handlers......................
@@ -319,7 +319,7 @@ func (app *application) AddCategory(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// AddCategory Handles category adding process
+// AddItem insert new item type to database
 func (app *application) AddItem(w http.ResponseWriter, r *http.Request) {
 
 	var item models.Item
@@ -336,7 +336,6 @@ func (app *application) AddItem(w http.ResponseWriter, r *http.Request) {
 	}
 	item.ItemCode = fmt.Sprintf("i-%06d", code)
 	item.ItemStatus = true
-	item.Quantity = 1
 
 	id, err := app.DB.AddItem(item)
 	if err != nil {
@@ -348,6 +347,26 @@ func (app *application) AddItem(w http.ResponseWriter, r *http.Request) {
 		Error:   false,
 		Message: "Item Added Succesfully",
 		Result:  item,
+	}
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// RestockItem add new purchased item to database
+func (app *application) RestockItem(w http.ResponseWriter, r *http.Request) {
+
+	var purchase_details models.Purchase
+	err := app.readJSON(w, r, &purchase_details)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+
+	//TODO store purhcase data
+	//........................//
+	var resp = JSONResponse{
+		Error:   false,
+		Message: "restock item Succesfully",
+		Result:  nil,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -378,7 +397,7 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//retrive categories from the database
-	categories, err := app.DB.GetAvailableCategories()
+	categories, err := app.DB.GetActiveCategoryList()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Category Available||"
 	} else if err != nil {
@@ -386,7 +405,7 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//retrive brands from the database
-	brands, err := app.DB.GetAvailableBrands()
+	brands, err := app.DB.GetActiveBrands()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Brand Available||"
 	} else if err != nil {
@@ -394,7 +413,7 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//retrive items from the database
-	items, err := app.DB.GetAvailableItems()
+	items, err := app.DB.GetActiveItems()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Item Available||"
 	} else if err != nil {

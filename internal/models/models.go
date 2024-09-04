@@ -41,37 +41,40 @@ const (
 
 // Brand is the type for Brand
 type Brand struct {
-	ID            int    `json:"id,omitempty"`
-	Name   string `json:"name,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	ID        int       `json:"id,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
+
 // Category is the type for Category
 type Category struct {
-	ID            int    `json:"id,omitempty"`
-	Name   string `json:"name,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	ID        int       `json:"id,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
+
 // Customer is the type for customers
 type Customer struct {
-	ID            int    `json:"id,omitempty"`
-	AccountCode   string `json:"account_code,omitempty"`
-	AccountName   string `json:"account_name,omitempty"`
-	ContactPerson string `json:"contact_person,omitempty"`
-	Division string `json:"division,omitempty"`
-	District string `json:"district,omitempty"`
-	Upazila  string `json:"upazila,omitempty"`
-	Area     string `json:"area,omitempty"`
-	Mobile   string `json:"mobile,omitempty"`
-	Email    string `json:"email,omitempty"`
-	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
-	Discount       int  `json:"discount,omitempty"`
-	OpeningBalance int  `json:"opening_balance,omitempty"`
-	JoiningDate time.Time `json:"joining_date,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	ID             int       `json:"id,omitempty"`
+	AccountCode    string    `json:"account_code,omitempty"`
+	AccountName    string    `json:"account_name,omitempty"`
+	ContactPerson  string    `json:"contact_person,omitempty"`
+	Division       string    `json:"division,omitempty"`
+	District       string    `json:"district,omitempty"`
+	Upazila        string    `json:"upazila,omitempty"`
+	Area           string    `json:"area,omitempty"`
+	Mobile         string    `json:"mobile,omitempty"`
+	Email          string    `json:"email,omitempty"`
+	AccountStatus  bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	Discount       int       `json:"discount,omitempty"`
+	OpeningBalance int       `json:"opening_balance,omitempty"`
+	JoiningDate    time.Time `json:"joining_date,omitempty"`
+	CreatedAt      time.Time `json:"created_at,omitempty"`
+	UpdatedAt      time.Time `json:"updated_at,omitempty"`
 }
+
 // Employee is the type for employees
 type Employee struct {
 	ID            int    `json:"id,omitempty"`
@@ -100,68 +103,85 @@ type Employee struct {
 	UpdatedAt   time.Time `json:"updated_at,omitempty"`
 }
 
-//Item is the type for items
-type HeadAccount struct{
-	ID int `json:"id,omitempty"`
-	AccountCode   string `json:"account_code,omitempty"`
-	AccountName   string `json:"account_name,omitempty"`
-	AccoutnStatus bool `json:"account_status,omitempty"`
-	CurrentAmount int `json:"current_amount,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+// Item is the type for items
+type HeadAccount struct {
+	ID            int       `json:"id,omitempty"`
+	AccountCode   string    `json:"account_code,omitempty"`
+	AccountName   string    `json:"account_name,omitempty"`
+	AccoutnStatus bool      `json:"account_status,omitempty"`
+	CurrentAmount int       `json:"current_amount,omitempty"`
+	CreatedAt     time.Time `json:"created_at,omitempty"`
+	UpdatedAt     time.Time `json:"updated_at,omitempty"`
 }
-//Item is the type for items
-type Item struct{
-	ID int `json:"id,omitempty"`
-	ItemCode string `json:"item_code,omitempty"`
-	ItemName string `json:"item_name,omitempty"`
-	ItemDescription string `json:"item_description,omitempty"`
-	ItemStatus bool `json:"item_status,omitempty"`
-	Quantity int `json:"quantity,omitempty"`
-	CategoryID int `json:"category_id,omitempty"`
-	BrandID int `json:"brand_id,omitempty"`
-	Discount int `json:"discount,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
-	Brand Brand `json:"brand,omitempty"`
+
+// Item is the type for items
+type Item struct {
+	ID              int       `json:"id,omitempty"`
+	ItemCode        string    `json:"item_code,omitempty"`
+	ItemName        string    `json:"item_name,omitempty"`
+	ItemDescription string    `json:"item_description,omitempty"`
+	ItemStatus      bool      `json:"item_status,omitempty"`
+	Quantity        int       `json:"quantity,omitempty"`
+	CategoryID      int       `json:"category_id,omitempty"`
+	BrandID         int       `json:"brand_id,omitempty"`
+	Discount        int       `json:"discount,omitempty"`
+	CreatedAt       time.Time `json:"created_at,omitempty"`
+	UpdatedAt       time.Time `json:"updated_at,omitempty"`
+	Brand           Brand     `json:"brand,omitempty"`
+}
+
+// Purchase is the type for purchase info
+type Purchase struct {
+	PurchaseDate  time.Time `json:"purchase_date,omitempty"`
+	SupplierID    int       `json:"supplier_id,omitempty"`
+	ItemID        int       `json:"item_id,omitempty"`
+	Quantity      int       `json:"quantity,omitempty"`
+	ItemsSerialNo int       `json:"items_serial_no,omitempty"`
+	AccountID     int       `json:"account_id,omitempty"`
+	ChalanNO      string    `json:"chalan_no"`
+	MemoNo        string    `json:"memo_no"`
+	Note          string    `json:"note"`
+	BillAmount    int       `json:"bill_amount,omitempty"`
+	Discount      int       `json:"discount,omitempty"`
+	TotalAmount   int       `json:"total_amount,omitempty"`
+	PaidAmount    int       `json:"paid_amount,omitempty"`
 }
 
 // Supplier is the type for suppliers
 type Supplier struct {
-	ID            int    `json:"id,omitempty"`
-	AccountCode   string `json:"account_code,omitempty"`
-	AccountName   string `json:"account_name,omitempty"`
-	ContactPerson string `json:"contact_person,omitempty"`
-	Division string `json:"division,omitempty"`
-	District string `json:"district,omitempty"`
-	Upazila  string `json:"upazila,omitempty"`
-	Area     string `json:"area,omitempty"`
-	Mobile   string `json:"mobile,omitempty"`
-	Email    string `json:"email,omitempty"`
-	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
-	Discount       int  `json:"discount,omitempty"`
-	JoiningDate time.Time `json:"joining_date,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	ID            int       `json:"id,omitempty"`
+	AccountCode   string    `json:"account_code,omitempty"`
+	AccountName   string    `json:"account_name,omitempty"`
+	ContactPerson string    `json:"contact_person,omitempty"`
+	Division      string    `json:"division,omitempty"`
+	District      string    `json:"district,omitempty"`
+	Upazila       string    `json:"upazila,omitempty"`
+	Area          string    `json:"area,omitempty"`
+	Mobile        string    `json:"mobile,omitempty"`
+	Email         string    `json:"email,omitempty"`
+	AccountStatus bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	Discount      int       `json:"discount,omitempty"`
+	JoiningDate   time.Time `json:"joining_date,omitempty"`
+	CreatedAt     time.Time `json:"created_at,omitempty"`
+	UpdatedAt     time.Time `json:"updated_at,omitempty"`
 }
 
 //................................................................
 
 // Order is the type for all orders
 type Order struct {
-	ID            int         `json:"id,omitempty"`
-	DatesID       int         `json:"dates_id,omitempty"`
-	TransactionID int         `json:"transaction_id,omitempty"`
-	CustomerID    int         `json:"customer_id,omitempty"`
-	StatusID      int         `json:"status_id,omitempty"` //Processing=1, Completed=2, Cancelled = 3
-	Quantity      int         `json:"quantity,omitempty"`
-	Amount        int         `json:"amount,omitempty"`
-	CreatedAt     time.Time   `json:"created_at,omitempty"`
-	UpdatedAt     time.Time   `json:"updated_at,omitempty"`
+	ID            int       `json:"id,omitempty"`
+	DatesID       int       `json:"dates_id,omitempty"`
+	TransactionID int       `json:"transaction_id,omitempty"`
+	CustomerID    int       `json:"customer_id,omitempty"`
+	StatusID      int       `json:"status_id,omitempty"` //Processing=1, Completed=2, Cancelled = 3
+	Quantity      int       `json:"quantity,omitempty"`
+	Amount        int       `json:"amount,omitempty"`
+	CreatedAt     time.Time `json:"created_at,omitempty"`
+	UpdatedAt     time.Time `json:"updated_at,omitempty"`
 	// Transaction   Transaction `json:"transaction,omitempty"`
-	Customer      Customer    `json:"customer,omitempty"`
+	Customer Customer `json:"customer,omitempty"`
 }
-
 
 // ................JSON Response model for invoice microservice........................
 // Order holds the necessary info to build invoice
