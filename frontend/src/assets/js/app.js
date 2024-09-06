@@ -435,6 +435,7 @@ function addNewProduct(page, brands, categories, products) {
             description: form.description.value,
             brand_id: form.brand.value,
             category_id: form.category.value,
+            category_name: form.category.options[form.category.selectedIndex].text,
             discount: form.discount.value,
           });
         } else {
@@ -470,6 +471,7 @@ function addNewProduct(page, brands, categories, products) {
   }).then((result) => {
     if (result.isConfirmed) {
       const data = result.value;
+      categoryName = data.category_name;
       let product = {
         product_name: data.name,
         product_description: data.description,
@@ -497,8 +499,11 @@ function addNewProduct(page, brands, categories, products) {
             showSuccessMessage(data.message);
 
             if (page === "purchase") {
+              document.getElementById("category").innerHTML = '';
+              document.getElementById("category").innerHTML = `<option value="${product.category_id}" selected>${categoryName}</option>`;
+              document.getElementById("category").disabled = true;
               document.getElementById("product").innerHTML = '';
-              document.getElementById("product").innerHTML = `<option value="${data.result.id}" selected>${data.result.product_name}</option>`;;
+              document.getElementById("product").innerHTML = `<option value="${data.result.id}" selected>${data.result.product_name}</option>`;
               document.getElementById("product").disabled = true;
               products.push(data.result);
             }

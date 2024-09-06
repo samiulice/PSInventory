@@ -143,6 +143,7 @@ type Purchase struct {
 	Note             string    `json:"note,omitempty"`
 	UnitPrice        int       `json:"unit_price,omitempty"`
 	MRP              int       `json:"mrp,omitempty"`
+	Warranty         int       `json:"warranty,omitempty"`
 	BillAmount       int       `json:"bill_amount,omitempty"`
 	Discount         int       `json:"discount,omitempty"`
 	TotalAmount      int       `json:"total_amount,omitempty"`

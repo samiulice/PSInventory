@@ -1081,10 +1081,10 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.UnitPrice, purchase.MRP, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.UnitPrice, purchase.MRP, purchase.Warranty, createdAt, updatedAt))
 	}
 
-	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,unit_price,mrp,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,unit_price,mrp,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
 	// Execute the query
 	_, err = tx.ExecContext(ctx, query)
 	if err != nil {

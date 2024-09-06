@@ -17,8 +17,10 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "PSInventory",
-		WindowStartState:  options.Maximised,
+		Title: "PSInventory",
+		// WindowStartState:  options.Maximised, //maximum width
+		Width:  1366,
+		Height: 768,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

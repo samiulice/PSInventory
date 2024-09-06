@@ -241,7 +241,7 @@
         <!-- Page content here -->
         <form action="#" id="purchaseForm">
           <!-- Purchase Details Secetion  -->
-          <div class="col-md-4 col-sm-4 col-xs-4">
+          <div class="col-md-5 col-sm-12 col-xs-12">
             <div class="x_panel">
               <div class="x_title">
                 <h2>Puschase Details</h2>
@@ -250,8 +250,8 @@
               <div class="x_content">
                 <div class="row">
                   <!-- Purchase Date -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-8 col-xs-8">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-10 col-sm-9 col-xs-9">
                       <label for="single_cal4">Purchase Date * :</label>
                       <input type="text" class="form-control has-feedback-left" id="single_cal4"
                         placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
@@ -260,8 +260,8 @@
                     </div>
                   </div>
                   <!-- Supplier Account -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-8 col-xs-8">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-10 col-sm-9 col-xs-9">
                       <label for="supplier">Supplier * :</label>
                       <select id="supplier" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Supplier Account</option>
@@ -270,15 +270,15 @@
                       <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
                         aria-hidden="true"></span>
                     </div>
-                    <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
-                      <a class="btn btn-xs btn-primary" id="createSupplierBtn" style="color: white;">
-                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Supplier</a>
+                    <div class="col-md-2 col-sm-3 col-xs-3">
+                      <a class="btn btn-xs btn-primary input-addon-btn" id="createSupplierBtn">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add</a>
                     </div>
                   </div>
 
                   <!-- Category Info -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-8 col-xs-8">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-10 col-sm-9 col-xs-9">
                       <label for="category">Product Category * :</label>
                       <select id="category" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Category</option>
@@ -287,16 +287,16 @@
                       <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
                         aria-hidden="true"></i>
                     </div>
-                    <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
-                      <a class="btn btn-xs btn-primary" id="createCategoryBtn" style="color: white;">
-                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Category
+                    <div class="col-md-2 col-sm-3 col-xs-3">
+                      <a class="btn btn-xs btn-primary input-addon-btn" id="createCategoryBtn">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add
                       </a>
                     </div>
                   </div>
 
                   <!-- Product Info -->
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                    <div class="col-md-9 col-sm-8 col-xs-8">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-10 col-sm-9 col-xs-9">
                       <label for="product">Product Name * :</label>
                       <select id="product" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Product</option>
@@ -305,9 +305,9 @@
                       <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
                         aria-hidden="true"></i>
                     </div>
-                    <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
-                      <a class="btn btn-xs btn-primary" id="createProductBtn" style="color: white;">
-                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Product
+                    <div class="col-md-2 col-sm-3 col-xs-3">
+                      <a class="btn btn-xs btn-primary input-addon-btn" id="createProductBtn">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add
                       </a>
                     </div>
                   </div>
@@ -316,8 +316,8 @@
             </div>
           </div>
           <!-- Payment Details  -->
-          <div class="col-md-8 col-sm-8 col-xs-8">
-            <div class="x_panel" style="min-width: 600px; min-height: 360px;">
+          <div class="col-md-7 col-sm-12 col-xs-12">
+            <div class="x_panel">
               <div class="x_title">
                 <h2>Payment Details</h2>
                 <div class="clearfix"></div>
@@ -327,7 +327,7 @@
                   <div class="col-md-6 col-sm-6 col-xs-6">
                     <div class="row">
                       <!-- Transaction Account -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="account">Account * :</label>
                           <select id="account" class="form-control form-select has-feedback-left" required>
@@ -341,7 +341,7 @@
                       </div>
 
                       <!-- Chalan No -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="chalan_no">Chalan No :</label>
                           <input type="text" class="form-control has-feedback-left" id="chalan_no"
@@ -352,7 +352,7 @@
                         </div>
                       </div>
                       <!-- Memo No -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="memo_no">Memo No :</label>
                           <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No">
@@ -362,7 +362,7 @@
                         </div>
                       </div>
                       <!-- Note -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="note">Note :</label>
                           <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
@@ -376,7 +376,7 @@
                   <div class="col-md-6 col-sm-6 col-xs-6">
                     <div class="row">
                       <!-- Bill Amount -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="billAmount">Bill Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="billAmount"
@@ -387,7 +387,7 @@
                         </div>
                       </div>
                       <!-- Discount -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="discount">Discount :</label>
                           <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
@@ -397,7 +397,7 @@
                         </div>
                       </div>
                       <!-- Total Amount -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="totalAmount">Total Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="totalAmount"
@@ -408,7 +408,7 @@
                         </div>
                       </div>
                       <!-- Paid Amount -->
-                      <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+                      <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
                           <label for="paidAmount">Paid Amount * :</label>
                           <input type="number" class="form-control has-feedback-left" id="paidAmount"
@@ -424,57 +424,78 @@
               </div>
             </div>
           </div>
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+              <div class="x_content">
+                <div class="row">
+                  <div class="col-md-4 col-sm-4 col-xs-12 has-feedback">
+                    <label for="unitPrice">Unit Price * :</label>
+                    <input type="number" class="form-control has-feedback-left" id="unitPrice" name="unitPrice"
+                      placeholder="TK" required>
+                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                      aria-hidden="true">
+                    </i>
+                  </div>
+                  <div class="col-md-4 col-sm-4 col-xs-12 has-feedback">
+                    <label for="mrp">M.R.P. * :</label>
+                    <input type="number" class="form-control has-feedback-left" id="mRP" name="mRP" placeholder="TK"
+                      required>
+                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                      aria-hidden="true">
+                    </i>
+                  </div>
+
+                  <div class="col-md-4 col-sm-4 col-xs-12 has-feedback">
+                    <label for="warranty">Warranty * :</label>
+                    <input type="number" class="form-control has-feedback-left" id="warranty" name="warranty"
+                      placeholder="e.g 365days" required>
+                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-cogs form-control-feedback left"
+                      aria-hidden="true">
+                    </i>
+                  </div>
+
+                </div>
+                <div class="clearfix"><br></div>
+              </div>
+            </div>
+          </div>
           <!-- Product Code Section -->
           <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel" style="min-width: 720px;">
+            <div class="x_panel">
               <div class="x_title">
                 <h2>Products Serial No.</h2>
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
                 <div class="row">
-                  <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="col-md-3 col-sm-3 col-xs-3">
-                      <label for="quantity">Quantity * :</label>
-                      <input type="number" min="1" max="100" name="quantity" id="quantity" value="4" required>
-                      <a class="btn btn-xs btn-danger d-none" id="resetQuantityBtn"><span
-                          class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;reset</a>
-                      <br><label id="err-exceed-quantity-limit" class="text-danger">(max 100)</label>
+                  <div class="col-md-6 col-sm-6 col-xs-6 text-start has-feedback">
+                    <div class="col-md-6 col-sm-6 col-xs-8">
+                      <label for="quantity">Quantity(max 100) * :</label>
+                      <input type="number" min="1" max="100" class="form-control has-feedback-left" id="quantity"
+                        name="quantity" required>
+                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-cubes form-control-feedback left"
+                        aria-hidden="true">
+                      </i>
                     </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3">
-                      <label for="unitPrice">Unit Price * :</label>
-                      <input type="number" name="unitPrice" id="unitPrice" placeholder="TK" required>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3">
-                      <label for="mrp">M.R.P. * :</label>
-                      <input type="number" name="mRP" id="mRP" placeholder="TK" required>
-                    </div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 text-center">
-                      <a class="btn btn-xs btn-dark" id="genRandomCodesBtn">
-                        <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random Serial No.
-                      </a>
-                      <a class="btn btn-xs btn-primary d-none" id="printRandomCodesBtn">
-                        <span class="glyphicon glyphicon-print"></span>&nbsp;&nbsp;Save Serial No.
+                    <div class="col-md-6 col-sm-6 col-xs-4">
+                      <a class="btn btn-xs btn-danger d-none input-addon-btn" id="resetQuantityBtn">
+                        <span class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;reset
                       </a>
                     </div>
+                  </div>
+                  <div class="col-md-9 col-sm-6 col-xs-6 text-right">
+                    <a class="btn btn-xs btn-dark d-none" id="genRandomCodesBtn">
+                      <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random Serial No.
+                    </a>
+                    <a class="btn btn-xs btn-primary d-none" id="printRandomCodesBtn">
+                      <span class="glyphicon glyphicon-print"></span>&nbsp;&nbsp;Save Serial No.
+                    </a>
                   </div>
                 </div>
                 <div class="clearfix"><br></div>
                 <!-- products serials no. input fields -->
                 <div id="productsSerialNo">
-                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback"></div>
-                  <div class="col-md-3 col-sm-3 col-xs-3">
-                    <input type="text" class="form-control" id="serialNo-0" placeholder="">
-                  </div>
-                  <div class="col-md-3 col-sm-3 col-xs-3">
-                    <input type="text" class="form-control" id="serialNo-1" placeholder="">
-                  </div>
-                  <div class="col-md-3 col-sm-3 col-xs-3">
-                    <input type="text" class="form-control" id="serialNo-2" placeholder="">
-                  </div>
-                  <div class="col-md-3 col-sm-3 col-xs-3">
-                    <input type="text" class="form-control" id="serialNo-3" placeholder="">
-                  </div>
+                  <div class="row text-center text-danger">Enter Product Quantity</div>
                   <!-- More field will be added by DOM JS if needed  -->
                 </div>
               </div>
@@ -575,6 +596,7 @@
 
         let unitPrice = document.getElementById("unitPrice");
         let mRP = document.getElementById("mRP");
+        let warranty = document.getElementById("warranty");
         let billAmount = document.getElementById("billAmount");
         let discount = document.getElementById("discount");
         let totalAmount = document.getElementById("totalAmount");
@@ -646,19 +668,18 @@
                   });
                   quantity.value = 100;
                   quantity.text = 100;
-                  updateProductSerialField(100);
-                } else {
-                  updateProductSerialField(q);
+                  q = 100;
                 }
+                updateProductSerialDiv(q);
               });
               genRandomCodesBtn.addEventListener("click", e => {
-                productCodes = insertRandomSerial(parseInt(quantity.value))
+                insertRandomSerial(parseInt(quantity.value));
               });
               resetQuantityBtn.addEventListener("click", e => {
-                updateProductSerialField(4);
-                document.getElementById("quantity").value = 4;
-                document.getElementById("quantity").disabled = false;
-                genRandomCodesBtn.classList.remove("d-none");
+                productsSerialNo.innerHTML = '<div class="row text-center text-danger">Enter Product Quantity</div>';
+                quantity.value = "";
+                quantity.disabled = false;
+                genRandomCodesBtn.classList.add("d-none");
                 printRandomCodesBtn.classList.add("d-none");
                 resetQuantityBtn.classList.add("d-none");
               })
@@ -686,6 +707,7 @@
                   note: note.value,
                   unit_price: parseInt(unitPrice.value),
                   mrp: parseInt(mRP.value),
+                  warranty: parseInt(warranty.value),
                   bill_amount: parseInt(billAmount.value),
                   discount: parseInt(discount.value),
                   total_amount: parseInt(totalAmount.value),
@@ -705,7 +727,7 @@
                 fetch('http://localhost:4321/api/inventory/restock-product', requestOptions)
                   .then(response => response.json())
                   .then(data => {
-                    console.log("Restock Product: ",data)
+                    console.log("Restock Product: ", data)
                     if (data.error === true) {
                       showErrorMessage(data.message)
                     } else {
@@ -760,9 +782,9 @@
         }
       }
       //updateProductSerialField adds input field as needed
-      function updateProductSerialField(quantity) {
+      function updateProductSerialDiv(quantity) {
         if (quantity > 0) {
-          productsSerialNo.innerHTML = `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
+          productsSerialNo.innerHTML = `<div class="row form-group"></div>`
           for (let i = 0; i < quantity; i++) {
             productsSerialNo.innerHTML += `
                   <div class="col-md-3 col-sm-3 col-xs-3">
@@ -770,10 +792,12 @@
                   </div>
                 `
             if (i % 4 === 3) {
-              productsSerialNo.innerHTML += `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
+              productsSerialNo.innerHTML += `<div class="row form-group"></div>`
             }
           }
         }
+        genRandomCodesBtn.classList.remove('d-none');
+        resetQuantityBtn.classList.remove('d-none')
       }
       //insertRandomSerial inserts random serial number for the products 
       function insertRandomSerial(quantity) {
