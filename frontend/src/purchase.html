@@ -239,7 +239,7 @@
       <div id="page-content" class="right_col" role="main">
 
         <!-- Page content here -->
-        <form action="#" id="purchase_form">
+        <form action="#" id="purchaseForm">
           <!-- Purchase Details Secetion  -->
           <div class="col-md-4 col-sm-4 col-xs-4">
             <div class="x_panel">
@@ -279,7 +279,7 @@
                   <!-- Category Info -->
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                     <div class="col-md-9 col-sm-8 col-xs-8">
-                      <label for="category">Item Category * :</label>
+                      <label for="category">Product Category * :</label>
                       <select id="category" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Category</option>
                         <!--Updated by JS DOM -->
@@ -294,20 +294,20 @@
                     </div>
                   </div>
 
-                  <!-- Item Info -->
+                  <!-- Product Info -->
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                     <div class="col-md-9 col-sm-8 col-xs-8">
-                      <label for="item">Item Name * :</label>
-                      <select id="item" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Item</option>
+                      <label for="product">Product Name * :</label>
+                      <select id="product" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Product</option>
                         <!--Updated by JS DOM -->
                       </select>
                       <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
                         aria-hidden="true"></i>
                     </div>
                     <div class="col-md-3 col-sm-4 col-xs-4" style="margin-top: 28px;">
-                      <a class="btn btn-xs btn-primary" id="createItemBtn" style="color: white;">
-                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Item
+                      <a class="btn btn-xs btn-primary" id="createProductBtn" style="color: white;">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Product
                       </a>
                     </div>
                   </div>
@@ -343,7 +343,7 @@
                       <!-- Chalan No -->
                       <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="chalan_no">Chalan No * :</label>
+                          <label for="chalan_no">Chalan No :</label>
                           <input type="text" class="form-control has-feedback-left" id="chalan_no"
                             placeholder="Chalan No">
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
@@ -354,7 +354,7 @@
                       <!-- Memo No -->
                       <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="memo_no">Memo No * :</label>
+                          <label for="memo_no">Memo No :</label>
                           <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No">
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
                             aria-hidden="true">
@@ -364,7 +364,7 @@
                       <!-- Note -->
                       <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="note">Note * :</label>
+                          <label for="note">Note :</label>
                           <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-comment form-control-feedback left"
                             aria-hidden="true">
@@ -378,8 +378,8 @@
                       <!-- Bill Amount -->
                       <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="bill_amount">Bill Amount * :</label>
-                          <input type="number" class="form-control has-feedback-left" id="bill_amount"
+                          <label for="billAmount">Bill Amount * :</label>
+                          <input type="number" class="form-control has-feedback-left" id="billAmount"
                             placeholder="Bill Amount" required>
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
@@ -389,7 +389,7 @@
                       <!-- Discount -->
                       <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="discount">Discount * :</label>
+                          <label for="discount">Discount :</label>
                           <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
                             aria-hidden="true">
@@ -399,8 +399,8 @@
                       <!-- Total Amount -->
                       <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="total_amount">Total Amount * :</label>
-                          <input type="number" class="form-control has-feedback-left" id="total_amount"
+                          <label for="totalAmount">Total Amount * :</label>
+                          <input type="number" class="form-control has-feedback-left" id="totalAmount"
                             placeholder="Total Amount" required>
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
@@ -410,8 +410,8 @@
                       <!-- Paid Amount -->
                       <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="paid_amount">Paid Amount * :</label>
-                          <input type="number" class="form-control has-feedback-left" id="paid_amount"
+                          <label for="paidAmount">Paid Amount * :</label>
+                          <input type="number" class="form-control has-feedback-left" id="paidAmount"
                             placeholder="Paid Amount" required>
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                             aria-hidden="true">
@@ -424,24 +424,32 @@
               </div>
             </div>
           </div>
-          <!-- Item Code Section -->
+          <!-- Product Code Section -->
           <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_panel" style="min-width: 720px;">
               <div class="x_title">
-                <h2>Items Serial No.</h2>
+                <h2>Products Serial No.</h2>
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
                 <div class="row">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="col-md-6 col-sm-6 col-xs-6">
-                      <label for="quantity">Total items:</label>
-                      <input type="number" min="1" max="100" name="quantity" id="quantity" value="4">
+                    <div class="col-md-3 col-sm-3 col-xs-3">
+                      <label for="quantity">Quantity * :</label>
+                      <input type="number" min="1" max="100" name="quantity" id="quantity" value="4" required>
                       <a class="btn btn-xs btn-danger d-none" id="resetQuantityBtn"><span
                           class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;reset</a>
                       <br><label id="err-exceed-quantity-limit" class="text-danger">(max 100)</label>
                     </div>
-                    <div class="col-md-6 col-sm-6 col-xs-6 text-center">
+                    <div class="col-md-3 col-sm-3 col-xs-3">
+                      <label for="unitPrice">Unit Price * :</label>
+                      <input type="number" name="unitPrice" id="unitPrice" placeholder="TK" required>
+                    </div>
+                    <div class="col-md-3 col-sm-3 col-xs-3">
+                      <label for="mrp">M.R.P. * :</label>
+                      <input type="number" name="mRP" id="mRP" placeholder="TK" required>
+                    </div>
+                    <div class="col-md-3 col-sm-3 col-xs-3 text-center">
                       <a class="btn btn-xs btn-dark" id="genRandomCodesBtn">
                         <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random Serial No.
                       </a>
@@ -452,8 +460,8 @@
                   </div>
                 </div>
                 <div class="clearfix"><br></div>
-                <!-- items serials no. input fields -->
-                <div id="items_serialNo">
+                <!-- products serials no. input fields -->
+                <div id="productsSerialNo">
                   <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback"></div>
                   <div class="col-md-3 col-sm-3 col-xs-3">
                     <input type="text" class="form-control" id="serialNo-0" placeholder="">
@@ -532,7 +540,7 @@
 
     <script>
 
-      let items, brands;
+      let products, brands;
 
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
@@ -542,37 +550,40 @@
         //for a successful registraion, autofill the the "supplier" field by current supplier id and name
 
         let category = document.getElementById("category");
-        // TODO: Get the a list of item category id , name and populate category div 
+        // TODO: Get the a list of product category id , name and populate category div 
         let createCategoryBtn = document.getElementById("createCategoryBtn");
         // TODO: Onclick ==> show a popup form to register new category
         //for a successful registraion, autofill the the "category" field by current category id and name
 
-        let item = document.getElementById("item");
-        // TODO: Get the a list of item id , name and populate item div 
-        let createItemBtn = document.getElementById("createItemBtn");
-        // TODO: Onclick ==> show a popup form to register new item
-        //for a successful registraion, autofill the the "item" field by current item id and name
+        let product = document.getElementById("product");
+        // TODO: Get the a list of product id , name and populate product div 
+        let createProductBtn = document.getElementById("createProductBtn");
+        // TODO: Onclick ==> show a popup form to register new product
+        //for a successful registraion, autofill the the "product" field by current product id and name
 
         let genRandomCodesBtn = document.getElementById("genRandomCodesBtn")
         let printRandomCodesBtn = document.getElementById("printRandomCodesBtn");
         //TODO: print the generated random codes
 
-        let items_serialNo = document.getElementById("items_serialNo");
+        let productsSerialNo = document.getElementById("productsSerialNo");
         let quantity = document.getElementById("quantity");
         let resetQuantityBtn = document.getElementById("resetQuantityBtn");
         let exceedQuantityLimit = document.getElementById("err-exceed-quantity-limit");
 
 
         let account = document.getElementById("account");
+
+        let unitPrice = document.getElementById("unitPrice");
+        let mRP = document.getElementById("mRP");
+        let billAmount = document.getElementById("billAmount");
         let discount = document.getElementById("discount");
+        let totalAmount = document.getElementById("totalAmount");
+        let paidAmount = document.getElementById("paidAmount");
         // TODO: Get the a list account info and populate account, discount div 
-        let form = document.getElementById('purchase_form');
+        let form = document.getElementById('purchaseForm');
         let submitBtn = document.getElementById("submitBtn");
         let processingBtn = document.getElementById("processingBtn");
         let invoiceBtn = document.getElementById("invoiceBtn");
-
-        //array of item codes
-        let itemCodes = new Array();
 
         //Fetch page data from server
         const requestOptions = {
@@ -592,21 +603,21 @@
               updateSupplierDiv(data.suppliers)
               updateCategoryDiv(data.categories)
               updateAccoutnsDiv(data.head_accounts)
-              //update item list based on selected category
+              //update product list based on selected category
               category.addEventListener("change", e => {
-                item.innerHTML = '';
+                product.innerHTML = '';
                 let isEmpty = true;
-                data.items.forEach(i => {
+                data.products.forEach(i => {
                   if (i.category_id == category.value) {
-                    item.innerHTML += `<option value="${i.id}">${i.item_name}</option>`;
+                    product.innerHTML += `<option value="${i.id}">${i.product_name}</option>`;
                     isEmpty = false;
                   }
                 })
 
                 if (isEmpty === true) {
                   let text = category.options[category.selectedIndex].text;
-                  item.innerHTML = `<option value="" selected disabled>No ${text} Available.</option>`;
-                  item.discount = true;
+                  product.innerHTML = `<option value="" selected disabled>No ${text} Available.</option>`;
+                  product.discount = true;
                 }
 
               });
@@ -615,36 +626,36 @@
               createSupplierBtn.addEventListener("click", e => {
                 addNewSupplier("purchase");
               });
-              //show popup form for adding new item category
+              //show popup form for adding new product category
               createCategoryBtn.addEventListener("click", e => {
                 addNewCategory("purchase", data.categories);
               });
-              //show popup form for adding new item type
-              createItemBtn.addEventListener("click", e => {
-                addNewItem("purchase", data.brands, data.categories, data.items);
+              //show popup form for adding new product type
+              createProductBtn.addEventListener("click", e => {
+                addNewProduct("purchase", data.brands, data.categories, data.products);
               });
 
               quantity.addEventListener("change", e => {
                 let q = parseInt(quantity.value);
                 if (q > 100) {
-                  // alert("Max 100 Item");
+                  // alert("Max 100 Product");
                   Swal.fire({
                     icon: "error",
-                    title: "Max 100 Items",
+                    title: "Max 100 Products",
                     showConfirmButton: true,
                   });
                   quantity.value = 100;
                   quantity.text = 100;
-                  updateItemSerialField(100);
+                  updateProductSerialField(100);
                 } else {
-                  updateItemSerialField(q);
+                  updateProductSerialField(q);
                 }
               });
               genRandomCodesBtn.addEventListener("click", e => {
-                itemCodes = insertRandomSerial(parseInt(quantity.value))
+                productCodes = insertRandomSerial(parseInt(quantity.value))
               });
               resetQuantityBtn.addEventListener("click", e => {
-                updateItemSerialField(4);
+                updateProductSerialField(4);
                 document.getElementById("quantity").value = 4;
                 document.getElementById("quantity").disabled = false;
                 genRandomCodesBtn.classList.remove("d-none");
@@ -655,20 +666,30 @@
               form.addEventListener('submit', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
+                //Getting productsCodes
+                let q = parseInt(quantity.value)
+                let productCodes = []; //reset length to 0
+                for (let i = 0; i < q; i++) {
+                  let id = "serialNo-" + i;
+                  let v = document.getElementById(id).value;
+                  productCodes.push(v);
+                }
                 let purchase_details = {
                   purchase_date: single_cal4.value,
                   supplier_id: parseInt(supplier.value),
-                  item_id: parseInt(item.value),
-                  quantity: parseInt(quantity.value),
-                  items_serial_no: itemCodes,
+                  product_id: parseInt(product.value),
+                  quantity: q,
+                  products_serial_no: productCodes,
                   account_id: parseInt(account.value),
                   chalan_no: chalan_no.value,
                   memo_no: memo_no.value,
                   note: note.value,
-                  bill_amount: parseInt(bill_amount.value),
+                  unit_price: parseInt(unitPrice.value),
+                  mrp: parseInt(mRP.value),
+                  bill_amount: parseInt(billAmount.value),
                   discount: parseInt(discount.value),
-                  total_amount: parseInt(total_amount.value),
-                  paid_amount: parseInt(paid_amount.value),
+                  total_amount: parseInt(totalAmount.value),
+                  paid_amount: parseInt(paidAmount.value),
                 }
                 console.log(purchase_details);
                 submitBtn.classList.add("d-none");
@@ -681,17 +702,18 @@
                   body: JSON.stringify(purchase_details),
                 }
 
-                fetch('http://localhost:4321/api/inventory/restock-item', requestOptions)
+                fetch('http://localhost:4321/api/inventory/restock-product', requestOptions)
                   .then(response => response.json())
                   .then(data => {
-                    console.log(data)
+                    console.log("Restock Product: ",data)
                     if (data.error === true) {
                       showErrorMessage(data.message)
                     } else {
                       showSuccessMessage(data.message);
                     }
-                    form.reset();
-                    submitBtn.classList.remove("d-none");
+                    // setTimeout(() => {
+                    //   location.reload();
+                    // }, 5000);
                   });
               })
               //account 
@@ -737,38 +759,35 @@
           account.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
         }
       }
-      //updateItemSerialField adds input field as needed
-      function updateItemSerialField(quantity) {
+      //updateProductSerialField adds input field as needed
+      function updateProductSerialField(quantity) {
         if (quantity > 0) {
-          items_serialNo.innerHTML = `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
+          productsSerialNo.innerHTML = `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
           for (let i = 0; i < quantity; i++) {
-            items_serialNo.innerHTML += `
+            productsSerialNo.innerHTML += `
                   <div class="col-md-3 col-sm-3 col-xs-3">
                     <input type="text" class="form-control" id="serialNo-${i}" placeholder="">
                   </div>
                 `
             if (i % 4 === 3) {
-              items_serialNo.innerHTML += `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
+              productsSerialNo.innerHTML += `<div class="col-md-12 col-sm-12 col-xs-12 form-group"></div>`
             }
           }
         }
       }
-      //insertRandomSerial inserts random serial number for the items 
+      //insertRandomSerial inserts random serial number for the products 
       function insertRandomSerial(quantity) {
-        let itemCodes = []; //reset length to 0
         for (let i = 0; i < quantity; i++) {
           let id = "serialNo-" + i;
           let uuid = crypto.randomUUID();
           document.getElementById(id).value = uuid;
           document.getElementById(id).text = uuid;
           document.getElementById(id).disabled = true;
-          itemCodes.push(uuid);
         }
         document.getElementById("quantity").disabled = true;
         genRandomCodesBtn.classList.add("d-none");
         printRandomCodesBtn.classList.remove("d-none");
         resetQuantityBtn.classList.remove("d-none");
-        return itemCodes;
       }
 
     </script>

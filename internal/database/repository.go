@@ -28,11 +28,18 @@ type DatabaseRepo interface {
 	GetCategoryList() ([]*models.Category, error)
 	GetActiveCategoryList() ([]*models.Category, error)
 
-	AddItem(i models.Item) (int, error)
-	GetItemList() ([]*models.Item, error)
-	GetActiveItems() ([]*models.Item, error)
-	GetAvailableItemsByCategoryID(cat_id int) ([]*models.Item, error)
-	GetAvailableItemsDetails() ([]*models.Item, error)
+	AddProduct(i models.Product) (int, error)
+	GetProductList() ([]*models.Product, error)
+	GetActiveProducts() ([]*models.Product, error)
+	GetAvailableProductsByCategoryID(cat_id int) ([]*models.Product, error)
+	GetAvailableProductsDetails() ([]*models.Product, error)
+	UpdateProductQuantity(quantity, productID int) error
+
+	AddProductSerialNumbers(purchase *models.Purchase) error
+
+	AddToPurchaseHistory(purchase *models.Purchase) (int, error)
+
+	RestockProduct(purchase *models.Purchase)(error)
 	//Helper functions
 	CountRows(tableName string) (int, error)
 }

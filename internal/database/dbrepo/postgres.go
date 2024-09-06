@@ -5,6 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -278,7 +280,6 @@ func (p *postgresDBRepo) AddCustomer(customer models.Customer) (int, error) {
 	}
 
 	return id, nil
-
 }
 
 // GetCustomerPaginated returns a chunks of customers
@@ -395,7 +396,6 @@ func (p *postgresDBRepo) AddSupplier(supplier models.Supplier) (int, error) {
 	}
 
 	return id, nil
-
 }
 
 // GetSuppliersIDAndName returns a slice of suppliers name with id
@@ -717,19 +717,19 @@ func (p *postgresDBRepo) GetActiveCategoryList() ([]*models.Category, error) {
 }
 
 // AddCategory inserts new product category to the database
-func (p *postgresDBRepo) AddItem(i models.Item) (int, error) {
+func (p *postgresDBRepo) AddProduct(i models.Product) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.items (item_code, item_name, item_description, item_status, quantity, category_id, brand_id, discount, created_at, updated_at) 
+	stmt := `INSERT INTO public.products (product_code, product_name, product_description, product_status, quantity, category_id, brand_id, discount, created_at, updated_at) 
 				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
-		i.ItemCode,
-		i.ItemName,
-		i.ItemDescription,
-		i.ItemStatus,
+		i.ProductCode,
+		i.ProductName,
+		i.ProductDescription,
+		i.ProductStatus,
 		i.Quantity,
 		i.CategoryID,
 		i.BrandID,
@@ -745,17 +745,17 @@ func (p *postgresDBRepo) AddItem(i models.Item) (int, error) {
 	return id, nil
 }
 
-// GetItemList returns a list of all items from the database
-func (p *postgresDBRepo) GetItemList() ([]*models.Item, error) {
+// GetProductList returns a list of all products from the database
+func (p *postgresDBRepo) GetProductList() ([]*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	var items []*models.Item
+	var products []*models.Product
 
 	query := `
 		SELECT 
-			i.id, i.item_code, i.item_name, i.item_description, i.item_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
 		FROM 
-			public.items i
+			public.products i
 			INNER JOIN brands b ON (b.id = i.category_id); 
 		`
 	var rows *sql.Rows
@@ -763,18 +763,18 @@ func (p *postgresDBRepo) GetItemList() ([]*models.Item, error) {
 
 	rows, err = p.DB.QueryContext(ctx, query)
 	if err != nil {
-		return items, err
+		return products, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var i models.Item
+		var i models.Product
 		err = rows.Scan(
 			&i.ID,
-			&i.ItemCode,
-			&i.ItemName,
-			&i.ItemDescription,
-			&i.ItemStatus,
+			&i.ProductCode,
+			&i.ProductName,
+			&i.ProductDescription,
+			&i.ProductStatus,
 			&i.Quantity,
 			&i.CategoryID,
 			&i.BrandID,
@@ -785,43 +785,43 @@ func (p *postgresDBRepo) GetItemList() ([]*models.Item, error) {
 			&i.Brand.Name,
 		)
 		if err != nil {
-			return items, err
+			return products, err
 		}
-		items = append(items, &i)
+		products = append(products, &i)
 	}
-	return items, nil
+	return products, nil
 }
 
-// GetAvailableItems returns a list of in-stock and active item from the database
-func (p *postgresDBRepo) GetActiveItems() ([]*models.Item, error) {
+// GetAvailableProducts returns a list of in-stock and active product from the database
+func (p *postgresDBRepo) GetActiveProducts() ([]*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	var items []*models.Item
+	var products []*models.Product
 
 	query := `
 		SELECT 
-			i.id, i.item_code, i.item_name, i.quantity, i.category_id, i.discount, b.id, b.name
+			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.discount, b.id, b.name
 		FROM 
-			public.items i
+			public.products i
 			INNER JOIN brands b ON (b.id = i.category_id)
 		WHERE 
-			item_status = true; 
+			product_status = true; 
 		`
 	var rows *sql.Rows
 	var err error
 
 	rows, err = p.DB.QueryContext(ctx, query)
 	if err != nil {
-		return items, err
+		return products, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var i models.Item
+		var i models.Product
 		err = rows.Scan(
 			&i.ID,
-			&i.ItemCode,
-			&i.ItemName,
+			&i.ProductCode,
+			&i.ProductName,
 			&i.Quantity,
 			&i.CategoryID,
 			&i.Discount,
@@ -829,45 +829,45 @@ func (p *postgresDBRepo) GetActiveItems() ([]*models.Item, error) {
 			&i.Brand.Name,
 		)
 		if err != nil {
-			return items, err
+			return products, err
 		}
-		items = append(items, &i)
+		products = append(products, &i)
 	}
-	return items, nil
+	return products, nil
 }
 
-// GetAvailableItems returns a list of details info in-stock and active item from the database
-func (p *postgresDBRepo) GetAvailableItemsDetails() ([]*models.Item, error) {
+// GetAvailableProducts returns a list of details info in-stock and active product from the database
+func (p *postgresDBRepo) GetAvailableProductsDetails() ([]*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	var items []*models.Item
+	var products []*models.Product
 
 	query := `
 		SELECT 
-			i.id, i.item_code, i.item_name, i.item_description, i.item_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
 		FROM 
-			public.items i
+			public.products i
 			INNER JOIN brands b ON (b.id = i.category_id)
 		WHERE 
-			item_status = true AND quantity > 0; 
+			product_status = true AND quantity > 0; 
 		`
 	var rows *sql.Rows
 	var err error
 
 	rows, err = p.DB.QueryContext(ctx, query)
 	if err != nil {
-		return items, err
+		return products, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var i models.Item
+		var i models.Product
 		err = rows.Scan(
 			&i.ID,
-			&i.ItemCode,
-			&i.ItemName,
-			&i.ItemDescription,
-			&i.ItemStatus,
+			&i.ProductCode,
+			&i.ProductName,
+			&i.ProductDescription,
+			&i.ProductStatus,
 			&i.Quantity,
 			&i.CategoryID,
 			&i.BrandID,
@@ -878,45 +878,45 @@ func (p *postgresDBRepo) GetAvailableItemsDetails() ([]*models.Item, error) {
 			&i.Brand.Name,
 		)
 		if err != nil {
-			return items, err
+			return products, err
 		}
-		items = append(items, &i)
+		products = append(products, &i)
 	}
-	return items, nil
+	return products, nil
 }
 
-// GetAvailableItemsByCategoryID returns a list of in-stock and active item that related to category ID from the database
-func (p *postgresDBRepo) GetAvailableItemsByCategoryID(cat_id int) ([]*models.Item, error) {
+// GetAvailableProductsByCategoryID returns a list of in-stock and active product that related to category ID from the database
+func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	var items []*models.Item
+	var products []*models.Product
 
 	query := `
 		SELECT 
-			i.id, i.item_code, i.item_name, i.item_description, i.item_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
 		FROM 
-			public.items i
+			public.products i
 			INNER JOIN brands b ON (b.id = i.category_id)
 		WHERE 
-			item_status = true AND quantity > 0 AND category_id = $1; 
+			product_status = true AND quantity > 0 AND category_id = $1; 
 		`
 	var rows *sql.Rows
 	var err error
 
 	rows, err = p.DB.QueryContext(ctx, query, cat_id)
 	if err != nil {
-		return items, err
+		return products, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var i models.Item
+		var i models.Product
 		err = rows.Scan(
 			&i.ID,
-			&i.ItemCode,
-			&i.ItemName,
-			&i.ItemDescription,
-			&i.ItemStatus,
+			&i.ProductCode,
+			&i.ProductName,
+			&i.ProductDescription,
+			&i.ProductStatus,
 			&i.Quantity,
 			&i.CategoryID,
 			&i.BrandID,
@@ -927,11 +927,175 @@ func (p *postgresDBRepo) GetAvailableItemsByCategoryID(cat_id int) ([]*models.It
 			&i.Brand.Name,
 		)
 		if err != nil {
-			return items, err
+			return products, err
 		}
-		items = append(items, &i)
+		products = append(products, &i)
 	}
-	return items, nil
+	return products, nil
+}
+
+// UpdateProductQuantity increases product quantity, to reduce product quantity pass negetive quantity number
+func (p *postgresDBRepo) UpdateProductQuantity(quantity, productID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	stmt := `UPDATE public.products
+        SET quantity = quantity + $1
+        WHERE id = $2;`
+	// Execute the query
+	_, err := p.DB.ExecContext(ctx, stmt, quantity, productID)
+	if err != nil {
+		return errors.New("SQLErrorUpdateProductQuantity:" + err.Error())
+	}
+	return nil
+}
+
+// AddToPurchaseHistory insets purchase history info to the database
+func (p *postgresDBRepo) AddToPurchaseHistory(purchase *models.Purchase) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var id int
+
+	stmt := `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
+	`
+	err := p.DB.QueryRowContext(ctx, stmt,
+		purchase.PurchaseDate,
+		purchase.SupplierID,
+		purchase.ProductID,
+		purchase.AccountID,
+		purchase.ChalanNO,
+		purchase.MemoNo,
+		purchase.Note,
+		purchase.BillAmount,
+		purchase.Discount,
+		purchase.TotalAmount,
+		purchase.PaidAmount,
+		time.Now(),
+		time.Now(),
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+// AddProductSerialNumbers insets product serial numbers to the database
+func (p *postgresDBRepo) AddProductSerialNumbers(purchase *models.Purchase) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	values := []string{}
+	now := time.Now()
+	purchase.CreatedAt = now
+	purchase.UpdatedAt = now
+
+	// Format timestamps with time zone in a PostgreSQL-friendly format
+	createdAt := purchase.CreatedAt.Format("2006-01-02 15:04:05 -07:00")
+	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
+
+	for _, serial_number := range purchase.ProductsSerialNo {
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.UnitPrice, purchase.MRP, createdAt, updatedAt))
+	}
+
+	query := "INSERT INTO public.product_serial_numbers (serial_number,product_id,unit_price,mrp,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	// Execute the query
+	_, err := p.DB.ExecContext(ctx, query)
+	if err != nil {
+		return errors.New("SQLErrorAddProductSerialNumbers:" + err.Error())
+	}
+	return nil
+}
+
+// RestockProduct update product quantity, store purchase history and product serial numbers
+func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	//Tx-1: Update product quantity
+	//Set quantity += newQuantity
+	query := `UPDATE public.products
+        SET quantity = quantity + $1
+        WHERE id = $2;`
+	// Execute the query
+	_, err = tx.ExecContext(ctx, query, purchase.Quantity, purchase.ProductID)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Upadate Quantity):" + err.Error())
+	}
+	//Tx-2: Insert data to purchase history table
+	//.........insert the following data into purchase_history table.........
+	// PurchaseDate     string
+	// SupplierID       int
+	// ProductID        int
+	// AccountID        int
+	// ChalanNO         string
+	// MemoNo           string
+	// Note             string
+	// BillAmount       int
+	// Discount         int
+	// TotalAmount      int
+	// PaidAmount       int
+	var id int
+	query = `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
+	`
+	row := tx.QueryRowContext(ctx, query,
+		purchase.PurchaseDate,
+		purchase.SupplierID,
+		purchase.ProductID,
+		purchase.AccountID,
+		purchase.ChalanNO,
+		purchase.MemoNo,
+		purchase.Note,
+		purchase.BillAmount,
+		purchase.Discount,
+		purchase.TotalAmount,
+		purchase.PaidAmount,
+		time.Now(),
+		time.Now(),
+	)
+	if err = row.Scan(&id); err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Upadate Quantity):" + err.Error())
+	}
+
+	//Tx-3: store product serial numbers
+	//.........insert the following data into product_serial_numbers table............//
+	//ProductID        int
+	// ProductsSerialNo []string
+	// UnitPrice        int
+	// MRP              int
+
+	values := []string{}
+	now := time.Now()
+	purchase.CreatedAt = now
+	purchase.UpdatedAt = now
+
+	// Format timestamps with time zone in a PostgreSQL-friendly format
+	createdAt := purchase.CreatedAt.Format("2006-01-02 15:04:05 -07:00")
+	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
+
+	for _, serial_number := range purchase.ProductsSerialNo {
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.UnitPrice, purchase.MRP, createdAt, updatedAt))
+	}
+
+	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,unit_price,mrp,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	// Execute the query
+	_, err = tx.ExecContext(ctx, query)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Product Serial Number):" + err.Error())
+	}
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		return errors.New("SQLErrorRestockProduct(Commit):" + err.Error())
+	}
+	return nil
 }
 
 // Helper functions

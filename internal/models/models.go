@@ -103,7 +103,7 @@ type Employee struct {
 	UpdatedAt   time.Time `json:"updated_at,omitempty"`
 }
 
-// Item is the type for items
+// Product is the type for products
 type HeadAccount struct {
 	ID            int       `json:"id,omitempty"`
 	AccountCode   string    `json:"account_code,omitempty"`
@@ -114,37 +114,41 @@ type HeadAccount struct {
 	UpdatedAt     time.Time `json:"updated_at,omitempty"`
 }
 
-// Item is the type for items
-type Item struct {
-	ID              int       `json:"id,omitempty"`
-	ItemCode        string    `json:"item_code,omitempty"`
-	ItemName        string    `json:"item_name,omitempty"`
-	ItemDescription string    `json:"item_description,omitempty"`
-	ItemStatus      bool      `json:"item_status,omitempty"`
-	Quantity        int       `json:"quantity,omitempty"`
-	CategoryID      int       `json:"category_id,omitempty"`
-	BrandID         int       `json:"brand_id,omitempty"`
-	Discount        int       `json:"discount,omitempty"`
-	CreatedAt       time.Time `json:"created_at,omitempty"`
-	UpdatedAt       time.Time `json:"updated_at,omitempty"`
-	Brand           Brand     `json:"brand,omitempty"`
+// Product is the type for products
+type Product struct {
+	ID                 int       `json:"id,omitempty"`
+	ProductCode        string    `json:"product_code,omitempty"`
+	ProductName        string    `json:"product_name,omitempty"`
+	ProductDescription string    `json:"product_description,omitempty"`
+	ProductStatus      bool      `json:"product_status,omitempty"`
+	Quantity           int       `json:"quantity,omitempty"`
+	CategoryID         int       `json:"category_id,omitempty"`
+	BrandID            int       `json:"brand_id,omitempty"`
+	Discount           int       `json:"discount,omitempty"`
+	CreatedAt          time.Time `json:"created_at,omitempty"`
+	UpdatedAt          time.Time `json:"updated_at,omitempty"`
+	Brand              Brand     `json:"brand,omitempty"`
 }
 
 // Purchase is the type for purchase info
 type Purchase struct {
-	PurchaseDate  time.Time `json:"purchase_date,omitempty"`
-	SupplierID    int       `json:"supplier_id,omitempty"`
-	ItemID        int       `json:"item_id,omitempty"`
-	Quantity      int       `json:"quantity,omitempty"`
-	ItemsSerialNo int       `json:"items_serial_no,omitempty"`
-	AccountID     int       `json:"account_id,omitempty"`
-	ChalanNO      string    `json:"chalan_no"`
-	MemoNo        string    `json:"memo_no"`
-	Note          string    `json:"note"`
-	BillAmount    int       `json:"bill_amount,omitempty"`
-	Discount      int       `json:"discount,omitempty"`
-	TotalAmount   int       `json:"total_amount,omitempty"`
-	PaidAmount    int       `json:"paid_amount,omitempty"`
+	PurchaseDate     string    `json:"purchase_date,omitempty"`
+	SupplierID       int       `json:"supplier_id,omitempty"`
+	ProductID        int       `json:"product_id,omitempty"`
+	Quantity         int       `json:"quantity,omitempty"`
+	ProductsSerialNo []string  `json:"products_serial_no,omitempty"`
+	AccountID        int       `json:"account_id,omitempty"`
+	ChalanNO         string    `json:"chalan_no,omitempty"`
+	MemoNo           string    `json:"memo_no,omitempty"`
+	Note             string    `json:"note,omitempty"`
+	UnitPrice        int       `json:"unit_price,omitempty"`
+	MRP              int       `json:"mrp,omitempty"`
+	BillAmount       int       `json:"bill_amount,omitempty"`
+	Discount         int       `json:"discount,omitempty"`
+	TotalAmount      int       `json:"total_amount,omitempty"`
+	PaidAmount       int       `json:"paid_amount,omitempty"`
+	CreatedAt        time.Time `json:"created_at,omitempty"`
+	UpdatedAt        time.Time `json:"updated_at,omitempty"`
 }
 
 // Supplier is the type for suppliers
@@ -191,7 +195,7 @@ type Invoice struct {
 	LastName  string           `json:"last_name,omitempty"`
 	Email     string           `json:"email,omitempty"`
 	CreatedAt time.Time        `json:"created_at,omitempty"`
-	Items     []InvoiceProduct `json:"items,omitempty"`
+	Products  []InvoiceProduct `json:"items,omitempty"`
 }
 type InvoiceProduct struct {
 	ID       int    `json:"product_id,omitempty"`

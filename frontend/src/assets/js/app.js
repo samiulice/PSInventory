@@ -16,19 +16,19 @@ function paginator(currPageIndex, pageSize, totalRecords) {
 
 
     if (currPageIndex > 1) {
-      htmlTmpl += `<li class="page-item"><a class="page-link" href="#" onclick="updatePage(${pageSize}, ${currPageIndex - 1})">Previous</a></li>`;
+      htmlTmpl += `<li class="page-product"><a class="page-link" href="#" onclick="updatePage(${pageSize}, ${currPageIndex - 1})">Previous</a></li>`;
     } else {
-      htmlTmpl += `<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>`;
+      htmlTmpl += `<li class="page-product disabled"><a class="page-link" href="#">Previous</a></li>`;
     }
     pages = Math.ceil(totalRecords / pageSize)
     for (let i = 1; i <= pages; i++) {
-      htmlTmpl += `<li class="page-item ${i === currPageIndex ? 'active' : ''}"><a class="page-link" href="#" onclick="updatePage(${pageSize}, ${i})">${i}</a></li>`;
+      htmlTmpl += `<li class="page-product ${i === currPageIndex ? 'active' : ''}"><a class="page-link" href="#" onclick="updatePage(${pageSize}, ${i})">${i}</a></li>`;
     }
 
     if (currPageIndex == pages) {
-      htmlTmpl += `<li class="page-item disabled"><a class="page-link" href="#">Next</a></li>`;
+      htmlTmpl += `<li class="page-product disabled"><a class="page-link" href="#">Next</a></li>`;
     } else {
-      htmlTmpl += `<li class="page-item"><a class="page-link" href="#" onclick="updatePage(${pageSize}, ${currPageIndex + 1})">Next</a></li>`;
+      htmlTmpl += `<li class="page-product"><a class="page-link" href="#" onclick="updatePage(${pageSize}, ${currPageIndex + 1})">Next</a></li>`;
     }
 
     pNav.innerHTML = htmlTmpl;
@@ -175,10 +175,10 @@ function updateChildList(parent, child, mapName) {
   subcategorySelect.appendChild(option);
 
   // Populate the subcategory dropdown with the fetched subcategory lists
-  lists.forEach(item => {
+  lists.forEach(product => {
     const option = document.createElement("option");
-    option.value = item;
-    option.textContent = item;
+    option.value = product;
+    option.textContent = product;
     subcategorySelect.appendChild(option);
   });
 }
@@ -339,8 +339,8 @@ function addNewBrand(page) {
     }
   });
 }
-//addNewItem show a popup form and then make an api call to insert iten data to the database table
-function addNewItem(page, brands, categories, items) {
+//addNewProduct show a popup form and then make an api call to insert iten data to the database table
+function addNewProduct(page, brands, categories, products) {
   let brandList = '';
   let categoryList = '';
   if (brands) {
@@ -362,18 +362,18 @@ function addNewItem(page, brands, categories, items) {
   let htmlContent = `
       <div class="x_panel">
           <div class="x_content">
-              <form id="add-item" class="needs-validation" novalidate>
-                  <!-- Item Name -->
+              <form id="add-product" class="needs-validation" novalidate>
+                  <!-- Product Name -->
                   <div class="col-6 form-group has-feedback">
                       <input type="text" class="form-control has-feedback-left" id="name" name="name"
-                          placeholder="Item Name" autocomplete="off" required>
-                      <div class="invalid-feedback d-none text-danger">Please enter the item name.</div>
+                          placeholder="Product Name" autocomplete="off" required>
+                      <div class="invalid-feedback d-none text-danger">Please enter the product name.</div>
                       <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                   </div>
                   <div class="col-6 form-group has-feedback">
                       <input type="text" class="form-control has-feedback-left" id="description" name="description"
-                          placeholder="Item Description(Optional)" autocomplete="off">
-                      <div class="invalid-feedback d-none text-danger">Please enter the item name.</div>
+                          placeholder="Product Description(Optional)" autocomplete="off">
+                      <div class="invalid-feedback d-none text-danger">Please enter the product name.</div>
                       <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                   </div>
                   <div class="col-6 form-group has-feedback">` + categoryList +
@@ -400,7 +400,7 @@ function addNewItem(page, brands, categories, items) {
       </div>
         `;
   Swal.fire({
-    title: 'Add New item',
+    title: 'Add New product',
     width: 600,
     html: htmlContent,
     showCloseButton: true,
@@ -409,7 +409,7 @@ function addNewItem(page, brands, categories, items) {
     allowOutsideClick: false,
     preConfirm: () => {
       return new Promise((resolve) => {
-        const form = document.getElementById('add-item');
+        const form = document.getElementById('add-product');
         const formFields = form.querySelectorAll('.form-control, .form-select');
         let isValid = true;
 
@@ -443,7 +443,7 @@ function addNewItem(page, brands, categories, items) {
       });
     },
     willOpen: () => {
-      const form = document.getElementById('add-item');
+      const form = document.getElementById('add-product');
       form.addEventListener('submit', function (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -470,9 +470,9 @@ function addNewItem(page, brands, categories, items) {
   }).then((result) => {
     if (result.isConfirmed) {
       const data = result.value;
-      let item = {
-        item_name: data.name,
-        item_description: data.description,
+      let product = {
+        product_name: data.name,
+        product_description: data.description,
         brand_id: parseInt(data.brand_id),
         category_id: parseInt(data.category_id),
         discount: parseInt(data.discount),
@@ -483,11 +483,11 @@ function addNewItem(page, brands, categories, items) {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(item),
+        body: JSON.stringify(product),
       }
-      console.log(item)
+      console.log(product)
 
-      fetch('http://localhost:4321/api/inventory/add-item', requestOptions)
+      fetch('http://localhost:4321/api/inventory/add-product', requestOptions)
         .then(response => response.json())
         .then(data => {
           console.log(data)
@@ -497,10 +497,10 @@ function addNewItem(page, brands, categories, items) {
             showSuccessMessage(data.message);
 
             if (page === "purchase") {
-              document.getElementById("item").innerHTML = '';
-              document.getElementById("item").innerHTML = `<option value="${data.result.id}" selected>${data.result.item_name}</option>`;;
-              document.getElementById("item").disabled = true;
-              items.push(data.result);
+              document.getElementById("product").innerHTML = '';
+              document.getElementById("product").innerHTML = `<option value="${data.result.id}" selected>${data.result.product_name}</option>`;;
+              document.getElementById("product").disabled = true;
+              products.push(data.result);
             }
           }
         });

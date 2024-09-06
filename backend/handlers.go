@@ -319,54 +319,55 @@ func (app *application) AddCategory(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// AddItem insert new item type to database
-func (app *application) AddItem(w http.ResponseWriter, r *http.Request) {
+// AddProduct insert new product type to database
+func (app *application) AddProduct(w http.ResponseWriter, r *http.Request) {
 
-	var item models.Item
-	err := app.readJSON(w, r, &item)
+	var product models.Product
+	err := app.readJSON(w, r, &product)
 	if err != nil {
 		app.badRequest(w, err)
 		return
 	}
 	//sanitize blank variables
-	code, err := app.DB.CountRows("items")
+	code, err := app.DB.CountRows("products")
 	if err != nil {
 		app.badRequest(w, err)
 		return
 	}
-	item.ItemCode = fmt.Sprintf("i-%06d", code)
-	item.ItemStatus = true
+	product.ProductCode = fmt.Sprintf("i-%06d", code)
+	product.ProductStatus = true
 
-	id, err := app.DB.AddItem(item)
+	id, err := app.DB.AddProduct(product)
 	if err != nil {
 		app.badRequest(w, err)
 		return
 	}
-	item.ID = id
+	product.ID = id
 	var resp = JSONResponse{
 		Error:   false,
-		Message: "Item Added Succesfully",
-		Result:  item,
+		Message: "Product Added Succesfully",
+		Result:  product,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// RestockItem add new purchased item to database
-func (app *application) RestockItem(w http.ResponseWriter, r *http.Request) {
-
+// RestockProduct add new purchased product to database
+func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 	var purchase_details models.Purchase
 	err := app.readJSON(w, r, &purchase_details)
 	if err != nil {
 		app.badRequest(w, err)
 		return
 	}
-
-	//TODO store purhcase data
-	//........................//
+	err = app.DB.RestockProduct(&purchase_details)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
 	var resp = JSONResponse{
 		Error:   false,
-		Message: "restock item Succesfully",
-		Result:  nil,
+		Message: "restock product Succesfully",
+		Result:  purchase_details,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -375,7 +376,7 @@ func (app *application) RestockItem(w http.ResponseWriter, r *http.Request) {
 func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 	//supplier
 	//category
-	//item
+	//product
 	//account
 	var resp struct {
 		Error      bool               `json:"error,omitempty"`
@@ -383,7 +384,7 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 		Suppliers  []*models.Supplier `json:"suppliers,omitempty"`
 		Categories []*models.Category `json:"categories,omitempty"`
 		Brands     []*models.Brand    `json:"brands,omitempty"`
-		Items      []*models.Item     `json:"items,omitempty"`
+		Products   []*models.Product  `json:"products,omitempty"`
 
 		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
 	}
@@ -412,10 +413,10 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive items from the database
-	items, err := app.DB.GetActiveItems()
+	//retrive products from the database
+	products, err := app.DB.GetActiveProducts()
 	if err == sql.ErrNoRows {
-		resp.Message += "||No Item Available||"
+		resp.Message += "||No Product Available||"
 	} else if err != nil {
 		app.badRequest(w, err) //send error response
 		return
@@ -435,7 +436,7 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 	resp.Suppliers = suppliers
 	resp.Categories = categories
 	resp.Brands = brands
-	resp.Items = items
+	resp.Products = products
 	resp.HeadAccounts = headAccounts
 
 	app.writeJSON(w, http.StatusOK, resp)

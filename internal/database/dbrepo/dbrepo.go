@@ -1,16 +1,16 @@
 package dbrepo
 
 import (
+	repository "PSInventory/internal/database"
 	"database/sql"
-	"PSInventory/internal/database"
 )
 
 type postgresDBRepo struct {
-	DB  *sql.DB
+	DB *sql.DB
 }
 
 func NewDBRepo(conn *sql.DB) repository.DatabaseRepo {
 	return &postgresDBRepo{
-		DB:  conn,
+		DB: conn,
 	}
 }

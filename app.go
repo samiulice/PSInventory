@@ -5,7 +5,6 @@ import (
 	repository "PSInventory/internal/database"
 	"PSInventory/internal/database/dbrepo"
 	"PSInventory/internal/driver"
-	"PSInventory/internal/models"
 	"context"
 	"database/sql"
 )
@@ -61,8 +60,8 @@ func (a *App) shutdown(ctx context.Context) {
 }
 
 // Greet returns a greeting for the given name
-func (a *App) Greet() []*models.Item {
-	// brands, err := a.DB.
-	var b []*models.Item
-	return b
-}
+// func (a *App) Greet() []*models.Product {
+// 	// brands, err := a.DB.
+// 	var b []*models.Product
+// 	return b
+// }

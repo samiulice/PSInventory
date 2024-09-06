@@ -34,8 +34,8 @@ func (app *application) routes() http.Handler {
 		
 		mux.Post("/inventory/add-brand", app.AddBrand)
 		mux.Post("/inventory/add-category", app.AddCategory)
-		mux.Post("/inventory/add-item", app.AddItem)
-		mux.Post("/inventory/restock-item", app.RestockItem)
+		mux.Post("/inventory/add-product", app.AddProduct)
+		mux.Post("/inventory/restock-product", app.RestockProduct)
 		mux.Post("/inventory/purchase/getPageDetails", app.GetPageDetails)
 	})
 	return mux
