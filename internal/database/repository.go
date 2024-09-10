@@ -38,7 +38,7 @@ type DatabaseRepo interface {
 	AddProductSerialNumbers(purchase *models.Purchase) error
 
 	AddToPurchaseHistory(purchase *models.Purchase) (int, error)
-
+	GetMemoListWithPurchaseID(supplierID int)([]*models.Purchase, error)
 	RestockProduct(purchase *models.Purchase)(error)
 	//Helper functions
 	CountRows(tableName string) (int, error)

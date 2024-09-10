@@ -132,6 +132,7 @@ type Product struct {
 
 // Purchase is the type for purchase info
 type Purchase struct {
+	ID               int       `json:"id"`
 	PurchaseDate     string    `json:"purchase_date,omitempty"`
 	SupplierID       int       `json:"supplier_id,omitempty"`
 	ProductID        int       `json:"product_id,omitempty"`

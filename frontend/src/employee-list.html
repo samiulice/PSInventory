@@ -87,7 +87,7 @@
                     <li><a href="#sale-return.html">Sale Return</a></li>
                     <li><a href="#sale-replace.html">Sale Replace</a></li>
                     <li><a href="purchase.html">Purchase</a></li>
-                    <li><a href="#purchase-return.html">Purchase Return</a></li>
+                    <li><a href="purchase-return.html">Purchase Return</a></li>
                     <li><a href="#warranty-check.html">Warranty Check</a></li>
                     <li><a href="#repair.html">Repair</a></li>
                     <li><a href="#delivary.html">Delivary</a></li>
@@ -238,36 +238,14 @@
 
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
-        <!-- top tiles -->
+        <!-- Content Title -->
+        <h2 class="text-center text-warning fa-2x"><label>Employee List</label></h2>
         <!-- Page content here -->
         <div class="x_panel">
-          <div class="x_title">
-            <h3 class="text-center">
-              Employee List
-            </h3>
-            <ul class="nav navbar-right panel_toolbox">
-              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-              </li>
-              <li><a><i class="fa fa-print"></i><!-- TODO: call print format later --></a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
-                    class="fa fa-save"></i></a><!-- TODO: call file formater later -->
-                <ul class="dropdown-menu" role="menu">
-                  <li><a href="#">PDF</a>
-                  </li>
-                  <li><a href="#">Excel</a>
-                  </li>
-                </ul>
-              </li>
-              <li><a class="close-link"><i class="fa fa-close"></i></a>
-              </li>
-            </ul>
-            <div class="clearfix"></div>
-          </div>
           <div class="x_content">
             <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
               <div class="row">
-                <div class="col-6">
+                <div class="col-4">
                   <div class="dataTables_length" id="datatable_length">
                     <label>Show
                       <select id="page_length_selector" name="datatable_length" aria-controls="datatable"
@@ -281,7 +259,7 @@
                     </label>
                   </div>
                 </div>
-                <div class="col-6 text-right">
+                <div class="col-4 text-right">
                   <div id="add_employee">
                     <a class="btn btn-primary" id="add-employee-btn" style="color: white;"><i
                         class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Employee</a>

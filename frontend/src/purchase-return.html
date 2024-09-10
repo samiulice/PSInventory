@@ -35,7 +35,7 @@
   <div class="container body">
     <div class="main_container">
       <div class="col-md-3 left_col menu_fixed">
-        <div class="left_col">
+        <div class="left_col scroll-view">
           <div class="navbar nav_title" style="border: 0;">
             <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Company Name</span></a>
           </div>
@@ -237,106 +237,78 @@
 
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
-
+        <!-- Content Title -->
+        <h2 class="text-center text-warning fa-2x"><label>Purchase Return</label></h2>
         <!-- Page content here -->
-        <div class="x_panel">
-          <div class="x_title">
-            <h2>Registration Form</h2>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <div class="row text-center">
-              <div class="h5 badge bg-success d-none" id="alert_msg">This is a test alert</div>
+        <form action="#" id="purchaseReturnForm">
+          <!-- Purchase Details Secetion  -->
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+              <div class="x_content">
+                <div class="row">
+                  <!-- Date -->
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-10 col-sm-9 col-xs-9">
+                      <label for="single_cal4">Date * :</label>
+                      <input type="text" class="form-control has-feedback-left" id="single_cal4"
+                        placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
+                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <!-- Supplier Account -->
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-10 col-sm-9 col-xs-9">
+                      <label for="supplier">Supplier * :</label>
+                      <select id="supplier" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Supplier Account</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
+                        aria-hidden="true"></span>
+                    </div>
+                  </div>
+                  <!-- Memo No. -->
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-10 col-sm-9 col-xs-9">
+                      <label for="memo_no">Memo No. * :</label>
+                      <select id="memo_no" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Memo No</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
+                        aria-hidden="true"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <form action="#" id="employee_regi_form" data-parsley-validate="">
-
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <label>Account Type * :</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                User:
-                <div class="iradio_flat-green checked" style="position: relative;"><input type="radio" class="flat"
-                    name="accType" id="userBtn" value="U" checked="" required=""
-                    style="position: absolute; opacity: 0;"><ins class="iCheck-helper"
-                    style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                </div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                Employee:
-                <div class="iradio_flat-green" style="position: relative;"><input type="radio" class="flat"
-                    name="accType" id="empBtn" value="E" style="position: absolute; opacity: 0;"><ins
-                    class="iCheck-helper"
-                    style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                </div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                Admin:
-                <div class="iradio_flat-green" style="position: relative;"><input type="radio" class="flat"
-                    name="accType" id="adminBtn" value="A" style="position: absolute; opacity: 0;"><ins
-                    class="iCheck-helper"
-                    style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                </div>
-              </div>
-
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <label for="first_name">First Name * :</label>
-                <input type="text" class="form-control has-feedback-left" id="first_name" name="first_name"
-                  placeholder="Enter First Name" required="" autocomplete="">
-                <span style="color: rgba(0, 0, 0, 0.75);" class="form-control-feedback left glyphicon glyphicon-user"
-                  aria-hidden="true"></span>
-              </div>
-
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <label for="last_name">Last Name :</label>
-                <input type="text" class="form-control has-feedback-left" id="last_name" name="last_name"
-                  placeholder="Enter Last Name" autocomplete="">
-                <span style="color: rgba(0, 0, 0, 0.75);" class="form-control-feedback left glyphicon glyphicon-user"
-                  aria-hidden="true"></span>
-              </div>
-
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <label for="user_contact">Mobile * :</label>
-                <input type="user_contact" class="form-control has-feedback-left" id="user_contact" name="user_contact"
-                  placeholder="Enter you email" data-parsley-trigger="change" required="" autocomplete="">
-                <span style="color: rgba(0, 0, 0, 0.75);" class="form-control-feedback left glyphicon glyphicon-phone"
-                  aria-hidden="true"></span>
-              </div>
-
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <label for="user_email">Email * :</label>
-                <input type="email" class="form-control has-feedback-left" id="user_email" name="user_email"
-                  placeholder="Enter you email" data-parsley-trigger="change" required="" autocomplete="">
-                <span style="color: rgba(0, 0, 0, 0.75);"
-                  class="form-control-feedback left glyphicon glyphicon-envelope" aria-hidden="true"></span>
-              </div>
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <br>
-              </div>
-
-              <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
-                <label>Get Verification Code * :</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                Email:
-                <div class="iradio_flat-green checked" style="position: relative;"><input type="radio" class="flat"
-                    name="otpMethod" id="EVerify" value="M" checked="" required=""
-                    style="position: absolute; opacity: 0;"><ins class="iCheck-helper"
-                    style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                </div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                SMS:
-                <div class="iradio_flat-green" style="position: relative;"><input type="radio" class="flat"
-                    name="otpMethod" id="SMSVerify" value="F" style="position: absolute; opacity: 0;"><ins
-                    class="iCheck-helper"
-                    style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div id="btns" class="col-md-12 col-sm-12 col-xs-12 col-md-offset-3">
-                  <br>
-                  <a onclick="goBack()" class="btn btn-dark">Cancel</a>
-                  <a id="submitBtn" class="btn btn-success">Submit</a>
-                </div>
-              </div>
-            </form>
           </div>
-        </div>
+          <!-- Product Code Section -->
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+              <div class="x_title">
+                <h2>Products Serial No.</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <!-- products serials no. input fields -->
+                <div id="productsSerialNo">
+                  <div class="row text-center text-danger">Enter Product Quantity</div>
+                  <!-- More field will be added by DOM JS if needed  -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
+              <br>
+              <button type="submit" id="submitBtn" class="btn btn-success">Save</button>
+              <a href="javascript:void(0);" id="processingBtn" class="btn btn-success d-none">Processing...</a>
+              <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
+            </div>
+          </div>
+        </form>
         <!-- /page content -->
       </div>
     </div>
@@ -381,6 +353,156 @@
 
     <!-- Custom Theme Scripts -->
     <script src="assets/js/custom.min.js"></script>
+    <script src="assets/js/app.js"></script>
+
+    <!-- sweetalert2 script -->
+    <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+
+    <script>
+
+      window.addEventListener("DOMContentLoaded", () => {
+        let supplier = document.getElementById("supplier");
+        let memo_no = document.getElementById("memo_no");
+        // TODO: Get the a list of supplier id , name and populate supplier div 
+        let form = document.getElementById('purchaseReturnForm');
+        let submitBtn = document.getElementById("submitBtn");
+        let processingBtn = document.getElementById("processingBtn");
+        let invoiceBtn = document.getElementById("invoiceBtn");
+
+        //Fetch page data from server
+        const requestOptions = {
+          method: 'post',
+        }
+        fetch('http://localhost:4321/api/mis/get-supplier-id-name', requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            if (data.error === true) {
+              document.getElementById("page-content").innerHTML = `
+                              <h4 class="text-info">Please contact to the app provider</h4>
+                              <br>
+                              <h4 class="text-danger">${data.message}</h4>
+                              `
+            } else {
+              console.log(data);
+              updateSupplierDiv(data.suppliers);
+
+              //update memo_no dropdown
+              supplier.addEventListener("change", e => {
+                let sup = {
+                  id: parseInt(supplier.value)
+                }
+                const requestOptions = {
+                  method: 'post',
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(sup),
+                }
+                fetch('http://localhost:4321/api/inventory/get-memo-list', requestOptions)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.error === true) {
+                      document.getElementById("page-content").innerHTML = `
+                              <h4 class="text-info">Please contact to the app provider</h4>
+                              <br>
+                              <h4 class="text-danger">${data.message}</h4>
+                              `
+                    } else {
+                      console.log("memo-data:", data);
+                      updateMemoNoListDiv(memo_no, data.purchase);
+                    }
+                  })
+
+              })
+
+              //update items list
+              // memo_no.addEventListener("change", )
+              //submit data to backend
+              form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                //Getting productsCodes
+                let q = parseInt(quantity.value)
+                let productCodes = []; //reset length to 0
+                for (let i = 0; i < q; i++) {
+                  let id = "serialNo-" + i;
+                  let v = document.getElementById(id).value;
+                  productCodes.push(v);
+                }
+                let purchase_details = {
+                  purchase_date: single_cal4.value,
+                  supplier_id: parseInt(supplier.value),
+                  product_id: parseInt(product.value),
+                  quantity: q,
+                  products_serial_no: productCodes,
+                  account_id: parseInt(account.value),
+                  chalan_no: chalan_no.value,
+                  memo_no: memo_no.value,
+                  note: note.value,
+                  unit_price: parseInt(unitPrice.value),
+                  mrp: parseInt(mRP.value),
+                  warranty: parseInt(warranty.value),
+                  bill_amount: parseInt(billAmount.value),
+                  discount: parseInt(discount.value),
+                  total_amount: parseInt(totalAmount.value),
+                  paid_amount: parseInt(paidAmount.value),
+                }
+                console.log(purchase_details);
+                submitBtn.classList.add("d-none");
+                const requestOptions = {
+                  method: 'post',
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(purchase_details),
+                }
+
+                fetch('http://localhost:4321/api/inventory/restock-product', requestOptions)
+                  .then(response => response.json())
+                  .then(data => {
+                    console.log("Restock Product: ", data)
+                    if (data.error === true) {
+                      showErrorMessage(data.message)
+                    } else {
+                      showSuccessMessage(data.message);
+                    }
+                    // setTimeout(() => {
+                    //   location.reload();
+                    // }, 5000);
+                  });
+              })
+              //account 
+            }
+          })
+      })
+      //updateSupplierDiv updates supplier selection options with the fetched data
+      function updateSupplierDiv(suppliers) {
+        supplier.innerHTML = '';
+
+        if (suppliers) {
+          supplier.innerHTML = `<option value="" selected disabled>Select Supplier Account</option>`;
+          suppliers.forEach(s => {
+            supplier.innerHTML += `<option value="${s.id}">${s.account_name}(${s.account_code})</option>`;
+          });
+        } else {
+          supplier.innerHTML = `<option value="" selected disabled>No Supplier Available</option>`;
+        }
+      }
+      function updateMemoNoListDiv(memo_no, memo_list) {
+        memo_no.innerHTML = '';
+
+        if (memo_list) {
+          memo_no.innerHTML = `<option value="" selected disabled>Select Memo No</option>`;
+          memo_list.forEach(m => {
+            memo_no.innerHTML += `<option value="${m.id}">${m.memo_no})</option>`;
+          });
+        } else {
+          memo_no.innerHTML = `<option value="" selected disabled>No Memo Available for this selected supplier</option>`;
+        }
+      }
+    </script>
 
 </body>
 

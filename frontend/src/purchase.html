@@ -86,7 +86,7 @@
                     <li><a href="#sale-return.html">Sale Return</a></li>
                     <li><a href="#sale-replace.html">Sale Replace</a></li>
                     <li><a href="purchase.html">Purchase</a></li>
-                    <li><a href="#purchase-return.html">Purchase Return</a></li>
+                    <li><a href="purchase-return.html">Purchase Return</a></li>
                     <li><a href="#warranty-check.html">Warranty Check</a></li>
                     <li><a href="#repair.html">Repair</a></li>
                     <li><a href="#delivary.html">Delivary</a></li>
@@ -237,6 +237,8 @@
 
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
+        <!-- Content Title -->
+        <h2 class="text-center text-warning fa-2x"><label>Puchase Form</label></h2>
 
         <!-- Page content here -->
         <form action="#" id="purchaseForm">
@@ -354,8 +356,8 @@
                       <!-- Memo No -->
                       <div class="row form-group has-feedback">
                         <div class="col-md-10 col-sm-12 col-xs-12">
-                          <label for="memo_no">Memo No :</label>
-                          <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No">
+                          <label for="memo_no">Memo No * :</label>
+                          <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No" required>
                           <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
                             aria-hidden="true">
                           </i>
@@ -473,9 +475,9 @@
                       <label for="quantity">Quantity(max 100) * :</label>
                       <input type="number" min="1" max="100" class="form-control has-feedback-left" id="quantity"
                         name="quantity" required>
-                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-cubes form-control-feedback left"
+                      <i style="color: #000000;" class="fa fa-cubes form-control-feedback left"
                         aria-hidden="true">
-                      </i>
+                      </i> 
                     </div>
                     <div class="col-md-6 col-sm-6 col-xs-4">
                       <a class="btn btn-xs btn-danger d-none input-addon-btn" id="resetQuantityBtn">

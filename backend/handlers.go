@@ -269,6 +269,31 @@ func (app *application) GetSuppliers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetSuppliersIDAndName retruns a list of supplier's id and name
+func (app *application) GetSuppliersIDAndName(w http.ResponseWriter, r *http.Request) {
+	//supplier
+	var resp struct {
+		Error     bool               `json:"error,omitempty"`
+		Message   string             `json:"message,omitempty"`
+		Suppliers []*models.Supplier `json:"suppliers,omitempty"`
+	}
+
+	//retrive suppliers from the database
+	suppliers, err := app.DB.GetSuppliersIDAndName()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Supplier Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//TODO: Retrive accounts and send to frontend
+	resp.Error = false
+	resp.Message += "data Succesfully fetched"
+	resp.Suppliers = suppliers
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // .....................Inventory Handlers......................
 
 // AddBrand Handles category adding process
@@ -351,6 +376,37 @@ func (app *application) AddProduct(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// GetMemoListBySupplierID return memo list against supplierID in JSON format
+func (app *application) GetMemoListBySupplierID(w http.ResponseWriter, r *http.Request) {
+	var supplier models.Supplier
+	err := app.readJSON(w, r, &supplier)
+	if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+	//Memo
+	var resp struct {
+		Error    bool               `json:"error,omitempty"`
+		Message  string             `json:"message,omitempty"`
+		Purchase []*models.Purchase `json:"purchase,omitempty"`
+	}
+
+	//retrive suppliers from the database
+	purchase, err := app.DB.GetMemoListWithPurchaseID(supplier.ID)
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Memo Available For this selected supplier||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//TODO: Retrive accounts and send to frontend
+	resp.Error = false
+	resp.Message += "data Succesfully fetched"
+	resp.Purchase = purchase
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // RestockProduct add new purchased product to database
 func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 	var purchase_details models.Purchase
@@ -372,8 +428,8 @@ func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// GetPageDetails scrape data from the database for init purchase page
-func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
+// GetPurchasePageDetails scrape data from the database for init purchase page
+func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Request) {
 	//supplier
 	//category
 	//product
@@ -441,3 +497,30 @@ func (app *application) GetPageDetails(w http.ResponseWriter, r *http.Request) {
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
+// GetPurchaseReturnPageDetails scrape data from the database for init purchase-return page
+// func (app *application) GetPurchaseReturnPageDetails(w http.ResponseWriter, r *http.Request) {
+// 	//supplier
+// 	//supplier-memo map
+// 	var resp struct {
+// 		Error     bool               `json:"error,omitempty"`
+// 		Message   string             `json:"message,omitempty"`
+// 		Suppliers []*models.Supplier `json:"suppliers,omitempty"`
+// 		// SupplierIDMemoMap map[int][]string   `json:"supplier_id_memo,omitempty"`
+// 	}
+
+// 	//retrive suppliers from the database
+// 	suppliers, err := app.DB.GetSuppliersIDAndName()
+// 	if err == sql.ErrNoRows {
+// 		resp.Message += "||No Supplier Available||"
+// 	} else if err != nil {
+// 		app.badRequest(w, err) //send error response
+// 		return
+// 	}
+
+// 	//TODO: Retrive accounts and send to frontend
+// 	resp.Error = false
+// 	resp.Message += "data Succesfully fetched"
+// 	resp.Suppliers = suppliers
+// 	app.writeJSON(w, http.StatusOK, resp)
+// }
