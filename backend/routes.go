@@ -32,7 +32,6 @@ func (app *application) routes() http.Handler {
 		mux.Post("/mis/add-supplier", app.AddSupplier)
 
 		//Inventory
-
 		mux.Post("/inventory/add-brand", app.AddBrand)
 		mux.Post("/inventory/add-category", app.AddCategory)
 		mux.Post("/inventory/add-product", app.AddProduct)

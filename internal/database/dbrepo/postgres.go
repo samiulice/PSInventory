@@ -1015,11 +1015,11 @@ func (p *postgresDBRepo) GetMemoListWithPurchaseID(supplierID int) ([]*models.Pu
 
 	query := `
 		SELECT 
-			id, memo_no
+			id, memo_no, product_id
 		FROM 
 			public.purchase_history
 		WHERE 
-			supplier_id = $1; 
+			quantity_purchased > quantity_sold AND supplier_id = $1 ; 
 		`
 	var rows *sql.Rows
 	var err error
@@ -1035,6 +1035,7 @@ func (p *postgresDBRepo) GetMemoListWithPurchaseID(supplierID int) ([]*models.Pu
 		err = rows.Scan(
 			&p.ID,
 			&p.MemoNo,
+			&p.ProductID,
 		)
 		if err != nil {
 			return purchases, err

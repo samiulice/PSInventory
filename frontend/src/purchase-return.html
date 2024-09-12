@@ -369,7 +369,7 @@
         let processingBtn = document.getElementById("processingBtn");
         let invoiceBtn = document.getElementById("invoiceBtn");
 
-        //Fetch page data from server
+        //Fetch active supplier from the server
         const requestOptions = {
           method: 'post',
         }
@@ -385,39 +385,6 @@
             } else {
               console.log(data);
               updateSupplierDiv(data.suppliers);
-
-              //update memo_no dropdown
-              supplier.addEventListener("change", e => {
-                let sup = {
-                  id: parseInt(supplier.value)
-                }
-                const requestOptions = {
-                  method: 'post',
-                  headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(sup),
-                }
-                fetch('http://localhost:4321/api/inventory/get-memo-list', requestOptions)
-                  .then(response => response.json())
-                  .then(data => {
-                    if (data.error === true) {
-                      document.getElementById("page-content").innerHTML = `
-                              <h4 class="text-info">Please contact to the app provider</h4>
-                              <br>
-                              <h4 class="text-danger">${data.message}</h4>
-                              `
-                    } else {
-                      console.log("memo-data:", data);
-                      updateMemoNoListDiv(memo_no, data.purchase);
-                    }
-                  })
-
-              })
-
-              //update items list
-              // memo_no.addEventListener("change", )
               //submit data to backend
               form.addEventListener('submit', function (event) {
                 event.preventDefault();
@@ -476,6 +443,36 @@
               //account 
             }
           })
+        //fetch memo_no list
+        supplier.addEventListener("change", e => {
+          let sup = {
+            id: parseInt(supplier.value)
+          }
+          const requestOptions = {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sup),
+          }
+          fetch('http://localhost:4321/api/inventory/get-memo-list', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              if (data.error === true) {
+                document.getElementById("page-content").innerHTML = `
+                              <h4 class="text-info">Please contact to the app provider</h4>
+                              <br>
+                              <h4 class="text-danger">${data.message}</h4>
+                              `
+              } else {
+                console.log("memo-data:", data);
+                updateMemoNoListDiv(memo_no, data.purchase);
+              }
+            })
+
+        })
+        
       })
       //updateSupplierDiv updates supplier selection options with the fetched data
       function updateSupplierDiv(suppliers) {
@@ -490,13 +487,14 @@
           supplier.innerHTML = `<option value="" selected disabled>No Supplier Available</option>`;
         }
       }
+      //updateMemoNoListDiv updates memo selection options with the fetched data
       function updateMemoNoListDiv(memo_no, memo_list) {
         memo_no.innerHTML = '';
 
         if (memo_list) {
           memo_no.innerHTML = `<option value="" selected disabled>Select Memo No</option>`;
           memo_list.forEach(m => {
-            memo_no.innerHTML += `<option value="${m.id}">${m.memo_no})</option>`;
+            memo_no.innerHTML += `<option value="${m.id}">${m.memo_no}</option>`;
           });
         } else {
           memo_no.innerHTML = `<option value="" selected disabled>No Memo Available for this selected supplier</option>`;
