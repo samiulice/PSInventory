@@ -271,8 +271,8 @@
                   <!-- Memo No. -->
                   <div class="row form-group has-feedback">
                     <div class="col-md-10 col-sm-9 col-xs-9">
-                      <label for="memo_no">Memo No. * :</label>
-                      <select id="memo_no" class="form-control form-select has-feedback-left" required>
+                      <label for="memo">Memo No. * :</label>
+                      <select id="memo" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Memo No</option>
                         <!--Updated by JS DOM -->
                       </select>
@@ -303,6 +303,7 @@
           <div class="form-group">
             <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
               <br>
+
               <button type="submit" id="submitBtn" class="btn btn-success">Save</button>
               <a href="javascript:void(0);" id="processingBtn" class="btn btn-success d-none">Processing...</a>
               <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
@@ -362,7 +363,7 @@
 
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
-        let memo_no = document.getElementById("memo_no");
+        let memo = document.getElementById("memo");
         // TODO: Get the a list of supplier id , name and populate supplier div 
         let form = document.getElementById('purchaseReturnForm');
         let submitBtn = document.getElementById("submitBtn");
@@ -386,64 +387,9 @@
               console.log(data);
               updateSupplierDiv(data.suppliers);
               //submit data to backend
-              form.addEventListener('submit', function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                //Getting productsCodes
-                let q = parseInt(quantity.value)
-                let productCodes = []; //reset length to 0
-                for (let i = 0; i < q; i++) {
-                  let id = "serialNo-" + i;
-                  let v = document.getElementById(id).value;
-                  productCodes.push(v);
-                }
-                let purchase_details = {
-                  purchase_date: single_cal4.value,
-                  supplier_id: parseInt(supplier.value),
-                  product_id: parseInt(product.value),
-                  quantity: q,
-                  products_serial_no: productCodes,
-                  account_id: parseInt(account.value),
-                  chalan_no: chalan_no.value,
-                  memo_no: memo_no.value,
-                  note: note.value,
-                  unit_price: parseInt(unitPrice.value),
-                  mrp: parseInt(mRP.value),
-                  warranty: parseInt(warranty.value),
-                  bill_amount: parseInt(billAmount.value),
-                  discount: parseInt(discount.value),
-                  total_amount: parseInt(totalAmount.value),
-                  paid_amount: parseInt(paidAmount.value),
-                }
-                console.log(purchase_details);
-                submitBtn.classList.add("d-none");
-                const requestOptions = {
-                  method: 'post',
-                  headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(purchase_details),
-                }
-
-                fetch('http://localhost:4321/api/inventory/restock-product', requestOptions)
-                  .then(response => response.json())
-                  .then(data => {
-                    console.log("Restock Product: ", data)
-                    if (data.error === true) {
-                      showErrorMessage(data.message)
-                    } else {
-                      showSuccessMessage(data.message);
-                    }
-                    // setTimeout(() => {
-                    //   location.reload();
-                    // }, 5000);
-                  });
-              })
-              //account 
             }
           })
-        //fetch memo_no list
+        //fetch memo list
         supplier.addEventListener("change", e => {
           let sup = {
             id: parseInt(supplier.value)
@@ -467,12 +413,39 @@
                               `
               } else {
                 console.log("memo-data:", data);
-                updateMemoNoListDiv(memo_no, data.purchase);
+                updateMemoNoListDiv(memo, data.purchase, supplier.options[supplier.selectedIndex].text);
               }
             })
-
         })
-        
+
+        //Fetch product list for selected memo
+        memo.addEventListener("change", e => {
+          let payload = {
+            memo_no: memo.value
+          }
+          const requestOptions = {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          }
+          fetch('http://localhost:4321/api/inventory/memo/get-product-list', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              if (data.error === true) {
+                document.getElementById("page-content").innerHTML = `
+                              <h4 class="text-info">Please contact to the app provider</h4>
+                              <br>
+                              <h4 class="text-danger">${data.message}</h4>
+                              `
+              } else {
+                console.log("ProductList: ", data);
+                // updateMemoNoListDiv(memo, data.purchase);
+              }
+            })
+        })
       })
       //updateSupplierDiv updates supplier selection options with the fetched data
       function updateSupplierDiv(suppliers) {
@@ -488,16 +461,16 @@
         }
       }
       //updateMemoNoListDiv updates memo selection options with the fetched data
-      function updateMemoNoListDiv(memo_no, memo_list) {
-        memo_no.innerHTML = '';
+      function updateMemoNoListDiv(memo, memo_list, supplier_name) {
+        memo.innerHTML = '';
 
         if (memo_list) {
-          memo_no.innerHTML = `<option value="" selected disabled>Select Memo No</option>`;
+          memo.innerHTML = `<option value="" selected disabled>Select Memo No</option>`;
           memo_list.forEach(m => {
-            memo_no.innerHTML += `<option value="${m.id}">${m.memo_no}</option>`;
+            memo.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.memo_no}">${m.memo_no}</option>`;
           });
         } else {
-          memo_no.innerHTML = `<option value="" selected disabled>No Memo Available for this selected supplier</option>`;
+          memo.innerHTML = `<option value="" selected disabled>No Memo Available for ${supplier_name}</option>`;
         }
       }
     </script>

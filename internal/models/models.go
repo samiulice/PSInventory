@@ -116,41 +116,59 @@ type HeadAccount struct {
 
 // Product is the type for products
 type Product struct {
-	ID                 int       `json:"id,omitempty"`
-	ProductCode        string    `json:"product_code,omitempty"`
-	ProductName        string    `json:"product_name,omitempty"`
-	ProductDescription string    `json:"product_description,omitempty"`
-	ProductStatus      bool      `json:"product_status,omitempty"`
-	Quantity           int       `json:"quantity,omitempty"`
-	CategoryID         int       `json:"category_id,omitempty"`
-	BrandID            int       `json:"brand_id,omitempty"`
-	Discount           int       `json:"discount,omitempty"`
-	CreatedAt          time.Time `json:"created_at,omitempty"`
-	UpdatedAt          time.Time `json:"updated_at,omitempty"`
-	Brand              Brand     `json:"brand,omitempty"`
+	ID              int                `json:"id,omitempty"`
+	ProductCode     string             `json:"product_code,omitempty"`
+	ProductName     string             `json:"product_name,omitempty"`
+	Description     string             `json:"product_description,omitempty"`
+	ProductStatus   bool               `json:"product_status,omitempty"`
+	Quantity        int                `json:"quantity,omitempty"`
+	CategoryID      int                `json:"category_id,omitempty"`
+	BrandID         int                `json:"brand_id,omitempty"`
+	Discount        int                `json:"discount,omitempty"`
+	CreatedAt       time.Time          `json:"created_at,omitempty"`
+	UpdatedAt       time.Time          `json:"updated_at,omitempty"`
+	Category        Category           `json:"category"`
+	Brand           Brand              `json:"brand,omitempty"`
+	ProductMetadata []*ProductMetadata `json:"product_metadata,omitempty"`
+}
+
+// ProductMetadata holds products meta data
+type ProductMetadata struct {
+	ID                int       `json:"id,omitempty"`
+	SerialNumber      string    `json:"serial_number,omitempty"`
+	ProductID         int       `json:"product_id,omitempty"`
+	PurchaseHistoryID int       `json:"purchase_history_id,omitempty"`
+	Status            string    `json:"status,omitempty"`
+	Warranty          int       `json:"warranty,omitempty"`
+	UnitPrice         int       `json:"unit_price,omitempty"`
+	MRP               int       `json:"mrp,omitempty"`
+	CreatedAt         time.Time `json:"created_at,omitempty"`
+	UpdatedAt         time.Time `json:"updated_at,omitempty"`
 }
 
 // Purchase is the type for purchase info
 type Purchase struct {
-	ID               int       `json:"id"`
-	PurchaseDate     string    `json:"purchase_date,omitempty"`
-	SupplierID       int       `json:"supplier_id,omitempty"`
-	ProductID        int       `json:"product_id,omitempty"`
-	Quantity         int       `json:"quantity,omitempty"`
-	ProductsSerialNo []string  `json:"products_serial_no,omitempty"`
-	AccountID        int       `json:"account_id,omitempty"`
-	ChalanNO         string    `json:"chalan_no,omitempty"`
-	MemoNo           string    `json:"memo_no,omitempty"`
-	Note             string    `json:"note,omitempty"`
-	UnitPrice        int       `json:"unit_price,omitempty"`
-	MRP              int       `json:"mrp,omitempty"`
-	Warranty         int       `json:"warranty,omitempty"`
-	BillAmount       int       `json:"bill_amount,omitempty"`
-	Discount         int       `json:"discount,omitempty"`
-	TotalAmount      int       `json:"total_amount,omitempty"`
-	PaidAmount       int       `json:"paid_amount,omitempty"`
-	CreatedAt        time.Time `json:"created_at,omitempty"`
-	UpdatedAt        time.Time `json:"updated_at,omitempty"`
+	ID                int       `json:"id"`
+	PurchaseDate      string    `json:"purchase_date,omitempty"`
+	SupplierID        int       `json:"supplier_id,omitempty"`
+	ProductID         int       `json:"product_id,omitempty"`
+	Quantity          int       `json:"quantity,omitempty"`
+	QuantityPurchased int       `json:"quantity_purchased,omitempty"`
+	QuantitySold      int       `json:"quantity_sold,omitempty"`
+	ProductsSerialNo  []string  `json:"products_serial_no,omitempty"`
+	AccountID         int       `json:"account_id,omitempty"`
+	ChalanNO          string    `json:"chalan_no,omitempty"`
+	MemoNo            string    `json:"memo_no,omitempty"`
+	Note              string    `json:"note,omitempty"`
+	UnitPrice         int       `json:"unit_price,omitempty"`
+	MRP               int       `json:"mrp,omitempty"`
+	Warranty          int       `json:"warranty,omitempty"`
+	BillAmount        int       `json:"bill_amount,omitempty"`
+	Discount          int       `json:"discount,omitempty"`
+	TotalAmount       int       `json:"total_amount,omitempty"`
+	PaidAmount        int       `json:"paid_amount,omitempty"`
+	CreatedAt         time.Time `json:"created_at,omitempty"`
+	UpdatedAt         time.Time `json:"updated_at,omitempty"`
 }
 
 // Supplier is the type for suppliers

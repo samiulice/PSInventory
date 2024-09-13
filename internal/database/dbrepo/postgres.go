@@ -728,7 +728,7 @@ func (p *postgresDBRepo) AddProduct(i models.Product) (int, error) {
 	err := p.DB.QueryRowContext(ctx, stmt,
 		i.ProductCode,
 		i.ProductName,
-		i.ProductDescription,
+		i.Description,
 		i.ProductStatus,
 		i.Quantity,
 		i.CategoryID,
@@ -753,10 +753,11 @@ func (p *postgresDBRepo) GetProductList() ([]*models.Product, error) {
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
-			INNER JOIN brands b ON (b.id = i.category_id); 
+			INNER JOIN brands b ON (b.id = i.brand_id) 
+			INNER JOIN categories c ON (c.id = i.category_id); 
 		`
 	var rows *sql.Rows
 	var err error
@@ -773,7 +774,7 @@ func (p *postgresDBRepo) GetProductList() ([]*models.Product, error) {
 			&i.ID,
 			&i.ProductCode,
 			&i.ProductName,
-			&i.ProductDescription,
+			&i.Description,
 			&i.ProductStatus,
 			&i.Quantity,
 			&i.CategoryID,
@@ -783,6 +784,8 @@ func (p *postgresDBRepo) GetProductList() ([]*models.Product, error) {
 			&i.UpdatedAt,
 			&i.Brand.ID,
 			&i.Brand.Name,
+			&i.Category.ID,
+			&i.Category.Name,
 		)
 		if err != nil {
 			return products, err
@@ -800,10 +803,11 @@ func (p *postgresDBRepo) GetActiveProducts() ([]*models.Product, error) {
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.discount, b.id, b.name
+			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.discount, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
-			INNER JOIN brands b ON (b.id = i.category_id)
+			INNER JOIN brands b ON (b.id = i.brand_id) 
+			INNER JOIN categories c ON (c.id = i.category_id)
 		WHERE 
 			product_status = true; 
 		`
@@ -827,6 +831,8 @@ func (p *postgresDBRepo) GetActiveProducts() ([]*models.Product, error) {
 			&i.Discount,
 			&i.Brand.ID,
 			&i.Brand.Name,
+			&i.Category.ID,
+			&i.Category.Name,
 		)
 		if err != nil {
 			return products, err
@@ -834,6 +840,38 @@ func (p *postgresDBRepo) GetActiveProducts() ([]*models.Product, error) {
 		products = append(products, &i)
 	}
 	return products, nil
+}
+
+// GetProductByID returns product info from the database
+func (p *postgresDBRepo) GetProductByID(id int) (models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var product models.Product
+
+	query := `
+		SELECT 
+			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.discount, b.id, b.name, c.id, c.name
+		FROM 
+			public.products i
+			INNER JOIN brands b ON (b.id = i.brand_id) 
+			INNER JOIN categories c ON (c.id = i.category_id)
+		WHERE 
+			i.id = $1; 
+		`
+	err := p.DB.QueryRowContext(ctx, query, id).Scan(
+		&product.ID,
+		&product.ProductCode,
+		&product.ProductName,
+		&product.Quantity,
+		&product.CategoryID,
+		&product.Discount,
+		&product.Brand.ID,
+		&product.Brand.Name,
+		&product.Category.ID,
+		&product.Category.Name,
+	)
+
+	return product, err
 }
 
 // GetAvailableProducts returns a list of details info in-stock and active product from the database
@@ -844,10 +882,11 @@ func (p *postgresDBRepo) GetAvailableProductsDetails() ([]*models.Product, error
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
-			INNER JOIN brands b ON (b.id = i.category_id)
+			INNER JOIN brands b ON (b.id = i.brand_id) 
+			INNER JOIN categories c ON (c.id = i.category_id)
 		WHERE 
 			product_status = true AND quantity > 0; 
 		`
@@ -866,7 +905,7 @@ func (p *postgresDBRepo) GetAvailableProductsDetails() ([]*models.Product, error
 			&i.ID,
 			&i.ProductCode,
 			&i.ProductName,
-			&i.ProductDescription,
+			&i.Description,
 			&i.ProductStatus,
 			&i.Quantity,
 			&i.CategoryID,
@@ -876,6 +915,8 @@ func (p *postgresDBRepo) GetAvailableProductsDetails() ([]*models.Product, error
 			&i.UpdatedAt,
 			&i.Brand.ID,
 			&i.Brand.Name,
+			&i.Category.ID,
+			&i.Category.Name,
 		)
 		if err != nil {
 			return products, err
@@ -893,10 +934,11 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
-			INNER JOIN brands b ON (b.id = i.category_id)
+			INNER JOIN brands b ON (b.id = i.brand_id) 
+			INNER JOIN categories c ON (c.id = i.category_id)
 		WHERE 
 			product_status = true AND quantity > 0 AND category_id = $1; 
 		`
@@ -915,7 +957,7 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 			&i.ID,
 			&i.ProductCode,
 			&i.ProductName,
-			&i.ProductDescription,
+			&i.Description,
 			&i.ProductStatus,
 			&i.Quantity,
 			&i.CategoryID,
@@ -925,6 +967,8 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 			&i.UpdatedAt,
 			&i.Brand.ID,
 			&i.Brand.Name,
+			&i.Category.ID,
+			&i.Category.Name,
 		)
 		if err != nil {
 			return products, err
@@ -932,6 +976,113 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 		products = append(products, &i)
 	}
 	return products, nil
+}
+
+// GetPurchaseHistoryByMemoNo returns purchase history associated with memo_no from database
+func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	// var products []*models.Product
+	var PurchaseHistory []*models.Purchase
+
+	//Get product ids for this memo with associated purchase_id for the given memo from purchase_history table
+	query := `
+		SELECT
+			ph.id, ph.purchase_date, ph.supplier_id, ph.product_id, ph.account_id, ph.chalan_no, ph.memo_no, ph.note, ph.quantity_purchased, ph.quantity_sold, ph.bill_amount, ph.discount, ph.total_amount, ph.paid_amount, ph.created_at, ph.updated_at
+		FROM
+			public.purchase_history ph
+		WHERE
+			ph.memo_no = $1
+	`
+	rows, err := p.DB.QueryContext(ctx, query, memo_no)
+	if err != nil {
+		return PurchaseHistory, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var purchase models.Purchase
+		err = rows.Scan(
+			&purchase.ID,
+			&purchase.PurchaseDate,
+			&purchase.SupplierID,
+			&purchase.ProductID,
+			&purchase.AccountID,
+			&purchase.ChalanNO,
+			&purchase.MemoNo,
+			&purchase.Note,
+			&purchase.QuantityPurchased,
+			&purchase.QuantitySold,
+			&purchase.BillAmount,
+			&purchase.Discount,
+			&purchase.TotalAmount,
+			&purchase.PaidAmount,
+			&purchase.CreatedAt,
+			&purchase.UpdatedAt,
+		)
+		if err != nil {
+			return PurchaseHistory, err
+		}
+		PurchaseHistory = append(PurchaseHistory, &purchase)
+	}
+	//get detailed Product info for these ids
+
+	//retrive all product-serial of each product_id && purchase_is
+	return PurchaseHistory, nil
+}
+
+// GetProductListByPurchaseIDAndProductID returns products list associated with purchaseID and ProductID
+func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var product *models.Product
+	var metadata []*models.ProductMetadata
+
+	//get metadata from product_serial_numbers
+	query := `
+			SELECT
+				id, serial_number, product_id, purchase_history_id, status, warranty, unit_price, mrp, created_at, updated_at
+			FROM
+				public.product_serial_numbers
+			WHERE
+				purchase_history_id = $1 AND product_id = $2
+		`
+	rows, err := p.DB.QueryContext(ctx, query, purchaseID, productID)
+	if err != nil {
+		return product, err
+	}
+
+	for rows.Next() {
+		var pm models.ProductMetadata
+		err = rows.Scan(
+			&pm.ID,
+			&pm.SerialNumber,
+			&pm.ProductID,
+			&pm.PurchaseHistoryID,
+			&pm.Status,
+			&pm.Warranty,
+			&pm.UnitPrice,
+			&pm.MRP,
+			&pm.CreatedAt,
+			&pm.UpdatedAt,
+		)
+		if err != nil {
+			return product, err
+		}
+		metadata = append(metadata, &pm)
+	}
+
+	//get product info
+	pr, err := p.GetProductByID(productID)
+	if err != nil {
+		return product, err
+	}
+	pr.ProductMetadata = metadata
+	product = &pr
+	return product, nil
+
 }
 
 // UpdateProductQuantity increases product quantity, to reduce product quantity pass negetive quantity number
@@ -1007,24 +1158,21 @@ func (p *postgresDBRepo) AddProductSerialNumbers(purchase *models.Purchase) erro
 	return nil
 }
 
-// GetMemoListWithPurchaseID returns a list of memo with purchase id from the database
-func (p *postgresDBRepo) GetMemoListWithPurchaseID(supplierID int) ([]*models.Purchase, error) {
+// GetMemoListBySupplierID returns a list of memo with purchase id from the database
+func (p *postgresDBRepo) GetMemoListBySupplierID(supplierID int) ([]*models.Purchase, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var purchases []*models.Purchase
 
 	query := `
-		SELECT 
-			id, memo_no, product_id
+		SELECT DISTINCT memo_no
 		FROM 
 			public.purchase_history
 		WHERE 
 			quantity_purchased > quantity_sold AND supplier_id = $1 ; 
 		`
-	var rows *sql.Rows
-	var err error
 
-	rows, err = p.DB.QueryContext(ctx, query, supplierID)
+	rows, err := p.DB.QueryContext(ctx, query, supplierID)
 	if err != nil {
 		return purchases, err
 	}
@@ -1033,9 +1181,7 @@ func (p *postgresDBRepo) GetMemoListWithPurchaseID(supplierID int) ([]*models.Pu
 	for rows.Next() {
 		var p models.Purchase
 		err = rows.Scan(
-			&p.ID,
 			&p.MemoNo,
-			&p.ProductID,
 		)
 		if err != nil {
 			return purchases, err
@@ -1122,7 +1268,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.UnitPrice, purchase.MRP, purchase.Warranty, createdAt, updatedAt))
 	}
 
-	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,unit_price,mrp,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,unit_price,mrp,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
 	// Execute the query
 	_, err = tx.ExecContext(ctx, query)
 	if err != nil {
