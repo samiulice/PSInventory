@@ -993,7 +993,7 @@ func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.P
 		FROM
 			public.purchase_history ph
 		WHERE
-			ph.memo_no = $1
+			ph.quantity_purchased>ph.quantity_sold AND ph.memo_no = $1
 	`
 	rows, err := p.DB.QueryContext(ctx, query, memo_no)
 	if err != nil {
@@ -1047,7 +1047,7 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 			FROM
 				public.product_serial_numbers
 			WHERE
-				purchase_history_id = $1 AND product_id = $2
+				status = 'in stock' AND purchase_history_id = $1 AND product_id = $2
 		`
 	rows, err := p.DB.QueryContext(ctx, query, purchaseID, productID)
 	if err != nil {
@@ -1082,7 +1082,6 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 	pr.ProductMetadata = metadata
 	product = &pr
 	return product, nil
-
 }
 
 // UpdateProductQuantity increases product quantity, to reduce product quantity pass negetive quantity number

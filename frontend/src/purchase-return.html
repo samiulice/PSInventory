@@ -286,16 +286,47 @@
           </div>
           <!-- Product Code Section -->
           <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel">
-              <div class="x_title">
-                <h2>Products Serial No.</h2>
-                <div class="clearfix"></div>
-              </div>
-              <div class="x_content">
-                <!-- products serials no. input fields -->
-                <div id="productsSerialNo">
-                  <div class="row text-center text-danger">Enter Product Quantity</div>
-                  <!-- More field will be added by DOM JS if needed  -->
+            <div class="row">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="x_panel">
+                    <div class="x_title">
+                      <h2>Product List <small>Select products</small></h2>
+                      <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                      </ul>
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                      <section class="content invoice">
+                        <!-- Table row -->
+                        <div class="row">
+                          <div class="col-xs-12 table">
+                            <table class="table table-striped">
+                              <thead>
+                                <tr>
+                                  <th>No.</th>
+                                  <th>Product Code</th>
+                                  <th>Product Name</th>
+                                  <th>Category</th>
+                                  <th>Brand</th>
+                                  <th>Qty</th>
+                                  <th>Purchase Date</th>
+                                  <th class="text-center" style="width: 33%">Serial #</th>
+                                </tr>
+                              </thead>
+                              <tbody id="product-list-container">
+                                <!-- DOM JS -->
+                              </tbody>
+                            </table>
+                          </div>
+                          <!-- /.col -->
+                        </div>
+                      </section>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -360,7 +391,8 @@
     <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
     <script>
-
+      let product_data;
+      let purchase_data;
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
         let memo = document.getElementById("memo");
@@ -369,6 +401,7 @@
         let submitBtn = document.getElementById("submitBtn");
         let processingBtn = document.getElementById("processingBtn");
         let invoiceBtn = document.getElementById("invoiceBtn");
+        let productListContainer = document.getElementById("product-list-container");
 
         //Fetch active supplier from the server
         const requestOptions = {
@@ -391,6 +424,7 @@
           })
         //fetch memo list
         supplier.addEventListener("change", e => {
+          document.getElementById("product-list-container").innerHTML = "";
           let sup = {
             id: parseInt(supplier.value)
           }
@@ -442,7 +476,60 @@
                               `
               } else {
                 console.log("ProductList: ", data);
-                // updateMemoNoListDiv(memo, data.purchase);
+                product_data = data;
+
+                let id = 0;
+                document.getElementById("product-list-container").innerHTML = "";
+                data.product.forEach(p => {
+                  // <th>No.</th>
+                  // <th>Product Code</th>
+                  // <th>Product Name</th>
+                  // <th>Category</th>
+                  // <th>Brand</th>
+                  // <th>Qty</th>
+                  // <th>Purchase Date</th>
+                  // <th>Serial #</th>
+                  let metadata = "";
+                  let prductMeta = p.product_metadata;
+                  if(p.product_metadata){
+                    p.product_metadata.forEach(pm =>{
+                    metadata += `
+                      <div class="checkbox">
+                        <label>
+                          <input type="checkbox" id="${pm.serial_number}" class="flat"> ${pm.serial_number}
+                        </label>
+                      </div>`
+                    })
+                  }
+                  console.log(`Inner:${id}`,product_data.purchase_history[id].purchase_date);
+                  document.getElementById("product-list-container").innerHTML +=
+                    `<tr id="pro-${id}">
+                      <td>${id}</td>
+                      <td>${p.product_code}</td>
+                      <td>${p.product_name}</td>
+                      <td>${p.category.name}</td>
+                      <td>${p.brand.name}</td>
+                      <td>${p.quantity}</td>
+                      <td> ${formatDate(product_data.purchase_history[id].purchase_date, "date", "-")} </td>
+                      <td class="text-center">
+                        <div class="row">
+                            <button id="showBtn-${id}" onclick="toggleBtn('${id}')" class="btn btn-xs btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample-${id}" aria-expanded="false" aria-controls="collapseExample">
+                              <i class="fa fa-eye"></i>&nbsp;&nbsp;Show
+                            </button>
+                            <button id="toggleCheckBoxBtn-${id}" class="btn btn-success btn-xs" type="button" onclick="toggleAllCheckBox(${id})">
+                              <i class="fa fa-check"></i>&nbsp;&nbsp;Select All
+                            </button>
+                          </div>
+                        <div class="collapse" id="collapseExample-${id}">
+                          <div id="pro-metadata-${id}">
+                            ${metadata}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>`
+
+                    id++;
+                });
               }
             })
         })
@@ -472,6 +559,97 @@
         } else {
           memo.innerHTML = `<option value="" selected disabled>No Memo Available for ${supplier_name}</option>`;
         }
+      }
+
+      //toggleAllCheckBox toggles all check box between checked and uncheckd
+      function toggleAllCheckBox(id){
+        let btn = document.getElementById("toggleCheckBoxBtn-"+id);
+        let checked = "";
+        if(btn.innerHTML.includes("Deselect")){
+          btn.classList.remove("btn-danger");
+          btn.classList.add("btn-success");
+          btn.innerHTML = `<i class="fa fa-check"></i>&nbsp;&nbsp;Select All`
+        } else{  
+          btn.classList.remove("btn-success");
+          btn.classList.add("btn-danger");
+          btn.innerHTML = `<i class="fa fa-close"></i>&nbsp;&nbsp;Deselect All`;
+          checked = "checked"
+        }
+        console.log(id);
+        let metadata = "";
+        let productMetaData = product_data.product[id].product_metadata;
+        if(productMetaData){
+          productMetaData.forEach(pm =>{
+          metadata += `
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="${pm.serial_number}" class="flat" ${checked}> ${pm.serial_number}
+              </label>
+            </div>`
+          })
+        }
+        document.getElementById(`pro-metadata-${id}`).innerHTML = metadata
+      }
+
+      //toggleBtn changes button state in between show and hide
+      function toggleBtn(id){
+        let elem = document.getElementById("showBtn-"+id)
+        console.log(elem.innerHTML);
+        if(elem.innerHTML.includes("Show")){
+          elem.innerHTML = `<i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide`
+        } else{
+          elem.innerHTML = `<i class="fa fa-eye"></i>&nbsp;&nbsp;Show`
+        }
+
+      }
+
+      function chooseProductItems(id) {
+
+        // let product = product_data[id];
+        // console.log("popup: ", typeof id);
+        const productMetaData = product_data.product[id].product_metadata;
+        let content = `
+            <div class="x_panel">
+                <div class="x_content">
+                    <form class="needs-validation col-md-12" novalidate>  
+                      <div class="col-md-8">`
+          productMetaData.forEach((pm)=>{
+          content += `<input type="checkbox" name="${pm.serial_number}" id="${pm.serial_number}" value="${pm.serial_number}" checked=""> <label style="font-size:15px; transform:translate(0,-10%)">${pm.serial_number}</label><br>`
+        })
+        content += `
+                    </div>
+                    <div class="form-group col-md-12">
+                      <br>
+                      <br>
+                      <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                  </form>
+              </div>
+          </div>
+          `
+        Swal.fire({
+          title: 'Add New Brand',
+          width: 600,
+          html: content,
+          showCloseButton: true,
+          showConfirmButton: false,
+          showCancelButton: false,
+          allowOutsideClick: false,
+          preConfirm: () => {
+            return new Promise((resolve) => {
+              resolve({
+                name: form.name.value,
+              });
+            });
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const data = result.value;
+            let brand = {
+              name: data.name,
+            }
+          }
+        });
       }
     </script>
 

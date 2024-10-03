@@ -39,7 +39,7 @@ function paginator(currPageIndex, pageSize, totalRecords) {
 if format = "date", returns date only, 
 if format = "time", returns time only 
 and returns both date and time for format = "" */
-function formatDate(time, format) {
+function formatDate(time, format, separator) {
   // Parse the input string into a Date object
   const date = new Date(time);
 
@@ -55,12 +55,16 @@ function formatDate(time, format) {
   const minutes = pad(date.getMinutes());
   const seconds = pad(date.getSeconds());
 
+  //fix separator
+  if(separator === "") {
+    separator = `/`
+  }
   // Format the date
   let formattedDate
   if (format === "") {
-    formattedDate = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    formattedDate = `${day}${separator}${month}${separator}${year} ${hours}:${minutes}:${seconds}`;
   } else if (format == "date") {
-    formattedDate = `${day}-${month}-${year}`
+    formattedDate = `${day}${separator}${month}${separator}${year}`
   } else if (format == "time") {
     formattedDate = `${hours}:${minutes}:${seconds}`
   }

@@ -1085,12 +1085,14 @@ a:visited {
 
 .panel_toolbox>li>a {
     padding: 5px;
-    color: #337AB7;
-    font-size: 20px
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 15px
 }
 
 .panel_toolbox>li>a:hover {
-    background: #9fcecf
+    background: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 1);
+    border-radius: 5px;
 }
 
 .line_30 {
@@ -1814,7 +1816,7 @@ ul.quick-list li {
     box-shadow: none;
     display: none;
     float: left;
-    font-size: 12px;
+    font-size: 8px;
     left: 0;
     list-style: none;
     padding: 0;

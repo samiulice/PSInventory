@@ -404,7 +404,7 @@
                   <td>${i.mobile}</td>
                   <td>${i.account_status === true ? `<button class="btn btn-success btn-xs">Active</button>` : `<button class="btn btn-dark btn-xs">Inactive</button>`}</td>
                   <td>${i.discount}</td>
-                  <td>${formatDate(i.updated_at, "date")}</th>
+                  <td>${formatDate(i.updated_at, "date", "-")}</th>
                   <td class="text-center">
                     <button type="button" onclick="showSupplierProfile(${i})" class="btn btn-primary btn-xs">
                       <i class="fa fa-folder"></i> View
