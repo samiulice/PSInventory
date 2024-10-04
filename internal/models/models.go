@@ -140,8 +140,8 @@ type ProductMetadata struct {
 	PurchaseHistoryID int       `json:"purchase_history_id,omitempty"`
 	Status            string    `json:"status,omitempty"`
 	Warranty          int       `json:"warranty,omitempty"`
-	UnitPrice         int       `json:"unit_price,omitempty"`
-	MRP               int       `json:"mrp,omitempty"`
+	MaxRetailPrice    int       `json:"max_retail_price,omitempty"` //max_retail_price = total_amount+profit/quantity_purchased
+	MinRetailPrice    int       `json:"min_retail_price,omitempty"` //min_retail_price = total_amount/quantity_purchased
 	CreatedAt         time.Time `json:"created_at,omitempty"`
 	UpdatedAt         time.Time `json:"updated_at,omitempty"`
 }
@@ -160,8 +160,8 @@ type Purchase struct {
 	ChalanNO          string    `json:"chalan_no,omitempty"`
 	MemoNo            string    `json:"memo_no,omitempty"`
 	Note              string    `json:"note,omitempty"`
-	UnitPrice         int       `json:"unit_price,omitempty"`
-	MRP               int       `json:"mrp,omitempty"`
+	MaxRetailPrice         int       `json:"max_retail_price,omitempty"`
+	MinRetailPrice               int       `json:"min_retail_price,omitempty"`
 	Warranty          int       `json:"warranty,omitempty"`
 	BillAmount        int       `json:"bill_amount,omitempty"`
 	Discount          int       `json:"discount,omitempty"`

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkbox List Example</title>
+</head>
+<body>
+
+    <h3>Select your favorite fruits:</h3>
+    <label><input type="checkbox" id="fruit1" value="Apple"> Apple</label><br>
+    <label><input type="checkbox" id="fruit2" value="Banana"> Banana</label><br>
+    <label><input type="checkbox" id="fruit3" value="Cherry"> Cherry</label><br>
+    <label><input type="checkbox" id="fruit4" value="Date"> Date</label><br>
+    <label><input type="checkbox" id="fruit5" value="Elderberry"> Elderberry</label><br>
+
+    <button id="getCheckedButton">Get Checked Fruits</button>
+
+    <script>
+        document.getElementById('getCheckedButton').addEventListener('click', function() {
+            // Get all checkboxes
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            var checkedIds = [];
+
+            // Loop through checkboxes and check if they are checked
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    checkedIds.push(checkbox.id); // Add the ID of the checked checkbox to the array
+                }
+            });
+
+            // Log the array of checked checkbox IDs
+            console.log('Checked checkbox IDs:', checkedIds);
+        });
+    </script>
+
+</body>
+</html>

@@ -242,13 +242,13 @@
         <!-- Page content here -->
         <form action="#" id="purchaseReturnForm">
           <!-- Purchase Details Secetion  -->
-          <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="col-md-6 col-sm-6 col-xs-6">
             <div class="x_panel">
               <div class="x_content">
                 <div class="row">
                   <!-- Date -->
                   <div class="row form-group has-feedback">
-                    <div class="col-md-10 col-sm-9 col-xs-9">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
                       <label for="single_cal4">Date * :</label>
                       <input type="text" class="form-control has-feedback-left" id="single_cal4"
                         placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
@@ -258,7 +258,7 @@
                   </div>
                   <!-- Supplier Account -->
                   <div class="row form-group has-feedback">
-                    <div class="col-md-10 col-sm-9 col-xs-9">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
                       <label for="supplier">Supplier * :</label>
                       <select id="supplier" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Supplier Account</option>
@@ -270,7 +270,7 @@
                   </div>
                   <!-- Memo No. -->
                   <div class="row form-group has-feedback">
-                    <div class="col-md-10 col-sm-9 col-xs-9">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
                       <label for="memo">Memo No. * :</label>
                       <select id="memo" class="form-control form-select has-feedback-left" required>
                         <option value="" selected disabled>Select Memo No</option>
@@ -279,6 +279,40 @@
                       <span style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left glyphicon glyphicon-user"
                         aria-hidden="true"></span>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-1 col-sm-1 col-xs-1"></div>
+          <div class="col-md-4 col-sm-4 col-xs-4">
+            <div class="x_panel">
+              <div class="x_content">
+                <div class="row">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label for="total_return_items">Total Return Items :</label>
+                      <input type="text" class="form-control has-feedback-left" id="total_return_items" placeholder="00"
+                        value="0" disabled>
+                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label for="total_return_value">Total Return Value :</label>
+                      <input type="text" class="form-control has-feedback-left" id="total_return_value" placeholder="00"
+                        disabled>
+                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
+                    <br>
+                    <button type="submit" id="submitBtn" class="btn btn-success">Save</button>
+                    <a href="javascript:void(0);" id="processingBtn" class="btn btn-success d-none">Processing...</a>
+                    <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
                   </div>
                 </div>
               </div>
@@ -329,15 +363,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
-              <br>
-
-              <button type="submit" id="submitBtn" class="btn btn-success">Save</button>
-              <a href="javascript:void(0);" id="processingBtn" class="btn btn-success d-none">Processing...</a>
-              <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-success">Generate Invoice</a>
             </div>
           </div>
         </form>
@@ -491,17 +516,16 @@
                   // <th>Serial #</th>
                   let metadata = "";
                   let prductMeta = p.product_metadata;
-                  if(p.product_metadata){
-                    p.product_metadata.forEach(pm =>{
-                    metadata += `
+                  if (p.product_metadata) {
+                    p.product_metadata.forEach(pm => {
+                      metadata += `
                       <div class="checkbox">
                         <label>
-                          <input type="checkbox" id="${pm.serial_number}" class="flat"> ${pm.serial_number}
+                          <input type="checkbox" id="${pm.serial_number}" class="flat product-list"> ${pm.serial_number}
                         </label>
                       </div>`
                     })
                   }
-                  console.log(`Inner:${id}`,product_data.purchase_history[id].purchase_date);
                   document.getElementById("product-list-container").innerHTML +=
                     `<tr id="pro-${id}">
                       <td>${id}</td>
@@ -528,10 +552,60 @@
                       </td>
                     </tr>`
 
-                    id++;
+                  id++;
+                });
+                let checkboxes = document.querySelectorAll('.product-list');
+                checkboxes.forEach(checkbox => {
+                  checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                      updateCounter(1);
+                    } else {
+                      updateCounter(-1);
+                    }
+                  });
                 });
               }
             })
+        })
+
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          let returnedProducts = [];
+          // Get all checkboxes
+          let checkboxes = document.querySelectorAll('.product-list');
+          // Loop through checkboxes and check if they are checked
+          checkboxes.forEach(function (checkbox) {
+            if (checkbox.checked) {
+              returnedProducts.push(checkbox.id); // Add the ID of the checked checkbox to the array
+            }
+          });
+          let returned_products_details = {
+            returned_date: single_cal4.value,
+            supplier_id: parseInt(supplier.value),
+            products_serial: returnedProducts,
+          }
+          console.log(returned_products_details);
+          submitBtn.classList.add("d-none");
+          const requestOptions = {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(returned_products_details),
+          }
+
+          fetch('http://localhost:4321/api/inventory/return-product-to-supplier', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              console.log("Restock Product: ", data)
+              if (data.error === true) {
+                showErrorMessage(data.message)
+              } else {
+                showSuccessMessage(data.message);
+              }
+            });
         })
       })
       //updateSupplierDiv updates supplier selection options with the fetched data
@@ -562,95 +636,64 @@
       }
 
       //toggleAllCheckBox toggles all check box between checked and uncheckd
-      function toggleAllCheckBox(id){
-        let btn = document.getElementById("toggleCheckBoxBtn-"+id);
+      function toggleAllCheckBox(id) {
+        let btn = document.getElementById("toggleCheckBoxBtn-" + id);
+        let productMetaData = product_data.product[id].product_metadata;
         let checked = "";
-        if(btn.innerHTML.includes("Deselect")){
+        let metadata = "";
+        if (btn.innerHTML.includes("Deselect")) {
           btn.classList.remove("btn-danger");
           btn.classList.add("btn-success");
           btn.innerHTML = `<i class="fa fa-check"></i>&nbsp;&nbsp;Select All`
-        } else{  
+          updateCounter(-1 * productMetaData.length);
+        } else {
           btn.classList.remove("btn-success");
           btn.classList.add("btn-danger");
           btn.innerHTML = `<i class="fa fa-close"></i>&nbsp;&nbsp;Deselect All`;
           checked = "checked"
+          updateCounter(productMetaData.length);
         }
-        console.log(id);
-        let metadata = "";
-        let productMetaData = product_data.product[id].product_metadata;
-        if(productMetaData){
-          productMetaData.forEach(pm =>{
-          metadata += `
+        if (productMetaData) {
+          productMetaData.forEach(pm => {
+            metadata += `
             <div class="checkbox">
               <label>
-                <input type="checkbox" id="${pm.serial_number}" class="flat" ${checked}> ${pm.serial_number}
+                <input type="checkbox" id="${pm.serial_number}" class="flat product-list" ${checked}> ${pm.serial_number}
               </label>
             </div>`
           })
         }
         document.getElementById(`pro-metadata-${id}`).innerHTML = metadata
+        let checkboxes = document.querySelectorAll('.product-list');
+        checkboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', function () {
+            if (this.checked) {
+              updateCounter(1);
+            } else {
+              updateCounter(-1);
+            }
+          });
+        });
+      }
+
+      function updateCounter(n) {
+        let itemsCounter = document.getElementById("total_return_items");
+        itemsCounter.value = parseInt(itemsCounter.value) + n;
+        itemsCounter.textContent = parseInt(itemsCounter.value);
       }
 
       //toggleBtn changes button state in between show and hide
-      function toggleBtn(id){
-        let elem = document.getElementById("showBtn-"+id)
-        console.log(elem.innerHTML);
-        if(elem.innerHTML.includes("Show")){
+      function toggleBtn(id) {
+        let elem = document.getElementById("showBtn-" + id)
+        if (elem.innerHTML.includes("Show")) {
           elem.innerHTML = `<i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide`
-        } else{
+        } else {
           elem.innerHTML = `<i class="fa fa-eye"></i>&nbsp;&nbsp;Show`
         }
-
       }
 
-      function chooseProductItems(id) {
 
-        // let product = product_data[id];
-        // console.log("popup: ", typeof id);
-        const productMetaData = product_data.product[id].product_metadata;
-        let content = `
-            <div class="x_panel">
-                <div class="x_content">
-                    <form class="needs-validation col-md-12" novalidate>  
-                      <div class="col-md-8">`
-          productMetaData.forEach((pm)=>{
-          content += `<input type="checkbox" name="${pm.serial_number}" id="${pm.serial_number}" value="${pm.serial_number}" checked=""> <label style="font-size:15px; transform:translate(0,-10%)">${pm.serial_number}</label><br>`
-        })
-        content += `
-                    </div>
-                    <div class="form-group col-md-12">
-                      <br>
-                      <br>
-                      <button type="submit" class="btn btn-success">Save</button>
-                    </div>
-                  </form>
-              </div>
-          </div>
-          `
-        Swal.fire({
-          title: 'Add New Brand',
-          width: 600,
-          html: content,
-          showCloseButton: true,
-          showConfirmButton: false,
-          showCancelButton: false,
-          allowOutsideClick: false,
-          preConfirm: () => {
-            return new Promise((resolve) => {
-              resolve({
-                name: form.name.value,
-              });
-            });
-          },
-        }).then((result) => {
-          if (result.isConfirmed) {
-            const data = result.value;
-            let brand = {
-              name: data.name,
-            }
-          }
-        });
-      }
+
     </script>
 
 </body>

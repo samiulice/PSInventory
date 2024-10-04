@@ -629,11 +629,11 @@
               updateAccoutnsDiv(data.head_accounts)
               //update product list based on selected category
               category.addEventListener("change", e => {
-                product.innerHTML = '';
+                product.innerHTML = '<option value="" selected disabled>Select Product</option>';
                 let isEmpty = true;
                 data.products.forEach(i => {
                   if (i.category_id == category.value) {
-                    product.innerHTML += `<option value="${i.id}">${i.product_name}</option>`;
+                    product.innerHTML += `<option value="${i.id}">${i.brand.name + "-" + i.product_name}</option>`;
                     isEmpty = false;
                   }
                 })
@@ -707,8 +707,8 @@
                   chalan_no: chalan_no.value,
                   memo_no: memo_no.value,
                   note: note.value,
-                  unit_price: parseInt(unitPrice.value),
-                  mrp: parseInt(mRP.value),
+                  max_retail_price: parseInt(mRP.value),
+                  min_retail_price: parseInt(unitPrice.value),
                   warranty: parseInt(warranty.value),
                   bill_amount: parseInt(billAmount.value),
                   discount: parseInt(discount.value),
