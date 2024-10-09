@@ -1044,7 +1044,7 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 	//get metadata from product_serial_numbers
 	query := `
 			SELECT
-				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, min_retail_price, created_at, updated_at
+				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, unit_price, created_at, updated_at
 			FROM
 				public.product_serial_numbers
 			WHERE
@@ -1065,7 +1065,7 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 			&pm.Status,
 			&pm.Warranty,
 			&pm.MaxRetailPrice,
-			&pm.MinRetailPrice,
+			&pm.UnitPrice,
 			&pm.CreatedAt,
 			&pm.UpdatedAt,
 		)
@@ -1085,8 +1085,8 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 	return product, nil
 }
 
-// UpdateProductQuantity increases product quantity, to reduce product quantity pass negetive quantity number
-func (p *postgresDBRepo) UpdateProductQuantity(quantity, productID int) error {
+// UpdateProductQuantityByProductID increases product quantity, to reduce product quantity pass negetive quantity number
+func (p *postgresDBRepo) UpdateProductQuantityByProductID(quantity, productID int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	stmt := `UPDATE public.products
@@ -1096,6 +1096,21 @@ func (p *postgresDBRepo) UpdateProductQuantity(quantity, productID int) error {
 	_, err := p.DB.ExecContext(ctx, stmt, quantity, productID)
 	if err != nil {
 		return errors.New("SQLErrorUpdateProductQuantity:" + err.Error())
+	}
+	return nil
+}
+
+// UpdateProductItemStatusByProductSerialNumber updates the status of the product unit in product_serial_numbers Table
+func (p *postgresDBRepo) UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	stmt := `UPDATE public.product_serial_numbers
+        SET status = $1
+        WHERE id = $2;`
+	// Execute the query
+	_, err := p.DB.ExecContext(ctx, stmt, status, productUnitsID)
+	if err != nil {
+		return errors.New("SQLErrorUpdateProductItemStatusByProductSerialNumber:" + err.Error())
 	}
 	return nil
 }
@@ -1146,10 +1161,10 @@ func (p *postgresDBRepo) AddProductSerialNumbers(purchase *models.Purchase) erro
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.MaxRetailPrice, purchase.MinRetailPrice, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.MaxRetailPrice, purchase.UnitPrice, createdAt, updatedAt))
 	}
 
-	query := "INSERT INTO public.product_serial_numbers (serial_number,product_id,max_retail_price,min_retail_price,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	query := "INSERT INTO public.product_serial_numbers (serial_number,product_id,max_retail_price,unit_price,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
 	// Execute the query
 	_, err := p.DB.ExecContext(ctx, query)
 	if err != nil {
@@ -1207,12 +1222,12 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
           SET quantity = quantity + $1
           WHERE id = $2;`
 
-// Execute the query with parameters
-_, err = tx.ExecContext(ctx, query, purchase.Quantity, purchase.ProductID)
-if err != nil {
-    tx.Rollback()
-    return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
-}
+	// Execute the query with parameters
+	_, err = tx.ExecContext(ctx, query, purchase.Quantity, purchase.ProductID)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
+	}
 
 	//Tx-2: Insert data to purchase history table
 	//.........insert the following data into purchase_history table.........
@@ -1257,7 +1272,7 @@ if err != nil {
 	//ProductID        int
 	// ProductsSerialNo []string
 	// MaxRetailPrice        int
-	// MinRetailPrice              int
+	// UnitPrice              int
 
 	values := []string{}
 	now := time.Now()
@@ -1269,10 +1284,10 @@ if err != nil {
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.MinRetailPrice, purchase.Warranty, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.UnitPrice, purchase.Warranty, createdAt, updatedAt))
 	}
 
-	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,max_retail_price,min_retail_price,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,max_retail_price,unit_price,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
 	// Execute the query
 	_, err = tx.ExecContext(ctx, query)
 	if err != nil {
@@ -1284,6 +1299,54 @@ if err != nil {
 		return errors.New("SQLErrorRestockProduct(Commit):" + err.Error())
 	}
 	return nil
+}
+
+// /ReturnProductUnitsToSupplier updates database
+func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionDate time.Time, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var id int
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return id, fmt.Errorf("failed to start transaction: %w", err)
+	}
+
+	// Prepare the SQL update query
+	query := `UPDATE public.product_serial_numbers SET status = $1 WHERE id = $2`
+
+	// Execute updates within the transaction
+	for _, unitsID := range ProductUnitsID {
+		_, err := tx.ExecContext(ctx, query, "purchase-returned", unitsID)
+		if err != nil {
+			tx.Rollback() // Rollback on error
+			return id, fmt.Errorf("failed to update record with id %d: %w", unitsID, err)
+		}
+	}
+
+	query = `INSERT INTO public.inventory_transaction_logs (job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
+			VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id
+		`
+
+	err = tx.QueryRowContext(ctx, query,
+		JobID,
+		"purchase-returned",
+		TotalUnits,
+		TotalPrices,
+		transactionDate,
+		time.Now(),
+		time.Now(),
+	).Scan(&id)
+
+	if err != nil {
+		tx.Rollback() // Rollback on error
+		return id, fmt.Errorf("failed to insert record to inventory_transaction_logs: %w", err)
+	}
+	// Commit the transaction
+	if err := tx.Commit(); err != nil {
+		return id, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return id, nil
 }
 
 // Helper functions

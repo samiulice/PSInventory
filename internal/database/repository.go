@@ -2,6 +2,7 @@ package repository
 
 import (
 	"PSInventory/internal/models"
+	"time"
 )
 
 type DatabaseRepo interface {
@@ -28,6 +29,7 @@ type DatabaseRepo interface {
 	GetCategoryList() ([]*models.Category, error)
 	GetActiveCategoryList() ([]*models.Category, error)
 	AddProduct(i models.Product) (int, error)
+	ReturnProductUnitsToSupplier(JobID string, transactionDate time.Time, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error)
 	GetProductList() ([]*models.Product, error)
 	GetProductByID(id int) (models.Product, error)
 	GetActiveProducts() ([]*models.Product, error)
@@ -36,7 +38,8 @@ type DatabaseRepo interface {
 	GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error)
 	GetProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
 
-	UpdateProductQuantity(quantity, productID int) error
+	UpdateProductQuantityByProductID(quantity, productID int) error
+	UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error
 
 	AddProductSerialNumbers(purchase *models.Purchase) error
 

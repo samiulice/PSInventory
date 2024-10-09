@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"time"
 
 	"PSInventory/internal/models"
 	"path"
@@ -449,6 +450,51 @@ func (app *application) GetMemoListBySupplierID(w http.ResponseWriter, r *http.R
 	resp.Error = false
 	resp.Message += "data Succesfully fetched"
 	resp.Purchase = purchase
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.Request) {
+	var ReturnProductsInfo struct {
+		JobID          string `json:"job_id"`
+		ReturnedDate   string `json:"returned_date"`
+		SupplierID     int    `json:"supplier_id"`
+		ProductUnitsID []int  `json:"product_units_id"`
+		TotalUnits     int    `json:"total_units"`
+		TotalPrices    int    `json:"total_prices"`
+	}
+	err := app.readJSON(w, r, &ReturnProductsInfo)
+
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+
+	//convert ReturnedDate in time.Time
+	// Define the layout for parsing the input date
+	layout := "02/01/2006"
+
+	// Parse the string into time.Time
+	transactionDate, err := time.Parse(layout, ReturnProductsInfo.ReturnedDate)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("unable to convert the date into time.Time Format: %w", err))
+		return
+	}
+
+	//Update product_serial_numbers
+	id, err := app.DB.ReturnProductUnitsToSupplier(ReturnProductsInfo.JobID, transactionDate, ReturnProductsInfo.ProductUnitsID, ReturnProductsInfo.TotalUnits, ReturnProductsInfo.TotalPrices)
+	var resp struct {
+		Error   bool   `json:"error,omitempty"`
+		Message string `json:"message,omitempty"`
+		ID      int    `json:"id"`
+	}
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	resp.Error = false
+	resp.Message = "Products Returned to supplier succesfully"
+	resp.ID = id
+
 	app.writeJSON(w, http.StatusOK, resp)
 }
 

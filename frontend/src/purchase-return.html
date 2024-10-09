@@ -302,8 +302,8 @@
                   <div class="row form-group has-feedback">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                       <label for="total_return_value">Total Return Value :</label>
-                      <input type="text" class="form-control has-feedback-left" id="total_return_value" placeholder="00"
-                        disabled>
+                      <input type="text" class="form-control has-feedback-left" id="total_return_value" value="0"
+                        placeholder="00" disabled>
                       <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
                         aria-hidden="true"></i>
                     </div>
@@ -418,6 +418,9 @@
     <script>
       let product_data;
       let purchase_data;
+      let memoID;
+      let totalUnits = 0;
+      let totalPrices = 0;
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
         let memo = document.getElementById("memo");
@@ -442,7 +445,6 @@
                               <h4 class="text-danger">${data.message}</h4>
                               `
             } else {
-              console.log(data);
               updateSupplierDiv(data.suppliers);
               //submit data to backend
             }
@@ -471,8 +473,11 @@
                               <h4 class="text-danger">${data.message}</h4>
                               `
               } else {
-                console.log("memo-data:", data);
                 updateMemoNoListDiv(memo, data.purchase, supplier.options[supplier.selectedIndex].text);
+                //Update selected product counter and price to zero for each supplier
+                totalUnits = 0;
+                totalPrices = 0;
+                updateTotaUnitsAndPricesFields(0, 0);
               }
             })
         })
@@ -482,6 +487,7 @@
           let payload = {
             memo_no: memo.value
           }
+          memoID = memo.value;
           const requestOptions = {
             method: 'post',
             headers: {
@@ -500,70 +506,73 @@
                               <h4 class="text-danger">${data.message}</h4>
                               `
               } else {
-                console.log("ProductList: ", data);
                 product_data = data;
-
-                let id = 0;
+                console.log(product_data);
+                //Update selected product counter and price to zero for each memo
+                totalUnits = 0;
+                totalPrices = 0;
+                updateTotaUnitsAndPricesFields(0, 0);
+                let counts = 0;
                 document.getElementById("product-list-container").innerHTML = "";
-                data.product.forEach(p => {
-                  // <th>No.</th>
-                  // <th>Product Code</th>
-                  // <th>Product Name</th>
-                  // <th>Category</th>
-                  // <th>Brand</th>
-                  // <th>Qty</th>
-                  // <th>Purchase Date</th>
-                  // <th>Serial #</th>
+                data.product.forEach((p, id) => {
                   let metadata = "";
-                  let prductMeta = p.product_metadata;
                   if (p.product_metadata) {
+                    counts += p.product_metadata.length;
                     p.product_metadata.forEach(pm => {
                       metadata += `
                       <div class="checkbox">
                         <label>
-                          <input type="checkbox" id="${pm.serial_number}" class="flat product-list"> ${pm.serial_number}
+                          <input type="checkbox" id="${pm.serial_number}" class="flat product-list" value="${pm.unit_price}"> ${pm.serial_number}
                         </label>
+                        <input type="hidden" id="id-${pm.serial_number}" value="${pm.id}">
                       </div>`
                     })
-                  }
-                  document.getElementById("product-list-container").innerHTML +=
-                    `<tr id="pro-${id}">
-                      <td>${id}</td>
-                      <td>${p.product_code}</td>
-                      <td>${p.product_name}</td>
-                      <td>${p.category.name}</td>
-                      <td>${p.brand.name}</td>
-                      <td>${p.quantity}</td>
-                      <td> ${formatDate(product_data.purchase_history[id].purchase_date, "date", "-")} </td>
-                      <td class="text-center">
-                        <div class="row">
-                            <button id="showBtn-${id}" onclick="toggleBtn('${id}')" class="btn btn-xs btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample-${id}" aria-expanded="false" aria-controls="collapseExample">
-                              <i class="fa fa-eye"></i>&nbsp;&nbsp;Show
-                            </button>
-                            <button id="toggleCheckBoxBtn-${id}" class="btn btn-success btn-xs" type="button" onclick="toggleAllCheckBox(${id})">
-                              <i class="fa fa-check"></i>&nbsp;&nbsp;Select All
-                            </button>
-                          </div>
-                        <div class="collapse" id="collapseExample-${id}">
-                          <div id="pro-metadata-${id}">
-                            ${metadata}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>`
 
-                  id++;
+                    document.getElementById("product-list-container").innerHTML +=
+                      `<tr id="pro-${id}">
+                        <td>${id}</td>
+                        <td>${p.product_code}</td>
+                        <td>${p.product_name}</td>
+                        <td>${p.category.name}</td>
+                        <td>${p.brand.name}</td>
+                        <td>${p.quantity}</td>
+                        <td> ${formatDate(product_data.purchase_history[id].purchase_date, "date", "-")} </td>
+                        <td class="text-center">
+                          <div class="row">
+                              <button id="showBtn-${id}" onclick="toggleBtn('${id}')" class="btn btn-xs btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample-${id}" aria-expanded="false" aria-controls="collapseExample-${id}">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;Show
+                              </button>
+                              <button id="toggleCheckBoxBtn-${id}" class="btn btn-success btn-xs" type="button" onclick="toggleAllCheckBox(${id})">
+                                <i class="fa fa-check"></i>&nbsp;&nbsp;Select All
+                              </button>
+                            </div>
+                          <div class="collapse" id="collapseExample-${id}">
+                            <div id="pro-metadata-${id}">
+                              ${metadata}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>`
+                  }
                 });
-                let checkboxes = document.querySelectorAll('.product-list');
-                checkboxes.forEach(checkbox => {
-                  checkbox.addEventListener('change', function () {
-                    if (this.checked) {
-                      updateCounter(1);
-                    } else {
-                      updateCounter(-1);
-                    }
+                if (counts === 0) {
+                  document.getElementById("product-list-container").innerHTML = "<tr><td colspan='8' class=text-center text-danger>No products available to return</td></tr>"
+                } else {
+                  let checkboxes = document.querySelectorAll('.product-list');
+                  checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                      if (this.checked) {
+                        totalUnits += 1;
+                        totalPrices += parseInt(this.value);
+                        updateTotaUnitsAndPricesFields(totalUnits, totalPrices);
+                      } else {
+                        totalUnits -= 1;
+                        totalPrices -= parseInt(this.value);
+                        updateTotaUnitsAndPricesFields(totalUnits, totalPrices);
+                      }
+                    });
                   });
-                });
+                }
               }
             })
         })
@@ -577,15 +586,17 @@
           // Loop through checkboxes and check if they are checked
           checkboxes.forEach(function (checkbox) {
             if (checkbox.checked) {
-              returnedProducts.push(checkbox.id); // Add the ID of the checked checkbox to the array
+              returnedProducts.push(parseInt(document.getElementById(`id-${checkbox.id}`).value)); // Add the ID of the checked checkbox to the array
             }
           });
           let returned_products_details = {
+            job_id: `PR-${memoID}`,
             returned_date: single_cal4.value,
-            supplier_id: parseInt(supplier.value),
-            products_serial: returnedProducts,
+            product_units_id: returnedProducts,
+            total_units: totalUnits,
+            total_prices: totalPrices,
           }
-          console.log(returned_products_details);
+
           submitBtn.classList.add("d-none");
           const requestOptions = {
             method: 'post',
@@ -599,7 +610,7 @@
           fetch('http://localhost:4321/api/inventory/return-product-to-supplier', requestOptions)
             .then(response => response.json())
             .then(data => {
-              console.log("Restock Product: ", data)
+              console.log(data);
               if (data.error === true) {
                 showErrorMessage(data.message)
               } else {
@@ -639,61 +650,61 @@
       function toggleAllCheckBox(id) {
         let btn = document.getElementById("toggleCheckBoxBtn-" + id);
         let productMetaData = product_data.product[id].product_metadata;
-        let checked = "";
-        let metadata = "";
-        if (btn.innerHTML.includes("Deselect")) {
-          btn.classList.remove("btn-danger");
-          btn.classList.add("btn-success");
-          btn.innerHTML = `<i class="fa fa-check"></i>&nbsp;&nbsp;Select All`
-          updateCounter(-1 * productMetaData.length);
-        } else {
-          btn.classList.remove("btn-success");
-          btn.classList.add("btn-danger");
-          btn.innerHTML = `<i class="fa fa-close"></i>&nbsp;&nbsp;Deselect All`;
-          checked = "checked"
-          updateCounter(productMetaData.length);
-        }
         if (productMetaData) {
-          productMetaData.forEach(pm => {
-            metadata += `
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" id="${pm.serial_number}" class="flat product-list" ${checked}> ${pm.serial_number}
-              </label>
-            </div>`
-          })
+          if (btn.innerHTML.includes("Deselect")) {
+            btn.classList.remove("btn-danger");
+            btn.classList.add("btn-success");
+            btn.innerHTML = `<i class="fa fa-check"></i>&nbsp;&nbsp;Select All`;
+            productMetaData.forEach(pm => {
+              let elem = document.getElementById(`${pm.serial_number}`);
+              if (elem.checked) {
+                elem.checked = false;
+                //Update selected product units and prices counter
+                totalUnits -= 1;
+                totalPrices -= pm.unit_price;
+              }
+            })
+          } else {
+            btn.classList.remove("btn-success");
+            btn.classList.add("btn-danger");
+            btn.innerHTML = `<i class="fa fa-close"></i>&nbsp;&nbsp;Deselect All`;
+
+            //total checks
+            c = 0;
+            productMetaData.forEach(pm => {
+              let elem = document.getElementById(`${pm.serial_number}`);
+              if (!elem.checked) {
+                elem.checked = true;
+                //Update selected product units and prices counter
+                totalUnits += 1;
+                totalPrices += pm.unit_price;
+              }
+            })
+          }
+          //update counter fields values
+          updateTotaUnitsAndPricesFields(totalUnits, totalPrices);
         }
-        document.getElementById(`pro-metadata-${id}`).innerHTML = metadata
-        let checkboxes = document.querySelectorAll('.product-list');
-        checkboxes.forEach(checkbox => {
-          checkbox.addEventListener('change', function () {
-            if (this.checked) {
-              updateCounter(1);
-            } else {
-              updateCounter(-1);
-            }
-          });
-        });
       }
 
-      function updateCounter(n) {
+      function updateTotaUnitsAndPricesFields(totalUnits, totalPrices) {
         let itemsCounter = document.getElementById("total_return_items");
-        itemsCounter.value = parseInt(itemsCounter.value) + n;
-        itemsCounter.textContent = parseInt(itemsCounter.value);
+        let itemsValue = document.getElementById("total_return_value");
+
+        itemsCounter.value = `${totalUnits}`;
+        itemsCounter.textContent = `${totalUnits}`;
+        itemsValue.value = `${totalPrices}`;
+        itemsValue.textContent = `${totalPrices}`;
       }
 
       //toggleBtn changes button state in between show and hide
       function toggleBtn(id) {
         let elem = document.getElementById("showBtn-" + id)
         if (elem.innerHTML.includes("Show")) {
-          elem.innerHTML = `<i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide`
+          elem.innerHTML = `<i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide`;
         } else {
-          elem.innerHTML = `<i class="fa fa-eye"></i>&nbsp;&nbsp;Show`
+          elem.innerHTML = `<i class="fa fa-eye"></i>&nbsp;&nbsp;Show`;
         }
       }
-
-
-
     </script>
 
 </body>
