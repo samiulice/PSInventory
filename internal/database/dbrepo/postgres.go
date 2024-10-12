@@ -283,6 +283,44 @@ func (p *postgresDBRepo) AddCustomer(customer models.Customer) (int, error) {
 	return id, nil
 }
 
+// GetActiveCustomersIDAndName returns a slice of customers name with id
+func (p *postgresDBRepo) GetActiveCustomersIDAndName() ([]*models.Customer, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var customers []*models.Customer
+
+	query := `
+		SELECT 
+			id, account_code, account_name
+		FROM
+			public.customers
+		WHERE 
+			account_status = '1'
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return customers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c models.Customer
+		err = rows.Scan(
+			&c.ID,
+			&c.AccountCode,
+			&c.AccountName,
+		)
+		if err != nil {
+			return customers, err
+		}
+		customers = append(customers, &c)
+	}
+	return customers, nil
+}
+
 // GetCustomerPaginated returns a chunks of customers
 // if accountType == all, it will return list all customer accounts
 // if accountType == active, it will return list of active customer accounts
@@ -400,7 +438,7 @@ func (p *postgresDBRepo) AddSupplier(supplier models.Supplier) (int, error) {
 }
 
 // GetSuppliersIDAndName returns a slice of suppliers name with id
-func (p *postgresDBRepo) GetSuppliersIDAndName() ([]*models.Supplier, error) {
+func (p *postgresDBRepo) GetActiveSuppliersIDAndName() ([]*models.Supplier, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var suppliers []*models.Supplier
@@ -977,6 +1015,59 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 		products = append(products, &i)
 	}
 	return products, nil
+}
+
+// GetProductItemsListByProductID returns a list of product items corresponds to productID
+func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var product *models.Product
+	var metadata []*models.ProductMetadata
+
+	//get metadata from product_serial_numbers
+	query := `
+			SELECT
+				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, unit_price, created_at, updated_at
+			FROM
+				public.product_serial_numbers
+			WHERE
+				status = 'in stock' AND product_id = $1
+		`
+	rows, err := p.DB.QueryContext(ctx, query, productID)
+	if err != nil {
+		return product, err
+	}
+
+	for rows.Next() {
+		var pm models.ProductMetadata
+		err = rows.Scan(
+			&pm.ID,
+			&pm.SerialNumber,
+			&pm.ProductID,
+			&pm.PurchaseHistoryID,
+			&pm.Status,
+			&pm.Warranty,
+			&pm.MaxRetailPrice,
+			&pm.UnitPrice,
+			&pm.CreatedAt,
+			&pm.UpdatedAt,
+		)
+		if err != nil {
+			return product, err
+		}
+		metadata = append(metadata, &pm)
+	}
+
+	log.Println(metadata)
+	//get product info
+	pr, err := p.GetProductByID(productID)
+	if err != nil {
+		return product, err
+	}
+	pr.ProductMetadata = metadata
+	product = &pr
+	return product, nil
 }
 
 // GetPurchaseHistoryByMemoNo returns purchase history associated with memo_no from database

@@ -28,7 +28,7 @@ func (app *application) routes() http.Handler {
 		mux.Post("/mis/view-customer/{type}", app.GetCustomers)
 		mux.Post("/mis/add-customer", app.AddCustomer)
 		mux.Post("/mis/view-supplier/{type}", app.GetSuppliers)
-		mux.Post("/mis/get-supplier-id-name", app.GetSuppliersIDAndName)
+		mux.Post("/mis/get-supplier-id-name", app.GetActiveSuppliersIDAndName)
 		mux.Post("/mis/add-supplier", app.AddSupplier)
 
 		//Inventory
@@ -36,10 +36,12 @@ func (app *application) routes() http.Handler {
 		mux.Post("/inventory/add-category", app.AddCategory)
 		mux.Post("/inventory/add-product", app.AddProduct)
 		mux.Post("/inventory/memo/get-product-list", app.FetchMemoProductItems)
+		mux.Post("/inventory/products/get-list-by-id", app.FetchProductItemsbyProductID)
 		mux.Post("/inventory/get-memo-list", app.GetMemoListBySupplierID)
 		mux.Post("/inventory/return-product-to-supplier", app.ReturnProductsToSupplier)
 		mux.Post("/inventory/restock-product", app.RestockProduct)
 		mux.Post("/inventory/purchase/getPageDetails", app.GetPurchasePageDetails)
+		mux.Post("/inventory/sale/getPageDetails", app.GetSalePageDetails)
 		// mux.Post("/inventory/purchase-return/getPageDetails", app.GetPurchaseReturnPageDetails)
 	})
 	return mux

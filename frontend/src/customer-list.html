@@ -83,7 +83,7 @@
                 </li>
                 <li><a><i class="fa fa-table"></i> Inventory <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li><a href="#sale.html">Sale</a></li>
+                    <li><a href="sale.html">Sale</a></li>
                     <li><a href="#sale-return.html">Sale Return</a></li>
                     <li><a href="#sale-replace.html">Sale Replace</a></li>
                     <li><a href="purchase.html">Purchase</a></li>
@@ -241,7 +241,7 @@
         <!-- Content Title -->
         <h2 class="text-center text-warning fa-2x"><label>Customer List</label></h2>
         <!-- Page content here -->
-        <div class="x_panel">
+        <div class="x_panel bg-gw">
           <div class="x_content">
             <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
               <div class="row">
@@ -267,7 +267,7 @@
                 </div>
               </div>
               <!-- start project list -->
-              <div class="row">
+              <div class="row bg-white">
                 <div class="col">
                   <table id="customer_list" class="table table-striped table-bordered dataTable no-footer" role="grid"
                     aria-describedby="datatable_info">
@@ -402,11 +402,11 @@
                   <td>${i.account_code}</td>
                   <td>${i.account_name}</td>
                   <td>${i.mobile}</td>
-                  <td>${i.account_status === true ? `<button class="btn btn-success btn-xs">Active</button>` : `<button class="btn btn-dark btn-xs">Inactive</button>`}</td>
+                  <td>${i.account_status === true ? `<button class="btn btn-round btn-success btn-xs">Active</button>` : `<button class="btn btn-round btn-dark btn-xs">Inactive</button>`}</td>
                   <td>${i.discount}</td>
                   <td>${formatDate(i.updated_at, "date", "-")}</th>
                   <td class="text-center">
-                    <button type="button" onclick="showcustomerProfile(${i})" class="btn btn-primary btn-xs">
+                    <button type="button" onclick="showcustomerProfile(${i})" class="btn btn-round btn-primary btn-xs">
                       <i class="fa fa-folder"></i> View
                     </button>
                   </td>

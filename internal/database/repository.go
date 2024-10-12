@@ -16,9 +16,10 @@ type DatabaseRepo interface {
 
 	//MIS
 	AddCustomer(customer models.Customer) (int, error)
+	GetActiveCustomersIDAndName() ([]*models.Customer, error)
 	GetCustomerListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Customer, int, error)
 	AddSupplier(supplier models.Supplier) (int, error)
-	GetSuppliersIDAndName() ([]*models.Supplier, error)
+	GetActiveSuppliersIDAndName() ([]*models.Supplier, error)
 	GetSupplierListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Supplier, int, error)
 
 	//Inventory
@@ -37,12 +38,13 @@ type DatabaseRepo interface {
 	GetAvailableProductsDetails() ([]*models.Product, error)
 	GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error)
 	GetProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
+	GetProductItemsListByProductID(productID int)(*models.Product,error)
 
 	UpdateProductQuantityByProductID(quantity, productID int) error
 	UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error
 
 	AddProductSerialNumbers(purchase *models.Purchase) error
-
+	
 	AddToPurchaseHistory(purchase *models.Purchase) (int, error)
 	GetMemoListBySupplierID(supplierID int) ([]*models.Purchase, error)
 	RestockProduct(purchase *models.Purchase) error

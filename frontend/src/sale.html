@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>PSINVENTORY</title>
+
+  <!-- Bootstrap -->
+  <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <!-- NProgress -->
+  <link href="assets/vendors/nprogress/nprogress.css" rel="stylesheet">
+  <!-- iCheck -->
+  <link href="assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link href="assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+  <!-- JQVMap -->
+  <link href="assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+  <!-- bootstrap-daterangepicker -->
+  <link href="assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+  <!-- Custom Theme Style -->
+  <link href="assets/css/custom.min.css" rel="stylesheet">
+  <script src="assets/js/app.js"></script>
+</head>
+
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col menu_fixed">
+        <div class="left_col scroll-view">
+          <div class="navbar nav_title" style="border: 0;">
+            <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Company Name</span></a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- menu profile quick info -->
+          <div class="profile clearfix">
+            <div class="profile_pic">
+              <img src="assets/images/samiul-photo.jpg" alt="..." class="img-circle profile_img">
+            </div>
+            <div class="profile_info">
+              <span>Welcome,</span>
+              <h2>John Doe</h2>
+            </div>
+          </div>
+          <!-- /menu profile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+              <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="open.html">Open</a></li>
+                    <li><a href="#company-profile.html">Company Profile</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-group"></i>HR Management<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="employee-list.html">Employee List</a></li>
+                    <li><a href="#manage-employee.html">Manage Employee</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="customer-list.html">Customer List</a></li>
+                    <li><a href="supplier-list.html">Supplier List</a></li>
+                    <li><a href="#customer_supplier-list.html">Customer & Supplier List</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-table"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="sale.html">Sale</a></li>
+                    <li><a href="#sale-return.html">Sale Return</a></li>
+                    <li><a href="#sale-replace.html">Sale Replace</a></li>
+                    <li><a href="purchase.html">Purchase</a></li>
+                    <li><a href="purchase-return.html">Purchase Return</a></li>
+                    <li><a href="#warranty-check.html">Warranty Check</a></li>
+                    <li><a href="#repair.html">Repair</a></li>
+                    <li><a href="#delivary.html">Delivary</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-bar-chart-o"></i> Accounts <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="#receive-collection.html">Receive & Collection</a></li>
+                    <li><a href="#payment.html">Payment</a></li>
+                    <li><a href="#cash-transfer.html">Cash Transfer</a></li>
+                    <li><a href="#amount-receivable.html">Amount Receivable</a></li>
+                    <li><a href="#amount-payable.html">Amount Payable</a></li>
+                    <li><a href="#expenses.html">Expenses</a></li>
+                    <li><a href="#adjustment.html">Adjustment</a></li>
+                    <li><a href="#bank-reconciliation.html">Bank Reconciliation</a></li>
+                    <li><a href="#transaction-posting.html">Transaction Posting</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="inventory-reports.html">Inventory Reports</a></li>
+                    <li><a href="account-reports.html">Account Reports</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+          <!-- /sidebar menu -->
+
+
+          <!-- /menu footer buttons -->
+          <div class="sidebar-footer hidden-small">
+            <a data-toggle="tooltip" data-placement="top" title="Settings">
+              <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+              <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Lock">
+              <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+            </a>
+          </div>
+          <!-- /menu footer buttons -->
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      <div class="top_nav">
+        <div class="nav_menu">
+          <nav>
+            <div class="nav toggle">
+              <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right">
+              <li class="">
+                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+                  aria-expanded="false">
+                  <img src="assets/images/samiul-photo.jpg" alt="">John Doe
+                  <span class=" fa fa-angle-down"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-usermenu pull-right">
+                  <li><a href="javascript:;"> Profile</a></li>
+                  <li>
+                    <a href="javascript:;">
+                      <span class="badge bg-red pull-right">50%</span>
+                      <span>App Settings</span>
+                    </a>
+                  </li>
+                  <li><a href="javascript:;">Help</a></li>
+                  <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                </ul>
+              </li>
+
+              <li role="presentation" class="dropdown">
+                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-envelope-o"></i>
+                  <span class="badge bg-green">6</span>
+                </a>
+                <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a>
+                      <span class="image"><img src="assets/images/samiul-photo.jpg" alt="Profile Image" /></span>
+                      <span>
+                        <span>John Smith</span>
+                        <span class="time">3 mins ago</span>
+                      </span>
+                      <span class="message">
+                        Film festivals used to be do-or-die moments for movie makers. They were where...
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <div class="text-center">
+                      <a>
+                        <strong>See All Alerts</strong>
+                        <i class="fa fa-angle-right"></i>
+                      </a>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div id="page-content" class="right_col" role="main">
+        <!-- Content Title -->
+        <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
+
+        <!-- Page content here -->
+        <form action="#" id="saleForm">
+          <div class="row">
+            <!-- View items Secetion  -->
+            <div class="col-md-5 col-sm-5 col-xs-12">
+              <div class="x_panel bg-gw" style="min-height: 520px; height: 520px; max-height: 850px">
+                <div class="x_title">
+                  <h2>Search Product</h2>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <!-- Category Info -->
+                  <div class="col-md-8 col-sm-8 col-xs-12">
+                    <div class="row form-group has-feedback">
+                      <label for="category">Product Category * :</label>
+                      <select id="category" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Category</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
+                        aria-hidden="true"></i>
+                    </div>
+                    <!-- Product Info -->
+                    <div class="row form-group has-feedback">
+                      <label for="product">Product Name * :</label>
+                      <select id="product" class="form-control form-select has-feedback-left" required>
+                        <option value="" selected disabled>Select Product</option>
+                        <!--Updated by JS DOM -->
+                      </select>
+                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div class="col-md-4 col-sm-4 col-xs-12" id="add-items-btn-container">
+
+                  </div>
+                </div>
+                <div class="x_title">
+                  <h2>Available Products</h2>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content" id="view-items-info-container">
+                  <!-- Table row -->
+                  <table class="table table-striped">
+                    <tbody>
+                      <tr>
+                        <td>Code:</td>
+                      </tr>
+                      <tr>
+                        <td>Name:</td>
+                      </tr>
+                      <tr>
+                        <td>Category:</td>
+                      </tr>
+                      <tr>
+                        <td>Brand:</td>
+                      </tr>
+                      <tr>
+                        <td>Quantity:</td>
+                      </tr>
+                      <tr>
+                        <td>MRP:</td>
+                      </tr>
+                      <tr>
+                        <td>Discount:</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <br><br>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Details  -->
+            <div class="col-md-7 col-sm-7 col-xs-12">
+              <div class="x_panel bg-gw" style="min-height: 520px; height: fit-content; max-height: 850px;">
+                <div class="x_title">
+                  <div class="title_left">
+                    <div class="col-md-8 col-sm-6 col-xs-6">
+                      <h2>Sale Details</h2>
+                    </div>
+                  </div>
+                  <div class="title_right">
+                    <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search text-right">
+                      
+                        <a class="btn btn-round btn-xs btn-primary" id="createCustomerBtn">
+                          <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Create Customer</a>
+                      
+                    </div>
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <div class="row">
+                    <!-- Sale Date -->
+                    <div class="row form-group has-feedback">
+                      <div class="col-md-6 col-sm-6 col-xs-10">
+                        <label for="single_cal4">Sale Date * :</label>
+                        <input type="text" class="form-control has-feedback-left" id="single_cal4"
+                          placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
+                        <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
+                          aria-hidden="true"></i>
+                      </div>
+                    <!-- Customer Account -->
+                      <div class="col-md-6 col-sm-6 col-xs-10">
+                        <label for="customer">Customer * :</label>
+                        <select id="customer" class="form-control form-select has-feedback-left" required>
+                          <option value="" selected disabled>Select Customer Account</option>
+                          <!--Updated by JS DOM -->
+                        </select>
+                        <span style="color: rgba(0, 0, 0, 1);"
+                          class="form-control-feedback left glyphicon glyphicon-user" aria-hidden="true"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="x_title">
+                  <h2>Payment Details</h2>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <div class="row">
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                      <div class="row">
+                        <!-- Transaction Account -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="account">Account * :</label>
+                            <select id="account" class="form-control form-select has-feedback-left" required>
+                              <option value="" selected disabled>Select Account</option>
+                              <!--Updated by JS DOM -->
+                            </select>
+                            <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-bank"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+
+                        <!-- Chalan No -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="chalan_no">Chalan No :</label>
+                            <input type="text" class="form-control has-feedback-left" id="chalan_no"
+                              placeholder="Chalan No">
+                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+                        <!-- Memo No -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="memo_no">Memo No * :</label>
+                            <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No"
+                              required>
+                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+                        <!-- Note -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="note">Note :</label>
+                            <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
+                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-comment form-control-feedback left"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                      <div class="row">
+                        <!-- Bill Amount -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="billAmount">Bill Amount * :</label>
+                            <input type="number" class="form-control has-feedback-left" id="billAmount"
+                              placeholder="Bill Amount" required>
+                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+                        <!-- Discount -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="discount">Discount :</label>
+                            <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
+                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+                        <!-- Total Amount -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="totalAmount">Total Amount * :</label>
+                            <input type="number" class="form-control has-feedback-left" id="totalAmount"
+                              placeholder="Total Amount" required>
+                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+                        <!-- Paid Amount -->
+                        <div class="row form-group has-feedback">
+                          <div class="col-md-11 col-sm-11 col-xs-11">
+                            <label for="paidAmount">Paid Amount * :</label>
+                            <input type="number" class="form-control has-feedback-left" id="paidAmount"
+                              placeholder="Paid Amount" required>
+                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                              aria-hidden="true">
+                            </i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <!-- Selected items Secetion  -->
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel bg-gw" style="height: 500px; overflow-x: scroll; overflow-y: scroll;">
+                <div class="x_title">
+                  <div class="title_left">
+                    <div class="col-md-8 col-sm-6 col-xs-6">
+                      <h2>Selected Products</h2>
+                    </div>
+                  </div>
+                  <div class="title_right">
+                    <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search">
+                      <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search item by serial number">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default" type="button"><i style="color: rgba(0, 0, 0, 1);"
+                              class="fa fa-arrow-right" aria-hidden="true">
+                            </i>&nbsp;</button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content" id="selected-items-info">
+                  <!-- Table row -->
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Product Name</th>
+                        <th class="text-center">Category</th>
+                        <th class="text-center">Brand</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-center">Serial #</th>
+                        <th class="text-center">MRP</th>
+                        <th class="text-center">Discount</th>
+                        <th class="text-center">Total Amount</th>
+                        <th class="text-center">Remove</th>
+                      </tr>
+                    </thead>
+                    <tbody id="selected-items-info-container">
+                      <!-- DOM JS -->
+                    </tbody>
+                    <div class="clearfix"></div>
+                  </table>
+
+                  <!-- /.col -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+          <div class="form-group">
+            <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
+              <br>
+              <button type="submit" id="submitBtn" class="btn btn-round btn-success">Save</button>
+              <a href="javascript:void(0);" id="processingBtn"
+                class="btn btn-round btn-success d-none">Processing...</a>
+              <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-round btn-success">Generate Invoice</a>
+            </div>
+          </div>
+        </form>
+      </div> <!-- /page content -->
+
+      <!-- jQuery -->
+      <script src="assets/vendors/jquery/dist/jquery.min.js"></script>
+      <!-- Bootstrap -->
+      <script src="assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+      <!-- FastClick -->
+      <script src="assets/vendors/fastclick/lib/fastclick.js"></script>
+      <!-- NProgress -->
+      <script src="assets/vendors/nprogress/nprogress.js"></script>
+      <!-- Chart.js -->
+      <script src="assets/vendors/Chart.js/dist/Chart.min.js"></script>
+      <!-- gauge.js -->
+      <script src="assets/vendors/gauge.js/dist/gauge.min.js"></script>
+      <!-- bootstrap-progressbar -->
+      <script src="assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+      <!-- iCheck -->
+      <script src="assets/vendors/iCheck/icheck.min.js"></script>
+      <!-- Skycons -->
+      <script src="assets/vendors/skycons/skycons.js"></script>
+      <!-- Flot -->
+      <script src="assets/vendors/Flot/jquery.flot.js"></script>
+      <script src="assets/vendors/Flot/jquery.flot.pie.js"></script>
+      <script src="assets/vendors/Flot/jquery.flot.time.js"></script>
+      <script src="assets/vendors/Flot/jquery.flot.stack.js"></script>
+      <script src="assets/vendors/Flot/jquery.flot.resize.js"></script>
+      <!-- Flot plugins -->
+      <script src="assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+      <script src="assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+      <script src="assets/vendors/flot.curvedlines/curvedLines.js"></script>
+      <!-- DateJS -->
+      <script src="assets/vendors/DateJS/build/date.js"></script>
+      <!-- JQVMap -->
+      <script src="assets/vendors/jqvmap/dist/jquery.vmap.js"></script>
+      <script src="assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+      <script src="assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+      <!-- bootstrap-daterangepicker -->
+      <script src="assets/vendors/moment/min/moment.min.js"></script>
+      <script src="assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+      <!-- Custom Theme Scripts -->
+      <script src="assets/js/custom.min.js"></script>
+      <script src="assets/js/app.js"></script>
+
+      <!-- sweetalert2 script -->
+      <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+
+      <script>
+
+        let products, brands, totalSelectedItems = 0, productIDs = [];
+
+        window.addEventListener("DOMContentLoaded", () => {
+          let category = document.getElementById("category");
+          // TODO: Get the a list of product category id , name and populate category div 
+          let product = document.getElementById("product");
+          // TODO: Get the a list of product id , name and populate product div 
+          let viewItemsInfoContainer = document.getElementById("view-items-info-container");
+          let selectedProductListContainer = document.getElementById("selected-items-info-container");
+          let addItemsBtnContainer = document.getElementById("add-items-btn-container");
+
+
+          //Fetch page data from server
+          const requestOptions = {
+            method: 'post',
+          }
+          //fetch page data
+          fetch('http://localhost:4321/api/inventory/sale/getPageDetails', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              if (data.error === true) {
+                document.getElementById("page-content").innerHTML = `
+                          <h4 class="text-info">Please contact to the app provider</h4>
+                          <br>
+                          <h4 class="text-danger">${data.message}</h4>
+                          `
+              } else {
+                console.log(data)
+                updateCustomerDiv(data.customers)
+                updateCategoryDiv(data.categories)
+                updateAccoutnsDiv(data.head_accounts)
+                //update product list based on selected category
+                category.addEventListener("change", e => {
+                  product.innerHTML = '<option value="" selected disabled>Select Product</option>';
+                  let isEmpty = true;
+                  data.products.forEach(i => {
+                    if (i.category_id == category.value) {
+                      product.innerHTML += `<option value="${i.id}">${i.brand.name + "-" + i.product_name}</option>`;
+                      isEmpty = false;
+                    }
+                  })
+                  if (isEmpty === true) {
+                    let text = category.options[category.selectedIndex].text;
+                    product.innerHTML = `<option value="" selected disabled>No Items Available For ${text}.</option>`;
+                  }
+                });
+                // show popup form for adding new customer
+                createCustomerBtn.addEventListener("click", e => {
+                  addNewCustomer("sale");
+                });
+
+                //fetch in-stock products list for specific product id under a specific category
+                product.addEventListener('change', e => {
+                  let payload = {
+                    product_id: parseInt(product.value)
+                  }
+                  console.log("payload: ", payload);
+                  const requestOptions = {
+                    method: 'post',
+                    headers: {
+                      'Accept': 'application/json',
+                      'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                  }
+                  fetch('http://localhost:4321/api/inventory/products/get-list-by-id', requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                      console.log(data)
+                      if (data.error === true) {
+                        showErrorMessage(data.message)
+                      } else {
+                        //update ViewProductListContainer
+                        products = data.product_items;
+                        let productMetadata = products.product_metadata;
+                        let qty = 0;
+                        if (productMetadata) {
+                          qty = productMetadata.length;
+                        }
+
+                        viewItemsInfoContainer.innerHTML = `
+                      <table class="table table-striped">
+                        <tbody>
+                          <tr>
+                            <td>Code:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.product_code}</b></td>
+                          </tr>
+                          <tr>
+                            <td>Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.product_name}</b></td>
+                          </tr>
+                          <tr>
+                            <td>Category:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.category.name}</b></b></td>
+                          </tr>
+                          <tr>
+                            <td>Brand:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.brand.name}</b></td>
+                          </tr>
+                          <tr>
+                            <td>Quantity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${qty > 0 ? `<span class="badge bg-green">${qty}</span>` : '<span class="badge bg-red">Out of stock</span>'}</b></td>
+                          </tr>
+                          <tr>
+                            <td>Discount:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.discount}</b></td>
+                          </tr>
+                          <tr>
+                            <td>MRP:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${qty > 0 ? productMetadata[0].max_retail_price : ''}</b></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      `
+                        if (qty > 0) {
+                          addItemsBtnContainer.innerHTML = `
+                          <div class=x_panel>
+                            <div class="x_content">
+                              <div class="row form-group">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                  <label for="add-quantity">Units * :</label>
+                                  <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                  <a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="MarkItemsAsSeleced(${products.id})"">
+                                  Add Items</a>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+
+                          `
+                        }
+                      }
+                    }) //End of fetch statement
+                })
+
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //submit data to backend
+              }
+            })
+        }) //End of Window.addEventListener
+        /////////////////////////////////////////////
+        /////////////////////////////////////////////
+        //updateCategoryDiv updates category selection options with the fetched data 
+        function updateCategoryDiv(categories) {
+          category.innerHTML = '';
+
+          if (categories) {
+            category.innerHTML = `<option value="" selected disabled>Select Category</option>`;
+            categories.forEach(c => {
+              category.innerHTML += `<option value=${c.id}>${c.name}</option>`;
+            });
+          } else {
+            category.innerHTML = `<option value="" selected disabled>No Category Available. Create One</option>`;
+          }
+        }
+        //updateCustomerDiv updates customer selection options with the fetched data
+        function updateCustomerDiv(customers) {
+          customer.innerHTML = '';
+          if (customers) {
+            customer.innerHTML = `<option value="" selected disabled>Select Customer Account</option>`;
+            customers.forEach(s => {
+              customer.innerHTML += `<option value="${s.id}">${s.account_name}(${s.account_code})</option>`;
+            });
+          } else {
+            customer.innerHTML = `<option value="" selected disabled>No Customer Available. Create One</option>`;
+          }
+        }
+
+        //updateAccoutnsDiv updates account selection options with the fetched data 
+        function updateAccoutnsDiv(accoutns) {
+          account.innerHTML = '';
+
+          if (accoutns) {
+            account.innerHTML = `<option value="" selected disabled>Select Account</option>`;
+            accoutns.forEach(ac => {
+              account.innerHTML += `<option value=${ac.id}>${ac.account_name}</option>`;
+            });
+          } else {
+            account.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
+          }
+        }
+
+
+        //toggleBtn changes button state in between show and hide
+        function toggleBtn(id) {
+          let elem = document.getElementById("showBtn-" + id)
+          if (elem.innerHTML.includes("Show")) {
+            elem.innerHTML = `<i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide`;
+          } else {
+            elem.innerHTML = `<i class="fa fa-eye"></i>&nbsp;&nbsp;Show`;
+          }
+        }
+
+        function toggleField(elem, price) {
+          if (elem.innerText.includes("See")) {
+            elem.innerText = `${price}`;
+          } else {
+            elem.innerText = "See";
+          }
+        }
+        function deleteFromSelectItems(id) {
+          let parentDiv = document.getElementById("selected-items-info-container");
+          let item = document.getElementById("selected-product-" + id);
+          if (parentDiv && item) {
+            parentDiv.removeChild(item);
+          }
+        }
+
+        function MarkItemsAsSeleced(id) {
+          //remove if this item already exist
+          deleteFromSelectItems(id);
+          quantity = parseInt(document.getElementById("add-quantity").value);
+          pm = products.product_metadata[0];
+          let serial = ""
+          for (let i = 0; i < quantity; i++) {
+            // const element = products.product_metadata[i].serial_number;  
+            serial += `${products.product_metadata[i].serial_number}</br>`;
+          }
+          document.getElementById("selected-items-info-container").innerHTML += `
+          <tr id="selected-product-${id}">
+            <th class="text-center">${products.product_name}</th>
+            <th class="text-center">${products.category.name}</th>
+            <th class="text-center">${products.brand.name}</th>
+            <th class="text-center" id="selected-product-qty-${id}">${quantity}</th>
+            <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
+            <th class="text-center">${pm.max_retail_price}</th>
+            <th class="text-center">${products.discount}</th>
+            <th class="text-center" id="product-price-${id}">${pm.max_retail_price * quantity}</th>
+            <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
+          </tr>
+        `;
+        }
+      </script>
+
+</body>
+
+</html>

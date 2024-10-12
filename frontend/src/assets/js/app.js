@@ -72,7 +72,7 @@ function formatDate(time, format, separator) {
 }
 
 //Define Division List
-const divisionList = ["Barisal", "Chattogram", "Dhaka", "Khulna", "Mymensingh", "Rajshahi", "Rangpur", "Sylhet"]
+// const divisionList = ["Barisal", "Chattogram", "Dhaka", "Khulna", "Mymensingh", "Rajshahi", "Rangpur", "Sylhet"]
 
 //Define division to district map
 const divisionToDistrict = {
@@ -244,7 +244,7 @@ function addNewBrand(page) {
                   <div class="form-group">
                     <div id="btns" class="col-4">
                         <br>
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" class="btn btn-round btn-success">Submit</button>
                     </div>
                   </div>
               </form>
@@ -396,7 +396,7 @@ function addNewProduct(page, brands, categories, products) {
                   <div class="form-group">
                     <div id="btns" class="col-4">
                         <br>
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" class="btn btn-round btn-success">Submit</button>
                     </div>
                   </div>
               </form>
@@ -535,7 +535,7 @@ function addNewCategory(page, categories) {
                   <div class="form-group">
                     <div id="btns" class="col-4">
                         <br>
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" class="btn btn-round btn-success">Submit</button>
                     </div>
                   </div>
               </form>
@@ -745,7 +745,7 @@ function addNewCustomer(page) {
                         <div class="form-group">
                           <div id="btns" class="col-4">
                               <br>
-                              <button type="submit" class="btn btn-success">Submit</button>
+                              <button type="submit" class="btn btn-round btn-success">Submit</button>
                           </div>
                         </div>
                     </form>
@@ -861,6 +861,11 @@ function addNewCustomer(page) {
             showErrorMessage(data.message)
           } else {
             showSuccessMessage(data.message);
+            if (page === "sale") {
+              document.getElementById("customer").innerHTML = '';
+              document.getElementById("customer").innerHTML = `<option value="${data.result.id}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
+              document.getElementById("customer").disabled = true;
+            }
           }
         });
     }
@@ -976,7 +981,7 @@ function addNewEmployee(page) {
                         <div class="form-group">
                           <div id="btns" class="col-4">
                               <br>
-                              <button type="submit" class="btn btn-success">Submit</button>
+                              <button type="submit" class="btn btn-round btn-success">Submit</button>
                           </div>
                         </div>
                     </form>
@@ -1201,7 +1206,7 @@ function addNewSupplier(page) {
                           <div class="form-group">
                             <div id="btns" class="col-4">
                                 <br>
-                                <button type="submit" class="btn btn-success">Submit</button>
+                                <button type="submit" class="btn btn-round btn-success">Submit</button>
                             </div>
                           </div>
                       </form>

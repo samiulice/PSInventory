@@ -561,8 +561,15 @@ body .container.body .right_col {
 .bg-white {
     background: #fff !important;
     border: 1px solid #fff !important;
-    color: #73879C
+    color: #000000
 }
+.bg-dark {
+    background: #000 !important;
+}
+.bg-gw {
+    background: #f6fafd !important;
+}
+
 
 .bg-green {
     background: #1ABB9C !important;
