@@ -422,7 +422,7 @@ func (app *application) FetchMemoProductItems(w http.ResponseWriter, r *http.Req
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchMemoProductItems retrive products list of a memo
+// FetchMemoProductItems retrive instock product items
 func (app *application) FetchProductItemsbyProductID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		ProductID int `json:"product_id"`
@@ -446,6 +446,43 @@ func (app *application) FetchProductItemsbyProductID(w http.ResponseWriter, r *h
 	resp.Error = false
 	resp.Message = "Data fetched succefully"
 	resp.ProductItems = productItems
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// FetchProductItembySerialNumber retrive product item by serial number
+func (app *application) FetchProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
+
+	//Define struct for JSON object
+	var payload struct {
+		SerialNumber string `json:"product_serial_number"`
+	}
+	var resp struct {
+		Error        bool            `json:"error,omitempty"`
+		Message      string          `json:"message,omitempty"`
+		ProductItems *models.Product `json:"product_items,omitempty"`
+	}
+	//Read JSON body
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "cannot read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusOK, resp)
+		return
+	}
+
+	//Get product item details for the given serial number(e.g. id,serial_number, product_id,purchase_history_id,warranty, max_retail_price, purchase_rate)
+	productItem, err := app.DB.GetProductItemDetailsBySerialNumber(payload.SerialNumber)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Error retriving data from database: " + err.Error()
+		app.writeJSON(w, http.StatusOK, resp)
+		return
+	}
+	//Get product details for the product id
+
+	resp.Error = false
+	resp.Message = "Data fetched succefully"
+	resp.ProductItems = productItem
 	app.writeJSON(w, http.StatusOK, resp)
 }
 

@@ -39,6 +39,7 @@ type DatabaseRepo interface {
 	GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error)
 	GetProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
 	GetProductItemsListByProductID(productID int)(*models.Product,error)
+	GetProductItemDetailsBySerialNumber(serialNumber string)(*models.Product,error)
 
 	UpdateProductQuantityByProductID(quantity, productID int) error
 	UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error

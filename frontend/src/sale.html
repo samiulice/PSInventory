@@ -241,7 +241,7 @@
         <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
 
         <!-- Page content here -->
-        <form action="#" id="saleForm">
+        <form action="#" id="sale-form">
           <div class="row">
             <!-- View items Secetion  -->
             <div class="col-md-5 col-sm-5 col-xs-12">
@@ -252,7 +252,7 @@
                 </div>
                 <div class="x_content">
                   <!-- Category Info -->
-                  <div class="col-md-8 col-sm-8 col-xs-12">
+                  <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="row form-group has-feedback">
                       <label for="category">Product Category * :</label>
                       <select id="category" class="form-control form-select has-feedback-left" required>
@@ -273,13 +273,6 @@
                         aria-hidden="true"></i>
                     </div>
                   </div>
-                  <div class="col-md-4 col-sm-4 col-xs-12" id="add-items-btn-container">
-
-                  </div>
-                </div>
-                <div class="x_title">
-                  <h2>Available Products</h2>
-                  <div class="clearfix"></div>
                 </div>
                 <div class="x_content" id="view-items-info-container">
                   <!-- Table row -->
@@ -308,7 +301,6 @@
                       </tr>
                     </tbody>
                   </table>
-                  <br><br>
                 </div>
               </div>
             </div>
@@ -430,7 +422,8 @@
                         <div class="row form-group has-feedback">
                           <div class="col-md-11 col-sm-11 col-xs-11">
                             <label for="discount">Discount :</label>
-                            <input type="number" class="form-control has-feedback-left" id="discount" value="0" min="0" max="100" step="0.01" placeholder="(%)" /> 
+                            <input type="number" class="form-control has-feedback-left" id="discount" value="0" min="0"
+                              max="100" step="0.01" placeholder="(%)" />
                             <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
                               aria-hidden="true">
                             </i>
@@ -478,10 +471,11 @@
                   <div class="title_right">
                     <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search">
                       <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search item by serial number">
+                        <input type="text" class="form-control" id="search-by-serial-number"
+                          placeholder="Search item by serial number">
                         <span class="input-group-btn">
-                          <button class="btn btn-default" type="button"><i style="color: rgba(0, 0, 0, 1);"
-                              class="fa fa-arrow-right" aria-hidden="true">
+                          <button class="btn btn-default btn-default" type="button" onclick="serachBySerial()"><i
+                              class="fa fa-arrow-right">
                             </i>&nbsp;</button>
                         </span>
                       </div>
@@ -588,8 +582,6 @@
           // TODO: Get the a list of product id , name and populate product div 
           let viewItemsInfoContainer = document.getElementById("view-items-info-container");
           let selectedProductListContainer = document.getElementById("selected-items-info-container");
-          let addItemsBtnContainer = document.getElementById("add-items-btn-container");
-
 
           //Fetch page data from server
           const requestOptions = {
@@ -653,67 +645,18 @@
                       } else {
                         //update ViewProductListContainer
                         products = data.product_items;
-                        let productMetadata = products.product_metadata;
-                        let qty = 0;
-                        if (productMetadata) {
-                          qty = productMetadata.length;
-                        }
-
-                        viewItemsInfoContainer.innerHTML = `
-                      <table class="table table-striped">
-                        <tbody>
-                          <tr>
-                            <td>Code:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.product_code}</b></td>
-                          </tr>
-                          <tr>
-                            <td>Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.product_name}</b></td>
-                          </tr>
-                          <tr>
-                            <td>Category:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.category.name}</b></b></td>
-                          </tr>
-                          <tr>
-                            <td>Brand:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.brand.name}</b></td>
-                          </tr>
-                          <tr>
-                            <td>Quantity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${qty > 0 ? `<span class="badge bg-green">${qty}</span>` : '<span class="badge bg-red">Out of stock</span>'}</b></td>
-                          </tr>
-                          <tr>
-                            <td>Discount:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${products.discount}</b></td>
-                          </tr>
-                          <tr>
-                            <td>MRP:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>${qty > 0 ? productMetadata[0].max_retail_price : ''}</b></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      `
-                        if (qty > 0) {
-                          addItemsBtnContainer.innerHTML = `
-                          <div class=x_panel>
-                            <div class="x_content">
-                              <div class="row form-group">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                  <label for="add-quantity">Units * :</label>
-                                  <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                  <a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="MarkItemsAsSeleced(${products.id})"">
-                                  Add Items</a>
-                                </div>
-                              </div>
-                            </div>
-                        </div>
-
-
-                          `
-                        }
+                        updateViewItemsInfoContainer(products, true);
                       }
                     }) //End of fetch statement
                 })
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 //submit data to backend
+                document.getElementById("sale-form").addEventListener('submit', function (event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  getMRPValues();
+                });
               }
             })
         }) //End of Window.addEventListener
@@ -721,9 +664,8 @@
         /////////////////////////////////////////////
         //updateCategoryDiv updates category selection options with the fetched data 
         function updateCategoryDiv(categories) {
-          category.innerHTML = '';
-
           if (categories) {
+            category.innerHTML = '';
             category.innerHTML = `<option value="" selected disabled>Select Category</option>`;
             categories.forEach(c => {
               category.innerHTML += `<option value=${c.id}>${c.name}</option>`;
@@ -734,8 +676,8 @@
         }
         //updateCustomerDiv updates customer selection options with the fetched data
         function updateCustomerDiv(customers) {
-          customer.innerHTML = '';
           if (customers) {
+            customer.innerHTML = '';
             customer.innerHTML = `<option value="" selected disabled>Select Customer Account</option>`;
             customers.forEach(s => {
               customer.innerHTML += `<option value="${s.id}">${s.account_name}(${s.account_code})</option>`;
@@ -747,9 +689,8 @@
 
         //updateAccoutnsDiv updates account selection options with the fetched data 
         function updateAccoutnsDiv(accoutns) {
-          account.innerHTML = '';
-
           if (accoutns) {
+            account.innerHTML = '';
             account.innerHTML = `<option value="" selected disabled>Select Account</option>`;
             accoutns.forEach(ac => {
               account.innerHTML += `<option value=${ac.id}>${ac.account_name}</option>`;
@@ -770,7 +711,7 @@
           }
         }
 
-        function toggleField(elem, price) {
+        function toggleTextVisibility(elem, price) {
           if (elem.innerText.includes("See")) {
             elem.innerText = `${price}`;
           } else {
@@ -781,21 +722,100 @@
           let parentDiv = document.getElementById("selected-items-info-container");
           let item = document.getElementById("selected-product-" + id);
           if (parentDiv && item) {
-            billAmount -= parseInt(document.getElementById(`product-price-${id}`).innerText);
+            billAmount -= parseInt(document.getElementById('selected-product-price-' + id).innerText);
             updateBillAmount();
             parentDiv.removeChild(item);
           }
         }
 
-        function MarkItemsAsSeleced(id) {
+        function updateViewItemsInfoContainer(items, status) {
+          let productMetadata = items.product_metadata;
+          let qty = 0;
+
+          let quantity_section = "";
+          let discount_section = "";
+          let mrp_section = "";
+          let item_unit_input_section = "";
+          if (productMetadata) {
+            qty = productMetadata.length;
+          }
+          if (qty > 0) {
+            quantity_section = `<span class="badge bg-green">${qty}</span>`;
+            mrp_section = `${productMetadata[0].max_retail_price} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="btn btn-xs btn-info" onclick="toggleTextVisibility(this, ${productMetadata[0].purchase_rate})">See</label>`;
+            discount_section = `${items.discount}`;
+          } else {
+            quantity_section = '<span class="badge bg-red">Out of stock</span>';
+          }
+          if (status) {
+            if (qty > 0) {
+              item_unit_input_section =
+                `<tr style="transform:translate(0,5px);">
+                  <td class="text-right text-primary"><b>Add Items:</b></td>
+                  <td class="text-left" style="transform:translate(0,-5px)">
+                    <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
+                  </td>
+                  <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markItemsAsSeleced(${items.id}, 0)">Add Items</a></td>
+                </tr>`
+            }
+          } else {
+            item_unit_input_section =
+              `<tr style="transform:translate(0,5px);">
+              <td class="text-primary"><b>Add Item:</b></td>
+              <td class="text-primary"><b>${products.product_metadata[0].serial_number}</b></td>
+              <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markSingleItemAsSelected(${items.id})">Add Item</a></td>
+            </tr>`
+          }
+
+          document.getElementById("view-items-info-container").innerHTML = `
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td>Code:</td>
+                <td><b>${items.product_code}</b></td>
+              </tr>
+              <tr>
+                <td>Name:</td>
+                <td><b>${items.product_name}</b></td>
+              </tr>
+              <tr>
+                <td>Category:</td>
+                <td><b>${items.category.name}</b></td>
+              </tr>
+              <tr>
+                <td>Brand:</td>
+                <td><b>${items.brand.name}</b></td>
+              </tr>
+              <tr>
+                <td>Quantity:</td>
+                <td><b>${quantity_section}</b></td>
+              </tr>
+              <tr>
+                <td>Discount:</td>
+                <td><b>${discount_section}</b></td>
+              </tr>
+              <tr>
+                <td>MRP:</td>
+                <td><b>${mrp_section}</b></td>
+              </tr>
+              ${item_unit_input_section}
+            </tbody>
+          </table>
+          `
+
+        }
+
+        //markSingleItemAsSelected add multiple items to the selected items section
+        function markItemsAsSeleced(id, quantity) {
           //remove if this item already exist
           deleteFromSelectItems(id);
-          quantity = parseInt(document.getElementById("add-quantity").value);
+          if (quantity === 0) {
+            quantity = parseInt(document.getElementById("add-quantity").value);
+          }
           pm = products.product_metadata[0];
           let serial = ""
           for (let i = 0; i < quantity; i++) {
             // const element = products.product_metadata[i].serial_number;  
-            serial += `${products.product_metadata[i].serial_number}</br>`;
+            serial += `<span class="serial-number">${products.product_metadata[i].serial_number}</span></br>`;
           }
           document.getElementById("selected-items-info-container").innerHTML += `
           <tr id="selected-product-${id}">
@@ -806,13 +826,32 @@
             <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
             <th class="text-center">${pm.max_retail_price}</th>
             <th class="text-center">${products.discount}</th>
-            <th class="text-center" id="product-price-${id}">${pm.max_retail_price * quantity}</th>
+            <th class="text-center" id="selected-product-price-${id}">${pm.max_retail_price * quantity}</th>
             <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
           </tr>
         `;
           //increase bill amount
           billAmount += pm.max_retail_price * quantity;
           updateBillAmount();
+        }
+
+        //markSingleItemAsSelected add current item to the selected items section
+        function markSingleItemAsSelected(id) {
+          //check id already exist or not
+          let elem = document.getElementById("selected-product-serial-" + id);
+          if (elem) {
+            if (!elem.innerHTML.includes(`${products.product_metadata[0].serial_number}`)) {
+              elem.innerHTML += `<span class="serial-number">${products.product_metadata[0].serial_number}</span> <br>`;
+              document.getElementById("selected-product-price-" + id).innerText = parseInt(document.getElementById("selected-product-price-" + id).innerText) + products.product_metadata[0].max_retail_price;
+              document.getElementById("selected-product-qty-" + id).innerText = parseInt(document.getElementById("selected-product-qty-" + id).innerText) + 1;
+
+              //increase bill amount
+              billAmount += products.product_metadata[0].max_retail_price;
+              updateBillAmount();
+            }
+          } else {
+            markItemsAsSeleced(id, 1)
+          }
         }
 
         //updateBillAmount updates current bill amount
@@ -842,6 +881,94 @@
           //updata max input of paid-amount field
           document.getElementById("paid-amount").max = `${totalAmount}`;
         })
+
+        //getMRPValues
+        function getMRPValues() {
+          // Get all rows from the table body
+          const rows = document.querySelectorAll('#selected-items-info-container tr');
+
+          // Array to store MRP values
+          const mrpValues = [];
+
+          // Loop through each row and get the 6th column (MRP)
+          rows.forEach(row => {
+            const mrpCell = row.cells[5]; // Get the MRP cell (6th column, 0-indexed)
+            if (mrpCell) {
+              mrpValues.push(mrpCell.textContent.trim()); // Add the MRP value to the array
+            }
+          });
+
+          // Log all MRP values
+          console.log(mrpValues);
+        }
+
+        //serachBySerial()
+        function serachBySerial() {
+          let serial_number = document.getElementById("search-by-serial-number").value;
+          if (serial_number === "") {
+            Swal.fire({
+              title: "Invalid Serial Number",
+              icon: "warning"
+            });
+          } else {
+            let serialNumber = {
+              product_serial_number: serial_number,
+            }
+            const requestOptions = {
+              method: 'post',
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              body: JSON.stringify(serialNumber)
+            }
+
+            fetch('http://localhost:4321/api/inventory/products/search-product-by-serial', requestOptions)
+              .then(response => response.json())
+              .then(data => {
+                console.log(data);
+                if (data.error === true) {
+                  //showErrorMessage(data.message)
+                  if (data.message.includes("no rows in result set")) {
+                    Swal.fire({
+                      title: "Out of stock",
+                      icon: "error"
+                    });
+                  } else {
+                    Swal.fire({
+                      title: "Error",
+                      text: data.message,
+                      icon: "error"
+                    });
+                  }
+                } else {
+                  //update ViewProductListContainer
+                  products = data.product_items;
+                  updateViewItemsInfoContainer(products, false);
+                }
+              })
+          }
+        }
+
+        //checkProductExitance check the id exist or not in the selected items table
+        //if it exist then serial number will be pushed to the serial_number col
+        //otherwise add item as new
+        function checkProductExitance(id) {
+          // Get all rows from the table body
+          const rows = document.querySelectorAll('#selected-items-info-container tr');
+
+          // Array to store MRP values
+          const mrpValues = [];
+
+          // Loop through each row and get the 6th column (MRP)
+          rows.forEach(row => {
+            const mrpCell = row.cells[5]; // Get the MRP cell (6th column, 0-indexed)
+            if (mrpCell) {
+              mrpValues.push(mrpCell.textContent.trim()); // Add the MRP value to the array
+            }
+          });
+
+          // Log all MRP values
+          console.log(mrpValues);
+        }
       </script>
 
 </body>

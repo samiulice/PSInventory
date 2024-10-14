@@ -431,8 +431,8 @@
               <div class="x_content">
                 <div class="row">
                   <div class="col-md-4 col-sm-4 col-xs-12 has-feedback">
-                    <label for="unitPrice">Unit Price * :</label>
-                    <input type="number" class="form-control has-feedback-left" id="unitPrice" name="unitPrice"
+                    <label for="purchaseRate">Purchase Rate * :</label>
+                    <input type="number" class="form-control has-feedback-left" id="purchaseRate" name="purchaseRate"
                       placeholder="TK" required>
                     <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                       aria-hidden="true">
@@ -596,7 +596,7 @@
 
         let account = document.getElementById("account");
 
-        let unitPrice = document.getElementById("unitPrice");
+        let purchaseRate = document.getElementById("purchaseRate");
         let mRP = document.getElementById("mRP");
         let warranty = document.getElementById("warranty");
         let billAmount = document.getElementById("billAmount");
@@ -708,7 +708,7 @@
                   memo_no: memo_no.value,
                   note: note.value,
                   max_retail_price: parseInt(mRP.value),
-                  unit_price: parseInt(unitPrice.value),
+                  purchase_rate: parseInt(purchaseRate.value),
                   warranty: parseInt(warranty.value),
                   bill_amount: parseInt(billAmount.value),
                   discount: parseInt(discount.value),

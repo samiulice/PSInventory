@@ -1028,7 +1028,7 @@ func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.
 	//get metadata from product_serial_numbers
 	query := `
 			SELECT
-				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, unit_price, created_at, updated_at
+				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
 			FROM
 				public.product_serial_numbers
 			WHERE
@@ -1049,7 +1049,7 @@ func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.
 			&pm.Status,
 			&pm.Warranty,
 			&pm.MaxRetailPrice,
-			&pm.UnitPrice,
+			&pm.PurchaseRate,
 			&pm.CreatedAt,
 			&pm.UpdatedAt,
 		)
@@ -1066,6 +1066,49 @@ func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.
 		return product, err
 	}
 	pr.ProductMetadata = metadata
+	product = &pr
+	return product, nil
+}
+
+// GetProductItemDetailsBySerialNumber returns product item details corresponds to serial number
+func (p *postgresDBRepo) GetProductItemDetailsBySerialNumber(serialNumber string) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var product *models.Product
+
+	//get metadata from product_serial_numbers
+	query := `
+		SELECT
+			id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+		FROM
+			public.product_serial_numbers
+		WHERE
+			status = 'in stock' AND serial_number = $1
+	`
+	var metadata models.ProductMetadata
+	err := p.DB.QueryRowContext(ctx, query, serialNumber).Scan(
+		&metadata.ID,
+		&metadata.SerialNumber,
+		&metadata.ProductID,
+		&metadata.PurchaseHistoryID,
+		&metadata.Status,
+		&metadata.Warranty,
+		&metadata.MaxRetailPrice,
+		&metadata.PurchaseRate,
+		&metadata.CreatedAt,
+		&metadata.UpdatedAt,
+	)
+	if err != nil {
+		return product, err
+	}
+
+	//get product info
+	pr, err := p.GetProductByID(metadata.ProductID)
+	if err != nil {
+		return product, err
+	}
+	pr.ProductMetadata = append(pr.ProductMetadata, &metadata)
 	product = &pr
 	return product, nil
 }
@@ -1135,7 +1178,7 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 	//get metadata from product_serial_numbers
 	query := `
 			SELECT
-				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, unit_price, created_at, updated_at
+				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
 			FROM
 				public.product_serial_numbers
 			WHERE
@@ -1156,7 +1199,7 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 			&pm.Status,
 			&pm.Warranty,
 			&pm.MaxRetailPrice,
-			&pm.UnitPrice,
+			&pm.PurchaseRate,
 			&pm.CreatedAt,
 			&pm.UpdatedAt,
 		)
@@ -1252,10 +1295,10 @@ func (p *postgresDBRepo) AddProductSerialNumbers(purchase *models.Purchase) erro
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.MaxRetailPrice, purchase.UnitPrice, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.MaxRetailPrice, purchase.PurchaseRate, createdAt, updatedAt))
 	}
 
-	query := "INSERT INTO public.product_serial_numbers (serial_number,product_id,max_retail_price,unit_price,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	query := "INSERT INTO public.product_serial_numbers (serial_number,product_id,max_retail_price,purchase_rate,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
 	// Execute the query
 	_, err := p.DB.ExecContext(ctx, query)
 	if err != nil {
@@ -1363,7 +1406,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	//ProductID        int
 	// ProductsSerialNo []string
 	// MaxRetailPrice        int
-	// UnitPrice              int
+	// PurchaseRate              int
 
 	values := []string{}
 	now := time.Now()
@@ -1375,10 +1418,10 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.UnitPrice, purchase.Warranty, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.Warranty, createdAt, updatedAt))
 	}
 
-	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,max_retail_price,unit_price,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,max_retail_price,purchase_rate,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
 	// Execute the query
 	_, err = tx.ExecContext(ctx, query)
 	if err != nil {

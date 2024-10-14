@@ -512,7 +512,7 @@
                       metadata += `
                       <div class="checkbox">
                         <label>
-                          <input type="checkbox" id="${pm.serial_number}" class="flat product-list" value="${pm.unit_price}"> ${pm.serial_number}
+                          <input type="checkbox" id="${pm.serial_number}" class="flat product-list" value="${pm.purchase_rate}"> ${pm.serial_number}
                         </label>
                         <input type="hidden" id="id-${pm.serial_number}" value="${pm.id}">
                       </div>`
@@ -652,7 +652,7 @@
                 elem.checked = false;
                 //Update selected product units and prices counter
                 totalUnits -= 1;
-                totalPrices -= pm.unit_price;
+                totalPrices -= pm.purchase_rate;
               }
             })
           } else {
@@ -668,7 +668,7 @@
                 elem.checked = true;
                 //Update selected product units and prices counter
                 totalUnits += 1;
-                totalPrices += pm.unit_price;
+                totalPrices += pm.purchase_rate;
               }
             })
           }
