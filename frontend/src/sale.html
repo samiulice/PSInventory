@@ -324,10 +324,10 @@
                   </div>
                   <div class="title_right">
                     <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search text-right">
-                      
-                        <a class="btn btn-round btn-xs btn-primary" id="createCustomerBtn">
-                          <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Create Customer</a>
-                      
+
+                      <a class="btn btn-round btn-xs btn-primary" id="createCustomerBtn">
+                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Create Customer</a>
+
                     </div>
                   </div>
                   <div class="clearfix"></div>
@@ -343,7 +343,7 @@
                         <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
                           aria-hidden="true"></i>
                       </div>
-                    <!-- Customer Account -->
+                      <!-- Customer Account -->
                       <div class="col-md-6 col-sm-6 col-xs-10">
                         <label for="customer">Customer * :</label>
                         <select id="customer" class="form-control form-select has-feedback-left" required>
@@ -418,9 +418,9 @@
                         <!-- Bill Amount -->
                         <div class="row form-group has-feedback">
                           <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="billAmount">Bill Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="billAmount"
-                              placeholder="Bill Amount" required>
+                            <label for="bill-amount">Bill Amount * :</label>
+                            <input type="number" class="form-control has-feedback-left" id="bill-amount"
+                              placeholder="Bill Amount" value="0" required>
                             <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                               aria-hidden="true">
                             </i>
@@ -430,7 +430,7 @@
                         <div class="row form-group has-feedback">
                           <div class="col-md-11 col-sm-11 col-xs-11">
                             <label for="discount">Discount :</label>
-                            <input type="number" class="form-control has-feedback-left" id="discount" placeholder="(%)">
+                            <input type="number" class="form-control has-feedback-left" id="discount" value="0" min="0" max="100" step="0.01" placeholder="(%)" /> 
                             <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
                               aria-hidden="true">
                             </i>
@@ -439,8 +439,8 @@
                         <!-- Total Amount -->
                         <div class="row form-group has-feedback">
                           <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="totalAmount">Total Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="totalAmount"
+                            <label for="total-amount">Total Amount * :</label>
+                            <input type="number" class="form-control has-feedback-left" id="total-amount" value="0"
                               placeholder="Total Amount" required>
                             <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                               aria-hidden="true">
@@ -450,8 +450,8 @@
                         <!-- Paid Amount -->
                         <div class="row form-group has-feedback">
                           <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="paidAmount">Paid Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="paidAmount"
+                            <label for="paid-amount">Paid Amount * :</label>
+                            <input type="number" class="form-control has-feedback-left" id="paid-amount"
                               placeholder="Paid Amount" required>
                             <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                               aria-hidden="true">
@@ -579,7 +579,7 @@
 
       <script>
 
-        let products, brands, totalSelectedItems = 0, productIDs = [];
+        let products, brands, billAmount = 0, totalAmount = 0;
 
         window.addEventListener("DOMContentLoaded", () => {
           let category = document.getElementById("category");
@@ -781,6 +781,8 @@
           let parentDiv = document.getElementById("selected-items-info-container");
           let item = document.getElementById("selected-product-" + id);
           if (parentDiv && item) {
+            billAmount -= parseInt(document.getElementById(`product-price-${id}`).innerText);
+            updateBillAmount();
             parentDiv.removeChild(item);
           }
         }
@@ -808,7 +810,38 @@
             <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
           </tr>
         `;
+          //increase bill amount
+          billAmount += pm.max_retail_price * quantity;
+          updateBillAmount();
         }
+
+        //updateBillAmount updates current bill amount
+        function updateBillAmount() {
+          document.getElementById("bill-amount").value = billAmount;
+          document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(document.getElementById("discount").value) / 100.0));
+          totalAmount = parseInt(document.getElementById("total-amount").value);
+
+          //updata max input of paid-amount field
+          document.getElementById("paid-amount").max = `${totalAmount}`;
+        }
+
+        //upadate total amount when discount is changed
+        document.getElementById("discount").addEventListener('change', e => {
+          document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(document.getElementById("discount").value) / 100.0));
+          totalAmount = parseInt(document.getElementById("total-amount").value);
+          //updata max input of paid-amount field
+          document.getElementById("paid-amount").max = `${totalAmount}`;
+        })
+        //upadate discount when total amount is changed
+        document.getElementById("total-amount").addEventListener('change', e => {
+          let discount = 100.0 - 100 * parseFloat(document.getElementById('total-amount').value) / billAmount;
+          document.getElementById("discount").value = (discount % 1 === 0) ? discount : discount.toFixed(2);;
+
+          totalAmount = parseInt(document.getElementById("total-amount").value);
+
+          //updata max input of paid-amount field
+          document.getElementById("paid-amount").max = `${totalAmount}`;
+        })
       </script>
 
 </body>
