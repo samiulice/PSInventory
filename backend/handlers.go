@@ -599,7 +599,7 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	var resp = JSONResponse{
 		Error:   false,
-		Message: "restock product Succesfully",
+		Message: "sale products Succesfully",
 		Result:  saleDetails,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
