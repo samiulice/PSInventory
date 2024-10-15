@@ -517,6 +517,7 @@ func (app *application) GetMemoListBySupplierID(w http.ResponseWriter, r *http.R
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// ReturnProductsToSupplier read json and update product items state from purchase to purchase-return
 func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.Request) {
 	var ReturnProductsInfo struct {
 		JobID          string `json:"job_id"`
@@ -533,9 +534,9 @@ func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.
 		return
 	}
 
-	//convert ReturnedDate in time.Time
-	// Define the layout for parsing the input date
-	layout := "02/01/2006"
+	//convert ReturnedDate into time.Time
+	// Define the layout matching the date format
+	layout := "01/02/2006" // MM/DD/YYYY
 
 	// Parse the string into time.Time
 	transactionDate, err := time.Parse(layout, ReturnProductsInfo.ReturnedDate)
@@ -579,6 +580,27 @@ func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 		Error:   false,
 		Message: "restock product Succesfully",
 		Result:  purchase_details,
+	}
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// SaleProducts sale products, update product items state from instock to sold in the database
+func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
+	var saleDetails models.Sale
+	err := app.readJSON(w, r, &saleDetails)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	err = app.DB.SaleProducts(&saleDetails)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	var resp = JSONResponse{
+		Error:   false,
+		Message: "restock product Succesfully",
+		Result:  saleDetails,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
 }

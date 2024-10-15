@@ -141,7 +141,7 @@ type ProductMetadata struct {
 	Status            string    `json:"status,omitempty"`
 	Warranty          int       `json:"warranty,omitempty"`
 	MaxRetailPrice    int       `json:"max_retail_price,omitempty"` //max_retail_price = total_amount+profit/quantity_purchased
-	PurchaseRate    int       `json:"purchase_rate,omitempty"` //purchase_rate = total_amount/quantity_purchased
+	PurchaseRate      int       `json:"purchase_rate,omitempty"`    //purchase_rate = total_amount/quantity_purchased
 	CreatedAt         time.Time `json:"created_at,omitempty"`
 	UpdatedAt         time.Time `json:"updated_at,omitempty"`
 }
@@ -160,8 +160,8 @@ type Purchase struct {
 	ChalanNO          string    `json:"chalan_no,omitempty"`
 	MemoNo            string    `json:"memo_no,omitempty"`
 	Note              string    `json:"note,omitempty"`
-	MaxRetailPrice         int       `json:"max_retail_price,omitempty"`
-	PurchaseRate               int       `json:"purchase_rate,omitempty"`
+	MaxRetailPrice    int       `json:"max_retail_price,omitempty"`
+	PurchaseRate      int       `json:"purchase_rate,omitempty"`
 	Warranty          int       `json:"warranty,omitempty"`
 	BillAmount        int       `json:"bill_amount,omitempty"`
 	Discount          int       `json:"discount,omitempty"`
@@ -169,6 +169,24 @@ type Purchase struct {
 	PaidAmount        int       `json:"paid_amount,omitempty"`
 	CreatedAt         time.Time `json:"created_at,omitempty"`
 	UpdatedAt         time.Time `json:"updated_at,omitempty"`
+}
+
+// Sale is the type for purchase info
+type Sale struct {
+	ID               int       `json:"id"`
+	SaleDate         string    `json:"sale_date,omitempty"`
+	CustomerID       int       `json:"customer_id,omitempty"`
+	ProductsSerialNo []string  `json:"products_serial_no,omitempty"`
+	AccountID        int       `json:"account_id,omitempty"`
+	ChalanNO         string    `json:"chalan_no,omitempty"`
+	MemoNo           string    `json:"memo_no,omitempty"`
+	Note             string    `json:"note,omitempty"`
+	BillAmount       int       `json:"bill_amount,omitempty"`
+	Discount         int       `json:"discount,omitempty"`
+	TotalAmount      int       `json:"total_amount,omitempty"`
+	PaidAmount       int       `json:"paid_amount,omitempty"`
+	CreatedAt        time.Time `json:"created_at,omitempty"`
+	UpdatedAt        time.Time `json:"updated_at,omitempty"`
 }
 
 // Supplier is the type for suppliers
