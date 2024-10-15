@@ -1435,101 +1435,89 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	return nil
 }
 
-// // RestockProduct update product quantity, store purchase history and product serial numbers
-// func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-// 	defer cancel()
-// 	tx, err := p.DB.BeginTx(ctx, nil)
-// 	if err != nil {
-// 		return err
-// 	}
-	
-// 	//Tx-1: Update product quantity
-// 	//Set quantity += newQuantity
-// 	query := `UPDATE public.products
-//           SET quantity = quantity + $1
-//           WHERE id = $2;`
+// RestockProduct update product quantity, store purchase history and product serial numbers
+func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
 
-// 	// Execute the query with parameters
-// 	_, err = tx.ExecContext(ctx, query, purchase.Quantity, purchase.ProductID)
-// 	if err != nil {
-// 		tx.Rollback()
-// 		return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
-// 	}
+	//Tx-1: Insert data to sales history table70
+	var sale_id int
+	query := `INSERT INTO public.sales_history (sale_date,customer_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
+	`
+	date, err := time.Parse("01/02/2006", sale.SaleDate)
+	if err != nil {
+		return err
+	}
+	row := tx.QueryRowContext(ctx, query,
+		date,
+		sale.CustomerID,
+		sale.AccountID,
+		sale.ChalanNO,
+		sale.MemoNo,
+		sale.Note,
+		sale.BillAmount,
+		sale.Discount,
+		sale.TotalAmount,
+		sale.PaidAmount,
+		time.Now(),
+		time.Now(),
+	)
+	if err = row.Scan(&sale_id); err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleProducts(INSERT sales_history): " + err.Error())
+	}
+	fmt.Println("sale ID: ", sale_id)
 
-// 	//Tx-2: Insert data to sales history table
-// 	//.........insert the following data into purchase_history table.........
-// 	// PurchaseDate     string
-// 	// SupplierID       int
-// 	// ProductID        int
-// 	// AccountID        int
-// 	// ChalanNO         string
-// 	// MemoNo           string
-// 	// Note             string
-// 	// BillAmount       int
-// 	// Discount         int
-// 	// TotalAmount      int
-// 	// PaidAmount       int
-// 	var purhcase_id int
-// 	query = `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
-// 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id
-// 	`
-// 	row := tx.QueryRowContext(ctx, query,
-// 		purchase.PurchaseDate,
-// 		purchase.SupplierID,
-// 		purchase.ProductID,
-// 		purchase.AccountID,
-// 		purchase.ChalanNO,
-// 		purchase.MemoNo,
-// 		purchase.Note,
-// 		purchase.Quantity,
-// 		purchase.BillAmount,
-// 		purchase.Discount,
-// 		purchase.TotalAmount,
-// 		purchase.PaidAmount,
-// 		time.Now(),
-// 		time.Now(),
-// 	)
-// 	if err = row.Scan(&purhcase_id); err != nil {
-// 		tx.Rollback()
-// 		return errors.New("SQLErrorRestockProduct(Insert purchase_history):" + err.Error())
-// 	}
+	//Tx-2:
+	//step-1: update product items status and sales_history id, returnin id affected row id
+	//step-2 Update product quantity, Set quantity -= newQuantity where id = {affected row id}
 
-// 	//Tx-3: update product items status and customer id
-// 	//.........insert the following data into product_serial_numbers table............//
-// 	//ProductID        int
-// 	// ProductsSerialNo []string
-// 	// MaxRetailPrice        int
-// 	// PurchaseRate              int
+	// Single query to update status and sale_history_id, and return the product ID and the update product quantity with the returned id
+	fmt.Println(sale.ProductsSerialNo[0])
+	for i, sn := range sale.ProductsSerialNo {
+		var productID, salesHistoryID int
+		query = `
+		WITH updated AS (
+			UPDATE public.product_serial_numbers
+			SET status = $1, sales_history_id = $2 
+			WHERE serial_number = $3
+			RETURNING id, product_id  -- Assuming product_id is part of product_serial_numbers
+		)
+		UPDATE public.products
+		SET quantity = quantity - 1
+		WHERE id = (SELECT product_id FROM updated)
+		RETURNING product_id;  -- This will return the product_id from the products table
 
-// 	values := []string{}
-// 	now := time.Now()
-// 	purchase.CreatedAt = now
-// 	purchase.UpdatedAt = now
+		`
+		// Execute the query with parameters
+		err = tx.QueryRowContext(ctx, query, "sold", sale_id, sn).Scan(&productID)
+		fmt.Println(salesHistoryID, productID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("#%dSQLErrorSaleProducts(Update-Status-Sales_history_id-Quantity: %w", i, err)
+		}
+	}
 
-// 	// Format timestamps with time zone in a PostgreSQL-friendly format
-// 	createdAt := purchase.CreatedAt.Format("2006-01-02 15:04:05 -07:00")
-// 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
-
-// 	for _, serial_number := range purchase.ProductsSerialNo {
-// 		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.Warranty, createdAt, updatedAt))
-// 	}
-
-// 	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,max_retail_price,purchase_rate,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
-// 	// Execute the query
-// 	_, err = tx.ExecContext(ctx, query)
-// 	if err != nil {
-// 		tx.Rollback()
-// 		return errors.New("SQLErrorRestockProduct(Product Serial Number):" + err.Error())
-// 	}
-
-// 	//Tx-4 insert summary about the sales in the inventory_transaction table
-// 	// Commit transaction
-// 	if err := tx.Commit(); err != nil {
-// 		return errors.New("SQLErrorRestockProduct(Commit):" + err.Error())
-// 	}
-// 	return nil
-// }
+	//Tx-4 insert summary about the sales in the inventory_transaction_logs table
+	var inv_tx_log_id int
+	query = `INSERT INTO public.inventory_transaction_logs(job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
+	VALUES($1, $2, $3, $4, $5, $6, $7) RETURNNING id`
+	err = tx.QueryRowContext(ctx, query, "S-"+sale.MemoNo, "sale", len(sale.ProductsSerialNo), sale.TotalAmount, time.Now(), time.Now()).Scan(&inv_tx_log_id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("SQLErrorSaleProducts(INSERT inventory_transaction_logs: %w", err)
+	}
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		return errors.New("SQLErrorSaleProducts(Commit):" + err.Error())
+	}
+	return nil
+}
 
 // /ReturnProductUnitsToSupplier updates database
 func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionDate time.Time, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error) {

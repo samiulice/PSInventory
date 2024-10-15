@@ -572,6 +572,7 @@
   <script>
 
     let products, brands, billAmount = 0, totalAmount = 0;
+    let selected_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -659,7 +660,7 @@
               const serialNumbers = document.querySelectorAll('.serial-number');
               // Extract the text content of each span
               const serialNumberValues = Array.from(serialNumbers).map(span => span.textContent);
-              
+
               let sale_details = {
                 sale_date: document.getElementById("single_cal4").value,
                 customer_id: parseInt(document.getElementById("customer").value),
@@ -758,15 +759,6 @@
         elem.innerText = "See";
       }
     }
-    function deleteFromSelectItems(id) {
-      let parentDiv = document.getElementById("selected-items-info-container");
-      let item = document.getElementById("selected-product-" + id);
-      if (parentDiv && item) {
-        billAmount -= parseInt(document.getElementById('selected-product-price-' + id).innerText);
-        updateBillAmount();
-        parentDiv.removeChild(item);
-      }
-    }
 
     function updateViewItemsInfoContainer(items, status) {
       let productMetadata = items.product_metadata;
@@ -842,6 +834,53 @@
       </table>
       `
 
+    }
+
+    function removeSerialNumber(productId, serialNumberToRemove) {
+      // Find the product by productId
+      const p = data.find(item => item.productId === productId);
+
+      if (p) {
+        // Filter out the serial number to remove
+        p.serialNumbers = p.serialNumbers.filter(
+          serialNumber => serialNumber !== serialNumberToRemove
+        );
+      } else {
+        console.log(`Product with ID ${productId} not found.`);
+      }
+    }
+    function insertSerialNumber(productId, newSerialNumber) {
+      // Find the product by productId
+      const product = data.find(item => item.productId === productId);
+
+      if (product) {
+        // Check if the new serial number already exists
+        if (!product.serialNumbers.includes(newSerialNumber)) {
+          product.serialNumbers.push(newSerialNumber);
+          console.log(`Serial number ${newSerialNumber} added to product ${productId}.`);
+        } else {
+          console.log(`Serial number ${newSerialNumber} already exists for product ${productId}.`);
+        }
+      } else {
+        // If the product doesn't exist, create a new one
+        const newProduct = {
+          productId: productId,
+          serialNumbers: [newSerialNumber]
+        };
+        data.push(newProduct);
+        console.log(`Product ${productId} created with serial number ${newSerialNumber}.`);
+      }
+    }
+
+
+    function deleteFromSelectItems(id) {
+      let parentDiv = document.getElementById("selected-items-info-container");
+      let item = document.getElementById("selected-product-" + id);
+      if (parentDiv && item) {
+        billAmount -= parseInt(document.getElementById('selected-product-price-' + id).innerText);
+        updateBillAmount();
+        parentDiv.removeChild(item);
+      }
     }
 
     //markSingleItemAsSelected add multiple items to the selected items section

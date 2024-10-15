@@ -586,23 +586,31 @@ func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 
 // SaleProducts sale products, update product items state from instock to sold in the database
 func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
+	var err error
 	var saleDetails models.Sale
-	err := app.readJSON(w, r, &saleDetails)
+	defer func() {
+		if err != nil {
+			app.badRequest(w,err)
+			return
+		}
+		var resp = JSONResponse{
+			Error:   false,
+			Message: "sale products Succesfully",
+			Result:  saleDetails,
+		}
+		app.writeJSON(w, http.StatusOK, resp)
+	}()
+
+	
+	err = app.readJSON(w, r, &saleDetails)
 	if err != nil {
-		app.badRequest(w, err)
+		return 
+	}
+	 err = app.DB.SaleProducts(&saleDetails)
+	if err != nil {
 		return
 	}
-	// err = app.DB.SaleProducts(&saleDetails)
-	if err != nil {
-		app.badRequest(w, err)
-		return
-	}
-	var resp = JSONResponse{
-		Error:   false,
-		Message: "sale products Succesfully",
-		Result:  saleDetails,
-	}
-	app.writeJSON(w, http.StatusOK, resp)
+	
 }
 
 // GetPurchasePageDetails scrape data from the database to initialize purchase page
