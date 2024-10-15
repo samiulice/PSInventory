@@ -1474,40 +1474,45 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 	fmt.Println("sale ID: ", sale_id)
 
 	//Tx-2:
-	//step-1: update product items status and sales_history id, returnin id affected row id
-	//step-2 Update product quantity, Set quantity -= newQuantity where id = {affected row id}
+	//step-1: Update product quantity, Set quantity -= newQuantity where id = {affected row id}
+	//step-2: update product items status and sales_history_id, returnin id affected row id
 
-	// Single query to update status and sale_history_id, and return the product ID and the update product quantity with the returned id
-	fmt.Println(sale.ProductsSerialNo[0])
-	for i, sn := range sale.ProductsSerialNo {
-		var productID, salesHistoryID int
-		query = `
-		WITH updated AS (
-			UPDATE public.product_serial_numbers
-			SET status = $1, sales_history_id = $2 
-			WHERE serial_number = $3
-			RETURNING id, product_id  -- Assuming product_id is part of product_serial_numbers
-		)
-		UPDATE public.products
-		SET quantity = quantity - 1
-		WHERE id = (SELECT product_id FROM updated)
-		RETURNING product_id;  -- This will return the product_id from the products table
-
-		`
+	//loop over the SelectedProduct array
+	for i, items := range sale.SelectedItems {
+		//Update product quantity
+		query := `
+			UPDATE public.products
+			SET quantity = quantity - $1
+			WHERE id = $2;
+		  `
 		// Execute the query with parameters
-		err = tx.QueryRowContext(ctx, query, "sold", sale_id, sn).Scan(&productID)
-		fmt.Println(salesHistoryID, productID)
+		_, err = tx.ExecContext(ctx, query, len(items.SerialNumbers), items.ProductID)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("#%dSQLErrorSaleProducts(Update-Status-Sales_history_id-Quantity: %w", i, err)
+			return fmt.Errorf("SQLErrorSaleProducts(Update Product Quantity):#%d --%w", i, err)
 		}
+
+		//update product items status and sales_history_id
+		for _, serialNumber := range items.SerialNumbers {
+			query = `
+				UPDATE public.product_serial_numbers
+				SET status = 'sold', sales_history_id = $1 
+				WHERE serial_number = $2
+			`
+			_, err := tx.ExecContext(ctx, query, sale_id, serialNumber)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("SQLErrorSaleProducts(Update Product status And status):#serial-%s --%w", serialNumber, err)
+			}
+		}
+		//
 	}
 
-	//Tx-4 insert summary about the sales in the inventory_transaction_logs table
+	//Tx-3 insert summary about the sales in the inventory_transaction_logs table
 	var inv_tx_log_id int
 	query = `INSERT INTO public.inventory_transaction_logs(job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
-	VALUES($1, $2, $3, $4, $5, $6, $7) RETURNNING id`
-	err = tx.QueryRowContext(ctx, query, "S-"+sale.MemoNo, "sale", len(sale.ProductsSerialNo), sale.TotalAmount, time.Now(), time.Now()).Scan(&inv_tx_log_id)
+	VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+	err = tx.QueryRowContext(ctx, query, "S-"+sale.MemoNo, "sale", len(sale.ProductsSerialNo), sale.TotalAmount, date, time.Now(), time.Now()).Scan(&inv_tx_log_id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("SQLErrorSaleProducts(INSERT inventory_transaction_logs: %w", err)

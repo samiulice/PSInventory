@@ -238,7 +238,7 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
+        <h2 class="text-center text-warning fa-2x"><label>WARRANTY</label></h2>
 
         <!-- Page content here -->
         <form action="#" id="sale-form">
@@ -247,32 +247,24 @@
             <div class="col-md-5 col-sm-5 col-xs-12">
               <div class="x_panel bg-gw" style="min-height: 520px; height: 520px; max-height: 850px">
                 <div class="x_title">
-                  <h2>Search Product</h2>
+                  <div class="title_left">
+                    <h2>Search Product</h2>
+                  </div>
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                  <!-- Category Info -->
-                  <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="row form-group has-feedback">
-                      <label for="category">Product Category * :</label>
-                      <select id="category" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Category</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
-                        aria-hidden="true"></i>
+                  <!-- Search by serial-->
+                    <div class="col-md-12 col-sm-12 col-xs-12 form-group pull-right top_search">
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="search-by-serial-number"
+                          placeholder="Search item by serial number">
+                        <span class="input-group-btn">
+                          <button class="btn btn-default btn-default" type="button" onclick="serachBySerial()"><i
+                              class="fa fa-arrow-right">
+                            </i>&nbsp;</button>
+                        </span>
+                      </div>
                     </div>
-                    <!-- Product Info -->
-                    <div class="row form-group has-feedback">
-                      <label for="product">Product Name * :</label>
-                      <select id="product" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Product</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
-                        aria-hidden="true"></i>
-                    </div>
-                  </div>
                 </div>
                 <div class="x_content" id="view-items-info-container">
                   <!-- Table row -->
@@ -291,13 +283,16 @@
                         <td>Brand:</td>
                       </tr>
                       <tr>
-                        <td>Quantity:</td>
-                      </tr>
-                      <tr>
                         <td>MRP:</td>
                       </tr>
                       <tr>
                         <td>Discount:</td>
+                      </tr>
+                      <tr>
+                        <td>Sale Price:</td>
+                      </tr>
+                      <tr>
+                        <td>Warranty Status: </td>
                       </tr>
                     </tbody>
                   </table>
@@ -311,7 +306,7 @@
                 <div class="x_title">
                   <div class="title_left">
                     <div class="col-md-8 col-sm-6 col-xs-6">
-                      <h2>Sale Details</h2>
+                      <h2>Warranty Details</h2>
                     </div>
                   </div>
                   <div class="title_right">
@@ -688,7 +683,7 @@
               fetch('http://localhost:4321/api/inventory/sale-products', requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                  console.log("Sale Products: ", data)
+                  console.log("Warranty  Products: ", data)
                   if (data.error === true) {
                     showErrorMessage(data.message)
                   } else {

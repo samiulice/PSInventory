@@ -606,10 +606,10 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(saleDetails)
-	//  err = app.DB.SaleProducts(&saleDetails)
-	// if err != nil {
-	// 	return
-	// }
+	err = app.DB.SaleProducts(&saleDetails)
+	if err != nil {
+		return
+	}
 
 }
 
