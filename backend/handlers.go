@@ -590,7 +590,7 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 	var saleDetails models.Sale
 	defer func() {
 		if err != nil {
-			app.badRequest(w,err)
+			app.badRequest(w, err)
 			return
 		}
 		var resp = JSONResponse{
@@ -601,16 +601,16 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 		app.writeJSON(w, http.StatusOK, resp)
 	}()
 
-	
 	err = app.readJSON(w, r, &saleDetails)
-	if err != nil {
-		return 
-	}
-	 err = app.DB.SaleProducts(&saleDetails)
 	if err != nil {
 		return
 	}
-	
+	fmt.Println(saleDetails)
+	//  err = app.DB.SaleProducts(&saleDetails)
+	// if err != nil {
+	// 	return
+	// }
+
 }
 
 // GetPurchasePageDetails scrape data from the database to initialize purchase page

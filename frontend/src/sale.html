@@ -669,6 +669,7 @@
                 memo_no: document.getElementById("memo_no").value,
                 note: document.getElementById("note").value,
                 products_serial_no: serialNumberValues,
+                selected_items: selected_products,
                 bill_amount: parseInt(document.getElementById("bill-amount").value),
                 discount: parseInt(document.getElementById("discount").value),
                 total_amount: parseInt(document.getElementById("total-amount").value),
@@ -836,9 +837,14 @@
 
     }
 
+
+    // Function to remove a product by productId
+    function removeProduct(productIdToRemove) {
+      selected_products = selected_products.filter(item => item.productId !== productIdToRemove);
+    }
     function removeSerialNumber(productId, serialNumberToRemove) {
       // Find the product by productId
-      const p = data.find(item => item.productId === productId);
+      const p = selected_products.find(item => item.productId === productId);
 
       if (p) {
         // Filter out the serial number to remove
@@ -851,12 +857,12 @@
     }
     function insertSerialNumber(productId, newSerialNumber) {
       // Find the product by productId
-      const product = data.find(item => item.productId === productId);
+      const p = selected_products.find(item => item.productId === productId);
 
-      if (product) {
+      if (p) {
         // Check if the new serial number already exists
-        if (!product.serialNumbers.includes(newSerialNumber)) {
-          product.serialNumbers.push(newSerialNumber);
+        if (!p.serialNumbers.includes(newSerialNumber)) {
+          p.serialNumbers.push(newSerialNumber);
           console.log(`Serial number ${newSerialNumber} added to product ${productId}.`);
         } else {
           console.log(`Serial number ${newSerialNumber} already exists for product ${productId}.`);
@@ -867,7 +873,7 @@
           productId: productId,
           serialNumbers: [newSerialNumber]
         };
-        data.push(newProduct);
+        selected_products.push(newProduct);
         console.log(`Product ${productId} created with serial number ${newSerialNumber}.`);
       }
     }
@@ -880,6 +886,7 @@
         billAmount -= parseInt(document.getElementById('selected-product-price-' + id).innerText);
         updateBillAmount();
         parentDiv.removeChild(item);
+        removeProduct(id)
       }
     }
 
@@ -893,6 +900,8 @@
       pm = products.product_metadata[0];
       let serial = ""
       for (let i = 0; i < quantity; i++) {
+        //insert serial number
+        insertSerialNumber(id, products.product_metadata[i].serial_number)
         // const element = products.product_metadata[i].serial_number;  
         serial += `<span class="serial-number">${products.product_metadata[i].serial_number}</span></br>`;
       }
@@ -924,6 +933,8 @@
           document.getElementById("selected-product-price-" + id).innerText = parseInt(document.getElementById("selected-product-price-" + id).innerText) + products.product_metadata[0].max_retail_price;
           document.getElementById("selected-product-qty-" + id).innerText = parseInt(document.getElementById("selected-product-qty-" + id).innerText) + 1;
 
+          //insert serial number
+          insertSerialNumber(id, products.product_metadata[0].serial_number)
           //increase bill amount
           billAmount += products.product_metadata[0].max_retail_price;
           updateBillAmount();
