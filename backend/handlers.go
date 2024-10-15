@@ -592,7 +592,7 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 		app.badRequest(w, err)
 		return
 	}
-	err = app.DB.SaleProducts(&saleDetails)
+	// err = app.DB.SaleProducts(&saleDetails)
 	if err != nil {
 		app.badRequest(w, err)
 		return
