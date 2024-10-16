@@ -138,6 +138,7 @@ type ProductMetadata struct {
 	SerialNumber      string    `json:"serial_number,omitempty"`
 	ProductID         int       `json:"product_id,omitempty"`
 	PurchaseHistoryID int       `json:"purchase_history_id,omitempty"`
+	SalesHistoryID    int       `json:"sales_history_id,omitempty"`
 	Status            string    `json:"status,omitempty"`
 	Warranty          int       `json:"warranty,omitempty"`
 	MaxRetailPrice    int       `json:"max_retail_price,omitempty"` //max_retail_price = total_amount+profit/quantity_purchased
@@ -172,27 +173,27 @@ type Purchase struct {
 }
 
 type SelectedItems struct {
-	ProductID     int      `json:"productId"`
+	ProductID     int      `json:"product_id"`
 	SerialNumbers []string `json:"serialNumbers"`
 }
 
 // Sale is the type for purchase info
 type Sale struct {
-	ID               int             `json:"id"`
-	SaleDate         string          `json:"sale_date,omitempty"`
-	CustomerID       int             `json:"customer_id,omitempty"`
-	ProductsSerialNo []string        `json:"products_serial_no,omitempty"`
-	SelectedItems    []SelectedItems `json:"selected_items,omitempty"`
-	AccountID        int             `json:"account_id,omitempty"`
-	ChalanNO         string          `json:"chalan_no,omitempty"`
-	MemoNo           string          `json:"memo_no,omitempty"`
-	Note             string          `json:"note,omitempty"`
-	BillAmount       int             `json:"bill_amount,omitempty"`
-	Discount         int             `json:"discount,omitempty"`
-	TotalAmount      int             `json:"total_amount,omitempty"`
-	PaidAmount       int             `json:"paid_amount,omitempty"`
-	CreatedAt        time.Time       `json:"created_at,omitempty"`
-	UpdatedAt        time.Time       `json:"updated_at,omitempty"`
+	ID               int              `json:"id"`
+	SaleDate         string           `json:"sale_date,omitempty"`
+	CustomerID       int              `json:"customer_id,omitempty"`
+	ProductsSerialNo []string         `json:"products_serial_no,omitempty"`
+	SelectedItems    []*SelectedItems `json:"selected_items,omitempty"`
+	AccountID        int              `json:"account_id,omitempty"`
+	ChalanNO         string           `json:"chalan_no,omitempty"`
+	MemoNo           string           `json:"memo_no,omitempty"`
+	Note             string           `json:"note,omitempty"`
+	BillAmount       int              `json:"bill_amount,omitempty"`
+	Discount         int              `json:"discount,omitempty"`
+	TotalAmount      int              `json:"total_amount,omitempty"`
+	PaidAmount       int              `json:"paid_amount,omitempty"`
+	CreatedAt        time.Time        `json:"created_at,omitempty"`
+	UpdatedAt        time.Time        `json:"updated_at,omitempty"`
 }
 
 // Supplier is the type for suppliers

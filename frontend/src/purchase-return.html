@@ -83,7 +83,7 @@
                 <li><a><i class="fa fa-table"></i> Inventory <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li><a href="sale.html">Sale</a></li>
-                    <li><a href="#sale-return.html">Sale Return</a></li>
+                    <li><a href="sale-return.html">Sale Return</a></li>
                     <li><a href="#sale-replace.html">Sale Replace</a></li>
                     <li><a href="purchase.html">Purchase</a></li>
                     <li><a href="purchase-return.html">Purchase Return</a></li>
@@ -94,7 +94,7 @@
                 </li>
                 <li><a><i class="fa fa-bar-chart-o"></i> Accounts <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li><a href="#receive-collection.html">Receive & Collection</a></li>
+                    <li><a href="receive-collection.html">Receive & Collection</a></li>
                     <li><a href="#payment.html">Payment</a></li>
                     <li><a href="#cash-transfer.html">Cash Transfer</a></li>
                     <li><a href="#amount-receivable.html">Amount Receivable</a></li>
@@ -425,7 +425,7 @@
         const requestOptions = {
           method: 'post',
         }
-        fetch('http://localhost:4321/api/mis/get-supplier-id-name', requestOptions)
+        fetch('http://localhost:4321/api/mis/get-supplier-id-name-list', requestOptions)
           .then(response => response.json())
           .then(data => {
             if (data.error === true) {
@@ -453,7 +453,7 @@
             },
             body: JSON.stringify(sup),
           }
-          fetch('http://localhost:4321/api/inventory/get-memo-list', requestOptions)
+          fetch('http://localhost:4321/api/inventory/get-supplier-memo-list', requestOptions)
             .then(response => response.json())
             .then(data => {
               if (data.error === true) {
@@ -486,7 +486,7 @@
             },
             body: JSON.stringify(payload),
           }
-          fetch('http://localhost:4321/api/inventory/memo/get-product-list', requestOptions)
+          fetch('http://localhost:4321/api/inventory/memo/get-purchase-product-list', requestOptions)
             .then(response => response.json())
             .then(data => {
               if (data.error === true) {

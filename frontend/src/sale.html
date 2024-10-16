@@ -83,7 +83,7 @@
                 <li><a><i class="fa fa-table"></i> Inventory <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li><a href="sale.html">Sale</a></li>
-                    <li><a href="#sale-return.html">Sale Return</a></li>
+                    <li><a href="sale-return.html">Sale Return</a></li>
                     <li><a href="#sale-replace.html">Sale Replace</a></li>
                     <li><a href="purchase.html">Purchase</a></li>
                     <li><a href="purchase-return.html">Purchase Return</a></li>
@@ -94,7 +94,7 @@
                 </li>
                 <li><a><i class="fa fa-bar-chart-o"></i> Accounts <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li><a href="#receive-collection.html">Receive & Collection</a></li>
+                    <li><a href="receive-collection.html">Receive & Collection</a></li>
                     <li><a href="#payment.html">Payment</a></li>
                     <li><a href="#cash-transfer.html">Cash Transfer</a></li>
                     <li><a href="#amount-receivable.html">Amount Receivable</a></li>
@@ -838,13 +838,13 @@
     }
 
 
-    // Function to remove a product by productId
+    // Function to remove a product by product_id
     function removeProduct(productIdToRemove) {
-      selected_products = selected_products.filter(item => item.productId !== productIdToRemove);
+      selected_products = selected_products.filter(item => item.product_id !== productIdToRemove);
     }
     function removeSerialNumber(productId, serialNumberToRemove) {
-      // Find the product by productId
-      const p = selected_products.find(item => item.productId === productId);
+      // Find the product by product_id
+      const p = selected_products.find(item => item.product_id === productId);
 
       if (p) {
         // Filter out the serial number to remove
@@ -856,8 +856,8 @@
       }
     }
     function insertSerialNumber(productId, newSerialNumber) {
-      // Find the product by productId
-      const p = selected_products.find(item => item.productId === productId);
+      // Find the product by product_id
+      const p = selected_products.find(item => item.product_id === productId);
 
       if (p) {
         // Check if the new serial number already exists
@@ -870,7 +870,7 @@
       } else {
         // If the product doesn't exist, create a new one
         const newProduct = {
-          productId: productId,
+          product_id: productId,
           serialNumbers: [newSerialNumber]
         };
         selected_products.push(newProduct);

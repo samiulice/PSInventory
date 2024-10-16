@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"time"
 
 	"PSInventory/internal/models"
 	"path"
@@ -295,6 +294,31 @@ func (app *application) GetActiveSuppliersIDAndName(w http.ResponseWriter, r *ht
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// GetActiveCustomersIDAndName retruns a list of customers's id and name
+func (app *application) GetActiveCustomersIDAndName(w http.ResponseWriter, r *http.Request) {
+	//supplier
+	var resp struct {
+		Error     bool               `json:"error,omitempty"`
+		Message   string             `json:"message,omitempty"`
+		Customers []*models.Customer `json:"customers,omitempty"`
+	}
+
+	//retrive suppliers from the database
+	customers, err := app.DB.GetActiveCustomersIDAndName()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Customer Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//TODO: Retrive accounts and send to frontend
+	resp.Error = false
+	resp.Message += "data Succesfully fetched"
+	resp.Customers = customers
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // .....................Inventory Handlers......................
 
 // AddBrand Handles category adding process
@@ -377,8 +401,8 @@ func (app *application) AddProduct(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchMemoProductItems retrive products list of a memo
-func (app *application) FetchMemoProductItems(w http.ResponseWriter, r *http.Request) {
+// FetchPurchaseMemoProductItems retrive purchased products list of a memo
+func (app *application) FetchPurchaseMemoProductItems(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		MemoNo string `json:"memo_no"`
 	}
@@ -397,7 +421,7 @@ func (app *application) FetchMemoProductItems(w http.ResponseWriter, r *http.Req
 	//retrive all product-serial of each product_id && purchase_id
 	var products []*models.Product
 	for _, v := range purchaseHistory {
-		product, err := app.DB.GetProductListByPurchaseIDAndProductID(v.ID, v.ProductID)
+		product, err := app.DB.GetInstockProductListByPurchaseIDAndProductID(v.ID, v.ProductID)
 		if err != nil {
 			app.badRequest(w, fmt.Errorf("ErrorProducts:: %v", err))
 		}
@@ -422,7 +446,52 @@ func (app *application) FetchMemoProductItems(w http.ResponseWriter, r *http.Req
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchMemoProductItems retrive instock product items
+// FetchPurchaseMemoProductItems retrive purchased products list of a memo
+func (app *application) FetchSalesMemoProductItems(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		MemoNo string `json:"memo_no"`
+	}
+	err := app.readJSON(w, r, &payload) //read json body
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	//get purchase history associated with memo_no
+	salesHistory, err := app.DB.GetSalesHistoryByMemoNo(payload.MemoNo)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ErrorSalesHistory:: %v", err))
+	}
+	//Get product ids for this memo with associated purchase_id for the given memo
+	//get detailed Product info for these ids
+	//retrive all product-serial of each product_id && purchase_id
+	var products []*models.Product
+	for _, v := range salesHistory {
+		product, err := app.DB.GetSoldProductListBySalesIDAndProductID(v.ID, v.SelectedItems[0].ProductID)
+		if err != nil {
+			app.badRequest(w, fmt.Errorf("ErrorProducts:: %v", err))
+		}
+		products = append(products, product)
+	}
+
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+
+	var resp struct {
+		Error        bool              `json:"error,omitempty"`
+		Message      string            `json:"message,omitempty"`
+		Products     []*models.Product `json:"products,omitempty"`
+		SalesHistory []*models.Sale    `json:"sales_history,omitempty"`
+	}
+	resp.Error = false
+	resp.Message = "Data fetched succefully"
+	resp.Products = products
+	// resp.SalesHistory = saleHistory
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// FetchProductItemsbyProductID retrive instock product items
 func (app *application) FetchProductItemsbyProductID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		ProductID int `json:"product_id"`
@@ -517,6 +586,39 @@ func (app *application) GetMemoListBySupplierID(w http.ResponseWriter, r *http.R
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// GetMemoListByCustomerID return memo list against customer id in JSON format
+func (app *application) GetMemoListByCustomerID(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		CustomerID int `json:"customer_id"`
+	}
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+	//Memo
+	var resp struct {
+		Error   bool           `json:"error,omitempty"`
+		Message string         `json:"message,omitempty"`
+		Sale    []*models.Sale `json:"sales,omitempty"`
+	}
+
+	//retrive memo list for given supplier id from sales_history talble
+	sale, err := app.DB.GetMemoListByCustomerID(payload.CustomerID)
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Memo Available For this selected customer||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//TODO: Retrive accounts and send to frontend
+	resp.Error = false
+	resp.Message += "data Succesfully fetched"
+	resp.Sale = sale
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // ReturnProductsToSupplier read json and update product items state from purchase to purchase-return
 func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.Request) {
 	var ReturnProductsInfo struct {
@@ -533,20 +635,8 @@ func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.
 		app.badRequest(w, err)
 		return
 	}
-
-	//convert ReturnedDate into time.Time
-	// Define the layout matching the date format
-	layout := "01/02/2006" // MM/DD/YYYY
-
-	// Parse the string into time.Time
-	transactionDate, err := time.Parse(layout, ReturnProductsInfo.ReturnedDate)
-	if err != nil {
-		app.badRequest(w, fmt.Errorf("unable to convert the date into time.Time Format: %w", err))
-		return
-	}
-
 	//Update product_serial_numbers
-	id, err := app.DB.ReturnProductUnitsToSupplier(ReturnProductsInfo.JobID, transactionDate, ReturnProductsInfo.ProductUnitsID, ReturnProductsInfo.TotalUnits, ReturnProductsInfo.TotalPrices)
+	id, err := app.DB.ReturnProductUnitsToSupplier(ReturnProductsInfo.JobID, ReturnProductsInfo.ReturnedDate, ReturnProductsInfo.ProductUnitsID, ReturnProductsInfo.TotalUnits, ReturnProductsInfo.TotalPrices)
 	var resp struct {
 		Error   bool   `json:"error,omitempty"`
 		Message string `json:"message,omitempty"`

@@ -1167,8 +1167,59 @@ func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.P
 	return PurchaseHistory, nil
 }
 
+// GetSalesHistoryByMemoNo returns sales history associated with memo_no from the sales_history table
+func (p *postgresDBRepo) GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var salesHistory []*models.Sale
+
+	//Get product ids for this memo with associated purchase_id for the given memo from purchase_history table
+	query := `
+		SELECT
+			id, sale_date, customer_id, product_id, account_id, chalan_no, memo_no, note, bill_amount, discount, total_amount, paid_amount, created_at, updated_at
+		FROM
+			public.sales_history 
+		WHERE
+			memo_no = $1
+	`
+	rows, err := p.DB.QueryContext(ctx, query, memo_no)
+	if err != nil {
+		return salesHistory, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var si models.SelectedItems
+		var sale models.Sale
+		err = rows.Scan(
+			&sale.ID,
+			&sale.SaleDate,
+			&sale.CustomerID,
+			&si.ProductID,
+			&sale.AccountID,
+			&sale.ChalanNO,
+			&sale.MemoNo,
+			&sale.Note,
+			&sale.BillAmount,
+			&sale.Discount,
+			&sale.TotalAmount,
+			&sale.PaidAmount,
+			&sale.CreatedAt,
+			&sale.UpdatedAt,
+		)
+		if err != nil {
+			return salesHistory, err
+		}
+		sale.SelectedItems = append(sale.SelectedItems, &si)
+		salesHistory = append(salesHistory, &sale)
+	}
+
+	return salesHistory, nil
+}
+
 // GetProductListByPurchaseIDAndProductID returns products list associated with purchaseID and ProductID
-func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error) {
+func (p *postgresDBRepo) GetInstockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -1196,6 +1247,59 @@ func (p *postgresDBRepo) GetProductListByPurchaseIDAndProductID(purchaseID, prod
 			&pm.SerialNumber,
 			&pm.ProductID,
 			&pm.PurchaseHistoryID,
+			&pm.Status,
+			&pm.Warranty,
+			&pm.MaxRetailPrice,
+			&pm.PurchaseRate,
+			&pm.CreatedAt,
+			&pm.UpdatedAt,
+		)
+		if err != nil {
+			return product, err
+		}
+		metadata = append(metadata, &pm)
+	}
+
+	//get product info
+	pr, err := p.GetProductByID(productID)
+	if err != nil {
+		return product, err
+	}
+	pr.ProductMetadata = metadata
+	product = &pr
+	return product, nil
+}
+
+// GetProductListBySalesIDAndProductID returns products list associated with salesID and ProductID
+func (p *postgresDBRepo) GetSoldProductListBySalesIDAndProductID(salesID, productID int) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var product *models.Product
+	var metadata []*models.ProductMetadata
+
+	//get metadata from product_serial_numbers
+	query := `
+			SELECT
+				id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+			FROM
+				public.product_serial_numbers
+			WHERE
+				status = 'sold' AND sales_history_id = $1 AND product_id = $2
+		`
+	rows, err := p.DB.QueryContext(ctx, query, salesID, productID)
+	if err != nil {
+		return product, err
+	}
+
+	for rows.Next() {
+		var pm models.ProductMetadata
+		err = rows.Scan(
+			&pm.ID,
+			&pm.SerialNumber,
+			&pm.ProductID,
+			&pm.PurchaseHistoryID,
+			&pm.SalesHistoryID,
 			&pm.Status,
 			&pm.Warranty,
 			&pm.MaxRetailPrice,
@@ -1340,6 +1444,39 @@ func (p *postgresDBRepo) GetMemoListBySupplierID(supplierID int) ([]*models.Purc
 	return purchases, nil
 }
 
+// GetMemoListByCustomerID returns a list of memo with sales id from the sales_history table
+func (p *postgresDBRepo) GetMemoListByCustomerID(customerID int) ([]*models.Sale, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var sales []*models.Sale
+
+	query := `
+		SELECT DISTINCT memo_no
+		FROM 
+			public.sales_history
+		WHERE 
+			customer_id = $1 ; 
+		`
+
+	rows, err := p.DB.QueryContext(ctx, query, customerID)
+	if err != nil {
+		return sales, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s models.Sale
+		err = rows.Scan(
+			&s.MemoNo,
+		)
+		if err != nil {
+			return sales, err
+		}
+		sales = append(sales, &s)
+	}
+	return sales, nil
+}
+
 // RestockProduct update product quantity, store purchase history and product serial numbers
 func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -1444,48 +1581,45 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 		return err
 	}
 
-	//Tx-1: Insert data to sales history table70
-	var sale_id int
-	query := `INSERT INTO public.sales_history (sale_date,customer_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
-	`
-	date, err := time.Parse("01/02/2006", sale.SaleDate)
-	if err != nil {
-		return err
-	}
-	row := tx.QueryRowContext(ctx, query,
-		date,
-		sale.CustomerID,
-		sale.AccountID,
-		sale.ChalanNO,
-		sale.MemoNo,
-		sale.Note,
-		sale.BillAmount,
-		sale.Discount,
-		sale.TotalAmount,
-		sale.PaidAmount,
-		time.Now(),
-		time.Now(),
-	)
-	if err = row.Scan(&sale_id); err != nil {
-		tx.Rollback()
-		return errors.New("SQLErrorSaleProducts(INSERT sales_history): " + err.Error())
-	}
-	fmt.Println("sale ID: ", sale_id)
-
-	//Tx-2:
-	//step-1: Update product quantity, Set quantity -= newQuantity where id = {affected row id}
-	//step-2: update product items status and sales_history_id, returnin id affected row id
+	//Tx-1:
+	//step-1: Insert sales details to sales history table
+	//step-2: Update product quantity, Set quantity -= newQuantity where id = {affected row id}
+	//step-3: update product items status and sales_history_id, returnin id affected row id
 
 	//loop over the SelectedProduct array
 	for i, items := range sale.SelectedItems {
-		//Update product quantity
+		//Insert sales details to sales history table
+		var sale_id int
 		query := `
+			INSERT INTO public.sales_history (sale_date,customer_id,product_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
+		`
+		row := tx.QueryRowContext(ctx, query,
+			sale.SaleDate,
+			sale.CustomerID,
+			items.ProductID,
+			sale.AccountID,
+			sale.ChalanNO,
+			sale.MemoNo,
+			sale.Note,
+			sale.BillAmount,
+			sale.Discount,
+			sale.TotalAmount,
+			sale.PaidAmount,
+			time.Now(),
+			time.Now(),
+		)
+		if err = row.Scan(&sale_id); err != nil {
+			tx.Rollback()
+			return errors.New("SQLErrorSaleProducts(INSERT sales_history): " + err.Error())
+		}
+		fmt.Println("sale ID: ", sale_id)
+		//Update product quantity
+		query = `
 			UPDATE public.products
 			SET quantity = quantity - $1
 			WHERE id = $2;
 		  `
-		// Execute the query with parameters
 		_, err = tx.ExecContext(ctx, query, len(items.SerialNumbers), items.ProductID)
 		if err != nil {
 			tx.Rollback()
@@ -1510,9 +1644,9 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 
 	//Tx-3 insert summary about the sales in the inventory_transaction_logs table
 	var inv_tx_log_id int
-	query = `INSERT INTO public.inventory_transaction_logs(job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
+	query := `INSERT INTO public.inventory_transaction_logs(job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
 	VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`
-	err = tx.QueryRowContext(ctx, query, "S-"+sale.MemoNo, "sale", len(sale.ProductsSerialNo), sale.TotalAmount, date, time.Now(), time.Now()).Scan(&inv_tx_log_id)
+	err = tx.QueryRowContext(ctx, query, "S-"+sale.MemoNo, "sale", len(sale.ProductsSerialNo), sale.TotalAmount, sale.SaleDate, time.Now(), time.Now()).Scan(&inv_tx_log_id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("SQLErrorSaleProducts(INSERT inventory_transaction_logs: %w", err)
@@ -1525,7 +1659,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 }
 
 // /ReturnProductUnitsToSupplier updates database
-func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionDate time.Time, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error) {
+func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionDate string, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	var id int

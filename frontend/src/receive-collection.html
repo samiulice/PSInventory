@@ -28,15 +28,14 @@
 
   <!-- Custom Theme Style -->
   <link href="assets/css/custom.min.css" rel="stylesheet">
-  <!-- sweetalert2 style -->
-  <link rel="stylesheet" href="assets/sweetalert2/sweetalert2.min.css">
+  <script src="assets/js/app.js"></script>
 </head>
 
 <body class="nav-md">
   <div class="container body">
     <div class="main_container">
       <div class="col-md-3 left_col menu_fixed">
-        <div class="left_col">
+        <div class="left_col scroll-view">
           <div class="navbar nav_title" style="border: 0;">
             <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Company Name</span></a>
           </div>
@@ -50,7 +49,7 @@
             </div>
             <div class="profile_info">
               <span>Welcome,</span>
-              <h2>Admin</h2>
+              <h2>John Doe</h2>
             </div>
           </div>
           <!-- /menu profile quick info -->
@@ -235,214 +234,57 @@
         </div>
       </div>
       <!-- /top navigation -->
-
+ <!-- TODO:::: -->
       <!-- page content -->
-      <div id="page-content" class="right_col" role="main">
-        <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>Supplier List</label></h2>
-        <!-- Page content here -->
-        <div class="x_panel bg-gw">
-          <div class="x_content">
-            <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-              <div class="row">
-                <div class="col-6">
-                  <div class="dataTables_length" id="datatable_length">
-                    <label>Show
-                      <select id="page_length_selector" name="datatable_length" aria-controls="datatable"
-                        class="form-control input-sm">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                      </select> entries
-                    </label>
-                  </div>
-                </div>
-                <div class="col-6 text-right">
-                  <div id="add_supplier">
-                    <a class="btn btn-primary" id="add-supplier-btn" style="color: white;"><i
-                        class="fa fa-plus-square">&nbsp;&nbsp;</i>Add Supplier</a>
-                  </div>
-                </div>
-              </div>
-              <!-- start project list -->
-              <div class="row bg-white">
-                <div class="col">
-                  <table id="supplier_list" class="table table-striped table-bordered dataTable no-footer" role="grid"
-                    aria-describedby="datatable_info">
-                    <thead>
-                      <tr>
-                        <th>Account Code</th>
-                        <th>Account Name</th>
-                        <th>Mobile</th>
-                        <th>Account Status</th>
-                        <th>Discount(%)</th>
-                        <th>Last Updated</th>
-                        <th id="row-actions" style="color:rgb(150, 147, 3); width: 20%">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- tbody is deployed by javascript -->
-                    </tbody>
-                  </table>
-                  <!-- end project list -->
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-3">
-                  <div id="paginator_info" class="dataTables_info" id="datatable_info" role="status" aria-live="polite">
-                    <!-- will be updated using js DOM -->
-                  </div>
-                </div>
-                <div class="col-9">
-                  <nav aria-label="Page navigation example">
-                    <ul id="paginate_nav" class="pagination">
-                      <!-- will be populated by Javascript DOM -->
-                    </ul>
-                  </nav>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- /top tiles -->
-      </div>
-      <!-- /page content -->
+      <div id="page-content" class="right_col" role="main"></div>
     </div>
-  </div>
 
-  <!-- jQuery -->
-  <script src="assets/vendors/jquery/dist/jquery.min.js"></script>
-  <!-- Bootstrap -->
-  <script src="assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-  <!-- FastClick -->
-  <script src="assets/vendors/fastclick/lib/fastclick.js"></script>
-  <!-- NProgress -->
-  <script src="assets/vendors/nprogress/nprogress.js"></script>
-  <!-- Chart.js -->
-  <script src="assets/vendors/Chart.js/dist/Chart.min.js"></script>
-  <!-- gauge.js -->
-  <script src="assets/vendors/gauge.js/dist/gauge.min.js"></script>
-  <!-- bootstrap-progressbar -->
-  <script src="assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-  <!-- iCheck -->
-  <script src="assets/vendors/iCheck/icheck.min.js"></script>
-  <!-- Skycons -->
-  <script src="assets/vendors/skycons/skycons.js"></script>
-  <!-- Flot -->
-  <script src="assets/vendors/Flot/jquery.flot.js"></script>
-  <script src="assets/vendors/Flot/jquery.flot.pie.js"></script>
-  <script src="assets/vendors/Flot/jquery.flot.time.js"></script>
-  <script src="assets/vendors/Flot/jquery.flot.stack.js"></script>
-  <script src="assets/vendors/Flot/jquery.flot.resize.js"></script>
-  <!-- Flot plugins -->
-  <script src="assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-  <script src="assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-  <script src="assets/vendors/flot.curvedlines/curvedLines.js"></script>
-  <!-- DateJS -->
-  <script src="assets/vendors/DateJS/build/date.js"></script>
-  <!-- JQVMap -->
-  <script src="assets/vendors/jqvmap/dist/jquery.vmap.js"></script>
-  <script src="assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-  <script src="assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
-  <!-- Validator JS  -->
-  <script src="assets/vendors/validator/validator.js"></script>
-  <!-- bootstrap-daterangepicker -->
-  <script src="assets/vendors/moment/min/moment.min.js"></script>
-  <script src="assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- jQuery -->
+    <script src="assets/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="assets/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="assets/vendors/nprogress/nprogress.js"></script>
+    <!-- Chart.js -->
+    <script src="assets/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="assets/vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="assets/vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="assets/vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="assets/vendors/Flot/jquery.flot.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="assets/vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="assets/vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="assets/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="assets/vendors/moment/min/moment.min.js"></script>
+    <script src="assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
-  <!-- Custom Theme Scripts -->
-  <script src="assets/js/custom.min.js"></script>
-  <script src="assets/js/app.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="assets/js/custom.min.js"></script>
+    <script src="assets/js/app.js"></script>
 
-  <!-- sweetalert2 script -->
-  <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+    <!-- sweetalert2 script -->
+    <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
-  <!-- fetching data from backend and populate frontend table -->
-  <script>
-    let currentPageIndex = 1;
-    let pageSize = parseInt(document.getElementById('page_length_selector').value); // Set initial page size
 
-    window.addEventListener('DOMContentLoaded', (event) => {
-      updatePage(pageSize, currentPageIndex);
-    });
-
-    function updatePage(pSize, cpIndex) {
-      let table = document.getElementById("supplier_list");
-      let tbody = table.getElementsByTagName("tbody")[0];
-      tbody.innerHTML = '';
-
-      let payload = {
-        page_size: pSize,
-        current_page_index: cpIndex,
-      }
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      }
-
-      fetch('http://localhost:4321/api/mis/view-supplier/all', requestOptions)
-        .then(response => response.json())
-        .then(function (data) {
-          if (data) {
-            if (data.error === true) {
-              tbody.innerHTML += `<tr><td colspan="7" class="text-center text-warning"><b>${data.message}}</b></td><tr>`
-              return;
-            }
-            console.log(data)
-            if (data.suppliers) {
-              data.suppliers.forEach(function (i) {
-                let newRow = `
-                <tr>
-                  <td>${i.account_code}</td>
-                  <td>${i.account_name}</td>
-                  <td>${i.mobile}</td>
-                  <td>${i.account_status === true ? `<button class="btn btn-round btn-success btn-xs">Active</button>` : `<button class="btn btn-round btn-dark btn-xs">Inactive</button>`}</td>
-                  <td>${i.discount}</td>
-                  <td>${formatDate(i.updated_at, "date", "-")}</th>
-                  <td class="text-center">
-                    <button type="button" onclick="showSupplierProfile(${i})" class="btn btn-round btn-primary btn-xs">
-                      <i class="fa fa-folder"></i> View
-                    </button>
-                  </td>
-                </tr>`
-                // http://localhost:4321/api/mis/view-supplier/view/${i.id}
-                // http://localhost:4321/api/mis/view-supplier/edit/${i.id}
-
-                tbody.innerHTML += newRow
-              });
-
-              //Reset Paginator
-              paginator(data.current_page_index, data.page_size, data.total_records);
-            } else {
-              tbody.innerHTML += `<tr><td colspan="7" class="text-center text-info"><b>No data available</b></td><tr>`
-            }
-
-          } else {
-            tbody.innerHTML += `<tr><td colspan="7" class="text-center text-danger"><b>Internal Server Error</b></td><tr>`
-          }
-        })
-        .catch(error => {
-          console.error('There was a problem with the fetch operation:', error);
-        });
-    }
-
-    document.getElementById('page_length_selector').addEventListener('change', function () {
-      pageSize = parseInt(this.value);
-      currentPageIndex = 1; // Reset to first page whenever page size changes
-      updatePage(pageSize, currentPageIndex);
-    });
-  </script>
-   <script>
-    document.getElementById('add-supplier-btn').addEventListener('click', function () {
-      addNewSupplier('');
-    });    
-  </script>
 </body>
 
 </html>

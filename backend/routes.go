@@ -28,23 +28,28 @@ func (app *application) routes() http.Handler {
 		mux.Post("/mis/view-customer/{type}", app.GetCustomers)
 		mux.Post("/mis/add-customer", app.AddCustomer)
 		mux.Post("/mis/view-supplier/{type}", app.GetSuppliers)
-		mux.Post("/mis/get-supplier-id-name", app.GetActiveSuppliersIDAndName)
+		mux.Post("/mis/get-supplier-id-name-list", app.GetActiveSuppliersIDAndName)
+		mux.Post("/mis/get-customer-id-name-list", app.GetActiveCustomersIDAndName)
 		mux.Post("/mis/add-supplier", app.AddSupplier)
 
 		//Inventory
 		mux.Post("/inventory/add-brand", app.AddBrand)
 		mux.Post("/inventory/add-category", app.AddCategory)
 		mux.Post("/inventory/add-product", app.AddProduct)
-		mux.Post("/inventory/memo/get-product-list", app.FetchMemoProductItems)
+		//memo--products list
+		mux.Post("/inventory/memo/get-purchase-product-list", app.FetchPurchaseMemoProductItems)
+		mux.Post("/inventory/memo/get-sales-product-list", app.FetchSalesMemoProductItems)
 		mux.Post("/inventory/products/get-list-by-id", app.FetchProductItemsbyProductID)
 		mux.Post("/inventory/products/search-product-by-serial", app.FetchProductItembySerialNumber)
-		mux.Post("/inventory/get-memo-list", app.GetMemoListBySupplierID)
+		//memo--supplier
+		mux.Post("/inventory/get-supplier-memo-list", app.GetMemoListBySupplierID)
+		//memo--supplier
+		mux.Post("/inventory/get-customer-memo-list", app.GetMemoListByCustomerID)
 		mux.Post("/inventory/return-product-to-supplier", app.ReturnProductsToSupplier)
 		mux.Post("/inventory/restock-product", app.RestockProduct)
 		mux.Post("/inventory/sale-products", app.SaleProducts)
 		mux.Post("/inventory/purchase/getPageDetails", app.GetPurchasePageDetails)
 		mux.Post("/inventory/sale/getPageDetails", app.GetSalePageDetails)
-		// mux.Post("/inventory/purchase-return/getPageDetails", app.GetPurchaseReturnPageDetails)
 	})
 	return mux
 }

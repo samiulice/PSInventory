@@ -2,7 +2,6 @@ package repository
 
 import (
 	"PSInventory/internal/models"
-	"time"
 )
 
 type DatabaseRepo interface {
@@ -30,14 +29,15 @@ type DatabaseRepo interface {
 	GetCategoryList() ([]*models.Category, error)
 	GetActiveCategoryList() ([]*models.Category, error)
 	AddProduct(i models.Product) (int, error)
-	ReturnProductUnitsToSupplier(JobID string, transactionDate time.Time, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error)
+	ReturnProductUnitsToSupplier(JobID string, transactionDate string, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error)
 	GetProductList() ([]*models.Product, error)
 	GetProductByID(id int) (models.Product, error)
 	GetActiveProducts() ([]*models.Product, error)
 	GetAvailableProductsByCategoryID(cat_id int) ([]*models.Product, error)
 	GetAvailableProductsDetails() ([]*models.Product, error)
-	GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error)
-	GetProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
+
+	GetInstockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
+	GetSoldProductListBySalesIDAndProductID(SalesID, productID int) (*models.Product, error)
 	GetProductItemsListByProductID(productID int) (*models.Product, error)
 	GetProductItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
 
@@ -47,7 +47,14 @@ type DatabaseRepo interface {
 	AddProductSerialNumbers(purchase *models.Purchase) error
 
 	AddToPurchaseHistory(purchase *models.Purchase) (int, error)
+
+	//purchase
+	GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error)
+	//sales
+	GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale, error)
+	//Memo
 	GetMemoListBySupplierID(supplierID int) ([]*models.Purchase, error)
+	GetMemoListByCustomerID(customerID int) ([]*models.Sale, error)
 	RestockProduct(purchase *models.Purchase) error
 	SaleProducts(sale *models.Sale) error
 
