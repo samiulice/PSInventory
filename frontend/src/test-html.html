@@ -593,7 +593,7 @@
           method: 'post',
         }
         //fetch page data
-        fetch('http://localhost:4321/api/inventory/sale/getPageDetails', requestOptions)
+        fetch('http://localhost:4321/api/inventory/sale/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
             if (data.error === true) {

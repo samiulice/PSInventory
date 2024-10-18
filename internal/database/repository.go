@@ -16,6 +16,10 @@ type DatabaseRepo interface {
 	//MIS
 	AddCustomer(customer models.Customer) (int, error)
 	GetActiveCustomersIDAndName() ([]*models.Customer, error)
+	GetCreditCustomersDetails() ([]*models.Customer, error)
+	GetDebitCustomersDetails() ([]*models.Customer, error)
+	GetCreditSuppliersDetails() ([]*models.Supplier, error)
+	GetDebitSuppliersDetails() ([]*models.Supplier, error)
 	GetCustomerListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Customer, int, error)
 	AddSupplier(supplier models.Supplier) (int, error)
 	GetActiveSuppliersIDAndName() ([]*models.Supplier, error)

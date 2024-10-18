@@ -424,24 +424,24 @@
         <!-- sweetalert2 script -->
         <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
-        
+
         <!-- Step-1: -->
-          <!-- On loading window, fetch customer list and populate customer dropdown -->
-            <!-- 'http://localhost:4321/api/mis/get-customer-id-name-list' -->
-            <!-- data structure: customers = [{
+        <!-- On loading window, fetch customer list and populate customer dropdown -->
+        <!-- 'http://localhost:4321/api/mis/get-customer-id-name-list' -->
+        <!-- data structure: customers = [{
               id,account_code,account_name
             }] -->
-          <!-- on changing customer, fetch associated memo list for the customer and populate memo dropdown -->
+        <!-- on changing customer, fetch associated memo list for the customer and populate memo dropdown -->
 
-            <!-- 'http://localhost:4321/api/inventory/get-customer-memo-list' -->
-             <!-- method: post body={customer_id} -->
-            <!-- data structure: memos = [{
+        <!-- 'http://localhost:4321/api/inventory/get-customer-memo-list' -->
+        <!-- method: post body={customer_id} -->
+        <!-- data structure: sales = [{
               id,memo_no
             }] -->
         <!-- on changing memo, fetch associated products details with serial number list for the memo and populate product list dropdown -->
-         <!-- 'http://localhost:4321/api/inventory/memo/get-sales-product-list' -->
-          <!-- method: post body={memo_id} -->
-         <!-- data structure: products: [
+        <!-- 'http://localhost:4321/api/inventory/memo/get-sales-product-list' -->
+        <!-- method: post body={memo_id} -->
+        <!-- data structure: products: [
         {
             id,product_code,product_name,quantity,category_id,created_at,updated_at,
             category: {id,name,created_at,updated_at}
@@ -449,11 +449,11 @@
             product_metadata: [{id,serial_number,product_id,purchase_history_id,status,warranty,max_retail_price,purchase_rate,created_at,updated_at}]
         },] -->
         <!-- Products list table should have remove option -->
-        
+
         <!-- Step-2: -->
-         <!-- Input serial field to search sold product and add it to the product list table if available -->
-          <!-- 'http://localhost:4321/api/inventory/products/search-product-by-serial' -->
-          <!-- data structure: products: [
+        <!-- Input serial field to search sold product and add it to the product list table if available -->
+        <!-- 'http://localhost:4321/api/inventory/products/search-product-by-serial' -->
+        <!-- data structure: products: [
         {
             id,product_code,product_name,quantity,category_id,created_at,updated_at,
             category: {id,name,created_at,updated_at}
@@ -461,6 +461,129 @@
             product_metadata: [{id,serial_number,product_id,purchase_history_id,status,warranty,max_retail_price,purchase_rate,created_at,updated_at}]
         },] -->
 
+        <script>
+            let customers;
+            window.addEventListener("DOMContentLoaded", e => {
+                let customerDiv = document.getElementById("customer");
+                let memoDiv = document.getElementById("memo");
+                let productListContainer = document.getElementById("product-list-container");
+                //Start fetch-1: On loading window, fetch customer list and populate customer dropdown
+                let requestOptions = {
+                    method: "post"
+                }
+                fetch('http://localhost:4321/api/mis/get-customer-id-name-list', requestOptions)
+                    .then(resposne => resposne.json())
+                    .then(data => {
+                        console.log(data)
+                        customers = data.customers
+                        if (data.error === true) {
+                            document.getElementById("page-content").innerHTML = `
+                      <h4 class="text-info">Please contact to the app provider</h4>
+                      <br>
+                      <h4 class="text-danger">${data.message}</h4>`
+                        } else {
+                            customerDiv.innerHTML = '<option value="" selected disabled>Select Customer Account</option>';
+                            if (customers) {
+                                customers.forEach(c => {
+                                    customerDiv.innerHTML += `<option value="${c.id}">${c.account_name}(${c.account_code})</option>`
+                                });
+                            }
+                        }
+                    })
+                //End fetch-1
+                //Start fetch-2: on changing customer, fetch associated memo list for the customer and populate memo dropdown 
+                customerDiv.addEventListener('change', e => {
+                    memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
+                    productListContainer.innerHTML = '';
+
+                    let customerID = {
+                        customer_id: parseInt(customerDiv.value)
+                    }
+                    const requestOptions = {
+                        method: 'post',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        body: JSON.stringify(customerID)
+                    }
+                    fetch('http://localhost:4321/api/inventory/get-customer-memo-list', requestOptions)
+                        .then(resposne => resposne.json())
+                        .then(data => {
+                            memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
+                            if (data.sales) {
+                                data.sales.forEach(m => {
+                                    memoDiv.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.memo_no}">${m.memo_no}</option>`
+                                })
+                            }
+                        })
+
+                    // on changing memo, fetch associated products details with serial number list for the memo and populate product list dropdown 
+                    memo.addEventListener('change', e => {
+                        productListContainer.innerHTML = '';
+                        let memoBody = {
+                            memo_no: memo.value
+                        }
+                        const requestOptions = {
+                            method: "post",
+                            'Accept': "application/json",
+                            'Content-Type': "application/json",
+                            body: JSON.stringify(memoBody)
+                        }
+                        fetch('http://localhost:4321/api/inventory/memo/get-sales-product-list', requestOptions)
+                        .then(response => response.json())
+                        .then(data => {
+
+                            if (data.error === true) {
+                                document.getElementById("page-content").innerHTML = `
+                                    <h4 class="text-info">Please contact to the app provider</h4>
+                                    <br>
+                                    <h4 class="text-danger">${data.message}</h4>
+                                    `
+                            } else {
+
+                                if (data.products) {
+                                    // <tr>
+                                    //     <th>No.</th>
+                                    //     <th>Product Code</th>
+                                    //     <th>Product Name</th>
+                                    //     <th>Category</th>
+                                    //     <th>Brand</th>
+                                    //     <th>Qty</th>
+                                    //     <th>Sale Date</th>
+                                    //     <th class="text-center" style="width: 33%">Serial #
+                                    //     </th>
+                                    // </tr>
+                                    let i = 1;
+                                    document.getElementById("product-list-container").innerHTML = '';
+                                    data.products.forEach(pr => {
+                                        if (pr.product_metadata.length > 0) {
+                                            console.log(pr.product_metadata)
+                                            let serial = ''
+                                            pr.product_metadata.forEach(pm => {
+                                                serial += `<input type="checkbox" id="${pm.id}">&nbsp;&nbsp;${pm.serial_number}</b></br>`
+                                            })
+                                            document.getElementById("product-list-container").innerHTML += `
+                                            <tr id="${pr.id}">  
+                                                <td>${i++}</td>
+                                                <td>${pr.product_code}</td>
+                                                <td>${pr.product_name}</td>
+                                                <td>${pr.category.name}</td>
+                                                <td>${pr.brand.name}</td>
+                                                <td>${pr.product_metadata.length}</td>
+                                                <td>{pr.updated_at}</td>
+                                                <td id="serial-${pr.id}" class="text-center" style="width: 33%">${serial}
+                                                </td>
+                                            </tr>`
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                    })
+                    //  Products list table should have add option 
+                })
+
+            })
+        </script>
 
 </body>
 

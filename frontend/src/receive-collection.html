@@ -234,9 +234,158 @@
         </div>
       </div>
       <!-- /top navigation -->
- <!-- TODO:::: -->
+
       <!-- page content -->
-      <div id="page-content" class="right_col" role="main"></div>
+      <div id="page-content" class="right_col" role="main">
+        <!-- Content Title -->
+        <h2 class="text-center text-warning fa-2x">Receive & Collection</h2>
+        <!-- Page content here -->
+        <form action="#" id="receiveCollectionForm">
+          <!-- ReceiveCollection Details Section  -->
+          <div class="x_panel bg-gw">
+            <div class="x_title">
+              <div class="title_left">
+                <h2>Due History</h2>
+              </div>
+              <div class="title_right text-right">
+                <button type="button" class="btn btn-primary" id="add-btn">Add</button>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="row">
+                <!-- first col -->
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label id="date" for="single_cal4">Date *:</label>
+                      <input type="text" id="single_cal4" class="form-control has-feedback-left"
+                        placeholder="Select Date" aria-describedby="inputSuccess2Status4" required>
+                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left "
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label for="received-amount">Received Amount *:</label>
+                      <input type="number" id="received-amount" class="form-control has-feedback-left"
+                        placeholder="Enter amount" required>
+                      <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left "
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+                <!-- /first col -->
+                <!-- second col -->
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label for="cash-bank">Cash/Bank *: </label>
+                      <select class="form-control  has-feedback-left" id="cash-bank" required>
+                        <option value="" selected disabled>Select Account</option>
+                      </select>
+                      <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label for="received-from">Received From *: </label>
+                      <select class="form-control  has-feedback-left" id="received-from" required>
+                        <option value="" selected disabled>Select Customer Account</option>
+                      </select>
+                      <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+                <!-- /second col -->
+                <!-- third col -->
+                <div class="col-md-4 col-sm-12 col-xs-12">
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label for="receipt-no">Receipt No *:</label>
+                      <input type="text" class="form-control form-select has-feedback-left" id="receipt-no"
+                        placeholder="Select Receipt No" required>
+                      <i style="color:rgba(0, 0, 0, 1);" class="fa fa-book form-control-feedback left"
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                  <div class="row form-group has-feedback">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <label for="carrier">Carrier:</label>
+                      <input type="text" class="form-control form-select has-feedback-left" id="carrier"
+                        placeholder="Enter name(optional)">
+                      <i style="color:rgba(0, 0, 0, 1);" class="fa fa-user form-control-feedback left"
+                        aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+                <!-- /third col -->
+              </div>
+              <div class="row form-group has-feedback">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <label for="description">Description :</label>
+                  <input type="text" name="description" id="description" class="form-control has-feedback-left"
+                    placeholder="Enter payment details(optional)">
+                  <i style="color:rgba(0, 0, 0, 1);" class="fa fa-bars form-control-feedback left"
+                    aria-hidden="true"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!-- /page content -->
+         <!-- Received section -->
+         <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="row">
+              <div class="col-md-12">
+                <div class="x_panel bg-gw">
+                  <div class="x_title">
+                    <div class="title_left">
+                      <h2>Due Customer Info </h2>
+                    </div>
+                    <div class="title_right" style="float: right;">
+                      <button type="submit" id="submitBtn" class="btn btn-round btn-success " >Save</button>
+                      <a href="javascript:void(0);" id="processingBtn" class="d-none fa-spin fa-spinner ">Processing...</a>
+                      <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-round btn-success ">Generate Invoice</a>                     
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+
+                    <section class="content invoice">
+                      <!-- Table row -->
+                      <div class="row">
+                        <div class="col-xs-12 table">
+                          <table  class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th>Voucher No.</th>
+                                <th>Received From</th>
+                                <th>Cash/Bank</th>
+                                <th>Carrier</th>
+                                <th>Received Amount</th>
+                                <th>Total Payable Amount</th>
+                                <th>Receipt No</th>
+                                <th>Received Date</th>                           
+                              </tr>
+                            </thead>
+                            <tbody id="payableTable">
+                              <!-- DOM JS -->
+                            </tbody>
+                          </table>
+                        </div>
+                        <!-- /.col -->
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            
+          </div>
+        </div>
+         <!-- /Received section -->
+      </div>
     </div>
 
     <!-- jQuery -->
@@ -283,7 +432,36 @@
 
     <!-- sweetalert2 script -->
     <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+    <script>
+      // fetch-1: On load window Get accounts for cash-bank and customers who have due amount
+      'http://localhost:4321/api/receive-collection/get-page-details'
+        //TODO: populate cash-bank and customers accounts div 
+          /* input : nill
+            output :
+            data = {
+              accounts :[
+                head_accounts = {
+                  id, account_name, account_code
+                },
+                customers = {
+                  id, account_name, account_code
+                }
+              ]
+            }
+          */
+        //Onclick add button , populate receive-info-container with date, receive amount, ......etc.
 
+        //fetch-2: on submit form get the table rows as a structure and make an array of these structure
+        //Voucher No, received_from_id(received-from.value), head_accounts_id(cash-bank.value), received_amount, receipt_no, received-date
+
+        // http:localhost:4321/api/accounts/payment/receive-collection
+        /* input : payment_info = [{tables row1}, {tables row2}.......]
+            output : data={
+            error(boolean)
+            message(success or failed)
+            }
+        */
+    </script>
 
 </body>
 

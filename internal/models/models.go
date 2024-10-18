@@ -57,22 +57,24 @@ type Category struct {
 
 // Customer is the type for customers
 type Customer struct {
-	ID             int       `json:"id,omitempty"`
-	AccountCode    string    `json:"account_code,omitempty"`
-	AccountName    string    `json:"account_name,omitempty"`
-	ContactPerson  string    `json:"contact_person,omitempty"`
-	Division       string    `json:"division,omitempty"`
-	District       string    `json:"district,omitempty"`
-	Upazila        string    `json:"upazila,omitempty"`
-	Area           string    `json:"area,omitempty"`
-	Mobile         string    `json:"mobile,omitempty"`
-	Email          string    `json:"email,omitempty"`
-	AccountStatus  bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
-	Discount       int       `json:"discount,omitempty"`
-	OpeningBalance int       `json:"opening_balance,omitempty"`
-	JoiningDate    time.Time `json:"joining_date,omitempty"`
-	CreatedAt      time.Time `json:"created_at,omitempty"`
-	UpdatedAt      time.Time `json:"updated_at,omitempty"`
+	ID               int       `json:"id,omitempty"`
+	AccountCode      string    `json:"account_code,omitempty"`
+	AccountName      string    `json:"account_name,omitempty"`
+	ContactPerson    string    `json:"contact_person,omitempty"`
+	Division         string    `json:"division,omitempty"`
+	District         string    `json:"district,omitempty"`
+	Upazila          string    `json:"upazila,omitempty"`
+	Area             string    `json:"area,omitempty"`
+	Mobile           string    `json:"mobile,omitempty"`
+	AmountPayable    int       `json:"amount_payable,omitempty"`
+	AmountReceivable int       `json:"amount_receivable,omitempty"`
+	Email            string    `json:"email,omitempty"`
+	AccountStatus    bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	Discount         int       `json:"discount,omitempty"`
+	OpeningBalance   int       `json:"opening_balance,omitempty"`
+	JoiningDate      time.Time `json:"joining_date,omitempty"`
+	CreatedAt        time.Time `json:"created_at,omitempty"`
+	UpdatedAt        time.Time `json:"updated_at,omitempty"`
 }
 
 // Employee is the type for employees
@@ -84,23 +86,24 @@ type Employee struct {
 	// Gender                string         `json:"gender,omitempty"`
 	// DateOfBith            time.Time      `json:"date_of_birth,omitempty"`
 	// Experties        string         `json:"exparties,omitempty"`
-	Division string `json:"division,omitempty"`
-	District string `json:"district,omitempty"`
-	Upazila  string `json:"upazila,omitempty"`
-	Area     string `json:"area,omitempty"`
-	Mobile   string `json:"mobile,omitempty"`
-	Email    string `json:"email,omitempty"`
-	// ImageLink             string         `json:"image_link,omitempty"`        //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
-	AccountStatus  bool `json:"account_status,omitempty"` //Active = true, Inactive = false
-	MonthlySalary  int  `json:"monthly_salary,omitempty"`
-	OpeningBalance int  `json:"opening_balance,omitempty"`
-	// CVLink               string         `json:"cv_link,omitempty"`
-	// NIDLink               string         `json:"nid_link,omitempty"`
-	// KYCUploadStatus       string         `json:"kyc_upload_status,omitempty"`       // incomplete // completed
-	// KYCVerificationStatus string         `json:"kyc_verification_status,omitempty"` //unchecked;Verified; Info Mismatch
-	JoiningDate time.Time `json:"joining_date,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
+	Division         string    `json:"division,omitempty"`
+	District         string    `json:"district,omitempty"`
+	Upazila          string    `json:"upazila,omitempty"`
+	Area             string    `json:"area,omitempty"`
+	Mobile           string    `json:"mobile,omitempty"`
+	AmountPayable    int       `json:"amount_payable,omitempty"`
+	AmountReceivable int       `json:"amount_receivable,omitempty"`
+	WhatsappAccount  string    `json:"whatsapp_account"`
+	Email            string    `json:"email,omitempty"`
+	ImageLink        string    `json:"image_link,omitempty"`     //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	AccountStatus    bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	MonthlySalary    int       `json:"monthly_salary,omitempty"`
+	OpeningBalance   int       `json:"opening_balance,omitempty"`
+	CVLink           string    `json:"cv_link,omitempty"`
+	NIDLink          string    `json:"nid_link,omitempty"`
+	JoiningDate      time.Time `json:"joining_date,omitempty"`
+	CreatedAt        time.Time `json:"created_at,omitempty"`
+	UpdatedAt        time.Time `json:"updated_at,omitempty"`
 }
 
 // Product is the type for products
@@ -198,21 +201,23 @@ type Sale struct {
 
 // Supplier is the type for suppliers
 type Supplier struct {
-	ID            int       `json:"id,omitempty"`
-	AccountCode   string    `json:"account_code,omitempty"`
-	AccountName   string    `json:"account_name,omitempty"`
-	ContactPerson string    `json:"contact_person,omitempty"`
-	Division      string    `json:"division,omitempty"`
-	District      string    `json:"district,omitempty"`
-	Upazila       string    `json:"upazila,omitempty"`
-	Area          string    `json:"area,omitempty"`
-	Mobile        string    `json:"mobile,omitempty"`
-	Email         string    `json:"email,omitempty"`
-	AccountStatus bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
-	Discount      int       `json:"discount,omitempty"`
-	JoiningDate   time.Time `json:"joining_date,omitempty"`
-	CreatedAt     time.Time `json:"created_at,omitempty"`
-	UpdatedAt     time.Time `json:"updated_at,omitempty"`
+	ID               int       `json:"id,omitempty"`
+	AccountCode      string    `json:"account_code,omitempty"`
+	AccountName      string    `json:"account_name,omitempty"`
+	ContactPerson    string    `json:"contact_person,omitempty"`
+	Division         string    `json:"division,omitempty"`
+	District         string    `json:"district,omitempty"`
+	Upazila          string    `json:"upazila,omitempty"`
+	Area             string    `json:"area,omitempty"`
+	Mobile           string    `json:"mobile,omitempty"`
+	AmountPayable    int       `json:"amount_payable,omitempty"`
+	AmountReceivable int       `json:"amount_receivable,omitempty"`
+	Email            string    `json:"email,omitempty"`
+	AccountStatus    bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	Discount         int       `json:"discount,omitempty"`
+	JoiningDate      time.Time `json:"joining_date,omitempty"`
+	CreatedAt        time.Time `json:"created_at,omitempty"`
+	UpdatedAt        time.Time `json:"updated_at,omitempty"`
 }
 
 //................................................................

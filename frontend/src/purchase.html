@@ -613,7 +613,7 @@
         const requestOptions = {
           method: 'post',
         }
-        fetch('http://localhost:4321/api/inventory/purchase/getPageDetails', requestOptions)
+        fetch('http://localhost:4321/api/inventory/purchase/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
             if (data.error === true) {

@@ -780,13 +780,12 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 	//product
 	//account
 	var resp struct {
-		Error      bool               `json:"error,omitempty"`
-		Message    string             `json:"message,omitempty"`
-		Customers  []*models.Customer `json:"customers,omitempty"`
-		Categories []*models.Category `json:"categories,omitempty"`
-		Brands     []*models.Brand    `json:"brands,omitempty"`
-		Products   []*models.Product  `json:"products,omitempty"`
-
+		Error        bool                  `json:"error,omitempty"`
+		Message      string                `json:"message,omitempty"`
+		Customers    []*models.Customer    `json:"customers,omitempty"`
+		Categories   []*models.Category    `json:"categories,omitempty"`
+		Brands       []*models.Brand       `json:"brands,omitempty"`
+		Products     []*models.Product     `json:"products,omitempty"`
 		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
 	}
 
@@ -838,6 +837,56 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 	resp.Categories = categories
 	resp.Brands = brands
 	resp.Products = products
+	resp.HeadAccounts = headAccounts
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// GetReceiveCollectionPageDetails scrape data from the database to initialize receive-collection page
+func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r *http.Request) {
+	/* input : nill
+	output :
+	data = {
+		accounts :[
+		head_accounts = {
+			id, account_name, account_code
+		},
+		customers = {
+			id, account_name, account_code, amount_payable, amount_receivable
+		}
+		]
+	}
+	*/
+	app.infoLog.Println("Hit receive-collection handler")
+	var resp struct {
+		Error        bool                  `json:"error,omitempty"`
+		Message      string                `json:"message,omitempty"`
+		Customers    []*models.Customer    `json:"customers,omitempty"`
+		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
+	}
+
+	//retrive suppliers from the database
+	customers, err := app.DB.GetCreditCustomersDetails()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Supplier Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//retrive accounts from the database
+	headAccounts, err := app.DB.GetAvailableHeadAccounts()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Accounts Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//TODO: Retrive accounts and send to frontend
+	resp.Error = false
+	resp.Message += "||data Succesfully fetched||"
+	resp.Customers = customers
 	resp.HeadAccounts = headAccounts
 
 	app.writeJSON(w, http.StatusOK, resp)

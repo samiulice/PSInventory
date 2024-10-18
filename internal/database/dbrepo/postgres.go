@@ -321,6 +321,174 @@ func (p *postgresDBRepo) GetActiveCustomersIDAndName() ([]*models.Customer, erro
 	return customers, nil
 }
 
+// GetCreditCustomersDetails returns a slice of customers details who have due amount(amount_payable > 0) from the customers table
+func (p *postgresDBRepo) GetCreditCustomersDetails() ([]*models.Customer, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var customers []*models.Customer
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+		FROM
+			public.customers
+		WHERE 
+			amount_payable > 0
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return customers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c models.Customer
+		err = rows.Scan(
+			&c.ID,
+			&c.AccountCode,
+			&c.AccountName,
+			&c.ContactPerson,
+			&c.AmountPayable,
+			&c.AmountReceivable,
+			&c.Mobile,
+		)
+		if err != nil {
+			return customers, err
+		}
+		customers = append(customers, &c)
+	}
+	return customers, nil
+}
+
+// GetDebitCustomersDetails returns a slice of customers details who have amount receivable(amount_receivable > 0) from the customers table
+func (p *postgresDBRepo) GetDebitCustomersDetails() ([]*models.Customer, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var customers []*models.Customer
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+		FROM
+			public.customers
+		WHERE 
+			amount_receivable > 0
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return customers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c models.Customer
+		err = rows.Scan(
+			&c.ID,
+			&c.AccountCode,
+			&c.AccountName,
+			&c.ContactPerson,
+			&c.AmountPayable,
+			&c.AmountReceivable,
+			&c.Mobile,
+		)
+		if err != nil {
+			return customers, err
+		}
+		customers = append(customers, &c)
+	}
+	return customers, nil
+}
+
+// GetCreditCustomersDetails returns a slice of suppliers details who have due amount(amount_receivable > 0) from the supplier table
+func (p *postgresDBRepo) GetCreditSuppliersDetails() ([]*models.Supplier, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var suppliers []*models.Supplier
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+		FROM
+			public.suppliers
+		WHERE 
+			amount_receivable > 0
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return suppliers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s models.Supplier
+		err = rows.Scan(
+			&s.ID,
+			&s.AccountCode,
+			&s.AccountName,
+			&s.ContactPerson,
+			&s.AmountPayable,
+			&s.AmountReceivable,
+			&s.Mobile,
+		)
+		if err != nil {
+			return suppliers, err
+		}
+		suppliers = append(suppliers, &s)
+	}
+	return suppliers, nil
+}
+
+// GetDebitSuppliersDetails returns a slice of suppliers details who have amount receivable(amount_payable > 0) from the suppliers table
+func (p *postgresDBRepo) GetDebitSuppliersDetails() ([]*models.Supplier, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var suppliers []*models.Supplier
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+		FROM
+			public.suppliers
+		WHERE 
+			amount_payable > 0
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return suppliers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s models.Supplier
+		err = rows.Scan(
+			&s.ID,
+			&s.AccountCode,
+			&s.AccountName,
+			&s.ContactPerson,
+			&s.AmountPayable,
+			&s.AmountReceivable,
+			&s.Mobile,
+		)
+		if err != nil {
+			return suppliers, err
+		}
+		suppliers = append(suppliers, &s)
+	}
+	return suppliers, nil
+}
+
 // GetCustomerPaginated returns a chunks of customers
 // if accountType == all, it will return list all customer accounts
 // if accountType == active, it will return list of active customer accounts
