@@ -13,19 +13,23 @@ type DatabaseRepo interface {
 	GetEmployeeByID(id int) (models.Employee, error)
 	GetEmployeeListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Employee, int, error)
 
-	//MIS
+	//MIS--customer
 	AddCustomer(customer models.Customer) (int, error)
+	GetCustomerByID(id int) (models.Customer, error)
 	GetActiveCustomersIDAndName() ([]*models.Customer, error)
 	GetCreditCustomersDetails() ([]*models.Customer, error)
 	GetDebitCustomersDetails() ([]*models.Customer, error)
-	GetCreditSuppliersDetails() ([]*models.Supplier, error)
-	GetDebitSuppliersDetails() ([]*models.Supplier, error)
 	GetCustomerListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Customer, int, error)
+	//MIS--supplier
 	AddSupplier(supplier models.Supplier) (int, error)
 	GetActiveSuppliersIDAndName() ([]*models.Supplier, error)
+	GetCreditSuppliersDetails() ([]*models.Supplier, error)
+	GetDebitSuppliersDetails() ([]*models.Supplier, error)
 	GetSupplierListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Supplier, int, error)
 
 	//Inventory
+
+	//product
 	AddBrand(b models.Brand) (int, error)
 	GetBrandList() ([]*models.Brand, error)
 	GetActiveBrands() ([]*models.Brand, error)
@@ -43,7 +47,9 @@ type DatabaseRepo interface {
 	GetInstockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
 	GetSoldProductListBySalesIDAndProductID(SalesID, productID int) (*models.Product, error)
 	GetProductItemsListByProductID(productID int) (*models.Product, error)
-	GetProductItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
+	GetInStockItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
+	GetSoldItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
+	GetItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
 
 	UpdateProductQuantityByProductID(quantity, productID int) error
 	UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error
@@ -56,11 +62,12 @@ type DatabaseRepo interface {
 	GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error)
 	//sales
 	GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale, error)
+	SaleProducts(sale *models.Sale) error
+	GetSalesHistoryByID(id int) (models.Sale, error)
 	//Memo
 	GetMemoListBySupplierID(supplierID int) ([]*models.Purchase, error)
 	GetMemoListByCustomerID(customerID int) ([]*models.Sale, error)
 	RestockProduct(purchase *models.Purchase) error
-	SaleProducts(sale *models.Sale) error
 
 	//Helper functions
 	CountRows(tableName string) (int, error)

@@ -238,45 +238,34 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
+        <h2 class="text-center text-warning fa-2x"><label>WARRANTY CLAIM</label></h2>
 
         <!-- Page content here -->
-        <form action="#" id="sale-form">
-          <div class="row">
-            <!-- View items Secetion  -->
-            <div class="col-md-5 col-sm-5 col-xs-12">
-              <div class="x_panel bg-gw" style="min-height: 520px; height: 520px; max-height: 850px">
-                <div class="x_title">
-                  <h2>Search Product</h2>
-                  <div class="clearfix"></div>
+        <form action="#" id="warranty-claim-form">
+          <!-- View items Secetion  -->
+          <div class="x_panel bg-gw">
+            <div class="x_title">
+              <div class="col-md-4 col-sm-4 col-xs-12">
+                <h2>Search Product</h2>
+              </div>
+              <div class="col-md-8 col-sm-6 col-xs-12 form-group pull-right top_search">
+                <div class="input-group">
+                  <input type="text" class="form-control" id="search-by-serial-number"
+                    placeholder="Search item by serial number">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="search-btn"><i class="fa fa-arrow-right">
+                      </i>&nbsp;</button>
+                  </span>
                 </div>
-                <div class="x_content">
-                  <!-- Category Info -->
-                  <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="row form-group has-feedback">
-                      <label for="category">Product Category * :</label>
-                      <select id="category" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Category</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
-                        aria-hidden="true"></i>
-                    </div>
-                    <!-- Product Info -->
-                    <div class="row form-group has-feedback">
-                      <label for="product">Product Name * :</label>
-                      <select id="product" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Product</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
-                        aria-hidden="true"></i>
-                    </div>
-                  </div>
-                </div>
-                <div class="x_content" id="view-items-info-container">
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content" id="view-items-info-container">
+              <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-6">
                   <!-- Table row -->
                   <table class="table table-striped">
+                    <caption>Product Information</caption>
                     <tbody>
                       <tr>
                         <td>Code:</td>
@@ -291,169 +280,51 @@
                         <td>Brand:</td>
                       </tr>
                       <tr>
-                        <td>Quantity:</td>
+                        <td>Sale Price:</td>
                       </tr>
                       <tr>
-                        <td>MRP:</td>
+                        <td>Sale Date:</td>
                       </tr>
                       <tr>
-                        <td>Discount:</td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="col-md-5 col-sm-5 col-xs-5">
+                  <!-- Table row -->
+                  <table class="table table-striped">
+                    <caption>Customer Information</caption>
+                    <tbody>
+                      <tr>
+                        <td>Code:</td>
+                      </tr>
+                      <tr>
+                        <td>Account Name:</td>
+                      </tr>
+                      <tr>
+                        <td>Contact Person:</td>
+                      </tr>
+                      <tr>
+                        <td>Mobile:</td>
+                      </tr>
+                      <tr>
+                        <td>Due Payment:</td>
+                      </tr>
+                      <tr>
+                        <td>Location:</td>
+                      </tr>
+                      <tr>
+                        <td></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
-
-            <!-- Payment Details  -->
-            <div class="col-md-7 col-sm-7 col-xs-12">
-              <div class="x_panel bg-gw" style="min-height: 520px; height: fit-content; max-height: 850px;">
-                <div class="x_title">
-                  <div class="title_left">
-                    <div class="col-md-8 col-sm-6 col-xs-6">
-                      <h2>Sale Details</h2>
-                    </div>
-                  </div>
-                  <div class="title_right">
-                    <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search text-right">
-
-                      <a class="btn btn-round btn-xs btn-primary" id="createCustomerBtn">
-                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Create Customer</a>
-
-                    </div>
-                  </div>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <div class="row">
-                    <!-- Sale Date -->
-                    <div class="row form-group has-feedback">
-                      <div class="col-md-6 col-sm-6 col-xs-10">
-                        <label for="single_cal4">Sale Date * :</label>
-                        <input type="text" class="form-control has-feedback-left" id="single_cal4"
-                          placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
-                        <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
-                          aria-hidden="true"></i>
-                      </div>
-                      <!-- Customer Account -->
-                      <div class="col-md-6 col-sm-6 col-xs-10">
-                        <label for="customer">Customer * :</label>
-                        <select id="customer" class="form-control form-select has-feedback-left" required>
-                          <option value="" selected disabled>Select Customer Account</option>
-                          <!--Updated by JS DOM -->
-                        </select>
-                        <span style="color: rgba(0, 0, 0, 1);"
-                          class="form-control-feedback left glyphicon glyphicon-user" aria-hidden="true"></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="x_title">
-                  <h2>Payment Details</h2>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <div class="row">
-                    <div class="col-md-6 col-sm-6 col-xs-12">
-                      <div class="row">
-                        <!-- Transaction Account -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="account">Account * :</label>
-                            <select id="account" class="form-control form-select has-feedback-left" required>
-                              <option value="" selected disabled>Select Account</option>
-                              <!--Updated by JS DOM -->
-                            </select>
-                            <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-bank"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-
-                        <!-- Chalan No -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="chalan_no">Chalan No :</label>
-                            <input type="text" class="form-control has-feedback-left" id="chalan_no"
-                              placeholder="Chalan No">
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Memo No -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="memo_no">Memo No * :</label>
-                            <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No"
-                              required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Note -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="note">Note :</label>
-                            <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-comment form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 col-xs-12">
-                      <div class="row">
-                        <!-- Bill Amount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="bill-amount">Bill Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="bill-amount"
-                              placeholder="Bill Amount" value="0" required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Discount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="discount">Discount :</label>
-                            <input type="number" class="form-control has-feedback-left" id="discount" value="0" min="0"
-                              max="100" step="0.01" placeholder="(%)" />
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Total Amount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="total-amount">Total Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="total-amount" value="0"
-                              placeholder="Total Amount" required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Paid Amount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="paid-amount">Paid Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="paid-amount"
-                              placeholder="Paid Amount" required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <h4>Warranty:</h4>
                 </div>
               </div>
             </div>
@@ -461,26 +332,9 @@
           <div class="row">
             <!-- Selected items Secetion  -->
             <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel bg-gw" style="height: 500px; overflow-x: scroll; overflow-y: scroll;">
+              <div class="x_panel bg-gw">
                 <div class="x_title">
-                  <div class="title_left">
-                    <div class="col-md-8 col-sm-6 col-xs-6">
-                      <h2>Selected Products</h2>
-                    </div>
-                  </div>
-                  <div class="title_right">
-                    <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search">
-                      <div class="input-group">
-                        <input type="text" class="form-control" id="search-by-serial-number"
-                          placeholder="Search item by serial number">
-                        <span class="input-group-btn">
-                          <button class="btn btn-default btn-default" type="button" onclick="serachBySerial()"><i
-                              class="fa fa-arrow-right">
-                            </i>&nbsp;</button>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <h2>Selected Products</h2>
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content" id="selected-items-info">
@@ -571,268 +425,174 @@
 
   <script>
 
-    let products, brands, billAmount = 0, totalAmount = 0;
-    let selected_products = [];
+    let product, customer, salesHistory, selected_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
-      let category = document.getElementById("category");
-      // TODO: Get the a list of product category id , name and populate category div 
-      let product = document.getElementById("product");
-      // TODO: Get the a list of product id , name and populate product div 
       let viewItemsInfoContainer = document.getElementById("view-items-info-container");
       let selectedProductListContainer = document.getElementById("selected-items-info-container");
-
-      //Fetch page data from server
-      const requestOptions = {
-        method: 'post',
-      }
-      //fetch page data
-      fetch('http://localhost:4321/api/inventory/sale/get-page-details', requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          if (data.error === true) {
-            document.getElementById("page-content").innerHTML = `
-                      <h4 class="text-info">Please contact to the app provider</h4>
-                      <br>
-                      <h4 class="text-danger">${data.message}</h4>
-                      `
-          } else {
+      document.getElementById('search-btn').addEventListener("click", e => {
+        let payload = {
+          product_serial_number: document.getElementById('search-by-serial-number')
+        }
+        console.log("payload: ", payload);
+        const requestOptions = {
+          method: 'post',
+          headers: {
+            'Accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }
+        fetch('http://localhost:4321/api/inventory/products/search-sold-products-by-serial', requestOptions)
+          .then(response => response.json())
+          .then(data => {
             console.log(data)
-            updateCustomerDiv(data.customers)
-            updateCategoryDiv(data.categories)
-            updateAccoutnsDiv(data.head_accounts)
-            //update product list based on selected category
-            category.addEventListener("change", e => {
-              product.innerHTML = '<option value="" selected disabled>Select Product</option>';
-              let isEmpty = true;
-              data.products.forEach(i => {
-                if (i.category_id == category.value) {
-                  product.innerHTML += `<option value="${i.id}">${i.brand.name + "-" + i.product_name}</option>`;
-                  isEmpty = false;
-                }
-              })
-              if (isEmpty === true) {
-                let text = category.options[category.selectedIndex].text;
-                product.innerHTML = `<option value="" selected disabled>No Items Available For ${text}.</option>`;
-              }
-            });
-            // show popup form for adding new customer
-            createCustomerBtn.addEventListener("click", e => {
-              addNewCustomer("sale");
-            });
+            if (data.error === true) {
+              showErrorMessage(data.message)
+            } else {
+              //update ViewProductListContainer
+              product = data.product_item;
+              customer = data.customer;
+              salesHistory = data.sales_history;
+              updateViewItemsInfoContainer(true);
+            }
+          }) //End of fetch statement
+      })
 
-            //fetch in-stock products list for specific product id under a specific category
-            product.addEventListener('change', e => {
-              let payload = {
-                product_id: parseInt(product.value)
-              }
-              console.log("payload: ", payload);
-              const requestOptions = {
-                method: 'post',
-                headers: {
-                  'Accept': 'application/json',
-                  'content-type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-              }
-              fetch('http://localhost:4321/api/inventory/products/get-list-by-id', requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                  console.log(data)
-                  if (data.error === true) {
-                    showErrorMessage(data.message)
-                  } else {
-                    //update ViewProductListContainer
-                    products = data.product_items;
-                    updateViewItemsInfoContainer(products, true);
-                  }
-                }) //End of fetch statement
-            })
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //submit data to backend
+      document.getElementById("warranty-claim-form").addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById("submitBtn").classList.add("d-none");
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //submit data to backend
-            document.getElementById("sale-form").addEventListener('submit', function (event) {
-              event.preventDefault();
-              event.stopPropagation();
-              document.getElementById("submitBtn").classList.add("d-none");
+        // Select all span elements with the class 'serial-number'
+        const serialNumbers = document.querySelectorAll('.serial-number');
+        // Extract the text content of each span
+        const serialNumberValues = Array.from(serialNumbers).map(span => span.textContent);
 
-              // Select all span elements with the class 'serial-number'
-              const serialNumbers = document.querySelectorAll('.serial-number');
-              // Extract the text content of each span
-              const serialNumberValues = Array.from(serialNumbers).map(span => span.textContent);
+        let sale_details = {
+          sale_date: document.getElementById("single_cal4").value,
+          customer_id: parseInt(document.getElementById("customer").value),
+          account_id: parseInt(document.getElementById("account").value),
+          chalan_no: document.getElementById("chalan_no").value,
+          memo_no: document.getElementById("memo_no").value,
+          note: document.getElementById("note").value,
+          products_serial_no: serialNumberValues,
+          selected_items: selected_products,
+          bill_amount: parseInt(document.getElementById("bill-amount").value),
+          discount: parseInt(document.getElementById("discount").value),
+          total_amount: parseInt(document.getElementById("total-amount").value),
+          paid_amount: parseInt(document.getElementById("paid-amount").value),
+        }
+        console.log(sale_details);
+        const requestOptions = {
+          method: 'post',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(sale_details),
+        }
 
-              let sale_details = {
-                sale_date: document.getElementById("single_cal4").value,
-                customer_id: parseInt(document.getElementById("customer").value),
-                account_id: parseInt(document.getElementById("account").value),
-                chalan_no: document.getElementById("chalan_no").value,
-                memo_no: document.getElementById("memo_no").value,
-                note: document.getElementById("note").value,
-                products_serial_no: serialNumberValues,
-                selected_items: selected_products,
-                bill_amount: parseInt(document.getElementById("bill-amount").value),
-                discount: parseInt(document.getElementById("discount").value),
-                total_amount: parseInt(document.getElementById("total-amount").value),
-                paid_amount: parseInt(document.getElementById("paid-amount").value),
-              }
-              console.log(sale_details);
-              const requestOptions = {
-                method: 'post',
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(sale_details),
-              }
+        fetch('http://localhost:4321/api/inventory/sale-products', requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            console.log("Sale Products: ", data)
+            if (data.error === true) {
+              showErrorMessage(data.message)
+            } else {
+              showSuccessMessage(data.message);
+            }
+            // setTimeout(() => {
+            //   location.reload();
+            // }, 5000);
+          });
+      })
+    })
+    //End of Window.addEventListener
 
-              fetch('http://localhost:4321/api/inventory/sale-products', requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                  console.log("Sale Products: ", data)
-                  if (data.error === true) {
-                    showErrorMessage(data.message)
-                  } else {
-                    showSuccessMessage(data.message);
-                  }
-                  // setTimeout(() => {
-                  //   location.reload();
-                  // }, 5000);
-                });
-            })
-          }
-        })
-    }) //End of Window.addEventListener
-    /////////////////////////////////////////////
-    /////////////////////////////////////////////
-    //updateCategoryDiv updates category selection options with the fetched data 
-    function updateCategoryDiv(categories) {
-      if (categories) {
-        category.innerHTML = '';
-        category.innerHTML = `<option value="" selected disabled>Select Category</option>`;
-        categories.forEach(c => {
-          category.innerHTML += `<option value=${c.id}>${c.name}</option>`;
-        });
-      } else {
-        category.innerHTML = `<option value="" selected disabled>No Category Available. Create One</option>`;
-      }
-    }
-    //updateCustomerDiv updates customer selection options with the fetched data
-    function updateCustomerDiv(customers) {
-      if (customers) {
-        customer.innerHTML = '';
-        customer.innerHTML = `<option value="" selected disabled>Select Customer Account</option>`;
-        customers.forEach(s => {
-          customer.innerHTML += `<option value="${s.id}">${s.account_name}(${s.account_code})</option>`;
-        });
-      } else {
-        customer.innerHTML = `<option value="" selected disabled>No Customer Available. Create One</option>`;
-      }
-    }
-
-    //updateAccoutnsDiv updates account selection options with the fetched data 
-    function updateAccoutnsDiv(accoutns) {
-      if (accoutns) {
-        account.innerHTML = '';
-        account.innerHTML = `<option value="" selected disabled>Select Account</option>`;
-        accoutns.forEach(ac => {
-          account.innerHTML += `<option value=${ac.id}>${ac.account_name}</option>`;
-        });
-      } else {
-        account.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-      }
-    }
-
-
-    //toggleBtn changes button state in between show and hide
-    function toggleBtn(id) {
-      let elem = document.getElementById("showBtn-" + id)
-      if (elem.innerHTML.includes("Show")) {
-        elem.innerHTML = `<i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide`;
-      } else {
-        elem.innerHTML = `<i class="fa fa-eye"></i>&nbsp;&nbsp;Show`;
-      }
-    }
-
-    function toggleTextVisibility(elem, price) {
-      if (elem.innerText.includes("See")) {
-        elem.innerText = `${price}`;
-      } else {
-        elem.innerText = "See";
-      }
-    }
 
     function updateViewItemsInfoContainer(items, status) {
       let productMetadata = items.product_metadata;
       let qty = 0;
-
-      let quantity_section = "";
-      let discount_section = "";
-      let mrp_section = "";
-      let item_unit_input_section = "";
       if (productMetadata) {
         qty = productMetadata.length;
       }
-      if (qty > 0) {
-        quantity_section = `<span class="badge bg-green">${qty}</span>`;
-        mrp_section = `${productMetadata[0].max_retail_price} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="btn btn-xs btn-info" onclick="toggleTextVisibility(this, ${productMetadata[0].purchase_rate})">See</label>`;
-        discount_section = `${items.discount}`;
-      } else {
-        quantity_section = '<span class="badge bg-red">Out of stock</span>';
-      }
-      if (status) {
-        if (qty > 0) {
-          item_unit_input_section =
-            `<tr style="transform:translate(0,5px);">
-              <td class="text-right text-primary"><b>Add Items:</b></td>
-              <td class="text-left" style="transform:translate(0,-5px)">
-                <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
-              </td>
-              <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markItemsAsSeleced(${items.id}, 0)">Add Items</a></td>
-            </tr>`
-        }
-      } else {
-        item_unit_input_section =
-          `<tr style="transform:translate(0,5px);">
-          <td class="text-primary"><b>Add Item:</b></td>
-          <td class="text-primary"><b>${products.product_metadata[0].serial_number}</b></td>
-          <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markSingleItemAsSelected(${items.id})">Add Item</a></td>
-        </tr>`
-      }
 
       document.getElementById("view-items-info-container").innerHTML = `
-      <table class="table table-striped">
-        <tbody>
-          <tr>
-            <td>Code:</td>
-            <td><b>${items.product_code}</b></td>
-          </tr>
-          <tr>
-            <td>Name:</td>
-            <td><b>${items.product_name}</b></td>
-          </tr>
-          <tr>
-            <td>Category:</td>
-            <td><b>${items.category.name}</b></td>
-          </tr>
-          <tr>
-            <td>Brand:</td>
-            <td><b>${items.brand.name}</b></td>
-          </tr>
-          <tr>
-            <td>Quantity:</td>
-            <td><b>${quantity_section}</b></td>
-          </tr>
-          <tr>
-            <td>Discount:</td>
-            <td><b>${discount_section}</b></td>
-          </tr>
-          <tr>
-            <td>MRP:</td>
-            <td><b>${mrp_section}</b></td>
-          </tr>
-          ${item_unit_input_section}
-        </tbody>
-      </table>
+        <div class="row">
+          <div class="col-md-6 col-sm-6 col-xs-6">
+            <!-- Table row -->
+            <table class="table table-striped">
+              <caption>Product Information</caption>
+              <tbody>
+                <tr>
+                  <td>Code:</td>
+                  <td>${product.product_code}</td>
+                </tr>
+                <tr>
+                  <td>Name:</td>
+                  <td>${product.product_name}</td>
+                </tr>
+                <tr>
+                  <td>Category:</td>
+                  <td>${product.category.name}:</td>
+                </tr>
+                <tr>
+                  <td>Brand:</td>
+                  <td>${product.brand.name}:</td>
+                </tr>
+                <tr>
+                  <td>Sale Price:</td>
+                  <td>${salesHistory.kldfsa}</td>
+                </tr>
+                <tr>
+                  <td>Sale Date:</td>
+                  <td>Sale Date:</td>
+                </tr>
+                <tr>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="col-md-5 col-sm-5 col-xs-5">
+            <!-- Table row -->
+            <table class="table table-striped">
+              <caption>Customer Information</caption>
+              <tbody>
+                <tr>
+                  <td>Code:</td>
+                </tr>
+                <tr>
+                  <td>Account Name:</td>
+                </tr>
+                <tr>
+                  <td>Contact Person:</td>
+                </tr>
+                <tr>
+                  <td>Mobile:</td>
+                </tr>
+                <tr>
+                  <td>Due Payment:</td>
+                </tr>
+                <tr>
+                  <td>Location:</td>
+                </tr>
+                <tr>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <h4>Warranty:</h4>
+          </div>
+        </div>
       `
 
     }
@@ -1039,6 +799,13 @@
       // Log all MRP values
       console.log(mrpValues);
     }
+  </script>
+
+  <script>
+    //fetch-1: on click button, get the serial number and fetch product item data from the backend
+    'http://localhost:4321/api/inventory/products/search-sold-products-by-serial'
+    //fetch-2: on submit form, send product metadata id
+    'http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id'
   </script>
 
 </body>

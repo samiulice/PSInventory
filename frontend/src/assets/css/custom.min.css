@@ -4929,3 +4929,17 @@ ul.notifications {
 .dataTables_wrapper>.row {
     overflow: auto !important
 }
+
+.vertical-solid-line {
+    border-left: 2px solid #E6E9ED; /* Vertical line */
+    height: min-content; /* Takes the height of the content */
+    margin: 0 10px; /* Spacing between content and the line */
+    padding: 0 20px; /* Spacing between content and the line */
+}
+.vertical-dotted-line {
+    border-left: 2px dotted #E6E9ED; /* Vertical line */
+    height: 100%; /* Takes the height of the content */
+    margin: 0 10px; /* Spacing between content and the line */
+    padding: 0 20px; /* Spacing between content and the line */
+    
+}

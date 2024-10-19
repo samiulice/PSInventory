@@ -283,6 +283,48 @@ func (p *postgresDBRepo) AddCustomer(customer models.Customer) (int, error) {
 	return id, nil
 }
 
+// GetCustomerByID search customer information by id from customers table
+func (p *postgresDBRepo) GetCustomerByID(id int) (models.Customer, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, division, district, upazila, area, amount_payable, amount_receivable, mobile, whatsapp_account, email, account_status, discount, opening_balance, joining_date, created_at, updated_at
+		FROM
+			public.customers
+		WHERE
+			id=$1
+	`
+	var customer models.Customer
+	err := p.DB.QueryRowContext(ctx, query, id).Scan(
+		&customer.ID,
+		&customer.AccountCode,
+		&customer.AccountName,
+		&customer.ContactPerson,
+		&customer.Division,
+		&customer.District,
+		&customer.Upazila,
+		&customer.Area,
+		&customer.AmountPayable,
+		&customer.AmountReceivable,
+		&customer.Mobile,
+		&customer.WhatsappAccount,
+		&customer.Email,
+		&customer.AccountStatus,
+		&customer.Discount,
+		&customer.OpeningBalance,
+		&customer.JoiningDate,
+		&customer.CreatedAt,
+		&customer.UpdatedAt,
+	)
+
+	if err != nil {
+		return customer, fmt.Errorf("DBERROR--GetCustomerByID: %w", err)
+	}
+	return customer, nil
+}
+
 // GetActiveCustomersIDAndName returns a slice of customers name with id
 func (p *postgresDBRepo) GetActiveCustomersIDAndName() ([]*models.Customer, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -1238,8 +1280,8 @@ func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.
 	return product, nil
 }
 
-// GetProductItemDetailsBySerialNumber returns product item details corresponds to serial number
-func (p *postgresDBRepo) GetProductItemDetailsBySerialNumber(serialNumber string) (*models.Product, error) {
+// GetInStockItemDetailsBySerialNumber returns in-stock product item details corresponds to serial number from product_serial_numbers table
+func (p *postgresDBRepo) GetInStockItemDetailsBySerialNumber(serialNumber string) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -1253,6 +1295,93 @@ func (p *postgresDBRepo) GetProductItemDetailsBySerialNumber(serialNumber string
 			public.product_serial_numbers
 		WHERE
 			status = 'in stock' AND serial_number = $1
+	`
+	var metadata models.ProductMetadata
+	err := p.DB.QueryRowContext(ctx, query, serialNumber).Scan(
+		&metadata.ID,
+		&metadata.SerialNumber,
+		&metadata.ProductID,
+		&metadata.PurchaseHistoryID,
+		&metadata.Status,
+		&metadata.Warranty,
+		&metadata.MaxRetailPrice,
+		&metadata.PurchaseRate,
+		&metadata.CreatedAt,
+		&metadata.UpdatedAt,
+	)
+	if err != nil {
+		return product, err
+	}
+
+	//get product info
+	pr, err := p.GetProductByID(metadata.ProductID)
+	if err != nil {
+		return product, err
+	}
+	pr.ProductMetadata = append(pr.ProductMetadata, &metadata)
+	product = &pr
+	return product, nil
+}
+
+// GetSoldItemDetailsBySerialNumber returns sold product item details corresponds to serial number from product_serial_numbers table
+func (p *postgresDBRepo) GetSoldItemDetailsBySerialNumber(serialNumber string) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var product *models.Product
+
+	//get metadata from product_serial_numbers
+	query := `
+		SELECT
+			id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+		FROM
+			public.product_serial_numbers
+		WHERE
+			status = 'sold' AND serial_number = $1
+	`
+	var metadata models.ProductMetadata
+	err := p.DB.QueryRowContext(ctx, query, serialNumber).Scan(
+		&metadata.ID,
+		&metadata.SerialNumber,
+		&metadata.ProductID,
+		&metadata.PurchaseHistoryID,
+		&metadata.SalesHistoryID,
+		&metadata.Status,
+		&metadata.Warranty,
+		&metadata.MaxRetailPrice,
+		&metadata.PurchaseRate,
+		&metadata.CreatedAt,
+		&metadata.UpdatedAt,
+	)
+	if err != nil {
+		return product, err
+	}
+
+	//get product info
+	pr, err := p.GetProductByID(metadata.ProductID)
+	if err != nil {
+		return product, err
+	}
+	pr.ProductMetadata = append(pr.ProductMetadata, &metadata)
+	product = &pr
+	return product, nil
+}
+
+// GetItemDetailsBySerialNumber returns product item details corresponds to serial number
+func (p *postgresDBRepo) GetItemDetailsBySerialNumber(serialNumber string) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var product *models.Product
+
+	//get metadata from product_serial_numbers
+	query := `
+		SELECT
+			id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+		FROM
+			public.product_serial_numbers
+		WHERE
+			serial_number = $1
 	`
 	var metadata models.ProductMetadata
 	err := p.DB.QueryRowContext(ctx, query, serialNumber).Scan(
@@ -1383,6 +1512,44 @@ func (p *postgresDBRepo) GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale
 		salesHistory = append(salesHistory, &sale)
 	}
 
+	return salesHistory, nil
+}
+
+// GetSalesHistoryByID returns sales history by its id from the sales_history table
+func (p *postgresDBRepo) GetSalesHistoryByID(id int) (models.Sale, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT
+			id, sale_date, customer_id, product_id, account_id, chalan_no, memo_no, note, bill_amount, discount, total_amount, paid_amount, created_at, updated_at
+		FROM
+			public.sales_history 
+		WHERE
+			id = $1
+	`
+	var si models.SelectedItems
+	var salesHistory models.Sale
+	err := p.DB.QueryRowContext(ctx, query, id).Scan(
+		&salesHistory.ID,
+		&salesHistory.SaleDate,
+		&salesHistory.CustomerID,
+		&si.ProductID,
+		&salesHistory.AccountID,
+		&salesHistory.ChalanNO,
+		&salesHistory.MemoNo,
+		&salesHistory.Note,
+		&salesHistory.BillAmount,
+		&salesHistory.Discount,
+		&salesHistory.TotalAmount,
+		&salesHistory.PaidAmount,
+		&salesHistory.CreatedAt,
+		&salesHistory.UpdatedAt,
+	)
+	if err != nil {
+		return salesHistory, fmt.Errorf("GetSalesHistoryByID: %w", err)
+	}
+	salesHistory.SelectedItems = append(salesHistory.SelectedItems, &si)
 	return salesHistory, nil
 }
 

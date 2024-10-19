@@ -519,7 +519,7 @@ func (app *application) FetchProductItemsbyProductID(w http.ResponseWriter, r *h
 }
 
 // FetchProductItembySerialNumber retrive product item by serial number
-func (app *application) FetchProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
+func (app *application) FetchInstockProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
 
 	//Define struct for JSON object
 	var payload struct {
@@ -540,7 +540,7 @@ func (app *application) FetchProductItembySerialNumber(w http.ResponseWriter, r 
 	}
 
 	//Get product item details for the given serial number(e.g. id,serial_number, product_id,purchase_history_id,warranty, max_retail_price, purchase_rate)
-	productItem, err := app.DB.GetProductItemDetailsBySerialNumber(payload.SerialNumber)
+	productItem, err := app.DB.GetInStockItemDetailsBySerialNumber(payload.SerialNumber)
 	if err != nil {
 		resp.Error = true
 		resp.Message = "Error retriving data from database: " + err.Error()
@@ -549,6 +549,108 @@ func (app *application) FetchProductItembySerialNumber(w http.ResponseWriter, r 
 	}
 	//Get product details for the product id
 
+	resp.Error = false
+	resp.Message = "Data fetched succefully"
+	resp.ProductItems = productItem
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// FetchSoldProductItembySerialNumber retrive sold product item by serial number
+func (app *application) FetchSoldProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
+
+	//Define struct for JSON object
+	var payload struct {
+		SerialNumber string `json:"product_serial_number"`
+	}
+	var resp struct {
+		Error        bool             `json:"error,omitempty"`
+		Message      string           `json:"message,omitempty"`
+		ProductItem  *models.Product  `json:"product_item,omitempty"`
+		SalesHistory *models.Sale     `json:"sales_history,omitempty"`
+		Customer     *models.Customer `json:"customer,omitempty"`
+	}
+	//Read JSON body
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "cannot read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusOK, resp)
+		return
+	}
+
+	var productItem *models.Product
+	var salesHistory models.Sale
+	var customer models.Customer
+
+	//Get product item details for the given serial number(e.g. id,serial_number, product_id,purchase_history_id,warranty, max_retail_price, purchase_rate)
+	productItem, err = app.DB.GetSoldItemDetailsBySerialNumber(payload.SerialNumber)
+	if err == sql.ErrNoRows {
+		resp.Message = "Product item not sold yet"
+		app.writeJSON(w, http.StatusOK, resp)
+		return
+	} else if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	if len(productItem.ProductMetadata) > 0 {
+		//Get sales history for the fetched product item
+		salesHistory, err = app.DB.GetSalesHistoryByID(productItem.ProductMetadata[0].SalesHistoryID)
+		if err == sql.ErrNoRows {
+			resp.Message = "sales history not found for the item"
+			app.writeJSON(w, http.StatusOK, resp)
+			return
+		} else if err != nil {
+			app.badRequest(w, err)
+			return
+		}
+		//Get customer details for the fetched product item
+		customer, err = app.DB.GetCustomerByID(salesHistory.CustomerID)
+		if err == sql.ErrNoRows {
+			resp.Message = "sales history not found for the item"
+			app.writeJSON(w, http.StatusOK, resp)
+			return
+		} else if err != nil {
+			app.badRequest(w, err)
+			return
+		}
+	}
+	resp.Error = false
+	resp.Message = "Data fetched succefully"
+	resp.ProductItem = productItem
+	resp.SalesHistory = &salesHistory
+	resp.Customer = &customer
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// FetchProductItembySerialNumber retrive product item by serial number
+func (app *application) FetchProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
+
+	//Define struct for JSON object
+	var payload struct {
+		SerialNumber string `json:"product_serial_number"`
+	}
+	var resp struct {
+		Error        bool            `json:"error,omitempty"`
+		Message      string          `json:"message,omitempty"`
+		ProductItems *models.Product `json:"product_items,omitempty"`
+	}
+	//Read JSON body
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "cannot read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusOK, resp)
+		return
+	}
+	//Get product item details for the given serial number(e.g. id,serial_number, product_id,purchase_history_id,warranty, max_retail_price, purchase_rate)
+	productItem, err := app.DB.GetItemDetailsBySerialNumber(payload.SerialNumber)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Error retriving data from database: " + err.Error()
+		app.writeJSON(w, http.StatusOK, resp)
+		return
+	}
+	//Get product details for the product id
 	resp.Error = false
 	resp.Message = "Data fetched succefully"
 	resp.ProductItems = productItem
