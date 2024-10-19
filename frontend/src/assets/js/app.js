@@ -628,7 +628,9 @@ function addNewCategory(page, categories) {
               document.getElementById("category").innerHTML = '';
               document.getElementById("category").innerHTML = `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
               document.getElementById("category").disabled = true;
-              categories.push(data.result);
+              if(categories){
+                categories.push(data.result);
+              }
             }
           }
         });
