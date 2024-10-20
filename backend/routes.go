@@ -41,8 +41,8 @@ func (app *application) routes() http.Handler {
 		mux.Post("/inventory/memo/get-sales-product-list", app.FetchSalesMemoProductItems)
 		mux.Post("/inventory/products/get-list-by-id", app.FetchProductItemsbyProductID)
 		mux.Post("/inventory/products/search-instock-products-by-serial", app.FetchInstockProductItembySerialNumber) //search in-stock items
-		mux.Post("/inventory/products/search-sold-products-by-serial", app.FetchSoldProductItembySerialNumber) //search sale/sold items
-		mux.Post("/inventory/products/search-products-by-serial", app.FetchProductItembySerialNumber) //search all type items
+		mux.Post("/inventory/products/search-sold-products-by-serial", app.FetchSoldProductItembySerialNumber)       //search sale/sold items
+		mux.Post("/inventory/products/search-products-by-serial", app.FetchProductItembySerialNumber)                //search all type items
 		//memo--supplier
 		mux.Post("/inventory/get-supplier-memo-list", app.GetMemoListBySupplierID)
 		//memo--supplier
@@ -53,8 +53,11 @@ func (app *application) routes() http.Handler {
 		//page details
 		mux.Post("/inventory/purchase/get-page-details", app.GetPurchasePageDetails)
 		mux.Post("/inventory/sale/get-page-details", app.GetSalePageDetails)
+		//warranty
+		mux.Post("/inventory/products/claim-warranty-by-serial-id", app.ClaimWarrantyBySerialID)
 		//accounts
 		mux.Post("/accounts/receive-collection/get-page-details", app.GetReceiveCollectionPageDetails)
+
 	})
 	return mux
 }

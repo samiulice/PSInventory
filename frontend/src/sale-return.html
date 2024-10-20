@@ -308,20 +308,24 @@
                                 </div>
                                 <div class="row form-group has-feedback">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label for="total_return_value">Total Return Value :</label>
+                                        <label for="total_return_values">Total Return Values :</label>
                                         <input type="text" class="form-control has-feedback-left"
-                                            id="total_return_value" value="0" placeholder="00" disabled>
+                                            id="total_return_values" value="0" placeholder="00" disabled>
                                         <i style="color: rgba(0, 0, 0, 1);"
                                             class="fa fa-money form-control-feedback left" aria-hidden="true"></i>
                                     </div>
                                 </div>
                                 <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
                                     <br>
-                                    <button type="submit" id="submitBtn" class="btn btn-round btn-success">Save</button>
-                                    <a href="javascript:void(0);" id="processingBtn"
-                                        class="d-none fa-spin fa-spinner">Processing...</a>
-                                    <a href="javascript:void(0);" id="invoiceBtn"
-                                        class="btn btn-round btn-success">Generate Invoice</a>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <button type="submit" id="submitBtn" class="btn btn-primary">Save</button>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <a href="javascript:void(0);" id="invoiceBtn"
+                                                class="btn btn-primary">Generate Invoice</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -333,11 +337,20 @@
                                 <div class="col-md-12">
                                     <div class="x_panel bg-gw">
                                         <div class="x_title">
-                                            <h2>Product List <small>Select products</small></h2>
-                                            <ul class="nav navbar-right panel_toolbox">
-                                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                                                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
-                                            </ul>
+                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                <h2>Returned Product list</h2>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group pull-right top_search">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="search-by-serial-number"
+                                                        placeholder="Search item by S/N or memo number">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" id="search-btn"><i
+                                                                class="fa fa-arrow-right">
+                                                            </i>&nbsp;</button>
+                                                    </span>
+                                                </div>
+                                            </div>
                                             <div class="clearfix"></div>
                                         </div>
                                         <div class="x_content">
@@ -462,7 +475,8 @@
         },] -->
 
         <script>
-            let customers;
+            let customers, products;
+            let returnedID = [], total_returned_values = 0, total_returned_items = 0;
             window.addEventListener("DOMContentLoaded", e => {
                 let customerDiv = document.getElementById("customer");
                 let memoDiv = document.getElementById("memo");
@@ -519,6 +533,9 @@
                     // on changing memo, fetch associated products details with serial number list for the memo and populate product list dropdown 
                     memo.addEventListener('change', e => {
                         productListContainer.innerHTML = '';
+                        returnedID = [];
+                        total_returned_values = 0;
+                        total_returned_items = 0;
                         let memoBody = {
                             memo_no: memo.value
                         }
@@ -529,60 +546,142 @@
                             body: JSON.stringify(memoBody)
                         }
                         fetch('http://localhost:4321/api/inventory/memo/get-sales-product-list', requestOptions)
-                        .then(response => response.json())
-                        .then(data => {
-
-                            if (data.error === true) {
-                                document.getElementById("page-content").innerHTML = `
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data)
+                                if (data.error === true) {
+                                    document.getElementById("page-content").innerHTML = `
                                     <h4 class="text-info">Please contact to the app provider</h4>
                                     <br>
                                     <h4 class="text-danger">${data.message}</h4>
                                     `
-                            } else {
+                                } else {
 
-                                if (data.products) {
-                                    // <tr>
-                                    //     <th>No.</th>
-                                    //     <th>Product Code</th>
-                                    //     <th>Product Name</th>
-                                    //     <th>Category</th>
-                                    //     <th>Brand</th>
-                                    //     <th>Qty</th>
-                                    //     <th>Sale Date</th>
-                                    //     <th class="text-center" style="width: 33%">Serial #
-                                    //     </th>
-                                    // </tr>
-                                    let i = 1;
-                                    document.getElementById("product-list-container").innerHTML = '';
-                                    data.products.forEach(pr => {
-                                        if (pr.product_metadata.length > 0) {
-                                            console.log(pr.product_metadata)
-                                            let serial = ''
-                                            pr.product_metadata.forEach(pm => {
-                                                serial += `<input type="checkbox" id="${pm.id}">&nbsp;&nbsp;${pm.serial_number}</b></br>`
-                                            })
-                                            document.getElementById("product-list-container").innerHTML += `
-                                            <tr id="${pr.id}">  
-                                                <td>${i++}</td>
-                                                <td>${pr.product_code}</td>
-                                                <td>${pr.product_name}</td>
-                                                <td>${pr.category.name}</td>
-                                                <td>${pr.brand.name}</td>
-                                                <td>${pr.product_metadata.length}</td>
-                                                <td>{pr.updated_at}</td>
-                                                <td id="serial-${pr.id}" class="text-center" style="width: 33%">${serial}
-                                                </td>
-                                            </tr>`
-                                        }
-                                    })
+                                    if (data.products) {
+
+                                        products = data.products
+                                        console.log(typeof data.products)
+                                        // <tr>
+                                        //     <th>No.</th>
+                                        //     <th>Product Code</th>
+                                        //     <th>Product Name</th>
+                                        //     <th>Category</th>
+                                        //     <th>Brand</th>
+                                        //     <th>Qty</th>
+                                        //     <th>Sale Date</th>
+                                        //     <th class="text-center" style="width: 33%">Serial #
+                                        //     </th>
+                                        // </tr>
+                                        document.getElementById("product-list-container").innerHTML = '';
+                                        data.products.forEach((pr, i) => {
+                                            if (pr.product_metadata.length > 0) {
+                                                let serial = ''
+                                                pr.product_metadata.forEach(pm => {
+                                                    serial += `<input type="checkbox" id="${pm.id}">&nbsp;&nbsp;${pm.serial_number}</b></br>`
+                                                })
+                                                document.getElementById("product-list-container").innerHTML += `
+                                                    <tr id="${pr.id}">  
+                                                        <td>${i + 1}</td>
+                                                        <td>${pr.product_code}</td>
+                                                        <td>${pr.product_name}</td>
+                                                        <td>${pr.category.name}</td>
+                                                        <td>${pr.brand.name}</td>
+                                                        <td>${pr.product_metadata.length}</td>
+                                                        <td>${pr.sales_date}</td>
+                                                        <td id="serial-${pr.id}" class="text-center" style="width: 33%"><button type="button" class="btn btn-xs btn-dark" id="selection-btn-${i}" onclick=ItemSelection(${i})>Select All</button><br>${serial}
+                                                        </td>
+                                                    </tr>
+                                                `
+
+                                                //adding event listener to each serial number checkbox
+                                                pr.product_metadata.forEach(pm => {
+                                                    document.getElementById(`${pm.id}`).addEventListener("change", e => {
+                                                        if (e.target.checked) {
+                                                            //insert item id to the array 
+                                                            returnedID.push(pm.id)
+                                                            total_returned_items += 1;
+                                                            total_returned_values += pm.max_retail_price;
+                                                        } else {
+                                                            //remove item id from the array
+                                                            returnedID = returnedID.filter(num => num !== pm.id)
+                                                            total_returned_items -= 1;
+                                                            total_returned_values -= pm.max_retail_price;
+                                                        }
+                                                        //set disabled field values
+                                                        document.getElementById("total_return_items").value = total_returned_items;
+                                                        document.getElementById("total_return_values").value = total_returned_values;
+                                                        //set button state
+                                                        let btn = document.getElementById(`selection-btn-${i}`);
+                                                        if (pr.product_metadata.length === total_returned_items) {
+                                                            btn.innerText = "Deselect All";
+                                                            btn.classList.remove("btn-dark");
+                                                            btn.classList.add("btn-danger");
+                                                        } else if (total_returned_items === 0) {
+                                                            btn.innerText = "Select All";
+                                                            btn.classList.remove("btn-danger");
+                                                            btn.classList.add("btn-dark");
+                                                        }
+
+                                                    })
+                                                })
+
+                                            }
+                                        })
+                                    }
                                 }
-                            }
-                        })
+                            })
                     })
                     //  Products list table should have add option 
                 })
 
             })
+
+            function ItemSelection(index) {
+                metadata = products[index].product_metadata;
+                let btn = document.getElementById(`selection-btn-${index}`);
+                let btnState = btn.innerText;
+                if (btnState.includes("Deselect")) {
+                    //deselect items that are selected
+                    metadata.forEach(pi => {
+                        let checkBox = document.getElementById(`${pi.id}`);
+                        if (checkBox) {
+                            if (checkBox.checked) {
+                                checkBox.checked = false;
+                                //decrease total_return_item by 1
+                                total_returned_items -= 1;
+                                //increase total_return_value by sales_price
+                                total_returned_values -= pi.max_retail_price;
+                            }
+                        }
+                    })
+                    btn.innerText = "Select All";
+                    btn.classList.remove("btn-danger");
+                    btn.classList.add("btn-dark");
+                } else {
+                    //select items that are deselect
+                    metadata.forEach(pi => {
+                        let checkBox = document.getElementById(`${pi.id}`)
+                        if (checkBox) {
+                            if (!checkBox.checked) {
+                                checkBox.checked = true;
+                                //increase total_return_item by 1
+                                total_returned_items += 1;
+
+                                //increse total_return_value by sales_price
+                                total_returned_values += pi.max_retail_price;
+                            }
+                        }
+                    })
+                    btn.innerText = "Deselect All";
+                    btn.classList.remove("btn-dark");
+                    btn.classList.add("btn-danger");
+
+                }
+                document.getElementById("total_return_items").value = total_returned_items;
+                document.getElementById("total_return_values").value = total_returned_values;
+
+
+            }
         </script>
 
 </body>
