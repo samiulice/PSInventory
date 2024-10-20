@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -1238,7 +1239,7 @@ func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.
 	//get metadata from product_serial_numbers
 	query := `
 			SELECT
-				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+				id, serial_number, product_id, purchase_history_id, status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
 			FROM
 				public.product_serial_numbers
 			WHERE
@@ -1257,7 +1258,7 @@ func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.
 			&pm.ProductID,
 			&pm.PurchaseHistoryID,
 			&pm.Status,
-			&pm.Warranty,
+			&pm.WarrantyPeriod,
 			&pm.MaxRetailPrice,
 			&pm.PurchaseRate,
 			&pm.CreatedAt,
@@ -1290,7 +1291,7 @@ func (p *postgresDBRepo) GetInStockItemDetailsBySerialNumber(serialNumber string
 	//get metadata from product_serial_numbers
 	query := `
 		SELECT
-			id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+			id, serial_number, product_id, purchase_history_id, status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
 		FROM
 			public.product_serial_numbers
 		WHERE
@@ -1303,7 +1304,7 @@ func (p *postgresDBRepo) GetInStockItemDetailsBySerialNumber(serialNumber string
 		&metadata.ProductID,
 		&metadata.PurchaseHistoryID,
 		&metadata.Status,
-		&metadata.Warranty,
+		&metadata.WarrantyPeriod,
 		&metadata.MaxRetailPrice,
 		&metadata.PurchaseRate,
 		&metadata.CreatedAt,
@@ -1333,7 +1334,7 @@ func (p *postgresDBRepo) GetSoldItemDetailsBySerialNumber(serialNumber string) (
 	//get metadata from product_serial_numbers
 	query := `
 		SELECT
-			id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+			id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty_status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
 		FROM
 			public.product_serial_numbers
 		WHERE
@@ -1347,7 +1348,8 @@ func (p *postgresDBRepo) GetSoldItemDetailsBySerialNumber(serialNumber string) (
 		&metadata.PurchaseHistoryID,
 		&metadata.SalesHistoryID,
 		&metadata.Status,
-		&metadata.Warranty,
+		&metadata.WarrantyStatus,
+		&metadata.WarrantyPeriod,
 		&metadata.MaxRetailPrice,
 		&metadata.PurchaseRate,
 		&metadata.CreatedAt,
@@ -1377,7 +1379,7 @@ func (p *postgresDBRepo) GetItemDetailsBySerialNumber(serialNumber string) (*mod
 	//get metadata from product_serial_numbers
 	query := `
 		SELECT
-			id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+			id, serial_number, product_id, purchase_history_id, status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
 		FROM
 			public.product_serial_numbers
 		WHERE
@@ -1390,7 +1392,7 @@ func (p *postgresDBRepo) GetItemDetailsBySerialNumber(serialNumber string) (*mod
 		&metadata.ProductID,
 		&metadata.PurchaseHistoryID,
 		&metadata.Status,
-		&metadata.Warranty,
+		&metadata.WarrantyPeriod,
 		&metadata.MaxRetailPrice,
 		&metadata.PurchaseRate,
 		&metadata.CreatedAt,
@@ -1564,7 +1566,7 @@ func (p *postgresDBRepo) GetInstockProductListByPurchaseIDAndProductID(purchaseI
 	//get metadata from product_serial_numbers
 	query := `
 			SELECT
-				id, serial_number, product_id, purchase_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+				id, serial_number, product_id, purchase_history_id, status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
 			FROM
 				public.product_serial_numbers
 			WHERE
@@ -1583,7 +1585,7 @@ func (p *postgresDBRepo) GetInstockProductListByPurchaseIDAndProductID(purchaseI
 			&pm.ProductID,
 			&pm.PurchaseHistoryID,
 			&pm.Status,
-			&pm.Warranty,
+			&pm.WarrantyPeriod,
 			&pm.MaxRetailPrice,
 			&pm.PurchaseRate,
 			&pm.CreatedAt,
@@ -1616,7 +1618,7 @@ func (p *postgresDBRepo) GetSoldProductListBySalesIDAndProductID(salesID, produc
 	//get metadata from product_serial_numbers
 	query := `
 			SELECT
-				id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty, max_retail_price, purchase_rate, created_at, updated_at
+				id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
 			FROM
 				public.product_serial_numbers
 			WHERE
@@ -1636,7 +1638,7 @@ func (p *postgresDBRepo) GetSoldProductListBySalesIDAndProductID(salesID, produc
 			&pm.PurchaseHistoryID,
 			&pm.SalesHistoryID,
 			&pm.Status,
-			&pm.Warranty,
+			&pm.WarrantyPeriod,
 			&pm.MaxRetailPrice,
 			&pm.PurchaseRate,
 			&pm.CreatedAt,
@@ -1890,10 +1892,10 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.Warranty, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.WarrantyPeriod, createdAt, updatedAt))
 	}
 
-	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,max_retail_price,purchase_rate,warranty,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
+	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,max_retail_price,purchase_rate,warranty_period,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
 	// Execute the query
 	_, err = tx.ExecContext(ctx, query)
 	if err != nil {
@@ -1993,7 +1995,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 	return nil
 }
 
-// /ReturnProductUnitsToSupplier updates database
+// ReturnProductUnitsToSupplier updates database
 func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionDate string, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -2039,6 +2041,62 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionD
 	}
 
 	return id, nil
+}
+
+// AddNewWarrantyClaim handles database opetions for completing claim warranty procedues
+func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contactNumber, reportedProblem, receivedBy string) error {
+	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancle()
+	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
+	query := `
+		INSERT INTO public.warranty_history(product_serial_id, previous_serial_number, contact_number, request_date, reported_problem, received_by, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
+	`
+	// Get the current time
+	currentTime := time.Now()
+	// Format the date into mm/dd/yyyy
+	formattedDateStr := currentTime.Format("01/02/2006")
+	var id int
+	err := p.DB.QueryRowContext(ctx, query,
+		serialID,
+		serialNumber,
+		contactNumber,
+		formattedDateStr,
+		reportedProblem,
+		receivedBy,
+		currentTime,
+		currentTime,
+	).Scan(&id)
+
+	if err != nil {
+		return err
+	}
+	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
+	query = `
+    UPDATE public.product_serial_numbers
+    SET latest_warranty_id = $1, 
+        warranty_history_ids = warranty_history_ids || $2, 
+        updated_at = $3
+    WHERE id = $4
+`
+
+	// Convert the `id` (int) to a string for concatenation.
+	textId := strconv.Itoa(id) // Converting the integer id to a string
+
+	result, err := p.DB.ExecContext(ctx, query, id, textId, currentTime, serialID)
+	if err != nil {
+		return err
+	}
+
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows == 0 {
+		return errors.New("DBERROR:AddNewWarrantyClaim::no row affected when trying to update product_serial_numbers table")
+	}
+
+	return nil
 }
 
 // Helper functions

@@ -160,18 +160,21 @@ type Product struct {
 
 // ProductMetadata holds products meta data
 type ProductMetadata struct {
-	ID                int       `json:"id,omitempty"`
-	SerialNumber      string    `json:"serial_number,omitempty"`
-	ProductID         int       `json:"product_id,omitempty"`
-	PurchaseHistoryID int       `json:"purchase_history_id,omitempty"`
-	SalesHistoryID    int       `json:"sales_history_id,omitempty"`
-	Status            string    `json:"status,omitempty"`
-	Warranty          int       `json:"warranty,omitempty"`
-	MaxRetailPrice    int       `json:"max_retail_price,omitempty"` //max_retail_price = total_amount+profit/quantity_purchased
-	PurchaseRate      int       `json:"purchase_rate,omitempty"`    //purchase_rate = total_amount/quantity_purchased
-	SaleRate      int       `json:"sale_rate,omitempty"`    
-	CreatedAt         time.Time `json:"created_at,omitempty"`
-	UpdatedAt         time.Time `json:"updated_at,omitempty"`
+	ID                     int       `json:"id,omitempty"`
+	SerialNumber           string    `json:"serial_number,omitempty"`
+	ProductID              int       `json:"product_id,omitempty"`
+	PurchaseHistoryID      int       `json:"purchase_history_id,omitempty"`
+	SalesHistoryID         int       `json:"sales_history_id,omitempty"`
+	Status                 string    `json:"status,omitempty"`
+	WarrantyPeriod         int       `json:"warranty,omitempty"`
+	WarrantyStatus         string    `json:"warranty_status,omitempty"`
+	LatesWarrantyHistoryID int       `json:"latest_warranty_history_id,omitempty"`
+	WarrantyHistoryIDs     string    `json:"warranty_history_ids,omitempty"`
+	MaxRetailPrice         int       `json:"max_retail_price,omitempty"` //max_retail_price = total_amount+profit/quantity_purchased
+	PurchaseRate           int       `json:"purchase_rate,omitempty"`    //purchase_rate = total_amount/quantity_purchased
+	SaleRate               int       `json:"sale_rate,omitempty"`
+	CreatedAt              time.Time `json:"created_at,omitempty"`
+	UpdatedAt              time.Time `json:"updated_at,omitempty"`
 }
 
 // Purchase is the type for purchase info
@@ -190,7 +193,7 @@ type Purchase struct {
 	Note              string    `json:"note,omitempty"`
 	MaxRetailPrice    int       `json:"max_retail_price,omitempty"`
 	PurchaseRate      int       `json:"purchase_rate,omitempty"`
-	Warranty          int       `json:"warranty,omitempty"`
+	WarrantyPeriod    int       `json:"warranty,omitempty"`
 	BillAmount        int       `json:"bill_amount,omitempty"`
 	Discount          int       `json:"discount,omitempty"`
 	TotalAmount       int       `json:"total_amount,omitempty"`

@@ -1000,28 +1000,36 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 // ClaimWarrantyBySerialID handels claiming warranty process for a specific product item with serial ID
 func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
-		SerialID int `json:"serial_id"`
+		ReportedProblem string          `json:"reported_problem"`
+		ContactNumber   string          `json:"contact_number"`
+		ReceivedBy      string          `json:"received_by"`
+		Product         *models.Product `json:"product_item_details"`
 	}
-// 	when requested for warranty:
-// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_number = current_serial_number
-// 	step-2 : update warranty_count = 1, updated_at = time.Now() in product_serial_number
 
-// When warranty product delivared
-// 	step-1 set serial_number = new product serial number to the prodcut_serial_number for serial id
-// 	step-1 search serial_id in warranty_history and set status = warranty_checkout, updated_at==delivary_date=time.now
 	err := app.readJSON(w, r, &payload)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("handler Error - ClaimWarrantyBySerialID: %w", err))
+		app.badRequest(w, fmt.Errorf("handler Error - ClaimWarrantyBySerialID => readJSON: %w", err))
 		return
 	}
 
+	// 	when requested for warranty:
+	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
+	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
+
+	err = app.DB.AddNewWarrantyClaim(payload.Product.ProductMetadata[0].ID, payload.Product.ProductMetadata[0].SerialNumber, payload.ContactNumber, payload.ReportedProblem, payload.ReceivedBy)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("handler Error - ClaimWarrantyBySerialID => AddNewWarrantyClaim: %w", err))
+		return
+	}
 	var resp struct {
-		Error   bool   `json:"error,omitempty"`
-		Message string `json:"message,omitempty"`
+		Error   bool            `json:"error,omitempty"`
+		Message string          `json:"message,omitempty"`
+		Item    *models.Product `json:"product_item"`
 	}
 
 	resp.Error = false
 	resp.Message = "Added for warranty"
+	resp.Item = payload.Product
 
 	app.writeJSON(w, http.StatusOK, resp)
 }

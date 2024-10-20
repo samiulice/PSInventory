@@ -107,42 +107,42 @@
                 </li>
                 <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                      <li>
-                        <a>Account Reports<span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                          <li class="sub_menu"><a href="#transaction-history.html">Transaction History</a></li>
-                          <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
-                          <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                          <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
-                          <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
-                          <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
-                          <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
-                          <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
-                          <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
-                          <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
-                          <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
-                          <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
-                        <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                          <li class="sub_menu"><a href="category-list.html">Category List</a></li>
-                          <li class="sub_menu"><a href="product-list.html">Product List</a></li>
-                          <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
-                          <li class="sub_menu"><a href="service-list.html">Service List</a></li>
-                          <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
-                          <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
-                          <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
-                          <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
-                          <li class="sub_menu"><a href="service-history.html">Service History</a></li>
-                          </li>
-                        </ul>
-                      </li>
-                      </li>
+                    <li>
+                      <a>Account Reports<span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li class="sub_menu"><a href="#transaction-history.html">Transaction History</a></li>
+                        <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
+                        <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
+                        <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
+                        <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
+                        <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
+                        <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
+                        <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
+                        <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
+                        <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
+                        <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
+                        <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
+                    </li>
                   </ul>
-                </li> 
+                </li>
+                <li>
+                  <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li class="sub_menu"><a href="category-list.html">Category List</a></li>
+                    <li class="sub_menu"><a href="product-list.html">Product List</a></li>
+                    <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
+                    <li class="sub_menu"><a href="service-list.html">Service List</a></li>
+                    <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                    <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
+                    <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
+                    <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
+                    <li class="sub_menu"><a href="service-history.html">Service History</a></li>
+                </li>
+              </ul>
+              </li>
+              </li>
+              </ul>
+              </li>
               </ul>
             </div>
 
@@ -389,7 +389,7 @@
                 viewItemsInfoContainer.innerHTML = `
                 <div class="row">
                   <div class="col-md-12 col-sm-12 col-xs-12 text-center">
-                    <h5 style="background-color: rgb(168, 224, 220); padding: 5px;">Product Unsold. Please enter correct serial number</h5>
+                    <label style="background-color: rgb(168, 224, 220); padding: 5px;">${data.message}</label>
                   </div>
                 </div>
                 `
@@ -412,7 +412,10 @@
         document.getElementById("submitBtn").classList.add("d-none");
 
         let warrantyClaimBody = {
-          product_serial_id: product.product_metadata[0].id
+          reported_problem: document.getElementById("reported-problem").value,
+          contact_number: document.getElementById("contact-number").value,
+          received_by: document.getElementById("received-by").value,
+          product_item_details: product
         }
         console.log(warrantyClaimBody);
         const requestOptions = {
@@ -432,7 +435,7 @@
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
-               document.getElementById("claim-warranty-btn-div").innerHTML = `<button type="button" id="generate-invoice" class="btn btn-info">Generate Invoice</button>`
+              document.getElementById("claim-warranty-btn-div").innerHTML = `<button type="button" id="generate-invoice" class="btn btn-info">Generate Invoice</button>`
             }
             // setTimeout(() => {
             //   location.reload();
@@ -446,6 +449,47 @@
     function updateViewItemsInfoContainer(status) {
       let salePrice = Math.round(product.product_metadata[0].max_retail_price * (1.00 - parseFloat(salesHistory.discount) / 100.0));
       let [warranty, period] = checkWarranty(salesHistory.sale_date, product.product_metadata[0].warranty, "/");
+      let additional_info = '';
+      if (warranty) {
+        additional_info = `
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="row form-group has-feedback">
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <label for="contact-number">Contact Number :</label>
+                <input type="tel" pattern="[0]{1}[1]{1}[3-9]{1}[0-9]{8}" class="form-control has-feedback-left" id="contact-number" placeholder="Customer contact number (Optional)">
+                <i style="color: rgba(0, 0, 0, 1);" class="fa fa-phone form-control-feedback left"
+                  aria-hidden="true">
+                </i>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <label for="received-by">Received By :</label>
+                <input type="text" class="form-control has-feedback-left" id="received-by" placeholder="Employee Name (Optional)">
+                <i style="color: rgba(0, 0, 0, 1);" class="fa fa-user form-control-feedback left"
+                  aria-hidden="true">
+                </i>
+              </div>
+            </div>
+            <div class="row form-group has-feedback">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                  <label for="reported-problem">Problem Description * :</label>
+                  <textarea rows="2" cols="50" class="form-control has-feedback-left" id="reported-problem"
+                    placeholder="Describe reported problem" required></textarea>
+              </div>              
+            </div> 
+          </div>
+        `
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
+          <button type="submit" id="submitBtn" class="btn btn-dark">Claim Warranty</button>
+        `
+      } else if (product.product_metadata[0].warranty_status === "in progress") {
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
+          <h4 style="color: white; background-color: rgb(156, 10, 10); padding: 5px;">Warranty has already been claimed</h4>
+        `
+      } else {
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
+          <h4 style="color: white; background-color: rgb(156, 10, 10); padding: 5px;">Warranty has expired</h4>
+        `
+      }
       document.getElementById("view-items-info-container").innerHTML = `
         <div class="row">
           <div class="col-md-6 col-sm-6 col-xs-12">
@@ -466,7 +510,7 @@
                   <td><b>${product.product_name}</b></td>
                 </tr>
                 <tr>
-                  <td>Name:</td>
+                  <td>Serial Number:</td>
                   <td><b>${product.product_metadata[0].serial_number}</b></td>
                 </tr>
                 <tr>
@@ -508,7 +552,7 @@
                 </tr>
                 <tr>
                   <td>Due Payment:</td>
-                  <td><b>${customer.amount_payable ? customer.amount_payable : ""}</b></td>
+                  <td><b>${customer.amount_payable ? customer.amount_payable : "0 TK"}</b></td>
                 </tr>
                 <tr>
                   <td></td>
@@ -517,17 +561,9 @@
               </tbody>
             </table>
           </div>
+          ${additional_info}
         </div>
       `
-      if (warranty) {
-        document.getElementById("claim-warranty-btn-div").innerHTML = `
-          <button type="submit" id="submitBtn" class="btn btn-dark">Claim Warranty</button>
-        `
-      } else {
-        document.getElementById("claim-warranty-btn-div").innerHTML = `
-          <h4 style="color: white; background-color: rgb(156, 10, 10); padding: 5px;">Warranty has expired</h4>
-        `
-      }
     }
 
   </script>
