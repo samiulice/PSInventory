@@ -2052,3 +2052,14 @@ func (p *postgresDBRepo) CountRows(tableName string) (int, error) {
 	err := p.DB.QueryRowContext(ctx, query).Scan(&c)
 	return c, err
 }
+
+// LastIndex returns the last index of a given database table
+func (p *postgresDBRepo) LastIndex(tableName string) (int, error) {
+	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancle()
+
+	var lastId int
+	query := "SELECT MAX(id) AS last_id FROM " + tableName
+	err := p.DB.QueryRowContext(ctx, query).Scan(&lastId)
+	return lastId, err
+}

@@ -1,22 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vertical Line with Dynamic Height</title>
     <link rel="stylesheet" href="./assets/css/custom.min.css">
 </head>
-<body>
 
-        <div>
-            <p>Content 1</p>
-            <p>This can have multiple lines of text.</p>
-        </div>
-        <div></div>
-        <div class="vertical-dotted-line">
-            <p>Content 2</p>
-            <p>This side can also have different content.</p>
-        </div>
+<body>
+    <div style="scale: 0.5;"></div>
+
+    <script>
+        function daysBetween(givenDate, separator = '-', format = 'mm-dd-yyyy') {
+            // Split the given date using the specified separator
+            const parts = givenDate.split(separator);
+
+            let day, month, year;
+
+            // Assign values based on the specified format
+            if (format === 'mm-dd-yyyy') {
+                month = parseInt(parts[0]) - 1; // Month (0-based)
+                day = parseInt(parts[1]);
+                year = parseInt(parts[2]);
+            } else if (format === 'dd-mm-yyyy') {
+                day = parseInt(parts[0]);
+                month = parseInt(parts[1]) - 1; // Month (0-based)
+                year = parseInt(parts[2]);
+            } else if (format === 'yyyy-mm-dd') {
+                year = parseInt(parts[0]);
+                month = parseInt(parts[1]) - 1; // Month (0-based)
+                day = parseInt(parts[2]);
+            } else {
+                throw new Error('Unsupported date format. Use mm-dd-yyyy, dd-mm-yyyy, or yyyy-mm-dd.');
+            }
+
+            const date = new Date(year, month, day);
+
+            // Get today's date
+            const today = new Date();
+
+            // Calculate the difference in milliseconds
+            const differenceInTime = today - date;
+
+            // Convert milliseconds to days
+            const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+
+            return differenceInDays;
+        }
+
+        // Example usage:
+        const givenDate = '10-19-2024'; // mm-dd-yyyy format
+        const days = daysBetween(givenDate, '-', 'mm-dd-yyyy');
+        console.log(`Days between ${givenDate} and today: ${days}`);
+
+
+    </script>
 
 </body>
+
 </html>

@@ -35,6 +35,28 @@ function paginator(currPageIndex, pageSize, totalRecords) {
   }
 }
 
+/**
+ * Generates a serial number in the format MM-hhmmss-ddmmyy-rand(digit6 int).
+ * 
+ * The serial number consists of:
+ * - MM: Current month (01-12)
+ * - hhmmss: Current time in hours, minutes, and seconds (24-hour format)
+ * - ddmmyy: Current date in day, month, and last two digits of the year
+ * - rand(digit6 int): A random 6-digit integer
+ *
+ * @returns {string} The formatted serial number.
+ */
+function generateSerialNumber(lastIndex) {
+  // Generate a random 6-digit number (from 100000 to 999999)
+  const randomSixDigit = String(Math.floor(100000 + Math.random() * 900000));
+
+  // Combine all parts into the desired format
+  const serialNumber = `MM-${randomSixDigit}${lastIndex}`;
+
+  return serialNumber; // Return the formatted serial number
+}
+
+
 /*formatDate returns formattedDate for the given time, 
 if format = "date", returns date only, 
 if format = "time", returns time only 
@@ -56,7 +78,7 @@ function formatDate(time, format, separator) {
   const seconds = pad(date.getSeconds());
 
   //fix separator
-  if(separator === "") {
+  if (separator === "") {
     separator = `/`
   }
   // Format the date
@@ -70,6 +92,89 @@ function formatDate(time, format, separator) {
   }
   return formattedDate
 }
+
+function stringToDate(dateString, separator = '-', format = 'mm-dd-yyyy') {
+  // Split the date string using the specified separator
+  const parts = dateString.split(separator);
+
+  let day, month, year;
+
+  // Assign values based on the specified format
+  if (format === 'mm-dd-yyyy') {
+    month = parseInt(parts[0]) - 1; // Month (0-based)
+    day = parseInt(parts[1]);
+    year = parseInt(parts[2]);
+  } else if (format === 'dd-mm-yyyy') {
+    day = parseInt(parts[0]);
+    month = parseInt(parts[1]) - 1; // Month (0-based)
+    year = parseInt(parts[2]);
+  } else if (format === 'yyyy-mm-dd') {
+    year = parseInt(parts[0]);
+    month = parseInt(parts[1]) - 1; // Month (0-based)
+    day = parseInt(parts[2]);
+  } else {
+    throw new Error('Unsupported date format. Use mm-dd-yyyy, dd-mm-yyyy, or yyyy-mm-dd.');
+  }
+
+  // Create and return a Date object
+  return new Date(year, month, day);
+}
+
+// Example usage:
+//const dateString = '01-10-2023'; // mm-dd-yyyy format
+//const dateObj = stringToDate(dateString, '-', 'mm-dd-yyyy');
+//console.log(dateObj); // Outputs: Tue Oct 01 2023 ...
+
+function checkWarranty(soldDate, warrantyPeriodInDays, separator = '-', format = 'mm-dd-yyyy') {
+  // Convert the sold date string to a Date object
+  const parts = soldDate.split(separator);
+  let day, month, year;
+
+  // Assign values based on the specified format
+  if (format === 'mm-dd-yyyy') {
+    month = parseInt(parts[0]) - 1; // Month (0-based)
+    day = parseInt(parts[1]);
+    year = parseInt(parts[2]);
+  } else if (format === 'dd-mm-yyyy') {
+    day = parseInt(parts[0]);
+    month = parseInt(parts[1]) - 1; // Month (0-based)
+    year = parseInt(parts[2]);
+  } else if (format === 'yyyy-mm-dd') {
+    year = parseInt(parts[0]);
+    month = parseInt(parts[1]) - 1; // Month (0-based)
+    day = parseInt(parts[2]);
+  } else {
+    throw new Error('Unsupported date format. Use mm-dd-yyyy, dd-mm-yyyy, or yyyy-mm-dd.');
+  }
+
+  const soldDateObj = new Date(year, month, day);
+
+  // Calculate warranty expiration date
+  const warrantyExpirationDate = new Date(soldDateObj);
+  warrantyExpirationDate.setDate(soldDateObj.getDate() + warrantyPeriodInDays);
+
+  // Get today's date at midnight
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set time to midnight
+
+  // Calculate the difference in milliseconds
+  const differenceInTime = warrantyExpirationDate - today;
+  const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+
+  warrantyAvailability = false;
+  // Check if warranty is available
+  if (differenceInDays > 0) {
+    warrantyAvailability = true;
+  } 
+  return [warrantyAvailability, differenceInDays]
+}
+
+// Example usage:
+const soldDate = '01-10-2022'; // mm-dd-yyyy format
+const warrantyPeriod = 365; // 1 year warranty
+const result = checkWarranty(soldDate, warrantyPeriod, '-', 'mm-dd-yyyy');
+console.log(result);
+
 
 //Define Division List
 // const divisionList = ["Barisal", "Chattogram", "Dhaka", "Khulna", "Mymensingh", "Rajshahi", "Rangpur", "Sylhet"]

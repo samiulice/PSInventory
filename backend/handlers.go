@@ -877,10 +877,6 @@ func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Re
 
 // GetSalePageDetails scrape data from the database to initialize sale page
 func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Request) {
-	//customer
-	//category
-	//product
-	//account
 	var resp struct {
 		Error        bool                  `json:"error,omitempty"`
 		Message      string                `json:"message,omitempty"`
@@ -889,6 +885,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		Brands       []*models.Brand       `json:"brands,omitempty"`
 		Products     []*models.Product     `json:"products,omitempty"`
 		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
+		LastIndex    int                   `json:"last_index,omitempty"`
 	}
 
 	//retrive suppliers from the database
@@ -931,6 +928,11 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		app.badRequest(w, err) //send error response
 		return
 	}
+	lastIndex, err := app.DB.LastIndex("sales_history")
+	if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
 
 	//TODO: Retrive accounts and send to frontend
 	resp.Error = false
@@ -940,6 +942,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 	resp.Brands = brands
 	resp.Products = products
 	resp.HeadAccounts = headAccounts
+	resp.LastIndex = lastIndex
 
 	app.writeJSON(w, http.StatusOK, resp)
 }

@@ -238,142 +238,43 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>WARRANTY CLAIM</label></h2>
+        <h2 class="text-center text-warning fa-2x"><label>WARRANTY CHECK</label></h2>
 
         <!-- Page content here -->
-        <form action="#" id="warranty-claim-form">
-          <!-- View items Secetion  -->
-          <div class="x_panel bg-gw">
-            <div class="x_title">
-              <div class="col-md-4 col-sm-4 col-xs-12">
-                <h2>Search Product</h2>
-              </div>
-              <div class="col-md-8 col-sm-6 col-xs-12 form-group pull-right top_search">
-                <div class="input-group">
-                  <input type="text" class="form-control" id="search-by-serial-number"
-                    placeholder="Search item by serial number">
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" id="search-btn"><i class="fa fa-arrow-right">
-                      </i>&nbsp;</button>
-                  </span>
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <form action="#" id="warranty-claim-form">
+            <!-- View items Secetion  -->
+            <div class="x_panel bg-gw">
+              <div class="x_title">
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                  <h2>Search Product</h2>
                 </div>
-              </div>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content" id="view-items-info-container">
-              <div class="row">
-                <div class="col-md-6 col-sm-6 col-xs-6">
-                  <!-- Table row -->
-                  <table class="table table-striped">
-                    <caption>Product Information</caption>
-                    <tbody>
-                      <tr>
-                        <td>Code:</td>
-                      </tr>
-                      <tr>
-                        <td>Name:</td>
-                      </tr>
-                      <tr>
-                        <td>Category:</td>
-                      </tr>
-                      <tr>
-                        <td>Brand:</td>
-                      </tr>
-                      <tr>
-                        <td>Sale Price:</td>
-                      </tr>
-                      <tr>
-                        <td>Sale Date:</td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="col-md-6 col-sm-6 col-xs-8 form-group pull-right top_search">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="search-by-serial-number"
+                      placeholder="Search item by serial number">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button" id="search-btn"><i class="fa fa-arrow-right">
+                        </i>&nbsp;</button>
+                    </span>
+                  </div>
                 </div>
-
-                <div class="col-md-5 col-sm-5 col-xs-5">
-                  <!-- Table row -->
-                  <table class="table table-striped">
-                    <caption>Customer Information</caption>
-                    <tbody>
-                      <tr>
-                        <td>Code:</td>
-                      </tr>
-                      <tr>
-                        <td>Account Name:</td>
-                      </tr>
-                      <tr>
-                        <td>Contact Person:</td>
-                      </tr>
-                      <tr>
-                        <td>Mobile:</td>
-                      </tr>
-                      <tr>
-                        <td>Due Payment:</td>
-                      </tr>
-                      <tr>
-                        <td>Location:</td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content col-md-12 col-sm-12 col-xs-12" id="view-items-info-container">
+                <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                  <b class="text-info">Enter serial number on the search bar</b>
+                  <!-- DOM JS -->
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                  <h4>Warranty:</h4>
+                <div class="col-md-12 col-sm-12 col-xs-12 text-center" id="claim-warranty-btn-div">
+                  <!-- DOM JS -->
                 </div>
               </div>
             </div>
-          </div>
-          <div class="row">
-            <!-- Selected items Secetion  -->
-            <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel bg-gw">
-                <div class="x_title">
-                  <h2>Selected Products</h2>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content" id="selected-items-info">
-                  <!-- Table row -->
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th class="text-center">Product Name</th>
-                        <th class="text-center">Category</th>
-                        <th class="text-center">Brand</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-center">Serial #</th>
-                        <th class="text-center">MRP</th>
-                        <th class="text-center">Discount</th>
-                        <th class="text-center">Total Amount</th>
-                        <th class="text-center">Remove</th>
-                      </tr>
-                    </thead>
-                    <tbody id="selected-items-info-container">
-                      <!-- DOM JS -->
-                    </tbody>
-                    <div class="clearfix"></div>
-                  </table>
-
-                  <!-- /.col -->
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
-              <br>
-              <button type="submit" id="submitBtn" class="btn btn-round btn-success">Save</button>
-              <a href="javascript:void(0);" id="processingBtn"
-                class="btn btn-round btn-success d-none">Processing...</a>
-              <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-round btn-success">Generate Invoice</a>
-            </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div> <!-- /page content -->
     </div> <!-- /page content -->
   </div> <!-- /page content -->
@@ -432,7 +333,7 @@
       let selectedProductListContainer = document.getElementById("selected-items-info-container");
       document.getElementById('search-btn').addEventListener("click", e => {
         let payload = {
-          product_serial_number: document.getElementById('search-by-serial-number')
+          product_serial_number: document.getElementById('search-by-serial-number').value.trim()
         }
         console.log("payload: ", payload);
         const requestOptions = {
@@ -451,12 +352,24 @@
               showErrorMessage(data.message)
             } else {
               //update ViewProductListContainer
-              product = data.product_item;
-              customer = data.customer;
-              salesHistory = data.sales_history;
-              updateViewItemsInfoContainer(true);
+              if (data.message === 'Product item not sold yet') {
+                document.getElementById("claim-warranty-btn-div").innerHTML = "";
+                viewItemsInfoContainer.innerHTML = `
+                <div class="row">
+                  <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                    <h5 style="background-color: rgb(168, 224, 220); padding: 5px;">Product Unsold. Please enter correct serial number</h5>
+                  </div>
+                </div>
+                `
+              } else {
+                product = data.product_item;
+                customer = data.customer;
+                salesHistory = data.sales_history;
+                updateViewItemsInfoContainer(true);
+              }
             }
           }) //End of fetch statement
+        document.getElementById('search-by-serial-number').value = "";
       })
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -466,36 +379,20 @@
         event.stopPropagation();
         document.getElementById("submitBtn").classList.add("d-none");
 
-        // Select all span elements with the class 'serial-number'
-        const serialNumbers = document.querySelectorAll('.serial-number');
-        // Extract the text content of each span
-        const serialNumberValues = Array.from(serialNumbers).map(span => span.textContent);
-
-        let sale_details = {
-          sale_date: document.getElementById("single_cal4").value,
-          customer_id: parseInt(document.getElementById("customer").value),
-          account_id: parseInt(document.getElementById("account").value),
-          chalan_no: document.getElementById("chalan_no").value,
-          memo_no: document.getElementById("memo_no").value,
-          note: document.getElementById("note").value,
-          products_serial_no: serialNumberValues,
-          selected_items: selected_products,
-          bill_amount: parseInt(document.getElementById("bill-amount").value),
-          discount: parseInt(document.getElementById("discount").value),
-          total_amount: parseInt(document.getElementById("total-amount").value),
-          paid_amount: parseInt(document.getElementById("paid-amount").value),
+        let warrantyClaimBody = {
+          product_serial_id: product.product_metadata[0].id
         }
-        console.log(sale_details);
+        console.log(warrantyClaimBody);
         const requestOptions = {
           method: 'post',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(sale_details),
+          body: JSON.stringify(warrantyClaimBody),
         }
 
-        fetch('http://localhost:4321/api/inventory/sale-products', requestOptions)
+        fetch('http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id', requestOptions)
           .then(response => response.json())
           .then(data => {
             console.log("Sale Products: ", data)
@@ -503,6 +400,7 @@
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+               document.getElementById("claim-warranty-btn-div").innerHTML = `<button type="button" id="generate-invoice" class="btn btn-info">Generate Invoice</button>`
             }
             // setTimeout(() => {
             //   location.reload();
@@ -513,299 +411,100 @@
     //End of Window.addEventListener
 
 
-    function updateViewItemsInfoContainer(items, status) {
-      let productMetadata = items.product_metadata;
-      let qty = 0;
-      if (productMetadata) {
-        qty = productMetadata.length;
-      }
-
+    function updateViewItemsInfoContainer(status) {
+      let salePrice = Math.round(product.product_metadata[0].max_retail_price * (1.00 - parseFloat(salesHistory.discount) / 100.0));
+      let [warranty, period] = checkWarranty(salesHistory.sale_date, product.product_metadata[0].warranty, "/");
       document.getElementById("view-items-info-container").innerHTML = `
         <div class="row">
-          <div class="col-md-6 col-sm-6 col-xs-6">
+          <div class="col-md-6 col-sm-6 col-xs-12">
             <!-- Table row -->
             <table class="table table-striped">
               <caption>Product Information</caption>
               <tbody>
                 <tr>
                   <td>Code:</td>
-                  <td>${product.product_code}</td>
+                  <td>
+                    <b>${product.product_code}</b>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <button type="button" id="product-details-btn" class="btn btn-dark btn-xs">See Details</button></b>
+                  </td>
                 </tr>
                 <tr>
                   <td>Name:</td>
-                  <td>${product.product_name}</td>
+                  <td><b>${product.product_name}</b></td>
                 </tr>
                 <tr>
-                  <td>Category:</td>
-                  <td>${product.category.name}:</td>
-                </tr>
-                <tr>
-                  <td>Brand:</td>
-                  <td>${product.brand.name}:</td>
+                  <td>Name:</td>
+                  <td><b>${product.product_metadata[0].serial_number}</b></td>
                 </tr>
                 <tr>
                   <td>Sale Price:</td>
-                  <td>${salesHistory.kldfsa}</td>
+                  <td><b>${salePrice}</b></td>
                 </tr>
                 <tr>
                   <td>Sale Date:</td>
-                  <td>Sale Date:</td>
+                  <td><b>${formatDate(salesHistory.sale_date, "date", "-")}</b></td>
                 </tr>
                 <tr>
+                  <td></td>
                   <td></td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="col-md-5 col-sm-5 col-xs-5">
+          <div class="col-md-6 col-sm-6 col-xs-12">
             <!-- Table row -->
             <table class="table table-striped">
               <caption>Customer Information</caption>
               <tbody>
                 <tr>
                   <td>Code:</td>
+                  <td><b>${customer.account_code}&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" id="customer-details-btn" class="btn btn-dark btn-xs">See Details</button></b></td>
                 </tr>
                 <tr>
                   <td>Account Name:</td>
+                  <td><b>${customer.account_name}</b></td>
                 </tr>
                 <tr>
                   <td>Contact Person:</td>
+                  <td><b>${customer.contact_person}</b></td>
                 </tr>
                 <tr>
                   <td>Mobile:</td>
+                  <td><b>${customer.mobile}</b></td>
                 </tr>
                 <tr>
                   <td>Due Payment:</td>
+                  <td><b>${customer.amount_payable ? customer.amount_payable : ""}</b></td>
                 </tr>
                 <tr>
-                  <td>Location:</td>
-                </tr>
-                <tr>
+                  <td></td>
                   <td></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-12 col-sm-12 col-xs-12">
-            <h4>Warranty:</h4>
-          </div>
-        </div>
       `
-
-    }
-
-
-    // Function to remove a product by product_id
-    function removeProduct(productIdToRemove) {
-      selected_products = selected_products.filter(item => item.product_id !== productIdToRemove);
-    }
-    function removeSerialNumber(productId, serialNumberToRemove) {
-      // Find the product by product_id
-      const p = selected_products.find(item => item.product_id === productId);
-
-      if (p) {
-        // Filter out the serial number to remove
-        p.serialNumbers = p.serialNumbers.filter(
-          serialNumber => serialNumber !== serialNumberToRemove
-        );
+      if (warranty) {
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
+          <button type="submit" id="submitBtn" class="btn btn-dark">Claim Warranty</button>
+        `
       } else {
-        console.log(`Product with ID ${productId} not found.`);
-      }
-    }
-    function insertSerialNumber(productId, newSerialNumber) {
-      // Find the product by product_id
-      const p = selected_products.find(item => item.product_id === productId);
-
-      if (p) {
-        // Check if the new serial number already exists
-        if (!p.serialNumbers.includes(newSerialNumber)) {
-          p.serialNumbers.push(newSerialNumber);
-          console.log(`Serial number ${newSerialNumber} added to product ${productId}.`);
-        } else {
-          console.log(`Serial number ${newSerialNumber} already exists for product ${productId}.`);
-        }
-      } else {
-        // If the product doesn't exist, create a new one
-        const newProduct = {
-          product_id: productId,
-          serialNumbers: [newSerialNumber]
-        };
-        selected_products.push(newProduct);
-        console.log(`Product ${productId} created with serial number ${newSerialNumber}.`);
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
+          <h4 style="color: white; background-color: rgb(156, 10, 10); padding: 5px;">Warranty has expired</h4>
+        `
       }
     }
 
-
-    function deleteFromSelectItems(id) {
-      let parentDiv = document.getElementById("selected-items-info-container");
-      let item = document.getElementById("selected-product-" + id);
-      if (parentDiv && item) {
-        billAmount -= parseInt(document.getElementById('selected-product-price-' + id).innerText);
-        updateBillAmount();
-        parentDiv.removeChild(item);
-        removeProduct(id)
-      }
-    }
-
-    //markSingleItemAsSelected add multiple items to the selected items section
-    function markItemsAsSeleced(id, quantity) {
-      //remove if this item already exist
-      deleteFromSelectItems(id);
-      if (quantity === 0) {
-        quantity = parseInt(document.getElementById("add-quantity").value);
-      }
-      pm = products.product_metadata[0];
-      let serial = ""
-      for (let i = 0; i < quantity; i++) {
-        //insert serial number
-        insertSerialNumber(id, products.product_metadata[i].serial_number)
-        // const element = products.product_metadata[i].serial_number;  
-        serial += `<span class="serial-number">${products.product_metadata[i].serial_number}</span></br>`;
-      }
-      document.getElementById("selected-items-info-container").innerHTML += `
-      <tr id="selected-product-${id}">
-        <th class="text-center">${products.product_name}</th>
-        <th class="text-center">${products.category.name}</th>
-        <th class="text-center">${products.brand.name}</th>
-        <th class="text-center" id="selected-product-qty-${id}">${quantity}</th>
-        <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
-        <th class="text-center">${pm.max_retail_price}</th>
-        <th class="text-center">${products.discount}</th>
-        <th class="text-center" id="selected-product-price-${id}">${pm.max_retail_price * quantity}</th>
-        <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
-      </tr>
-    `;
-      //increase bill amount
-      billAmount += pm.max_retail_price * quantity;
-      updateBillAmount();
-    }
-
-    //markSingleItemAsSelected add current item to the selected items section
-    function markSingleItemAsSelected(id) {
-      //check id already exist or not
-      let elem = document.getElementById("selected-product-serial-" + id);
-      if (elem) {
-        if (!elem.innerHTML.includes(`${products.product_metadata[0].serial_number}`)) {
-          elem.innerHTML += `<span class="serial-number">${products.product_metadata[0].serial_number}</span> <br>`;
-          document.getElementById("selected-product-price-" + id).innerText = parseInt(document.getElementById("selected-product-price-" + id).innerText) + products.product_metadata[0].max_retail_price;
-          document.getElementById("selected-product-qty-" + id).innerText = parseInt(document.getElementById("selected-product-qty-" + id).innerText) + 1;
-
-          //insert serial number
-          insertSerialNumber(id, products.product_metadata[0].serial_number)
-          //increase bill amount
-          billAmount += products.product_metadata[0].max_retail_price;
-          updateBillAmount();
-        }
-      } else {
-        markItemsAsSeleced(id, 1)
-      }
-    }
-
-    //updateBillAmount updates current bill amount
-    function updateBillAmount() {
-      document.getElementById("bill-amount").value = billAmount;
-      document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(document.getElementById("discount").value) / 100.0));
-      totalAmount = parseInt(document.getElementById("total-amount").value);
-
-      //updata max input of paid-amount field
-      document.getElementById("paid-amount").max = `${totalAmount}`;
-    }
-
-    //upadate total amount when discount is changed
-    document.getElementById("discount").addEventListener('change', e => {
-      document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(document.getElementById("discount").value) / 100.0));
-      totalAmount = parseInt(document.getElementById("total-amount").value);
-      //updata max input of paid-amount field
-      document.getElementById("paid-amount").max = `${totalAmount}`;
-    })
-    //upadate discount when total amount is changed
-    document.getElementById("total-amount").addEventListener('change', e => {
-      let discount = 100.0 - 100 * parseFloat(document.getElementById('total-amount').value) / billAmount;
-      document.getElementById("discount").value = (discount % 1 === 0) ? discount : discount.toFixed(2);;
-
-      totalAmount = parseInt(document.getElementById("total-amount").value);
-
-      //updata max input of paid-amount field
-      document.getElementById("paid-amount").max = `${totalAmount}`;
-    })
-
-    //serachBySerial()
-    function serachBySerial() {
-      let serial_number = document.getElementById("search-by-serial-number").value;
-      if (serial_number === "") {
-        Swal.fire({
-          title: "Invalid Serial Number",
-          icon: "warning"
-        });
-      } else {
-        let serialNumber = {
-          product_serial_number: serial_number,
-        }
-        const requestOptions = {
-          method: 'post',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          body: JSON.stringify(serialNumber)
-        }
-
-        fetch('http://localhost:4321/api/inventory/products/search-instock-products-by-serial', requestOptions)
-          .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            if (data.error === true) {
-              //showErrorMessage(data.message)
-              if (data.message.includes("no rows in result set")) {
-                Swal.fire({
-                  title: "Out of stock",
-                  icon: "error"
-                });
-              } else {
-                Swal.fire({
-                  title: "Error",
-                  text: data.message,
-                  icon: "error"
-                });
-              }
-            } else {
-              //update ViewProductListContainer
-              products = data.product_items;
-              updateViewItemsInfoContainer(products, false);
-            }
-          })
-      }
-    }
-
-    //checkProductExitance check the id exist or not in the selected items table
-    //if it exist then serial number will be pushed to the serial_number col
-    //otherwise add item as new
-    function checkProductExitance(id) {
-      // Get all rows from the table body
-      const rows = document.querySelectorAll('#selected-items-info-container tr');
-
-      // Array to store MRP values
-      const mrpValues = [];
-
-      // Loop through each row and get the 6th column (MRP)
-      rows.forEach(row => {
-        const mrpCell = row.cells[5]; // Get the MRP cell (6th column, 0-indexed)
-        if (mrpCell) {
-          mrpValues.push(mrpCell.textContent.trim()); // Add the MRP value to the array
-        }
-      });
-
-      // Log all MRP values
-      console.log(mrpValues);
-    }
   </script>
 
   <script>
     //fetch-1: on click button, get the serial number and fetch product item data from the backend
-    'http://localhost:4321/api/inventory/products/search-sold-products-by-serial'
+    // 'http://localhost:4321/api/inventory/products/search-sold-products-by-serial'
     //fetch-2: on submit form, send product metadata id
-    'http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id'
+    // 'http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id'
   </script>
 
 </body>

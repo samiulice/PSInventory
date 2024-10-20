@@ -453,6 +453,12 @@
                         </div>
                       </div>
                     </div>
+                    <div class="row form-group text-center py-">
+                      <div id="btns">
+                        <br>
+                        <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Save</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -494,7 +500,6 @@
                         <th class="text-center">Qty</th>
                         <th class="text-center">Serial #</th>
                         <th class="text-center">MRP</th>
-                        <th class="text-center">Discount</th>
                         <th class="text-center">Total Amount</th>
                         <th class="text-center">Remove</th>
                       </tr>
@@ -508,15 +513,6 @@
                   <!-- /.col -->
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
-              <br>
-              <button type="submit" id="submitBtn" class="btn btn-round btn-success">Save</button>
-              <a href="javascript:void(0);" id="processingBtn"
-                class="btn btn-round btn-success d-none">Processing...</a>
-              <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-round btn-success">Generate Invoice</a>
             </div>
           </div>
         </form>
@@ -571,7 +567,7 @@
 
   <script>
 
-    let products, brands, billAmount = 0, totalAmount = 0;
+    let products, brands, billAmount = 0, totalAmount = 0, lastIndex;
     let selected_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -598,6 +594,10 @@
                       `
           } else {
             console.log(data)
+            //Set memo no(MM-RandomSixDigit)
+            lastIndex = data.last_index;
+            document.getElementById("memo_no").value = generateSerialNumber(lastIndex);
+            document.getElementById("memo_no").disabled = true;
             updateCustomerDiv(data.customers)
             updateCategoryDiv(data.categories)
             updateAccoutnsDiv(data.head_accounts)
@@ -693,6 +693,8 @@
                     showErrorMessage(data.message)
                   } else {
                     showSuccessMessage(data.message);
+                    document.getElementById("btns").innerHTML = `<a href="javascript:void(0);" id="invoiceBtn" class="btn btn-primary">Generate
+                          Invoice</a>`
                   }
                   // setTimeout(() => {
                   //   location.reload();
@@ -823,10 +825,6 @@
             <td><b>${quantity_section}</b></td>
           </tr>
           <tr>
-            <td>Discount:</td>
-            <td><b>${discount_section}</b></td>
-          </tr>
-          <tr>
             <td>MRP:</td>
             <td><b>${mrp_section}</b></td>
           </tr>
@@ -913,7 +911,6 @@
         <th class="text-center" id="selected-product-qty-${id}">${quantity}</th>
         <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
         <th class="text-center">${pm.max_retail_price}</th>
-        <th class="text-center">${products.discount}</th>
         <th class="text-center" id="selected-product-price-${id}">${pm.max_retail_price * quantity}</th>
         <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
       </tr>
@@ -974,7 +971,7 @@
 
     //serachBySerial()
     function serachBySerial() {
-      let serial_number = document.getElementById("search-by-serial-number").value;
+      let serial_number = document.getElementById("search-by-serial-number").value.trim();
       if (serial_number === "") {
         Swal.fire({
           title: "Invalid Serial Number",

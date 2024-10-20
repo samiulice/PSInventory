@@ -169,6 +169,7 @@ type ProductMetadata struct {
 	Warranty          int       `json:"warranty,omitempty"`
 	MaxRetailPrice    int       `json:"max_retail_price,omitempty"` //max_retail_price = total_amount+profit/quantity_purchased
 	PurchaseRate      int       `json:"purchase_rate,omitempty"`    //purchase_rate = total_amount/quantity_purchased
+	SaleRate      int       `json:"sale_rate,omitempty"`    
 	CreatedAt         time.Time `json:"created_at,omitempty"`
 	UpdatedAt         time.Time `json:"updated_at,omitempty"`
 }
@@ -185,7 +186,7 @@ type Purchase struct {
 	ProductsSerialNo  []string  `json:"products_serial_no,omitempty"`
 	AccountID         int       `json:"account_id,omitempty"`
 	ChalanNO          string    `json:"chalan_no,omitempty"`
-	MemoNo            string    `json:"memo_no,omitempty"`
+	MemoNo            string    `json:"memo_no,omitempty"` //MM-hhmmss-ddmmyy-rand(digit6 int)
 	Note              string    `json:"note,omitempty"`
 	MaxRetailPrice    int       `json:"max_retail_price,omitempty"`
 	PurchaseRate      int       `json:"purchase_rate,omitempty"`
@@ -199,8 +200,8 @@ type Purchase struct {
 }
 
 type SelectedItems struct {
-	ProductID     int      `json:"product_id"`
-	SerialNumbers []string `json:"serialNumbers"`
+	ProductID     int      `json:"product_id,omitempty"`
+	SerialNumbers []string `json:"serialNumbers,omitempty"`
 }
 
 // Sale is the type for purchase info
