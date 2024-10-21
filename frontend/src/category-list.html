@@ -296,7 +296,6 @@
                       <th>Account Status</th>
                       <th>Monthly Salary</th>
                       <th>Joining Date</th>
-                      <th id="row-actions" style="color:rgb(150, 147, 3); width: 20%">Actions</th>
                     </tr>
                   </thead>
                   <tbody></tbody>
@@ -403,26 +402,18 @@
       var handleDataTableButtons = function () {
         if ($(".datatable-buttons").length) {
           var table = $(".datatable-buttons").DataTable({
-            dom: '<"row"<"col-md-5 col-sm-6"lB><"col-md-6"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
+            dom: '<"row"<"col-md-9 col-sm-6"l><"col-md-3 col-sm-6"B>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
             processing: true, // Show processing indicator
             serverSide: true, // Enable server-side processing
             pageLength: 10, // Default page size
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], // Add -1 for 'All' option
             columns: [
-              { data: "account_code", title: "Account Code"},
-              { data: "account_name", title: "Account Name"},
-              { data: "mobile", title: "Mobile"},
-              { data: "account_status", title: "Account Status"},
-              { data: "monthly_salary", title: "Monthly Salary"},
-              { data: "joining_date", title: "Joining Date"},
-              {
-                data: null,
-                render: function (data, type, row) {
-                  return `<button class="btn btn-primary">Edit</button>
-                                <button class="btn btn-danger">Delete</button>`;
-                },
-                orderable: false // Disable sorting for actions column
-              }
+              { data: "account_code", title: "Account Code", className:"account-code"},
+              { data: "account_name", title: "Account Name", className:"account-name"},
+              { data: "mobile", title: "Mobile",},
+              { data: "account_status", title: "Account Status", className:"account-Status"},
+              { data: "monthly_salary", title: "Monthly Salary", className:"monthly-salary"},
+              { data: "joining_date", title: "Joining Date", className:"joining-date"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -453,6 +444,9 @@
               fetch('http://localhost:4321/api/hr/view-employee/all', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
+                  responseData.employees.forEach(emp => {
+                    emp.joining_date = formatDate(emp.joining_date, "date", "-");
+                  });
                   const returnData = {
                     draw: data.draw,
                     recordsTotal: responseData.total_records,
