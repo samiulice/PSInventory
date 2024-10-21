@@ -1334,7 +1334,7 @@ func (p *postgresDBRepo) GetSoldItemDetailsBySerialNumber(serialNumber string) (
 	//get metadata from product_serial_numbers
 	query := `
 		SELECT
-			id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty_status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
+			id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty_status, warranty_period, latest_warranty_id, warranty_history_ids, max_retail_price, purchase_rate, created_at, updated_at
 		FROM
 			public.product_serial_numbers
 		WHERE
@@ -1350,6 +1350,8 @@ func (p *postgresDBRepo) GetSoldItemDetailsBySerialNumber(serialNumber string) (
 		&metadata.Status,
 		&metadata.WarrantyStatus,
 		&metadata.WarrantyPeriod,
+		&metadata.LatesWarrantyHistoryID,
+		&metadata.WarrantyHistoryIDs,
 		&metadata.MaxRetailPrice,
 		&metadata.PurchaseRate,
 		&metadata.CreatedAt,
@@ -2044,9 +2046,14 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionD
 }
 
 // AddNewWarrantyClaim handles database opetions for completing claim warranty procedues
-func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contactNumber, reportedProblem, receivedBy string) error {
+func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) error {
 	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancle()
+	//begin transaction
+	tx, err := p.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("DBERROR: AddNewWarrantyClaim => Begin Tx => %w", err)
+	}
 	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
 	query := `
 		INSERT INTO public.warranty_history(product_serial_id, previous_serial_number, contact_number, request_date, reported_problem, received_by, created_at, updated_at)
@@ -2057,7 +2064,7 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contact
 	// Format the date into mm/dd/yyyy
 	formattedDateStr := currentTime.Format("01/02/2006")
 	var id int
-	err := p.DB.QueryRowContext(ctx, query,
+	err = tx.QueryRowContext(ctx, query,
 		serialID,
 		serialNumber,
 		contactNumber,
@@ -2069,33 +2076,47 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contact
 	).Scan(&id)
 
 	if err != nil {
-		return err
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: AddNewWarrantyClaim =>Insert_warranty_history Table => %w", err)
 	}
 	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
 	query = `
     UPDATE public.product_serial_numbers
-    SET latest_warranty_id = $1, 
+    SET latest_warranty_id = $1,
+		warranty_status = 'in progress',
         warranty_history_ids = warranty_history_ids || $2, 
         updated_at = $3
     WHERE id = $4
 `
 
 	// Convert the `id` (int) to a string for concatenation.
-	textId := strconv.Itoa(id) // Converting the integer id to a string
+	// txt := warrantyHistoryIds + "||" + strconv.Itoa(id) // Converting the integer id to a string
+	// fmt.Println("Concatenated text: ", txt)
 
-	result, err := p.DB.ExecContext(ctx, query, id, textId, currentTime, serialID)
+	// Execute the query, passing the correct values in the right order
+	result, err := p.DB.ExecContext(ctx, query, id, strconv.Itoa(id), currentTime, serialID)
 	if err != nil {
-		return err
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: AddNewWarrantyClaim => Update_product_serial_numbers: %w", err)
 	}
 
-	affectedRows, err := result.RowsAffected()
+	// Optionally, you can check the result (rows affected) if needed
+	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return err
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: RowsAffected: %w", err)
 	}
-	if affectedRows == 0 {
+
+	fmt.Printf("Rows affected: %d\n", rowsAffected)
+
+	if rowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("DBERROR:AddNewWarrantyClaim::no row affected when trying to update product_serial_numbers table")
 	}
-
+	// Commit the transaction
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("DBERROR: AddNewWarrantyClaim => failed to commit transaction: %w", err)
+	}
 	return nil
 }
 

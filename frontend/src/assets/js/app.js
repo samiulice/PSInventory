@@ -34,26 +34,111 @@ function paginator(currPageIndex, pageSize, totalRecords) {
     pNav.innerHTML = htmlTmpl;
   }
 }
+/* DATA TABLES */
+
+function init_DataTables() {
+
+  console.log('run_datatables');
+
+  if (typeof ($.fn.DataTable) === 'undefined') { return; }
+  console.log('init_DataTables');
+
+  var handleDataTableButtons = function () {
+    if ($("#datatable-buttons").length) {
+      $("#datatable-buttons").DataTable({
+        dom: "Bfrtip",
+        buttons: [
+          {
+            extend: "copy",
+            className: "btn-sm"
+          },
+          {
+            extend: "csv",
+            className: "btn-sm"
+          },
+          {
+            extend: "excel",
+            className: "btn-sm"
+          },
+          {
+            extend: "pdfHtml5",
+            className: "btn-sm"
+          },
+          {
+            extend: "print",
+            className: "btn-sm"
+          },
+        ],
+        responsive: true
+      });
+    }
+  };
+
+  TableManageButtons = function () {
+    "use strict";
+    return {
+      init: function () {
+        handleDataTableButtons();
+      }
+    };
+  }();
+
+  $('#datatable').dataTable();
+
+  $('#datatable-keytable').DataTable({
+    keys: true
+  });
+
+  $('#datatable-responsive').DataTable();
+
+  $('#warranty-inprogress-table').DataTable();
+
+  $('#datatable-scroller').DataTable({
+    ajax: "js/datatables/json/scroller-demo.json",
+    deferRender: true,
+    scrollY: 380,
+    scrollCollapse: true,
+    scroller: true
+  });
+
+  $('#datatable-fixed-header').DataTable({
+    fixedHeader: true
+  });
+
+  var $datatable = $('#datatable-checkbox');
+
+  $datatable.dataTable({
+    'order': [[1, 'asc']],
+    'columnDefs': [
+      { orderable: false, targets: [0] }
+    ]
+  });
+  $datatable.on('draw.dt', function () {
+    $('checkbox input').iCheck({
+      checkboxClass: 'icheckbox_flat-green'
+    });
+  });
+
+  TableManageButtons.init();
+
+};
 
 /**
- * Generates a serial number in the format MM-hhmmss-ddmmyy-rand(digit6 int).
+ * Generates a memo number in the format MM-memo_type-rand(digit6 int)LastIndexOfDBTable.
  * 
- * The serial number consists of:
- * - MM: Current month (01-12)
- * - hhmmss: Current time in hours, minutes, and seconds (24-hour format)
- * - ddmmyy: Current date in day, month, and last two digits of the year
+ * The memo number consists of:
  * - rand(digit6 int): A random 6-digit integer
  *
- * @returns {string} The formatted serial number.
+ * @returns {string} The formatted memo number.
  */
-function generateSerialNumber(lastIndex) {
+function generateMemoNumber(lastIndex, memoType) {
   // Generate a random 6-digit number (from 100000 to 999999)
   const randomSixDigit = String(Math.floor(100000 + Math.random() * 900000));
 
   // Combine all parts into the desired format
-  const serialNumber = `MM-${randomSixDigit}${lastIndex}`;
+  const memoNumber = `MM-${memoType}-${randomSixDigit}${lastIndex}`;
 
-  return serialNumber; // Return the formatted serial number
+  return memoNumber; // Return the formatted serial number
 }
 
 
@@ -165,7 +250,7 @@ function checkWarranty(soldDate, warrantyPeriodInDays, separator = '-', format =
   // Check if warranty is available
   if (differenceInDays > 0) {
     warrantyAvailability = true;
-  } 
+  }
   return [warrantyAvailability, differenceInDays]
 }
 
@@ -733,7 +818,7 @@ function addNewCategory(page, categories) {
               document.getElementById("category").innerHTML = '';
               document.getElementById("category").innerHTML = `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
               document.getElementById("category").disabled = true;
-              if(categories){
+              if (categories) {
                 categories.push(data.result);
               }
             }

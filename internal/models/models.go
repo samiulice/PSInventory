@@ -4,6 +4,15 @@ import (
 	"time"
 )
 
+//MM-PR-rand(6)+LastIndexOfPurchaseHistory Table //Purchase
+//MM-SL-rand(6)+LastIndexOfSalesHistory Table //Sale
+//MM-WC-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Claim
+//MM-Wa-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Arrived
+//MM-WD-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Delivered
+//MM-RR-rand(6)+LastIndexOfWarrantyHistory Table //Repair Receive
+//MM-RC-rand(6)+LastIndexOfWarrantyHistory Table //Repair Completed
+//MM-RD-rand(6)+LastIndexOfWarrantyHistory Table //Repair Delivared
+
 const (
 	// AustraliaRegex matches Australian mobile numbers with or without country code (+61)
 	AustraliaRegex = `^(\+?61|0)4\d{8}$`
@@ -189,7 +198,7 @@ type Purchase struct {
 	ProductsSerialNo  []string  `json:"products_serial_no,omitempty"`
 	AccountID         int       `json:"account_id,omitempty"`
 	ChalanNO          string    `json:"chalan_no,omitempty"`
-	MemoNo            string    `json:"memo_no,omitempty"` //MM-hhmmss-ddmmyy-rand(digit6 int)
+	MemoNo            string    `json:"memo_no,omitempty"` //MM-P-rand(6)LastIndexOfPurchaseHistoryDB
 	Note              string    `json:"note,omitempty"`
 	MaxRetailPrice    int       `json:"max_retail_price,omitempty"`
 	PurchaseRate      int       `json:"purchase_rate,omitempty"`
@@ -225,39 +234,3 @@ type Sale struct {
 	CreatedAt        time.Time        `json:"created_at,omitempty"`
 	UpdatedAt        time.Time        `json:"updated_at,omitempty"`
 }
-
-//................................................................
-
-// Order is the type for all orders
-type Order struct {
-	ID            int       `json:"id,omitempty"`
-	DatesID       int       `json:"dates_id,omitempty"`
-	TransactionID int       `json:"transaction_id,omitempty"`
-	CustomerID    int       `json:"customer_id,omitempty"`
-	StatusID      int       `json:"status_id,omitempty"` //Processing=1, Completed=2, Cancelled = 3
-	Quantity      int       `json:"quantity,omitempty"`
-	Amount        int       `json:"amount,omitempty"`
-	CreatedAt     time.Time `json:"created_at,omitempty"`
-	UpdatedAt     time.Time `json:"updated_at,omitempty"`
-	// Transaction   Transaction `json:"transaction,omitempty"`
-	Customer Customer `json:"customer,omitempty"`
-}
-
-// ................JSON Response model for invoice microservice........................
-// Order holds the necessary info to build invoice
-type Invoice struct {
-	ID        int              `json:"id,omitempty"`
-	FirstName string           `json:"first_name,omitempty"`
-	LastName  string           `json:"last_name,omitempty"`
-	Email     string           `json:"email,omitempty"`
-	CreatedAt time.Time        `json:"created_at,omitempty"`
-	Products  []InvoiceProduct `json:"items,omitempty"`
-}
-type InvoiceProduct struct {
-	ID       int    `json:"product_id,omitempty"`
-	Name     string `json:"product_name,omitempty"`
-	Quantity int    `json:"quantity,omitempty"`
-	Amount   int    `json:"amount,omitempty"`
-}
-
-//........................................................................................

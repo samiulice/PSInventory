@@ -1016,7 +1016,7 @@ func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.R
 	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
 	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
 
-	err = app.DB.AddNewWarrantyClaim(payload.Product.ProductMetadata[0].ID, payload.Product.ProductMetadata[0].SerialNumber, payload.ContactNumber, payload.ReportedProblem, payload.ReceivedBy)
+	err = app.DB.AddNewWarrantyClaim(payload.Product.ProductMetadata[0].ID, payload.Product.ProductMetadata[0].SerialNumber, payload.ContactNumber, payload.ReportedProblem, payload.ReceivedBy, payload.Product.ProductMetadata[0].WarrantyHistoryIDs)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("handler Error - ClaimWarrantyBySerialID => AddNewWarrantyClaim: %w", err))
 		return
