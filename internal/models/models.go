@@ -82,8 +82,8 @@ type Employee struct {
 	AmountReceivable int       `json:"amount_receivable,omitempty"`
 	WhatsappAccount  string    `json:"whatsapp_account"`
 	Email            string    `json:"email,omitempty"`
-	ImageLink        string    `json:"image_link,omitempty"`     //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
-	AccountStatus    bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	ImageLink        string    `json:"image_link,omitempty"` //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	AccountStatus    bool      `json:"account_status"`       //Active = true, Inactive = false
 	MonthlySalary    int       `json:"monthly_salary,omitempty"`
 	OpeningBalance   int       `json:"opening_balance,omitempty"`
 	CVLink           string    `json:"cv_link,omitempty"`
@@ -108,7 +108,7 @@ type Customer struct {
 	AmountReceivable int       `json:"amount_receivable,omitempty"`
 	Email            string    `json:"email,omitempty"`
 	WhatsappAccount  string    `json:"whatsapp_account,omitempty"`
-	AccountStatus    bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
 	Discount         int       `json:"discount,omitempty"`
 	OpeningBalance   int       `json:"opening_balance,omitempty"`
 	JoiningDate      time.Time `json:"joining_date,omitempty"`
@@ -131,7 +131,7 @@ type Supplier struct {
 	AmountReceivable int       `json:"amount_receivable,omitempty"`
 	Email            string    `json:"email,omitempty"`
 	WhatsappAccount  string    `json:"whatsapp_account,omitempty"`
-	AccountStatus    bool      `json:"account_status,omitempty"` //Active = true, Inactive = false
+	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
 	Discount         int       `json:"discount,omitempty"`
 	JoiningDate      time.Time `json:"joining_date,omitempty"`
 	CreatedAt        time.Time `json:"created_at,omitempty"`
@@ -143,7 +143,7 @@ type HeadAccount struct {
 	ID            int       `json:"id,omitempty"`
 	AccountCode   string    `json:"account_code,omitempty"`
 	AccountName   string    `json:"account_name,omitempty"`
-	AccoutnStatus bool      `json:"account_status,omitempty"`
+	AccoutnStatus bool      `json:"account_status"`
 	CurrentAmount int       `json:"current_amount,omitempty"`
 	CreatedAt     time.Time `json:"created_at,omitempty"`
 	UpdatedAt     time.Time `json:"updated_at,omitempty"`
@@ -155,7 +155,7 @@ type Product struct {
 	ProductCode     string             `json:"product_code,omitempty"`
 	ProductName     string             `json:"product_name,omitempty"`
 	Description     string             `json:"product_description,omitempty"`
-	ProductStatus   bool               `json:"product_status,omitempty"`
+	ProductStatus   bool               `json:"product_status"`
 	Quantity        int                `json:"quantity,omitempty"`
 	CategoryID      int                `json:"category_id,omitempty"`
 	BrandID         int                `json:"brand_id,omitempty"`
@@ -174,9 +174,9 @@ type ProductMetadata struct {
 	ProductID              int       `json:"product_id,omitempty"`
 	PurchaseHistoryID      int       `json:"purchase_history_id,omitempty"`
 	SalesHistoryID         int       `json:"sales_history_id,omitempty"`
-	Status                 string    `json:"status,omitempty"`
+	Status                 string    `json:"status"`
 	WarrantyPeriod         int       `json:"warranty,omitempty"`
-	WarrantyStatus         string    `json:"warranty_status,omitempty"`
+	WarrantyStatus         string    `json:"warranty_status"`
 	LatesWarrantyHistoryID int       `json:"latest_warranty_history_id,omitempty"`
 	WarrantyHistoryIDs     string    `json:"warranty_history_ids,omitempty"`
 	MaxRetailPrice         int       `json:"max_retail_price,omitempty"` //max_retail_price = total_amount+profit/quantity_purchased

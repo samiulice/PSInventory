@@ -170,12 +170,13 @@ func (p *postgresDBRepo) GetEmployeeByID(id int) (models.Employee, error) {
 // if accountType == all, it will return list all employee accounts
 // if accountType == active, it will return list of active employee accounts
 // if accountType == inactive, it will return list of inactive employee accounts
+// GetEmployeeListPaginated retrieves a paginated list of employees based on account type and pagination parameters
 func (p *postgresDBRepo) GetEmployeeListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Employee, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	offset := (currentPageIndex - 1) * pageSize
 	var employees []*models.Employee
 
+	// Prepare the base query for selecting employees
 	query := `
 		SELECT 
 			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, monthly_salary, opening_balance, joining_date, created_at, updated_at
@@ -183,37 +184,71 @@ func (p *postgresDBRepo) GetEmployeeListPaginated(accountType string, pageSize, 
 			employees
 		`
 
-	trails := `
-		 ORDER BY
-			id asc
-		LIMIT $1 OFFSET $2`
+	// Prepare a separate query for counting total records
 	newQuery := `
 	SELECT 
 		COUNT(id)
 	FROM
 		employees
 	`
-	var rows *sql.Rows
-	var err error
 
+	// Initialize the limit and offset
+	var limit int
+	var offset int
+
+	// Check for account type and adjust query accordingly
 	if accountType == "all" {
-		query = query + trails
+		if pageSize == -1 {
+			// If pageSize is -1, return all employees without limit
+			query += ` ORDER BY id ASC`
+			limit = 0 // No limit when fetching all records
+		} else {
+			// Set limit and offset for pagination
+			limit = pageSize
+			offset = (currentPageIndex - 1) * pageSize
+			query += ` ORDER BY id ASC LIMIT $1 OFFSET $2`
+		}
 	} else if accountType == "active" {
-		query += ` WHERE account_status = '1'` + trails
-		newQuery += ` WHERE account_status = '1'`
+		if pageSize == -1 {
+			query += ` WHERE account_status = '1' ORDER BY id ASC`
+			limit = 0 // No limit when fetching all records
+			newQuery += ` WHERE account_status = '1'`
+		} else {
+			limit = pageSize
+			offset = (currentPageIndex - 1) * pageSize
+			query += ` WHERE account_status = '1' ORDER BY id ASC LIMIT $1 OFFSET $2`
+			newQuery += ` WHERE account_status = '1'`
+		}
 	} else if accountType == "inactive" {
-		query += ` WHERE account_status = '0'` + trails
-		newQuery += ` WHERE account_status = '0'`
+		if pageSize == -1 {
+			query += ` WHERE account_status = '0' ORDER BY id ASC`
+			limit = 0 // No limit when fetching all records
+			newQuery += ` WHERE account_status = '0'`
+		} else {
+			limit = pageSize
+			offset = (currentPageIndex - 1) * pageSize
+			query += ` WHERE account_status = '0' ORDER BY id ASC LIMIT $1 OFFSET $2`
+			newQuery += ` WHERE account_status = '0'`
+		}
 	} else {
 		return employees, 0, errors.New("please enter correct parameter to get employees list")
 	}
 
-	rows, err = p.DB.QueryContext(ctx, query, pageSize, offset)
+	// Execute the employee query
+	var rows *sql.Rows
+	var err error
+	if limit > 0 {
+		rows, err = p.DB.QueryContext(ctx, query, limit, offset)
+	} else {
+		rows, err = p.DB.QueryContext(ctx, query)
+	}
+
 	if err != nil {
 		return employees, 0, err
 	}
 	defer rows.Close()
 
+	// Scan the rows into employee struct
 	for rows.Next() {
 		var e models.Employee
 		err = rows.Scan(
@@ -240,12 +275,14 @@ func (p *postgresDBRepo) GetEmployeeListPaginated(accountType string, pageSize, 
 		employees = append(employees, &e)
 	}
 
+	// Get total records count
 	var totalRecords int
 	countRow := p.DB.QueryRowContext(ctx, newQuery)
 	err = countRow.Scan(&totalRecords)
 	if err != nil {
 		return employees, 0, err
 	}
+
 	return employees, totalRecords, nil
 }
 

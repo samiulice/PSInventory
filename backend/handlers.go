@@ -32,18 +32,18 @@ func (app *application) GetEmployees(w http.ResponseWriter, r *http.Request) {
 		app.writeJSON(w, http.StatusOK, employee)
 	} else {
 		var payload struct {
-			PageSize         int `json:"page_size,omitempty"`
-			CurrentPageIndex int `json:"current_page_index,omitempty"`
+			PageSize         int `json:"page_size"`
+			CurrentPageIndex int `json:"current_page_index"`
 		}
 		err := app.readJSON(w, r, &payload)
 		if err != nil {
-			app.badRequest(w, err)
+			app.badRequest(w, fmt.Errorf("ERROR Unable to read JSON: %w", err))
 			return
 		}
 		employees, totalRecords, err := app.DB.GetEmployeeListPaginated(accountType, payload.PageSize, payload.CurrentPageIndex)
 
 		if err != nil {
-			app.badRequest(w, err)
+			app.badRequest(w, fmt.Errorf("DBERROR: %w", err))
 			return
 		}
 		var Resp struct {
