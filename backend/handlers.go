@@ -1033,3 +1033,31 @@ func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.R
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
+// GetClaimWarrantyList writes a list of Claimed warranty data to the response body
+func (app *application) GetClaimWarrantyList(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		SearchType string `json:"search_type"`
+	}
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR => GetClaimWarranty: %w", err))
+		return
+	}
+
+	warrantyHistory, err := app.DB.GetWarrantyList(payload.SearchType)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR => GetClaimWarranty: %w", err))
+		return
+	}
+	var resp struct {
+		Error   bool            `json:"error,omitempty"`
+		Message string          `json:"message,omitempty"`
+		WarrantyHistory    []*models.Warranty `json:"warranty_history"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data Fatched Successfully"
+	resp.WarrantyHistory = warrantyHistory
+	app.writeJSON(w, http.StatusOK, resp)
+}

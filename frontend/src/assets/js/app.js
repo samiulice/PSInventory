@@ -91,7 +91,7 @@ function init_DataTables() {
 
   $('#datatable-responsive').DataTable();
 
-  $('#warranty-inprogress-table').DataTable();
+  // $('#warranty-inprogress-table').DataTable();
 
   $('#datatable-scroller').DataTable({
     ajax: "js/datatables/json/scroller-demo.json",

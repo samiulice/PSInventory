@@ -2157,6 +2157,52 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contact
 	return nil
 }
 
+// GetWarrantyList retrives a slice of warranty history from warranty_history_table
+func (p *postgresDBRepo) GetWarrantyList(searchType string) ([]*models.Warranty, error) {
+	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancle()
+
+	var warrantyHistory []*models.Warranty
+
+	query := `
+			SELECT
+				id, status, memo_no, product_serial_id, previous_serial_number, contact_number, request_date, reported_problem, received_by, delivary_date, delivared_by, comment, created_at, updated_at
+			FROM
+				public.warranty_history
+			WHERE
+				status = $1
+		`
+	rows, err := p.DB.QueryContext(ctx, query, searchType)
+	if err != nil {
+		return warrantyHistory, fmt.Errorf("DBERROR:GetWarrantyList => %w", err)
+	}
+
+	for rows.Next() {
+		var wh models.Warranty
+		err = rows.Scan(
+			&wh.ID,
+			&wh.Status,
+			&wh.MemoNo,
+			&wh.ProductsSerialID,
+			&wh.PreviousSerialNo,
+			&wh.ContactNumber,
+			&wh.RequestedDate,
+			&wh.ReportedProblem,
+			&wh.ReceivedBy,
+			&wh.DelivaryDate,
+			&wh.DelivaredBy,
+			&wh.Comment,
+			&wh.CreatedAt,
+			&wh.UpdatedAt,
+		)
+		if err != nil {
+			return warrantyHistory, err
+		}
+		warrantyHistory = append(warrantyHistory, &wh)
+	}
+	return warrantyHistory, nil
+}
+
 // Helper functions
 // CountTotalEntries counts total number of rows in given the table
 func (p *postgresDBRepo) CountRows(tableName string) (int, error) {

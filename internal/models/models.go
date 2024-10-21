@@ -7,7 +7,7 @@ import (
 //MM-PR-rand(6)+LastIndexOfPurchaseHistory Table //Purchase
 //MM-SL-rand(6)+LastIndexOfSalesHistory Table //Sale
 //MM-WC-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Claim
-//MM-Wa-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Arrived
+//MM-WO-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Arrived
 //MM-WD-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Delivered
 //MM-RR-rand(6)+LastIndexOfWarrantyHistory Table //Repair Receive
 //MM-RC-rand(6)+LastIndexOfWarrantyHistory Table //Repair Completed
@@ -233,4 +233,25 @@ type Sale struct {
 	PaidAmount       int              `json:"paid_amount,omitempty"`
 	CreatedAt        time.Time        `json:"created_at,omitempty"`
 	UpdatedAt        time.Time        `json:"updated_at,omitempty"`
+}
+
+type Warranty struct {
+	ID               int       `json:"id"`
+	Status           string    `json:"status,omitempty"`
+	ProductsSerialID int       `json:"products_serial_id,omitempty"`
+	PreviousSerialNo string    `json:"previous_serial_no,omitempty"`
+	MemoNo           string    `json:"memo_no,omitempty"`
+	ContactNumber    string    `json:"contact_number,omitempty"`
+	RequestedDate    string    `json:"requested_date,omitempty"`
+	ReportedProblem  string    `json:"reported_problem,omitempty"`
+	ReceivedBy       string    `json:"received_by,omitempty"`
+	DelivaryDate     string    `json:"delivary_date,omitempty"`
+	DelivaredBy      string    `json:"delivered_by,omitempty"`
+	Comment          string    `json:"comment,omitempty"`
+	CreatedAt        time.Time `json:"created_at,omitempty"`
+	UpdatedAt        time.Time `json:"updated_at,omitempty"`
+	ProductInfo      Product   `json:"product_info,omitempty"`
+	SalesInfo        Sale      `json:"sales_info,omitempty"`
+	CustomerInfo     Customer  `json:"customer_info,omitempty"`
+	SupplierInfo     Supplier  `json:"supplier_info,omitempty"`
 }
