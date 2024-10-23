@@ -11,7 +11,7 @@ import (
 //MM-WD-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Delivered
 //MM-RR-rand(6)+LastIndexOfWarrantyHistory Table //Repair Receive
 //MM-RC-rand(6)+LastIndexOfWarrantyHistory Table //Repair Completed
-//MM-RD-rand(6)+LastIndexOfWarrantyHistory Table //Repair Delivared
+//MM-RD-rand(6)+LastIndexOfWarrantyHistory Table //Repair Delivered
 
 const (
 	// AustraliaRegex matches Australian mobile numbers with or without country code (+61)
@@ -238,15 +238,17 @@ type Sale struct {
 type Warranty struct {
 	ID               int       `json:"id"`
 	Status           string    `json:"status,omitempty"`
-	ProductsSerialID int       `json:"products_serial_id,omitempty"`
+	ProductSerialID int       `json:"product_serial_id,omitempty"`
 	PreviousSerialNo string    `json:"previous_serial_no,omitempty"`
+	NewSerialNo string    `json:"new_serial_no,omitempty"`
 	MemoNo           string    `json:"memo_no,omitempty"`
 	ContactNumber    string    `json:"contact_number,omitempty"`
 	RequestedDate    string    `json:"requested_date,omitempty"`
 	ReportedProblem  string    `json:"reported_problem,omitempty"`
 	ReceivedBy       string    `json:"received_by,omitempty"`
-	DelivaryDate     string    `json:"delivary_date,omitempty"`
-	DelivaredBy      string    `json:"delivered_by,omitempty"`
+	CheckoutDate     string    `json:"checkout_date,omitempty"`
+	DeliveryDate     string    `json:"delivery_date,omitempty"`
+	DeliveredBy      string    `json:"delivered_by,omitempty"`
 	Comment          string    `json:"comment,omitempty"`
 	CreatedAt        time.Time `json:"created_at,omitempty"`
 	UpdatedAt        time.Time `json:"updated_at,omitempty"`

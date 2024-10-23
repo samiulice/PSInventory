@@ -569,6 +569,9 @@ body .container.body .right_col {
 .bg-gw {
     background: #f6fafd !important;
 }
+.bg-swal-popup {
+    background-color: #04423a; /* Change to your desired color */
+  }
 
 
 .bg-green {

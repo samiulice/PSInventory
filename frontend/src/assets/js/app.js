@@ -205,11 +205,26 @@ function stringToDate(dateString, separator = '-', format = 'mm-dd-yyyy') {
   return new Date(year, month, day);
 }
 
-// Example usage:
-//const dateString = '01-10-2023'; // mm-dd-yyyy format
-//const dateObj = stringToDate(dateString, '-', 'mm-dd-yyyy');
-//console.log(dateObj); // Outputs: Tue Oct 01 2023 ...
+// setCurrentDate sets current date(mm-dd-yyyy) to the date input by its id
+function setCurrentDate(dateInputField) {
+  document.getElementById(dateInputField).value = getCurrentDate(); // Set value of the input
+}
+// getCurrentDate returns current date(mm-dd-yyyy) 
+function getCurrentDate() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(today.getDate()).padStart(2, '0');
+  const year = today.getFullYear();
 
+  return `${month}-${day}-${year}`; // Format as MM-DD-YYYY
+}
+let currentDate = getCurrentDate();
+
+// Example usage:
+// const soldDate = '01-10-2022'; // mm-dd-yyyy format
+// const warrantyPeriod = 365; // 1 year warranty
+// const result = checkWarranty(soldDate, warrantyPeriod, '-', 'mm-dd-yyyy');
+// console.log(result);
 function checkWarranty(soldDate, warrantyPeriodInDays, separator = '-', format = 'mm-dd-yyyy') {
   // Convert the sold date string to a Date object
   const parts = soldDate.split(separator);
@@ -254,11 +269,7 @@ function checkWarranty(soldDate, warrantyPeriodInDays, separator = '-', format =
   return [warrantyAvailability, differenceInDays]
 }
 
-// Example usage:
-const soldDate = '01-10-2022'; // mm-dd-yyyy format
-const warrantyPeriod = 365; // 1 year warranty
-const result = checkWarranty(soldDate, warrantyPeriod, '-', 'mm-dd-yyyy');
-console.log(result);
+
 
 
 //Define Division List
@@ -1516,6 +1527,143 @@ function addNewSupplier(page) {
               document.getElementById("supplier").innerHTML = `<option value="${data.result.id}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
               document.getElementById("supplier").disabled = true;
             }
+          }
+        });
+    }
+  });
+}
+
+//checkoutWarrantyProducts show a popup checkout warranty for and make an api call to update database table for checkout process
+function checkoutWarrantyProducts(warrantyHistoryID, salesHistoryID) {
+
+  let htmlContent = `
+      <div class="x_panel">
+          <div class="x_content">
+              <form id="checkout-wp" class="needs-validation" novalidate>
+                  <!-- Arrival Date -->
+                  <div class="col-6 form-group has-feedback">
+                      <input type="date" class="form-control has-feedback-left"  id="arrival_date" name="arrival_date"
+                          placeholder="Enter date(mm-dd-yyyy)" autocomplete="off" required>
+                      <div class="invalid-feedback d-none text-danger">Please correct date.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                  </div>
+                  <!-- New SN Name -->
+                  <div class="col-6 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" id="new_sn" name="new_sn"
+                          placeholder="New S/N (enter previous S/N if warranty repair)" autocomplete="off" required>
+                      <div class="invalid-feedback d-none text-danger">For old items, enter previous serial; for new, enter a new serial."</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-barcode" aria-hidden="true"></span>
+                  </div>
+                  <div class="col-6 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" id="comment" name="comment"
+                          placeholder="Comment" autocomplete="off">
+                      <div class="invalid-feedback d-none text-danger">Please enter the product name.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left fa fa-file-text-o" aria-hidden="true"></span>
+                  </div>
+                  <div class="form-group">
+                    <div id="btns" class="col-4">
+                        <br>
+                        <button type="submit" class="btn btn-danger">Submit</button>
+                    </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+        `;
+  Swal.fire({
+    title: 'Checkout Warranty',
+    width: 600,
+    html: htmlContent,
+    showCloseButton: true,
+    showConfirmButton: false,
+    showCancelButton: false,
+    allowOutsideClick: false,
+    preConfirm: () => {
+      return new Promise((resolve) => {
+        const form = document.getElementById('checkout-wp');
+        const formFields = form.querySelectorAll('.form-control, .form-select');
+        let isValid = true;
+
+        // Reset all feedback messages
+        form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+          feedback.classList.add('d-none');
+        });
+
+        // Check each field
+        formFields.forEach(field => {
+          if (!field.checkValidity()) {
+            isValid = false;
+            const feedback = field.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+              feedback.classList.remove('d-none');
+            }
+          }
+        });
+
+        if (isValid) {
+          resolve({
+            arrival_date: form.arrival_date.value,
+            new_sn: form.new_sn.value,
+            comment: form.comment.value,
+          });
+        } else {
+          Swal.showValidationMessage('Please correct the errors in the form.');
+        }
+      });
+    },
+    willOpen: () => {
+      const form = document.getElementById('checkout-wp');
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+          feedback.classList.add('d-none');
+        });
+        let isValid = true;
+        form.querySelectorAll('.form-control, .form-select').forEach(field => {
+          if (!field.checkValidity()) {
+            isValid = false;
+            const feedback = field.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+              feedback.classList.remove('d-none');
+            }
+          }
+        });
+        if (isValid) {
+          Swal.getConfirmButton().click();
+        } else {
+          Swal.showValidationMessage('Please correct the errors in the form.');
+        }
+      });
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const data = result.value;
+      let wp = {
+        warranty_history_id: warrantyHistoryID,
+        sales_history_id: salesHistoryID,
+        arrival_date: data.arrival_date.value,
+        new_sn: data.new_sn.value,
+        comment: data.comment.value,
+      }
+      const requestOptions = {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(wp),
+      }
+      console.log(wp)
+
+      fetch('http://localhost:4321/api/inventory/products/warranty/checkout', requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          if (data.error === true) {
+            showErrorMessage(data.message)
+          } else {
+            showSuccessMessage(data.message);
           }
         });
     }

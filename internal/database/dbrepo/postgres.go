@@ -116,7 +116,7 @@ func (p *postgresDBRepo) AddEmployee(employee models.Employee) (int, error) {
 	return id, nil
 }
 
-// GetEmployeeDetails retrive detailed info about an employee
+// GetEmployeeDetails retrieves detailed info about an employee
 func (p *postgresDBRepo) GetEmployeeByID(id int) (models.Employee, error) {
 	// 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	// 	defer cancel()
@@ -1501,7 +1501,7 @@ func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.P
 	}
 	//get detailed Product info for these ids
 
-	//retrive all product-serial of each product_id && purchase_is
+	//retrieves all product-serial of each product_id && purchase_is
 	return PurchaseHistory, nil
 }
 
@@ -2084,8 +2084,8 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionD
 
 // AddNewWarrantyClaim handles database opetions for completing claim warranty procedues
 func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) error {
-	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 	//begin transaction
 	tx, err := p.DB.Begin()
 	if err != nil {
@@ -2157,16 +2157,16 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contact
 	return nil
 }
 
-// GetWarrantyList retrives a slice of warranty history from warranty_history_table
+// GetWarrantyList retrieves a slice of warranty history from warranty_history_table
 func (p *postgresDBRepo) GetWarrantyList(searchType string) ([]*models.Warranty, error) {
-	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
 	var warrantyHistory []*models.Warranty
 
 	query := `
 			SELECT
-				id, status, memo_no, product_serial_id, previous_serial_number, contact_number, request_date, reported_problem, received_by, delivary_date, delivared_by, comment, created_at, updated_at
+				id, status, memo_no, product_serial_id, previous_serial_number, new_serial_number, contact_number, request_date, reported_problem, received_by, checkout_date, delivery_date, delivered_by, comment, created_at, updated_at
 			FROM
 				public.warranty_history
 			WHERE
@@ -2183,14 +2183,16 @@ func (p *postgresDBRepo) GetWarrantyList(searchType string) ([]*models.Warranty,
 			&wh.ID,
 			&wh.Status,
 			&wh.MemoNo,
-			&wh.ProductsSerialID,
+			&wh.ProductSerialID,
 			&wh.PreviousSerialNo,
+			&wh.NewSerialNo,
 			&wh.ContactNumber,
 			&wh.RequestedDate,
 			&wh.ReportedProblem,
 			&wh.ReceivedBy,
-			&wh.DelivaryDate,
-			&wh.DelivaredBy,
+			&wh.CheckoutDate,
+			&wh.DeliveryDate,
+			&wh.DeliveredBy,
 			&wh.Comment,
 			&wh.CreatedAt,
 			&wh.UpdatedAt,
@@ -2206,8 +2208,8 @@ func (p *postgresDBRepo) GetWarrantyList(searchType string) ([]*models.Warranty,
 // Helper functions
 // CountTotalEntries counts total number of rows in given the table
 func (p *postgresDBRepo) CountRows(tableName string) (int, error) {
-	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
 	var c int
 	query := "SELECT COUNT(id) FROM " + tableName
@@ -2217,8 +2219,8 @@ func (p *postgresDBRepo) CountRows(tableName string) (int, error) {
 
 // LastIndex returns the last index of a given database table
 func (p *postgresDBRepo) LastIndex(tableName string) (int, error) {
-	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
 	var lastId int
 	query := "SELECT MAX(id) AS last_id FROM " + tableName
