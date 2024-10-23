@@ -1066,7 +1066,7 @@ func (app *application) GetClaimWarrantyList(w http.ResponseWriter, r *http.Requ
 func (app *application) CheckoutWarrantyProduct(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		WarrantyHistoryID int    `json:"warranty_history_id"`
-		SalesHistoryID    int    `json:"sales_history_id"`
+		ProductSerialID    int    `json:"product_serial_id"`
 		ArrivalDate       string `json:"arrival_date"`
 		NewSerialNumber   string `json:"new_sn"`
 		Comment           string `json:"comment"`
@@ -1077,7 +1077,7 @@ func (app *application) CheckoutWarrantyProduct(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	warrantyHistory, err := app.DB.GetWarrantyList(payload.SearchType)
+	err = app.DB.CheckoutWarrantyProduct(payload.WarrantyHistoryID,payload.ProductSerialID,payload.ArrivalDate,payload.NewSerialNumber,payload.Comment)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR => GetClaimWarranty: %w", err))
 		return
@@ -1085,11 +1085,9 @@ func (app *application) CheckoutWarrantyProduct(w http.ResponseWriter, r *http.R
 	var resp struct {
 		Error           bool               `json:"error,omitempty"`
 		Message         string             `json:"message,omitempty"`
-		WarrantyHistory []*models.Warranty `json:"warranty_history"`
 	}
 
 	resp.Error = false
-	resp.Message = "Data Fatched Successfully"
-	resp.WarrantyHistory = warrantyHistory
+	resp.Message = "product checkout successfully"
 	app.writeJSON(w, http.StatusOK, resp)
 }

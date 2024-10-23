@@ -274,16 +274,15 @@
         <!-- Page content here -->
         <div class="x_panel bg-gw">
           <div class="row">
-            <div class="" role="tabpanel" data-example-id="togglable-tabs">
-              <ul id="myTab" class="nav nav-pills nav-tabs" role="tablist">
-                <li role="presentation" class=""><a href="#check_warranty_div" id="check_warranty_div-tab" role="tab"
-                    data-toggle="tab" aria-expanded="true">Warranty Check</a>
+            <div class="" role="tabpanel">
+              <ul class="nav nav-pills nav-tabs">
+                <li class="active">
+                  <a id="check_warranty_div-tab" onclick="reloadWindow()">Warranty Check</a>
                 </li>
-                <li role="presentation" class="active"><a href="#warranty_in_progrss" role="tab"
-                    id="warranty_in_progrss-tab" data-toggle="tab" aria-expanded="false">Warranty In-progrss</a>
+                <li>
+                  <a id="warranty_in_progrss-tab" onclick="reloadWindow()">Warranty In-progrss</a>
                 </li>
-                <li role="presentation" class=""><a href="#product_delivery" role="tab" id="product_delivery-tab"
-                    data-toggle="tab" aria-expanded="false">Product Delivery</a>
+                <li><a id="product_delivery-tab" >Product Delivery</a>
                 </li>
               </ul>
             </div>
@@ -291,7 +290,7 @@
         </div>
         <div id="myTabContent" class="tab-content">
 
-          <div role="tabpanel" class="tab-pane fade" id="check_warranty_div" aria-labelledby="check_warranty_div-tab">
+          <div role="tabpanel" class="tab-pane fade active in" id="check_warranty_div" aria-labelledby="check_warranty_div-tab">
             <div class="x_panel bg-gw">
               <div class="x_content">
                 <form action="#" id="warranty-claim-form">
@@ -321,14 +320,14 @@
               </div>
             </div>
           </div>
-          <div role="tabpanel" class="tab-pane fade active in" id="warranty_in_progrss"
+          <div role="tabpanel" class="tab-pane fade" id="warranty_in_progrss"
             aria-labelledby="warranty_in_progrss-tab">
             <div class="x_panel">
               <div class="x_title">
                   <div class="col-md-3 col-sm-6 col-xs-6 form-group pull-right">
                     <select class="form-control form-select btn-dark" id="history-type">
-                      <option value="checkout">Checkout</option>
-                      <option value="claimed" selected>In Progress</option>
+                      <option value="checkout" selected>Checkout</option>
+                      <option value="claimed">In Progress</option>
                       <option value="delivered">Delivered</option>
                     </select>
                   </div>
@@ -448,7 +447,7 @@
     let warrantyHistoryList;
 
     window.addEventListener("DOMContentLoaded", () => {
-      updateWarrantyHistoryTable("claimed");
+      updateWarrantyHistoryTable(document.getElementById("history-type").value.trim());
       document.getElementById("history-type").addEventListener("change", () => {
         let searchType = document.getElementById("history-type").value.trim();
         updateWarrantyHistoryTable(searchType)
@@ -498,15 +497,6 @@
                 } else if (wh.status === "delivered") {
                   btnState = `<button class="btn btn-xs btn-success" onclick="viewDetailsNow(${i})">View Details</button>`
                 }
-                          // <th>Memo No.</th>
-                          // <th>Old S/N</th>
-                          // <th>New S/N</th>
-                          // <th>Contact Number</th>
-                          // <th>Reported Problem</th>
-                          // <th>Requested Date</th>
-                          // <th>Arrival Date</th>
-                          // <th>Delivery Date</th>
-                          // <th>Action</th>
                 content += `
                   <tr>
                     <td>${wh.memo_no ? wh.memo_no : "-"}</td>
@@ -521,8 +511,6 @@
                   </tr>
                 `
               });
-              console.log("updated");
-              checkoutNow(0);
             } else {
               content = `<tr><td colspan="7" class="text-danger text-center">No Data Available For ${caption.innerText} </td>`
             }
@@ -532,7 +520,7 @@
     }
 
     function checkoutNow(i){
-      checkoutWarrantyProducts(warrantyHistoryList.warranty_history[i].id,warrantyHistoryList.warranty_history[i].sales_info.id)
+      checkoutWarrantyProducts(warrantyHistoryList.warranty_history[i].id,warrantyHistoryList.warranty_history[i].product_serial_id)
     }
 
 

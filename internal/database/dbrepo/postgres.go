@@ -2118,18 +2118,13 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contact
 	}
 	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
 	query = `
-    UPDATE public.product_serial_numbers
-    SET latest_warranty_id = $1,
-		warranty_status = 'in progress',
-        warranty_history_ids = warranty_history_ids || $2, 
-        updated_at = $3
-    WHERE id = $4
-`
-
-	// Convert the `id` (int) to a string for concatenation.
-	// txt := warrantyHistoryIds + "||" + strconv.Itoa(id) // Converting the integer id to a string
-	// fmt.Println("Concatenated text: ", txt)
-
+		UPDATE public.product_serial_numbers
+		SET latest_warranty_id = $1,
+			warranty_status = 'in progress',
+			warranty_history_ids = warranty_history_ids || $2, 
+			updated_at = $3
+		WHERE id = $4
+	`
 	// Execute the query, passing the correct values in the right order
 	result, err := p.DB.ExecContext(ctx, query, id, strconv.Itoa(id), currentTime, serialID)
 	if err != nil {
@@ -2203,6 +2198,78 @@ func (p *postgresDBRepo) GetWarrantyList(searchType string) ([]*models.Warranty,
 		warrantyHistory = append(warrantyHistory, &wh)
 	}
 	return warrantyHistory, nil
+}
+
+//CheckoutWarrantyProduct update database for checkout product
+/*	step-1: set new_serial_number = NewSerialNumber, status = "checkout", checkout_date = ArrivalDate, comment=Comment, updated_at = time.Now()
+	where id = WarrantyHistoryID in warranty_history table
+	step-2: set serial_number = NewSerialNumber, updated_at = time.Now()
+	where id = SalesHistoryID in sales_history Table
+*/
+func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSerialID int, arrivalDate, newSerialNumber, comment string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//begin a transaction
+	tx, err := p.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to begin transaction => %w", err)
+	}
+	//update warranty_history Table
+	query := `
+		UPDATE 
+			public.warranty_history
+		SET 
+			new_serial_number = $1, status = 'checkout', checkout_date = $2, comment= $3, updated_at = $4
+		WHERE 
+			id = $5;		
+	`
+	result, err := tx.ExecContext(ctx, query, newSerialNumber, arrivalDate, comment, time.Now(), warrantyHistoryID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to update warranty_history Table => %w", err)
+	}
+	n, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Error counting affected rows in warranty_history Table => %w", err)
+	}
+	if n != 1 {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Number of affected rows in warranty_history Table is undesired => %w", err)
+	}
+
+	//update product_serial_numbers
+	query = `
+		UPDATE 
+			public.product_serial_numbers
+		SET 
+			new_serial_number = $1 updated_at = $2
+		WHERE 
+			id = $3;		
+	`
+	result, err = tx.ExecContext(ctx, query, newSerialNumber, time.Now(), productSerialID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to update product_serial_numbers Table => %w", err)
+	}
+	n, err = result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Error counting affected rows in product_serial_numbers Table => %w", err)
+	}
+	if n != 1 {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Number of affected rows in product_serial_numbers Table is undesired => %w", err)
+	}
+
+	//commit the changes
+	err = tx.Commit();
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to commit changes => %w", err)
+	}
+	return nil
 }
 
 // Helper functions

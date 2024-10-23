@@ -218,7 +218,6 @@ function getCurrentDate() {
 
   return `${month}-${day}-${year}`; // Format as MM-DD-YYYY
 }
-let currentDate = getCurrentDate();
 
 // Example usage:
 // const soldDate = '01-10-2022'; // mm-dd-yyyy format
@@ -1534,7 +1533,7 @@ function addNewSupplier(page) {
 }
 
 //checkoutWarrantyProducts show a popup checkout warranty for and make an api call to update database table for checkout process
-function checkoutWarrantyProducts(warrantyHistoryID, salesHistoryID) {
+function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
 
   let htmlContent = `
       <div class="x_panel">
@@ -1641,7 +1640,7 @@ function checkoutWarrantyProducts(warrantyHistoryID, salesHistoryID) {
       const data = result.value;
       let wp = {
         warranty_history_id: warrantyHistoryID,
-        sales_history_id: salesHistoryID,
+        product_serial_id: productSerialID,
         arrival_date: data.arrival_date.value,
         new_sn: data.new_sn.value,
         comment: data.comment.value,
