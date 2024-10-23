@@ -4,14 +4,14 @@ import (
 	"time"
 )
 
-//MM-PR-rand(6)+LastIndexOfPurchaseHistory Table //Purchase
-//MM-SL-rand(6)+LastIndexOfSalesHistory Table //Sale
-//MM-WC-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Claim
-//MM-WO-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Arrived
-//MM-WD-rand(6)+LastIndexOfWarrantyHistory Table //Warranty Delivered
-//MM-RR-rand(6)+LastIndexOfWarrantyHistory Table //Repair Receive
-//MM-RC-rand(6)+LastIndexOfWarrantyHistory Table //Repair Completed
-//MM-RD-rand(6)+LastIndexOfWarrantyHistory Table //Repair Delivered
+//MM-PR-randomAlphanumeriac(6)+CurrentIndexOfPurchaseHistory Table //Purchase
+//MM-SL-randomAlphanumeriac(6)+CurrentIndexOfSalesHistory Table //Sale
+//MM-WC-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Warranty Claimed
+//MM-WCO-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Warranty Checked Out
+//MM-WD-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Warranty Delivered
+//MM-RR-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Repair Receive
+//MM-RC-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Repair Completed
+//MM-RD-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Repair Delivered
 
 const (
 	// AustraliaRegex matches Australian mobile numbers with or without country code (+61)
@@ -198,7 +198,7 @@ type Purchase struct {
 	ProductsSerialNo  []string  `json:"products_serial_no,omitempty"`
 	AccountID         int       `json:"account_id,omitempty"`
 	ChalanNO          string    `json:"chalan_no,omitempty"`
-	MemoNo            string    `json:"memo_no,omitempty"` //MM-P-rand(6)LastIndexOfPurchaseHistoryDB
+	MemoNo            string    `json:"memo_no,omitempty"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
 	Note              string    `json:"note,omitempty"`
 	MaxRetailPrice    int       `json:"max_retail_price,omitempty"`
 	PurchaseRate      int       `json:"purchase_rate,omitempty"`
@@ -238,9 +238,9 @@ type Sale struct {
 type Warranty struct {
 	ID               int       `json:"id"`
 	Status           string    `json:"status,omitempty"`
-	ProductSerialID int       `json:"product_serial_id,omitempty"`
+	ProductSerialID  int       `json:"product_serial_id,omitempty"`
 	PreviousSerialNo string    `json:"previous_serial_no,omitempty"`
-	NewSerialNo string    `json:"new_serial_no,omitempty"`
+	NewSerialNo      string    `json:"new_serial_no,omitempty"`
 	MemoNo           string    `json:"memo_no,omitempty"`
 	ContactNumber    string    `json:"contact_number,omitempty"`
 	RequestedDate    string    `json:"requested_date,omitempty"`

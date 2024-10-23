@@ -1602,7 +1602,7 @@ function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
         if (isValid) {
           resolve({
             arrival_date: form.arrival_date.value,
-            new_sn: form.new_sn.value,
+            new_s_n: form.new_sn.value,
             comment: form.comment.value,
           });
         } else {
@@ -1638,12 +1638,12 @@ function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
   }).then((result) => {
     if (result.isConfirmed) {
       const data = result.value;
-      let wp = {
+      let wpData = {
         warranty_history_id: warrantyHistoryID,
         product_serial_id: productSerialID,
-        arrival_date: data.arrival_date.value,
-        new_sn: data.new_sn.value,
-        comment: data.comment.value,
+        checkout_date: data.arrival_date,
+        new_serial_number: data.new_s_n,
+        comment: data.comment,
       }
       const requestOptions = {
         method: 'post',
@@ -1651,9 +1651,9 @@ function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(wp),
+        body: JSON.stringify(wpData),
       }
-      console.log(wp)
+      console.log(wpData)
 
       fetch('http://localhost:4321/api/inventory/products/warranty/checkout', requestOptions)
         .then(response => response.json())

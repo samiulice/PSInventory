@@ -1016,7 +1016,15 @@ func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.R
 	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
 	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
 
-	err = app.DB.AddNewWarrantyClaim(payload.Product.ProductMetadata[0].ID, payload.Product.ProductMetadata[0].SerialNumber, payload.ContactNumber, payload.ReportedProblem, payload.ReceivedBy, payload.Product.ProductMetadata[0].WarrantyHistoryIDs)
+	//MM-WC-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Warranty Claimed
+	//generate 6 digits random Alphanumeric
+	randomCode, err := app.GenerateRandomAlphanumericCode(6)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("handler Error - ClaimWarrantyBySerialID => GenerateRandomAlphanumericCode: %w", err))
+		return
+	}
+	memoPrefix := "MM-WC-" + randomCode
+	err = app.DB.AddNewWarrantyClaim(memoPrefix, payload.Product.ProductMetadata[0].ID, payload.Product.ProductMetadata[0].SerialNumber, payload.ContactNumber, payload.ReportedProblem, payload.ReceivedBy, payload.Product.ProductMetadata[0].WarrantyHistoryIDs)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("handler Error - ClaimWarrantyBySerialID => AddNewWarrantyClaim: %w", err))
 		return
@@ -1066,28 +1074,28 @@ func (app *application) GetClaimWarrantyList(w http.ResponseWriter, r *http.Requ
 func (app *application) CheckoutWarrantyProduct(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		WarrantyHistoryID int    `json:"warranty_history_id"`
-		ProductSerialID    int    `json:"product_serial_id"`
-		ArrivalDate       string `json:"arrival_date"`
-		NewSerialNumber   string `json:"new_sn"`
+		ProductSerialID   int    `json:"product_serial_id"`
+		ArrivalDate       string `json:"checkout_date"`
+		NewSerialNumber   string `json:"new_serial_number"`
 		Comment           string `json:"comment"`
 	}
 	err := app.readJSON(w, r, &payload)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR => GetClaimWarranty: %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR => CheckoutWarrantyProduct: %w", err))
 		return
 	}
 
-	err = app.DB.CheckoutWarrantyProduct(payload.WarrantyHistoryID,payload.ProductSerialID,payload.ArrivalDate,payload.NewSerialNumber,payload.Comment)
+	err = app.DB.CheckoutWarrantyProduct(payload.WarrantyHistoryID, payload.ProductSerialID, payload.ArrivalDate, payload.NewSerialNumber, payload.Comment)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR => GetClaimWarranty: %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR => CheckoutWarrantyProduct: %w", err))
 		return
 	}
 	var resp struct {
-		Error           bool               `json:"error,omitempty"`
-		Message         string             `json:"message,omitempty"`
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
 	}
 
 	resp.Error = false
-	resp.Message = "product checkout successfully"
+	resp.Message = "product checked out successfully"
 	app.writeJSON(w, http.StatusOK, resp)
 }

@@ -2083,7 +2083,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionD
 }
 
 // AddNewWarrantyClaim handles database opetions for completing claim warranty procedues
-func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) error {
+func (p *postgresDBRepo) AddNewWarrantyClaim(memoPrefix string, serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	//begin transaction
@@ -2091,26 +2091,22 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contact
 	if err != nil {
 		return fmt.Errorf("DBERROR: AddNewWarrantyClaim => Begin Tx => %w", err)
 	}
-	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
-	query := `
-		INSERT INTO public.warranty_history(product_serial_id, previous_serial_number, contact_number, request_date, reported_problem, received_by, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
-	`
 	// Get the current time
 	currentTime := time.Now()
 	// Format the date into mm/dd/yyyy
 	formattedDateStr := currentTime.Format("01/02/2006")
+
+	lastIndex, err := p.LastIndex("warranty_history")
+	if err != nil {
+		return fmt.Errorf("DBERROR: AddNewWarrantyClaim => unable to find Last Index of warranty_history Table => %w", err)
+	}
+	memoPrefix += strconv.Itoa(lastIndex)
+	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
+	query := `INSERT INTO public.warranty_history(memo_no, product_serial_id, previous_serial_number, contact_number, request_date, reported_problem, received_by, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
+
 	var id int
-	err = tx.QueryRowContext(ctx, query,
-		serialID,
-		serialNumber,
-		contactNumber,
-		formattedDateStr,
-		reportedProblem,
-		receivedBy,
-		currentTime,
-		currentTime,
-	).Scan(&id)
+	err = tx.QueryRowContext(ctx, query, memoPrefix, serialID, serialNumber, contactNumber, formattedDateStr, reportedProblem, receivedBy, currentTime, currentTime).Scan(&id)
 
 	if err != nil {
 		tx.Rollback()
@@ -2118,12 +2114,15 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(serialID int, serialNumber, contact
 	}
 	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
 	query = `
-		UPDATE public.product_serial_numbers
-		SET latest_warranty_id = $1,
+		UPDATE 
+			public.product_serial_numbers
+		SET 
+			latest_warranty_id = $1,
 			warranty_status = 'in progress',
 			warranty_history_ids = warranty_history_ids || $2, 
 			updated_at = $3
-		WHERE id = $4
+		WHERE 
+			id = $4
 	`
 	// Execute the query, passing the correct values in the right order
 	result, err := p.DB.ExecContext(ctx, query, id, strconv.Itoa(id), currentTime, serialID)
@@ -2201,7 +2200,7 @@ func (p *postgresDBRepo) GetWarrantyList(searchType string) ([]*models.Warranty,
 }
 
 //CheckoutWarrantyProduct update database for checkout product
-/*	step-1: set new_serial_number = NewSerialNumber, status = "checkout", checkout_date = ArrivalDate, comment=Comment, updated_at = time.Now()
+/*	step-1: set new_serial_number = NewSerialNumber, status = "checked out", checkout_date = ArrivalDate, comment=Comment, updated_at = time.Now()
 	where id = WarrantyHistoryID in warranty_history table
 	step-2: set serial_number = NewSerialNumber, updated_at = time.Now()
 	where id = SalesHistoryID in sales_history Table
@@ -2220,7 +2219,7 @@ func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSeria
 		UPDATE 
 			public.warranty_history
 		SET 
-			new_serial_number = $1, status = 'checkout', checkout_date = $2, comment= $3, updated_at = $4
+			new_serial_number = $1, status = 'checked out', checkout_date = $2, comment= $3, updated_at = $4
 		WHERE 
 			id = $5;		
 	`
@@ -2244,7 +2243,7 @@ func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSeria
 		UPDATE 
 			public.product_serial_numbers
 		SET 
-			new_serial_number = $1 updated_at = $2
+			serial_number = $1, warranty_status = 'no issue', updated_at = $2
 		WHERE 
 			id = $3;		
 	`
@@ -2264,7 +2263,7 @@ func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSeria
 	}
 
 	//commit the changes
-	err = tx.Commit();
+	err = tx.Commit()
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to commit changes => %w", err)
