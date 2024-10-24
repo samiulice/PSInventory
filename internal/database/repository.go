@@ -65,9 +65,11 @@ type DatabaseRepo interface {
 	SaleProducts(sale *models.Sale) error
 	GetSalesHistoryByID(id int) (models.Sale, error)
 	//warranty
-	AddNewWarrantyClaim(memoPrefix string, serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) error
+	AddNewWarrantyClaim(memoPrefix string, serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) (int, error)
 	GetWarrantyList(SearchType string) ([]*models.Warranty, error)
+	// GetWarrantyDetailsByID(id int) ([]*models.Warranty, error)
 	CheckoutWarrantyProduct(warrantyHistoryID, productSerialID int, arrivalDate, newSerialNumber, comment string) error
+	DeliveryWarrantyProduct(warrantyHistoryID, productSerialID int, deliveredBy string) error
 	//Memo
 	GetMemoListBySupplierID(supplierID int) ([]*models.Purchase, error)
 	GetMemoListByCustomerID(customerID int) ([]*models.Sale, error)

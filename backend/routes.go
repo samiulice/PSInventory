@@ -54,10 +54,13 @@ func (app *application) routes() http.Handler {
 		mux.Post("/inventory/purchase/get-page-details", app.GetPurchasePageDetails)
 		mux.Post("/inventory/sale/get-page-details", app.GetSalePageDetails)
 		//warranty
-		mux.Post("/inventory/products/warranty/get-history", app.GetClaimWarrantyList)
-		mux.Post("/inventory/products/warranty/checkout", app.CheckoutWarrantyProduct)
-		mux.Post("/inventory/products/warranty/checkout/get-list", app.GetClaimWarrantyList)
+
 		mux.Post("/inventory/products/claim-warranty-by-serial-id", app.ClaimWarrantyBySerialID)
+		mux.Post("/inventory/products/warranty/checkout", app.CheckoutWarrantyProduct)
+		mux.Post("/inventory/products/warranty/delivery", app.DeliveryWarrantyProduct)
+		mux.Post("/inventory/products/warranty/checkout/get-list", app.GetClaimWarrantyList)
+		mux.Post("/inventory/products/warranty/get-history", app.GetClaimWarrantyList)
+
 		//accounts
 		mux.Post("/accounts/receive-collection/get-page-details", app.GetReceiveCollectionPageDetails)
 

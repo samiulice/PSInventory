@@ -1668,3 +1668,99 @@ function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
     }
   });
 }
+
+//checkoutWarrantyProducts show a popup checkout warranty for and make an api call to update database table for checkout process
+function ConfirmWarrantyDeliveryProcess(warrantyHistoryID, productSerialID) {
+  Swal.fire({
+    title: 'Proceed with delivery?',
+    width: 600,
+    showCloseButton: true,
+    showConfirmButton: false,
+    showCancelButton: true,
+    allowOutsideClick: false,
+    icon: "warning",
+
+    willOpen: () => {
+      let wpData = {
+        warranty_history_id: warrantyHistoryID,
+        product_serial_id: productSerialID,
+      }
+      const requestOptions = {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(wpData),
+      }
+      console.log(wpData)
+
+      fetch('http://localhost:4321/api/inventory/products/warranty/checkout', requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          if (data.error === true) {
+            showErrorMessage(data.message)
+          } else {
+            showSuccessMessage(data.message);
+          }
+        });
+    }
+  });
+}
+
+
+// Function to show SweetAlert2 prompt and handle the delivery process for a warranty product
+function confirmWarrantyDeliveryProcess(warrantyHistoryID, productSerialID) {
+  // Display a SweetAlert2 confirmation prompt to proceed with delivery
+  Swal.fire({
+    title: 'Proceed with delivery?',   // Prompt message
+    showCancelButton: true,            // Show the cancel button
+    confirmButtonText: 'Yes',          // Text for the confirm button
+    cancelButtonText: 'Cancel',        // Text for the cancel button
+    icon: 'warning',                   // Icon type to indicate a warning action
+  }).then((result) => {
+    // Check if the user confirmed by clicking "Yes"
+    if (result.isConfirmed) {
+      // Data object containing warranty history ID and product serial ID
+      let wpData = {
+        warranty_history_id: warrantyHistoryID,
+        product_serial_id: productSerialID,
+      };
+      
+      // Fetch API request options, including method, headers, and body (as JSON)
+      const requestOptions = {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(wpData),  // Convert data object to a JSON string
+      };
+      
+      // Log the data being sent to the API (for debugging purposes)
+      console.log(wpData);
+      
+      // Send a POST request to the API endpoint for warranty delivery
+      fetch('http://localhost:4321/api/inventory/products/warranty/delivery', requestOptions)
+        .then(response => response.json())  // Parse the response as JSON
+        .then(data => {
+          // Check if the API returned an error
+          if (data.error === true) {
+            showErrorMessage(data.message);  // Show error message if there's an issue
+          } else {
+            showSuccessMessage(data.message);  // Show success message on success
+            setTimeout(function () {
+              location.reload();
+            }, 3000); // Adjust the delay as needed 
+          }
+        })
+        .catch(error => {
+          // Handle any errors that occur during the fetch request
+          console.error('Error during the request:', error);
+          showErrorMessage('An error occurred during the delivery process.');
+        });
+    }
+  });
+}
+

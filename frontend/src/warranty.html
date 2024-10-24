@@ -521,7 +521,10 @@
     }
 
     function checkoutNow(i){
-      checkoutWarrantyProducts(warrantyHistoryList.warranty_history[i].id,warrantyHistoryList.warranty_history[i].product_serial_id)
+      checkoutWarrantyProducts(warrantyHistoryList.warranty_history[i].id,warrantyHistoryList.warranty_history[i].product_serial_id)      
+    }
+    function deliveryNow(i){
+      confirmWarrantyDeliveryProcess(warrantyHistoryList.warranty_history[i].id,warrantyHistoryList.warranty_history[i].product_serial_id)
     }
 
 
@@ -586,9 +589,10 @@
         reported_problem: document.getElementById("reported-problem").value,
         contact_number: document.getElementById("contact-number").value,
         received_by: document.getElementById("received-by").value,
-        product_item_details: product
+        product_item_details: product,
+        customer_info : customer
       }
-      console.log(warrantyClaimBody);
+      console.log("calim warranty Body:",warrantyClaimBody);
       const requestOptions = {
         method: 'post',
         headers: {
@@ -601,7 +605,7 @@
       fetch('http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id', requestOptions)
         .then(response => response.json())
         .then(data => {
-          console.log("Sale Products: ", data)
+          console.log("Claim warranty: ", data)
           if (data.error === true) {
             showErrorMessage(data.message)
           } else {
