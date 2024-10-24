@@ -4,6 +4,30 @@
 //   e.preventDefault();
 // });
 
+// GenerateRandomAlphanumericCode generates a random alphanumeric string of the specified length.
+//
+// The string consists of a mix of uppercase letters, lowercase letters, and digits.
+// It uses cryptographic randomness to ensure that the generated string is secure.
+//
+// Parameters:
+//   - length: The desired length of the generated string (should be a positive integer).
+//
+// Returns:
+//   - A random alphanumeric string of the specified length.
+function generateRandomAlphanumericCode(length) {
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const charsetLength = charset.length;
+  let randomCode = '';
+
+  for (let i = 0; i < length; i++) {
+      const index = Math.floor(Math.random() * charsetLength);
+      randomCode += charset[index];
+  }
+
+  return randomCode;
+}
+
+
 function paginator(currPageIndex, pageSize, totalRecords) {
   let pNav = document.getElementById("paginate_nav");
   let pInfo = document.getElementById("paginator_info");
@@ -123,23 +147,6 @@ function init_DataTables() {
 
 };
 
-/**
- * Generates a memo number in the format MM-memo_type-rand(digit6 int)LastIndexOfDBTable.
- * 
- * The memo number consists of:
- * - rand(digit6 int): A random 6-digit integer
- *
- * @returns {string} The formatted memo number.
- */
-function generateMemoNumber(lastIndex, memoType) {
-  // Generate a random 6-digit number (from 100000 to 999999)
-  const randomSixDigit = String(Math.floor(100000 + Math.random() * 900000));
-
-  // Combine all parts into the desired format
-  const memoNumber = `MM-${memoType}-${randomSixDigit}${lastIndex}`;
-
-  return memoNumber; // Return the formatted serial number
-}
 
 
 /*formatDate returns formattedDate for the given time, 
@@ -1533,7 +1540,7 @@ function addNewSupplier(page) {
 }
 
 //checkoutWarrantyProducts show a popup checkout warranty for and make an api call to update database table for checkout process
-function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
+function checkoutWarrantyProducts(warrantyHistoryID, productSerialNo, productSerialID) {
 
   let htmlContent = `
       <div class="x_panel">
@@ -1641,6 +1648,7 @@ function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
       let wpData = {
         warranty_history_id: warrantyHistoryID,
         product_serial_id: productSerialID,
+        old_serial_number: productSerialNo,
         checkout_date: data.arrival_date,
         new_serial_number: data.new_s_n,
         comment: data.comment,
@@ -1669,48 +1677,8 @@ function checkoutWarrantyProducts(warrantyHistoryID, productSerialID) {
   });
 }
 
-//checkoutWarrantyProducts show a popup checkout warranty for and make an api call to update database table for checkout process
-function ConfirmWarrantyDeliveryProcess(warrantyHistoryID, productSerialID) {
-  Swal.fire({
-    title: 'Proceed with delivery?',
-    width: 600,
-    showCloseButton: true,
-    showConfirmButton: false,
-    showCancelButton: true,
-    allowOutsideClick: false,
-    icon: "warning",
 
-    willOpen: () => {
-      let wpData = {
-        warranty_history_id: warrantyHistoryID,
-        product_serial_id: productSerialID,
-      }
-      const requestOptions = {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(wpData),
-      }
-      console.log(wpData)
-
-      fetch('http://localhost:4321/api/inventory/products/warranty/checkout', requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if (data.error === true) {
-            showErrorMessage(data.message)
-          } else {
-            showSuccessMessage(data.message);
-          }
-        });
-    }
-  });
-}
-
-
-// Function to show SweetAlert2 prompt and handle the delivery process for a warranty product
+//Function to show SweetAlert2 prompt and handle the delivery process for a warranty product
 function confirmWarrantyDeliveryProcess(warrantyHistoryID, productSerialID) {
   // Display a SweetAlert2 confirmation prompt to proceed with delivery
   Swal.fire({
@@ -1727,7 +1695,7 @@ function confirmWarrantyDeliveryProcess(warrantyHistoryID, productSerialID) {
         warranty_history_id: warrantyHistoryID,
         product_serial_id: productSerialID,
       };
-      
+
       // Fetch API request options, including method, headers, and body (as JSON)
       const requestOptions = {
         method: 'post',
@@ -1737,10 +1705,10 @@ function confirmWarrantyDeliveryProcess(warrantyHistoryID, productSerialID) {
         },
         body: JSON.stringify(wpData),  // Convert data object to a JSON string
       };
-      
+
       // Log the data being sent to the API (for debugging purposes)
       console.log(wpData);
-      
+
       // Send a POST request to the API endpoint for warranty delivery
       fetch('http://localhost:4321/api/inventory/products/warranty/delivery', requestOptions)
         .then(response => response.json())  // Parse the response as JSON
@@ -1764,3 +1732,91 @@ function confirmWarrantyDeliveryProcess(warrantyHistoryID, productSerialID) {
   });
 }
 
+//viewWarrantyHistory shows warranty history
+function viewWarrantyHistory(warrantyHistory) {
+  let mm = warrantyHistory.memo_no.split("-").pop() //get the last part of the memo
+  // Display a SweetAlert2 confirmation prompt to proceed with delivery
+  Swal.fire({
+    width: 1024,
+    title: 'Warranty Information',   // Prompt message
+    showCancelButton: true,            // Show the cancel button
+    confirmButtonText: 'Yes',          // Text for the confirm button
+    cancelButtonText: 'Cancel',        // Text for the cancel button
+    allowOutsideClick: false,          //disable outside click
+    
+    html: `<div class="row">
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <!-- Table row -->
+          <table class="table table-striped">
+            <caption>Product Reception</caption>
+            <tbody>
+              <tr>
+                <td>Invoice No:</td>
+                <td>
+                  <b>MM-WC-${mm}</b>
+                </td>
+              </tr>
+              <tr>
+                <td>Old S/N:</td>
+                <td><b>${warrantyHistory.previous_serial_no}</b></td>
+              </tr>
+              <tr>
+                <td>Received By:</td>
+                <td><b>${warrantyHistory.received_by?warrantyHistory.received_by:""}
+              </tr>
+              <tr>
+                <td>Receiption Date:</td>
+                <td><b>${formatDate(warrantyHistory.requested_date, "date", "-")}</b></td>
+              </tr>
+              <tr>
+                <td>Complain:</td>
+                <td><b>${warrantyHistory.reported_problem}</b></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <!-- Table row -->
+          <table class="table table-striped">
+            <caption>Delivery Information</caption>
+            <tbody>
+              <tr>
+                <td>Invoice No:</td>
+                <td>
+                  <b>MM-WD-${mm}</b>
+                </td>
+              </tr>
+               <tr>
+                <td>New S/N:</td>
+                <td><b>${warrantyHistory.new_serial_no}</b></td>
+              </tr>
+              <tr>
+                <td>Delivered By:</td>
+                <td><b>${warrantyHistory.delivered_by?warrantyHistory.delivered_by:""}
+              </tr>
+              <tr>
+                <td>Delivery Date:</td>
+                <td><b>${formatDate(warrantyHistory.delivery_date, "date", "-")}</b></td>
+              </tr>
+              <tr>
+                <td>Comment:</td>
+                <td><b>${warrantyHistory.comment}</b></td>
+              </tr>
+              
+              <tr>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `
+  }).then((result) => {
+  });
+}

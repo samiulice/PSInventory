@@ -1,9 +1,72 @@
-:root{
+:root {
     --bg_color: #111314
 }
-.d-none{
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('../fonts/Nunito-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('../fonts/Nunito-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-Regular';
+    src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Poppins-Bold';
+    src: url('../fonts/Poppins-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'IBMPlexSans-Regular';
+    src: url('../fonts/IBMPlexSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'IBMPlexSans-Bold';
+    src: url('../fonts/IBMPlexSans-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* sweetaler2 styles customization */
+.swal2-popup {
+    font-family: 'IBMPlexSans-Regular', Impact;
+    font-size: 1.15rem;
+    /* Adjust font size */
+    width: 600px;
+    /* Set a custom width */
+    padding: 20px;
+    /* Increase padding */
+}
+
+.swal2-title {
+    font-size: 1.5rem;
+    /* Adjust title size */
+}
+
+.swal2-content {
+    font-size: 1rem;
+    /* Adjust content size */
+}
+
+/* /sweetaler2 styles customization */
+.d-none {
     display: none;
 }
+
 .x_title h2,
 table.tile_info td p {
     white-space: nowrap;
@@ -563,15 +626,19 @@ body .container.body .right_col {
     border: 1px solid #fff !important;
     color: #000000
 }
+
 .bg-dark {
     background: #000 !important;
 }
+
 .bg-gw {
     background: #f6fafd !important;
 }
+
 .bg-swal-popup {
-    background-color: #04423a; /* Change to your desired color */
-  }
+    background-color: #04423a;
+    /* Change to your desired color */
+}
 
 
 .bg-green {
@@ -622,18 +689,12 @@ body .container.body .right_col {
 .top_nav .nav>li>a:hover {
     background: #D9DEE4
 }
-@font-face {
-    font-family: 'Nunito';
-    font-style: normal;
-    font-weight: 400;
-    src: local("../fonts/nunito-v16-latin-regular.woff2") format("woff2"),
-    /* url("../fonts/nunito-v16-latin-regular.woff2") format("woff2"); */
-}
+
 
 body {
     color: #1d1e20;
     background: #feffff;
-    font-family: 'Nunito',  sans-serif, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, ;
+    font-family: 'IBMPlexSans-Regular';
     font-size: 13px;
     font-weight: 400;
     line-height: 1.471
@@ -2404,7 +2465,8 @@ button {
     margin-bottom: 0;
     margin-right: 0
 }
-.input-addon-btn{
+
+.input-addon-btn {
     transform: translate(-10px, 28px)
 }
 
@@ -2590,7 +2652,7 @@ span.section {
 
 .form-control:focus {
     border-color: #417bdf;
-    
+
 }
 
 legend {
@@ -2978,7 +3040,7 @@ span.tag a {
 .tagsinput input {
     width: 80px;
     margin: 0;
-    font-family: helvetica;
+    font-family: 'IBMPlexSans-Regular';
     font-size: 13px;
     border: 1px solid transparent;
     padding: 3px;
@@ -3762,7 +3824,7 @@ ul.project_files li a i {
 }
 
 .view p {
-    font-family: Georgia, serif;
+    font-family: 'IBMPlexSans-Regular', serif;
     font-size: 12px;
     color: #fff;
     padding: 10px 20px 20px;
@@ -3957,7 +4019,7 @@ ul.project_files li a i {
     color: #666;
     background: rgba(243, 242, 243, .8);
     border: 2px solid rgba(195, 194, 196, .8);
-    font-family: sans-serif;
+    font-family: 'IBMPlexSans-Regular';
     font-size: 12px;
     text-align: center
 }
@@ -4934,15 +4996,24 @@ ul.notifications {
 }
 
 .vertical-solid-line {
-    border-left: 2px solid #E6E9ED; /* Vertical line */
-    height: min-content; /* Takes the height of the content */
-    margin: 0 10px; /* Spacing between content and the line */
-    padding: 0 20px; /* Spacing between content and the line */
+    border-left: 2px solid #E6E9ED;
+    /* Vertical line */
+    height: min-content;
+    /* Takes the height of the content */
+    margin: 0 10px;
+    /* Spacing between content and the line */
+    padding: 0 20px;
+    /* Spacing between content and the line */
 }
+
 .vertical-dotted-line {
-    border-left: 2px dotted #E6E9ED; /* Vertical line */
-    height: 100%; /* Takes the height of the content */
-    margin: 0 10px; /* Spacing between content and the line */
-    padding: 0 20px; /* Spacing between content and the line */
-    
+    border-left: 2px dotted #E6E9ED;
+    /* Vertical line */
+    height: 100%;
+    /* Takes the height of the content */
+    margin: 0 10px;
+    /* Spacing between content and the line */
+    padding: 0 20px;
+    /* Spacing between content and the line */
+
 }

@@ -7,9 +7,6 @@ import (
 	"io"
 	"math/big"
 	"net/http"
-	"regexp"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 // readJSON read json from request body into data. It accepts a sinle JSON of 1MB max size value in the body
@@ -64,42 +61,42 @@ func (app *application) badRequest(w http.ResponseWriter, err error) {
 	_ = app.writeJSON(w, http.StatusOK, payload)
 }
 
-// invalidCradentials sends a JSON response for invalid credentials
-func (app *application) invalidCradentials(w http.ResponseWriter) error {
-	var payload struct {
-		Error   bool   `json:"error"`
-		Message string `json:"message"`
-	}
+// // invalidCradentials sends a JSON response for invalid credentials
+// func (app *application) invalidCradentials(w http.ResponseWriter) error {
+// 	var payload struct {
+// 		Error   bool   `json:"error"`
+// 		Message string `json:"message"`
+// 	}
 
-	payload.Error = true
-	payload.Message = "Invalid authentication credentials"
-	err := app.writeJSON(w, http.StatusOK, payload)
-	return err
-}
+// 	payload.Error = true
+// 	payload.Message = "Invalid authentication credentials"
+// 	err := app.writeJSON(w, http.StatusOK, payload)
+// 	return err
+// }
 
-func (app *application) passwordMatchers(hashPassword, password string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
-	if err != nil {
-		switch {
-		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
-			return false, nil
-		default:
-			return false, err
-		}
-	}
-	return true, nil
-}
+// func (app *application) passwordMatchers(hashPassword, password string) (bool, error) {
+// 	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
+// 	if err != nil {
+// 		switch {
+// 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+// 			return false, nil
+// 		default:
+// 			return false, err
+// 		}
+// 	}
+// 	return true, nil
+// }
 
-// MatchMobileNumberPattern checks if the given number matches the provided regex pattern
-func (app *application) MatchMobileNumberPattern(input, pattern string) bool {
-	matched, err := regexp.MatchString(pattern, input)
-	if err != nil {
-		// Handle error if the regex is invalid
-		println("Error matching regex:", err)
-		return false
-	}
-	return matched
-}
+// // MatchMobileNumberPattern checks if the given number matches the provided regex pattern
+// func (app *application) MatchMobileNumberPattern(input, pattern string) bool {
+// 	matched, err := regexp.MatchString(pattern, input)
+// 	if err != nil {
+// 		// Handle error if the regex is invalid
+// 		println("Error matching regex:", err)
+// 		return false
+// 	}
+// 	return matched
+// }
 
 // GenerateRandomAlphanumericCode generates a random alphanumeric string of the specified length.
 //
@@ -112,7 +109,7 @@ func (app *application) MatchMobileNumberPattern(input, pattern string) bool {
 // Returns:
 //   - A random alphanumeric string of the specified length.
 //   - An error if there is an issue generating the random string (e.g., failure in random number generation).
-func (app *application)GenerateRandomAlphanumericCode(length int) (string, error) {
+func (app *application) GenerateRandomAlphanumericCode(length int) (string, error) {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	charsetLength := len(charset)
 	randomCode := make([]byte, length)

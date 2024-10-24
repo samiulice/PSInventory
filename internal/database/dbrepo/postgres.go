@@ -2236,13 +2236,12 @@ func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSeria
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Number of affected rows in warranty_history Table is undesired => %w", err)
 	}
-
 	//update product_serial_numbers
 	query = `
 		UPDATE 
 			public.product_serial_numbers
 		SET 
-			serial_number = $1, warranty_status = 'ready to delivery', updated_at = $2
+			serial_number = $1, warranty_status = 'delivery ready', updated_at = $2
 		WHERE 
 			id = $3;		
 	`
@@ -2338,7 +2337,7 @@ func (p *postgresDBRepo) DeliveryWarrantyProduct(warrantyHistoryID, productSeria
 	err = tx.Commit()
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to commit changes => %w", err)
+		return fmt.Errorf("DBERROR: DeliveryWarrantyProduct: Unable to commit changes => %w", err)
 	}
 	return nil
 }

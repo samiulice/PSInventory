@@ -419,7 +419,7 @@
                           <div class="col-md-11 col-sm-11 col-xs-11">
                             <label for="memo_no">Memo No * :</label>
                             <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No"
-                              required>
+                              disable required>
                             <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
                               aria-hidden="true">
                             </i>
@@ -627,8 +627,7 @@
           } else {
             console.log(data)
             //Set memo no(MM-RandomSixDigit)
-            lastIndex = data.last_index;
-            document.getElementById("memo_no").value = generateMemoNumber(lastIndex, "SL");
+            document.getElementById("memo_no").value = `MM-SL-${generateRandomAlphanumericCode(6)}`;
             document.getElementById("memo_no").disabled = true;
             updateCustomerDiv(data.customers)
             updateCategoryDiv(data.categories)

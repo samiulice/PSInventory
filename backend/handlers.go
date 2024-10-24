@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"PSInventory/internal/models"
@@ -586,39 +587,35 @@ func (app *application) FetchSoldProductItembySerialNumber(w http.ResponseWriter
 	//Get product item details for the given serial number(e.g. id,serial_number, product_id,purchase_history_id,warranty, max_retail_price, purchase_rate)
 	productItem, err = app.DB.GetItemDetailsBySerialNumber(payload.SerialNumber)
 	if err == sql.ErrNoRows {
-		resp.Message = "No Product found"
+		resp.Message = "Product item not found"
 		app.writeJSON(w, http.StatusOK, resp)
 		return
 	} else if err != nil {
 		app.badRequest(w, err)
 		return
-	} else if productItem.ProductMetadata[0].Status != "sold" {
-		resp.Message = "Product Unsold"
+	}
+
+	//Get sales history for the fetched product item
+	salesHistory, err = app.DB.GetSalesHistoryByID(productItem.ProductMetadata[0].SalesHistoryID)
+	if err == sql.ErrNoRows {
+		resp.Message = "sales history not found for the item"
 		app.writeJSON(w, http.StatusOK, resp)
 		return
+	} else if err != nil {
+		app.badRequest(w, err)
+		return
 	}
-	if len(productItem.ProductMetadata) > 0 {
-		//Get sales history for the fetched product item
-		salesHistory, err = app.DB.GetSalesHistoryByID(productItem.ProductMetadata[0].SalesHistoryID)
-		if err == sql.ErrNoRows {
-			resp.Message = "sales history not found for the item"
-			app.writeJSON(w, http.StatusOK, resp)
-			return
-		} else if err != nil {
-			app.badRequest(w, err)
-			return
-		}
-		//Get customer details for the fetched product item
-		customer, err = app.DB.GetCustomerByID(salesHistory.CustomerID)
-		if err == sql.ErrNoRows {
-			resp.Message = "sales history not found for the item"
-			app.writeJSON(w, http.StatusOK, resp)
-			return
-		} else if err != nil {
-			app.badRequest(w, err)
-			return
-		}
+	//Get customer details for the fetched product item
+	customer, err = app.DB.GetCustomerByID(salesHistory.CustomerID)
+	if err == sql.ErrNoRows {
+		resp.Message = "sales history not found for the item"
+		app.writeJSON(w, http.StatusOK, resp)
+		return
+	} else if err != nil {
+		app.badRequest(w, err)
+		return
 	}
+
 	resp.Error = false
 	resp.Message = "Data fetched succefully"
 	resp.ProductItem = productItem
@@ -890,7 +887,6 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		Brands       []*models.Brand       `json:"brands,omitempty"`
 		Products     []*models.Product     `json:"products,omitempty"`
 		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
-		LastIndex    int                   `json:"last_index,omitempty"`
 	}
 
 	//retrive suppliers from the database
@@ -933,11 +929,6 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		app.badRequest(w, err) //send error response
 		return
 	}
-	lastIndex, err := app.DB.LastIndex("sales_history")
-	if err != nil {
-		app.badRequest(w, err) //send error response
-		return
-	}
 
 	//TODO: Retrive accounts and send to frontend
 	resp.Error = false
@@ -947,7 +938,6 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 	resp.Brands = brands
 	resp.Products = products
 	resp.HeadAccounts = headAccounts
-	resp.LastIndex = lastIndex
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -1099,16 +1089,21 @@ func (app *application) GetClaimWarrantyList(w http.ResponseWriter, r *http.Requ
 // CheckoutWarrantyProduct updates database tables for checkout process
 func (app *application) CheckoutWarrantyProduct(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
-		WarrantyHistoryID int    `json:"warranty_history_id,omitempty"`
-		ProductSerialID   int    `json:"product_serial_id,omitempty"`
-		ArrivalDate       string `json:"checkout_date,omitempty"`
-		NewSerialNumber   string `json:"new_serial_number,omitempty"`
-		Comment           string `json:"comment,omitempty"`
+		WarrantyHistoryID int    `json:"warranty_history_id"`
+		ProductSerialID   int    `json:"product_serial_id"`
+		ArrivalDate       string `json:"checkout_date"`
+		NewSerialNumber   string `json:"new_serial_number"`
+		OldSerialNumber   string `json:"old_serial_number"`
+		Comment           string `json:"comment"`
 	}
 	err := app.readJSON(w, r, &payload)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR => CheckoutWarrantyProduct: %w", err))
 		return
+	}
+	//
+	if strings.TrimSpace(payload.NewSerialNumber) == "" {
+		payload.NewSerialNumber = payload.OldSerialNumber
 	}
 
 	err = app.DB.CheckoutWarrantyProduct(payload.WarrantyHistoryID, payload.ProductSerialID, payload.ArrivalDate, payload.NewSerialNumber, payload.Comment)

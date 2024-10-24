@@ -29,6 +29,10 @@
   <!-- Custom Theme Style -->
   <link href="assets/css/custom.min.css" rel="stylesheet">
   <script src="assets/js/app.js"></script>
+  <style>
+    
+</style>
+
 </head>
 
 <body class="nav-md">
@@ -276,14 +280,11 @@
           <div class="row">
             <div class="" role="tabpanel" data-example-id="togglable-tabs">
               <ul id="myTab" class="nav nav-pills nav-tabs" role="tablist">
-                <li role="presentation" class="active"><a href="#check_warranty_div" id="check_warranty_div-tab" role="tab"
-                    data-toggle="tab" aria-expanded="true">Warranty Check</a>
+                <li role="presentation" class="active"><a href="#check_warranty_div" id="check_warranty_div-tab"
+                    role="tab" data-toggle="tab" aria-expanded="true">Warranty Check</a>
                 </li>
-                <li role="presentation" class=""><a href="#warranty_in_progrss" role="tab"
-                    id="warranty_in_progrss-tab" data-toggle="tab" aria-expanded="false">Warranty In-progrss</a>
-                </li>
-                <li role="presentation" class=""><a href="#product_delivery" role="tab" id="product_delivery-tab"
-                    data-toggle="tab" aria-expanded="false">Product Delivery</a>
+                <li role="presentation" class=""><a href="#warranty_in_progrss" role="tab" id="warranty_in_progrss-tab"
+                    data-toggle="tab" aria-expanded="false">Warranty In-progrss</a>
                 </li>
               </ul>
             </div>
@@ -291,7 +292,8 @@
         </div>
         <div id="myTabContent" class="tab-content">
 
-          <div role="tabpanel" class="tab-pane fade active in" id="check_warranty_div" aria-labelledby="check_warranty_div-tab">
+          <div role="tabpanel" class="tab-pane fade active in" id="check_warranty_div"
+            aria-labelledby="check_warranty_div-tab">
             <div class="x_panel bg-gw">
               <div class="x_content">
                 <form action="#" id="warranty-claim-form">
@@ -321,17 +323,16 @@
               </div>
             </div>
           </div>
-          <div role="tabpanel" class="tab-pane fade" id="warranty_in_progrss"
-            aria-labelledby="warranty_in_progrss-tab">
+          <div role="tabpanel" class="tab-pane fade" id="warranty_in_progrss" aria-labelledby="warranty_in_progrss-tab">
             <div class="x_panel">
               <div class="x_title">
-                  <div class="col-md-3 col-sm-6 col-xs-6 form-group pull-right">
-                    <select class="form-control form-select btn-dark" id="history-type">
-                      <option value="checked out" selected>Checkout</option>
-                      <option value="claimed">In Progress</option>
-                      <option value="delivered">Delivered</option>
-                    </select>
-                  </div>
+                <div class="col-md-3 col-sm-6 col-xs-6 form-group pull-right">
+                  <select class="form-control form-select btn-dark" id="history-type">
+                    <option value="checked out" selected>Checkout</option>
+                    <option value="claimed">In Progress</option>
+                    <option value="delivered">Delivered</option>
+                  </select>
+                </div>
                 <div class="clearfix"></div>
               </div>
 
@@ -360,21 +361,6 @@
               </div>
             </div>
           </div>
-          <div role="tabpanel" class="tab-pane fade" id="product_delivery" aria-labelledby="product_delivery-tab">
-            <div class="x_panel">
-              <div class="x_title">
-                <h2>Responsive example<small>Users</small></h2>
-              </div>
-              <div class="x_content">
-                <p class="text-muted font-13 m-b-30">
-                  Responsive is an extension for DataTables that resolves that problem by optimising the table's layout
-                  for different screen sizes through the dynamic insertion and removal of columns from the table.
-                </p>
-
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </div> <!-- /page content -->
@@ -489,6 +475,7 @@
             let content = "";
             if (data.warranty_history) {
               warrantyHistoryList = data;
+              console.log(warrantyHistoryList);
               data.warranty_history.forEach((wh, i) => {
                 let btnState = ""
                 if (wh.status === "claimed") {
@@ -520,113 +507,128 @@
         })
     }
 
-    function checkoutNow(i){
-      checkoutWarrantyProducts(warrantyHistoryList.warranty_history[i].id,warrantyHistoryList.warranty_history[i].product_serial_id)      
+    function checkoutNow(i) {
+      checkoutWarrantyProducts(warrantyHistoryList.warranty_history[i].id, warrantyHistoryList.warranty_history[i].previous_serial_no, warrantyHistoryList.warranty_history[i].product_serial_id)
     }
-    function deliveryNow(i){
-      confirmWarrantyDeliveryProcess(warrantyHistoryList.warranty_history[i].id,warrantyHistoryList.warranty_history[i].product_serial_id)
+    function deliveryNow(i) {
+      confirmWarrantyDeliveryProcess(warrantyHistoryList.warranty_history[i].id, warrantyHistoryList.warranty_history[i].product_serial_id)
+    }
+    function viewDetailsNow(i) {
+      viewWarrantyHistory(warrantyHistoryList.warranty_history[i])
     }
 
 
   </script>
 
-<script>
+  <script>
 
-  let product, customer, salesHistory, selected_products = [];
+    let product, customer, salesHistory, selected_products = [];
 
-  window.addEventListener("DOMContentLoaded", () => {
-    let viewItemsInfoContainer = document.getElementById("view-items-info-container");
-    let selectedProductListContainer = document.getElementById("selected-items-info-container");
-    document.getElementById('search-btn').addEventListener("click", e => {
-      let payload = {
-        product_serial_number: document.getElementById('search-by-serial-number').value.trim()
-      }
-      console.log("payload: ", payload);
-      const requestOptions = {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      }
-      fetch('http://localhost:4321/api/inventory/products/search-sold-products-by-serial', requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if (data.error === true) {
-            showErrorMessage(data.message)
-          } else {
-            //update ViewProductListContainer
-            if (data.message === 'Product item not sold yet') {
-              document.getElementById("claim-warranty-btn-div").innerHTML = "";
-              viewItemsInfoContainer.innerHTML = `
+    window.addEventListener("DOMContentLoaded", () => {
+      let viewItemsInfoContainer = document.getElementById("view-items-info-container");
+      let selectedProductListContainer = document.getElementById("selected-items-info-container");
+      document.getElementById('search-btn').addEventListener("click", e => {
+        let payload = {
+          product_serial_number: document.getElementById('search-by-serial-number').value.trim()
+        }
+        console.log("payload: ", payload);
+        const requestOptions = {
+          method: 'post',
+          headers: {
+            'Accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }
+        fetch('http://localhost:4321/api/inventory/products/search-sold-products-by-serial', requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data)
+            if (data.error === true) {
+              showErrorMessage(data.message)
+            } else {
+              //update ViewProductListContainer
+              if (data.message === 'Product Unsold') {
+                document.getElementById("claim-warranty-btn-div").innerHTML = "";
+                viewItemsInfoContainer.innerHTML = `
               <div class="row">
                 <div class="col-md-12 col-sm-12 col-xs-12 text-center">
-                  <label style="background-color: rgb(168, 224, 220); padding: 5px;">${data.message}</label>
+                  <label class="text-danger">Product Unsold</label>
                 </div>
               </div>
               `
-            } else {
-              product = data.product_item;
-              customer = data.customer;
-              salesHistory = data.sales_history;
-              updateViewItemsInfoContainer(true);
+              } else if (data.message === 'Product item not found') {
+                document.getElementById("claim-warranty-btn-div").innerHTML = "";
+                viewItemsInfoContainer.innerHTML = `
+              <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                  <label class="text-danger">Product item not found</label>
+                </div>
+              </div>
+              `
+              } else {
+                product = data.product_item;
+                customer = data.customer;
+                salesHistory = data.sales_history;
+                updateViewItemsInfoContainer(true);
+              }
             }
-          }
-        }) //End of fetch statement
-      document.getElementById('search-by-serial-number').value = "";
+          }) //End of fetch statement
+        document.getElementById('search-by-serial-number').value = "";
+      })
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //submit data to backend
+      document.getElementById("warranty-claim-form").addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById("submitBtn").classList.add("d-none");
+
+        let warrantyClaimBody = {
+          reported_problem: document.getElementById("reported-problem").value,
+          contact_number: document.getElementById("contact-number").value,
+          received_by: document.getElementById("received-by").value,
+          product_item_details: product,
+          customer_info: customer
+        }
+        console.log("calim warranty Body:", warrantyClaimBody);
+        const requestOptions = {
+          method: 'post',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(warrantyClaimBody),
+        }
+
+        fetch('http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id', requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            console.log("Claim warranty: ", data)
+            if (data.error === true) {
+              showErrorMessage(data.message)
+            } else {
+              showSuccessMessage(data.message);
+              document.getElementById("claim-warranty-btn-div").innerHTML = `<button type="button" id="generate-invoice" class="btn btn-info">Generate Invoice</button>`
+            }
+            // setTimeout(() => {
+            //   location.reload();
+            // }, 5000);
+          });
+      })
     })
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //submit data to backend
-    document.getElementById("warranty-claim-form").addEventListener('submit', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      document.getElementById("submitBtn").classList.add("d-none");
-
-      let warrantyClaimBody = {
-        reported_problem: document.getElementById("reported-problem").value,
-        contact_number: document.getElementById("contact-number").value,
-        received_by: document.getElementById("received-by").value,
-        product_item_details: product,
-        customer_info : customer
-      }
-      console.log("calim warranty Body:",warrantyClaimBody);
-      const requestOptions = {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(warrantyClaimBody),
-      }
-
-      fetch('http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id', requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          console.log("Claim warranty: ", data)
-          if (data.error === true) {
-            showErrorMessage(data.message)
-          } else {
-            showSuccessMessage(data.message);
-            document.getElementById("claim-warranty-btn-div").innerHTML = `<button type="button" id="generate-invoice" class="btn btn-info">Generate Invoice</button>`
-          }
-          // setTimeout(() => {
-          //   location.reload();
-          // }, 5000);
-        });
-    })
-  })
-  //End of Window.addEventListener
+    //End of Window.addEventListener
 
 
-  function updateViewItemsInfoContainer(status) {
-    let salePrice = Math.round(product.product_metadata[0].max_retail_price * (1.00 - parseFloat(salesHistory.discount) / 100.0));
-    let [warranty, period] = checkWarranty(salesHistory.sale_date, product.product_metadata[0].warranty, "/");
-    let additional_info = '';
-    if (warranty && product.product_metadata[0].warranty_status === "no issue") {
-      additional_info = `
+    function updateViewItemsInfoContainer(status) {
+      let salePrice = Math.round(product.product_metadata[0].max_retail_price * (1.00 - parseFloat(salesHistory.discount) / 100.0));
+      console.log("sale Price: ",salePrice);
+      console.log("MRP: ",product.product_metadata[0].max_retail_price);
+      console.log("discount: ",salesHistory.discount);
+      let [warranty, period] = checkWarranty(salesHistory.sale_date, product.product_metadata[0].warranty, "/");
+      let additional_info = '';
+      if (warranty && product.product_metadata[0].warranty_status === "no issue") {
+        additional_info = `
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="row form-group has-feedback">
             <div class="col-md-6 col-sm-6 col-xs-12">
@@ -653,19 +655,23 @@
           </div> 
         </div>
       `
-      document.getElementById("claim-warranty-btn-div").innerHTML = `
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
         <button type="submit" id="submitBtn" class="btn btn-dark">Claim Warranty</button>
       `
-    } else if (product.product_metadata[0].warranty_status === "in progress") {
-      document.getElementById("claim-warranty-btn-div").innerHTML = `
-        <h4 style="color: white; background-color: rgb(156, 10, 10); padding: 5px;">Warranty has already been claimed</h4>
+      } else if (product.product_metadata[0].warranty_status === "in progress") {
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
+        <h4 style="color: black; background-color: yellow; padding: 5px;">The product warranty has already been claimed</h4>
       `
-    } else {
-      document.getElementById("claim-warranty-btn-div").innerHTML = `
+      } else if (product.product_metadata[0].warranty_status === "delivery ready") {
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
+        <h4 style="color: white; background-color: green; padding: 5px;">Warranty claimed!The product is ready to deliver</h4>
+      `
+      } else {
+        document.getElementById("claim-warranty-btn-div").innerHTML = `
         <h4 style="color: white; background-color: rgb(156, 10, 10); padding: 5px;">Warranty has expired</h4>
       `
-    }
-    document.getElementById("view-items-info-container").innerHTML = `
+      }
+      document.getElementById("view-items-info-container").innerHTML = `
       <div class="row">
         <div class="col-md-6 col-sm-6 col-xs-12">
           <!-- Table row -->
@@ -676,8 +682,6 @@
                 <td>Code:</td>
                 <td>
                   <b>${product.product_code}</b>
-                  &nbsp;&nbsp;&nbsp;&nbsp;
-                  <button type="button" id="product-details-btn" class="btn btn-dark btn-xs">See Details</button></b>
                 </td>
               </tr>
               <tr>
@@ -691,6 +695,10 @@
               <tr>
                 <td>Sale Price:</td>
                 <td><b>${salePrice}</b></td>
+              </tr>
+              <tr>
+                <td>Purchase Date:</td>
+                <td><b>${formatDate(product.product_metadata[0].updated_at, "date", "-")}</b></td>
               </tr>
               <tr>
                 <td>Sale Date:</td>
@@ -711,7 +719,7 @@
             <tbody>
               <tr>
                 <td>Code:</td>
-                <td><b>${customer.account_code}&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" id="customer-details-btn" class="btn btn-dark btn-xs">See Details</button></b></td>
+                <td><b>${customer.account_code}
               </tr>
               <tr>
                 <td>Account Name:</td>
@@ -730,6 +738,10 @@
                 <td><b>${customer.amount_payable ? customer.amount_payable : "0 TK"}</b></td>
               </tr>
               <tr>
+                <td>Address:</td>
+                <td><b>${customer.upazila ? customer.upazila : ""},&nbsp;${customer.district ? customer.district : ""}</b></td>
+              </tr>
+              <tr>
                 <td></td>
                 <td></td>
               </tr>
@@ -739,16 +751,16 @@
         ${additional_info}
       </div>
     `
-  }
+    }
 
-</script>
+  </script>
 
-<script>
-  //fetch-1: on click button, get the serial number and fetch product item data from the backend
-  // 'http://localhost:4321/api/inventory/products/search-sold-products-by-serial'
-  //fetch-2: on submit form, send product metadata id
-  // 'http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id'
-</script>
+  <script>
+    //fetch-1: on click button, get the serial number and fetch product item data from the backend
+    // 'http://localhost:4321/api/inventory/products/search-sold-products-by-serial'
+    //fetch-2: on submit form, send product metadata id
+    // 'http://localhost:4321/api/inventory/products/claim-warranty-by-serial-id'
+  </script>
 
 
 </body>
