@@ -2337,7 +2337,121 @@ func (p *postgresDBRepo) DeliveryWarrantyProduct(warrantyHistoryID, productSeria
 	return nil
 }
 
-//.......................Inventory Reports.......................
+// .......................Inventory Reports.......................
+// GetCategoryListReport returns a list of all categories with detailed info from categories table
+func (p *postgresDBRepo) GetCategoryListReport() ([]*models.Category, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var categories []*models.Category
+
+	query := `
+		SELECT * FROM public.categories ORDER BY id ASC
+	`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return categories, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c models.Category
+		err = rows.Scan(
+			&c.ID,
+			&c.Name,
+			&c.Status,
+			&c.CreatedAt,
+			&c.UpdatedAt,
+		)
+		if err != nil {
+			return categories, err
+		}
+		categories = append(categories, &c)
+	}
+	return categories, nil
+}
+
+// GetProductListReport returns a list of all products with detailed info from products table
+func (p *postgresDBRepo) GetProductListReport() ([]*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var product []*models.Product
+
+	query := `
+		SELECT * FROM public.products ORDER BY id ASC
+	`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return product, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p models.Product
+		err = rows.Scan(
+			&p.ID,
+			&p.ProductCode,
+			&p.ProductName,
+			&p.Description,
+			&p.ProductStatus,
+			&p.Quantity,
+			&p.CategoryID,
+			&p.BrandID,
+			&p.Discount,
+			&p.CreatedAt,
+			&p.UpdatedAt,
+		)
+		if err != nil {
+			return product, err
+		}
+		product = append(product, &p)
+	}
+	return product, nil
+}
+
+// GetServiceListReport returns a list of all products with detailed info from products table
+func (p *postgresDBRepo) GetServiceListReport() ([]*models.Service, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var service []*models.Service
+
+	query := `
+		SELECT * FROM public.services ORDER BY id ASC
+	`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return service, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p models.Service
+		err = rows.Scan(
+			&p.ID,
+			&p.ServiceCode,
+			&p.ServiceName,
+			&p.Description,
+			&p.MinimumCharge,
+			&p.Discount,
+			&p.ServiceStatus,
+			&p.CreatedAt,
+			&p.UpdatedAt,
+		)
+		if err != nil {
+			return service, err
+		}
+		service = append(service, &p)
+	}
+	return service, nil
+}
 
 // Helper functions
 // CountTotalEntries counts total number of rows in given the table

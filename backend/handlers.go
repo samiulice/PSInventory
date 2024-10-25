@@ -1150,9 +1150,9 @@ func (app *application) DeliveryWarrantyProduct(w http.ResponseWriter, r *http.R
 }
 
 // .......................Inventory Reports.......................
-// GetCategoryList retrieves the category list
-func (app *application) GetCategoryList(w http.ResponseWriter, r *http.Request) {
-	categories, err := app.DB.GetCategoryList()
+// GetCategoryListReport retrieves the category list
+func (app *application) GetCategoryListReport(w http.ResponseWriter, r *http.Request) {
+	categories, err := app.DB.GetCategoryListReport()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR:GetCategoryList: %w", err))
 		return
@@ -1171,23 +1171,44 @@ func (app *application) GetCategoryList(w http.ResponseWriter, r *http.Request) 
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// GetProductList retrieves the product list
-func (app *application) GetProductList(w http.ResponseWriter, r *http.Request) {
-	products, err := app.DB.GetProductList()
+// GetProductListReport retrieves the product list
+func (app *application) GetProductListReport(w http.ResponseWriter, r *http.Request) {
+	products, err := app.DB.GetProductListReport()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR:GetProductList: %w", err))
 		return
 	}
 
 	var resp struct {
-		Error      bool              `json:"error"`
-		Message    string            `json:"message"`
+		Error    bool              `json:"error"`
+		Message  string            `json:"message"`
 		Products []*models.Product `json:"products"`
 	}
 
 	resp.Error = false
 	resp.Message = "Data fatched successfully"
 	resp.Products = products
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// GetServiceListReport retrieves the services list
+func (app *application) GetServiceListReport(w http.ResponseWriter, r *http.Request) {
+	services, err := app.DB.GetServiceListReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetservicesList: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error    bool              `json:"error"`
+		Message  string            `json:"message"`
+		Services []*models.Service `json:"services"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fatched successfully"
+	resp.Services = services
 
 	app.writeJSON(w, http.StatusOK, resp)
 }

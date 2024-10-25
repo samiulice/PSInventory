@@ -75,6 +75,11 @@ type DatabaseRepo interface {
 	GetMemoListByCustomerID(customerID int) ([]*models.Sale, error)
 	RestockProduct(purchase *models.Purchase) error
 
+	//Inventory Reports
+	GetCategoryListReport() ([]*models.Category, error)
+	GetProductListReport() ([]*models.Product, error)
+	GetServiceListReport() ([]*models.Service, error)
+
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int, error)

@@ -107,42 +107,42 @@
                 </li>
                 <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                      <li>
-                        <a>Account Reports<span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                          <li class="sub_menu"><a href="#transaction-history.html">Transaction History</a></li>
-                          <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
-                          <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                          <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
-                          <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
-                          <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
-                          <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
-                          <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
-                          <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
-                          <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
-                          <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
-                          <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
-                        <a>Account Reports<span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                          <li class="sub_menu"><a href="category-list.html">Category List</a></li>
-                          <li class="sub_menu"><a href="product-list.html">Product List</a></li>
-                          <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
-                          <li class="sub_menu"><a href="service-list.html">Service List</a></li>
-                          <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
-                          <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
-                          <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
-                          <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
-                          <li class="sub_menu"><a href="service-history.html">Service History</a></li>
-                          </li>
-                        </ul>
-                      </li>
-                      </li>
+                    <li>
+                      <a>Account Reports<span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li class="sub_menu"><a href="#transaction-history.html">Transaction History</a></li>
+                        <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
+                        <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
+                        <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
+                        <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
+                        <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
+                        <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
+                        <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
+                        <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
+                        <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
+                        <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
+                        <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
+                    </li>
                   </ul>
-                </li> 
+                </li>
+                <li>
+                  <a>Account Reports<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li class="sub_menu"><a href="category-list.html">Category List</a></li>
+                    <li class="sub_menu"><a href="product-list.html">Product List</a></li>
+                    <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
+                    <li class="sub_menu"><a href="service-list.html">Service List</a></li>
+                    <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                    <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
+                    <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
+                    <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
+                    <li class="sub_menu"><a href="service-history.html">Service History</a></li>
+                </li>
+              </ul>
+              </li>
+              </li>
+              </ul>
+              </li>
               </ul>
             </div>
 
@@ -489,6 +489,9 @@
                       <div id="btns">
                         <br>
                         <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Save</button>
+                        <a href="javascript:void(0);" id="invoiceBtn" onclick="printInvoice()"
+                          class="btn btn-primary d-none">Generate
+                          Invoice</a>
                       </div>
                     </div>
                   </div>
@@ -601,6 +604,7 @@
 
     let products, brands, billAmount = 0, totalAmount = 0, lastIndex;
     let selected_products = [];
+    let InvoiceData;
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -723,9 +727,9 @@
                   if (data.error === true) {
                     showErrorMessage(data.message)
                   } else {
+                    InvoiceData = data;
                     showSuccessMessage(data.message);
-                    document.getElementById("btns").innerHTML = `<a href="javascript:void(0);" id="invoiceBtn" class="btn btn-primary">Generate
-                          Invoice</a>`
+                    document.getElementById("invoiceBtn").classList.remove('d-none');
                   }
                   // setTimeout(() => {
                   //   location.reload();
@@ -1066,6 +1070,346 @@
 
       // Log all MRP values
       console.log(mrpValues);
+    }
+
+    function printInvoice() {
+      //show and print invoice for the current sale;
+      console.log("invoice-data:", InvoiceData)
+      //create a new temporary window
+      const invoiceWindow = window.open('', '', 1024, 720);
+
+      //Define HTML content for invoice
+      let htmlContent = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Redressed&family=Ubuntu:wght@400;700&display=swap");
+
+    :root {
+      --white: #fff;
+      --primary-clr: #2f2929;
+      --secondary-clr: #5265a7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Ubuntu", sans-serif;
+    }
+
+    body {
+      font-size: 12px;
+      line-height: 20px;
+      color: var(--primary-clr);
+      
+    }
+
+    .invoice {
+      width: 90%;
+      max-width: 95%;
+      height: auto;
+      background: var(--white);
+      padding: 50px 60px;
+      position: relative;
+      margin: 20px auto;
+    }
+
+    .w_15 {
+      width: 15%;
+    }
+
+    .w_50 {
+      width: 50%;
+    }
+
+    .w_55 {
+      width: 55%;
+    }
+
+    .p_title {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .i_row {
+      display: flex;
+    }
+
+    .text_right {
+      text-align: right;
+    }
+
+    .invoice .header .i_row {
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .invoice .header .i_row:last-child {
+      align-items: flex-end;
+    }
+
+    .invoice .header .i_row .i_logo p {
+      font-family: "Redressed", cursive;
+    }
+
+    .invoice .header .i_row .i_logo p,
+    .invoice .header .i_row .i_title h2 {
+      font-size: 32px;
+      line-height: 38px;
+      color: var(--secondary-clr);
+    }
+
+    .invoice .header .i_row .i_address .p_title span {
+      font-weight: 400;
+      font-size: 12px;
+    }
+
+    .invoice .body .i_table .i_col p {
+      font-weight: 700;
+    }
+
+    .invoice .body .i_table .i_row .i_col {
+      padding: 12px 5px;
+    }
+
+    .invoice .body .i_table .i_table_head .i_row {
+      border: 2px solid;
+      border-color: var(--primary-clr) transparent var(--primary-clr) transparent;
+    }
+
+    .invoice .body .i_table .i_table_body .i_row:last-child {
+      border-bottom: 2px solid var(--primary-clr);
+    }
+
+    .invoice .body .i_table .i_table_foot .grand_total_wrap {
+      margin-top: 20px;
+    }
+
+    .invoice .body .i_table .i_table_foot .grand_total_wrap .grand_total {
+      background: var(--secondary-clr);
+      color: var(--white);
+      padding: 10px 15px;
+    }
+
+    .invoice .body .i_table .i_table_foot .grand_total_wrap .grand_total p {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .invoice .footer {
+      margin-top: 30px;
+    }
+
+    .top_line,
+    .bottom_line {
+      width: 25px;
+      height: 175px;
+      z-index: 1;
+      position: absolute;
+      background: var(--secondary-clr);
+    }
+
+    .top_line {
+      top: 0;
+      left: 0;
+    }
+
+    .bottom_line {
+      bottom: 0;
+      right: 0;
+    }
+
+    .top_line:before,
+    .bottom_line:before {
+      content: "";
+      position: absolute;
+      border: 13px solid;
+    }
+
+    .top_line:before {
+      bottom: 0;
+      left: 0px;
+      border-color: transparent var(--white) var(--white) transparent;
+    }
+
+    .bottom_line:before {
+      top: 0;
+      left: 0px;
+      border-color: var(--white) transparent transparent var(--white);
+    }
+    /* Force background graphics for printing */
+    @media print {
+      body{
+        -webkit-print-color-adjust: exact;
+        -webkit-color-adjust: exact;
+        color-adjust: exact;
+      }
+      * {
+        -webkit-print-color-adjust: exact;
+        -webkit-color-adjust: exact;
+        color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section>
+    <div class="invoice">
+      <div class="top_line"></div>
+      <div class="header">
+        <div class="i_row">
+          <div class="i_logo">
+            <p>Coding Market</p>
+          </div>
+          <div class="i_title">
+            <h2>INVOICE</h2>
+            <p class="p_title text_right">
+              April 20, 2023
+            </p>
+          </div>
+        </div>
+        <div class="i_row">
+          <div class="i_number">
+            <p class="p_title">INVOICE NO: 3452324</p>
+          </div>
+          <div class="i_address text_right">
+            <p>TO</p>
+            <p class="p_title">
+              Facebook <br />
+              <span>Menlo Park, California</span><br />
+              <span>United States</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="i_table">
+          <div class="i_table_head">
+            <div class="i_row">
+              <div class="i_col w_15">
+                <p class="p_title">QTY</p>
+              </div>
+              <div class="i_col w_55">
+                <p class="p_title">DESCRIPTION</p>
+              </div>
+              <div class="i_col w_15">
+                <p class="p_title">PRICE</p>
+              </div>
+              <div class="i_col w_15">
+                <p class="p_title">TOTAL</p>
+              </div>
+            </div>
+          </div>
+          <div class="i_table_body">
+            <div class="i_row">
+              <div class="i_col w_15">
+                <p>3</p>
+              </div>
+              <div class="i_col w_55">
+                <p>Lorem, ipsum.</p>
+                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam, vel.</span>
+              </div>
+              <div class="i_col w_15">
+                <p>$10.00</p>
+              </div>
+              <div class="i_col w_15">
+                <p>$30.00</p>
+              </div>
+            </div>
+            <div class="i_row">
+              <div class="i_col w_15">
+                <p>2</p>
+              </div>
+              <div class="i_col w_55">
+                <p>Lorem, ipsum.</p>
+                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam, vel.</span>
+              </div>
+              <div class="i_col w_15">
+                <p>$10.00</p>
+              </div>
+              <div class="i_col w_15">
+                <p>$20.00</p>
+              </div>
+            </div>
+            <div class="i_row">
+              <div class="i_col w_15">
+                <p>5</p>
+              </div>
+              <div class="i_col w_55">
+                <p>Lorem, ipsum.</p>
+                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam, vel.</span>
+              </div>
+              <div class="i_col w_15">
+                <p>$10.00</p>
+              </div>
+              <div class="i_col w_15">
+                <p>$100.00</p>
+              </div>
+            </div>
+          </div>
+          <div class="i_table_foot">
+            <div class="i_row">
+              <div class="i_col w_15">
+                <p></p>
+              </div>
+              <div class="i_col w_55">
+                <p></p>
+              </div>
+              <div class="i_col w_15">
+                <p>Sub Total</p>
+                <p>Tax 10%</p>
+              </div>
+              <div class="i_col w_15">
+                <p>$150.00</p>
+                <p>$15.00</p>
+              </div>
+            </div>
+            <div class="i_row grand_total_wrap">
+              <div class="i_col w_50">
+              </div>
+              <div class="i_col w_50 grand_total">
+                <p><span>GRAND TOTAL:</span>
+                  <span>$165.00</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="i_row">
+          <div class="i_col w_50">
+            <p class="p_title">Payment Method</p>
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cumque, dicta distinctio! Laudantium
+              voluptatibus est nemo.</p>
+          </div>
+          <div class="i_col w_50 text_right">
+            <p class="p_title">Terms and Conditions</p>
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cumque, dicta distinctio! Laudantium
+              voluptatibus est nemo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bottom_line"></div>
+    </div>
+  </section>
+</body>
+
+</html>`
+      //Write HTML content to the newly created tmporary window
+      invoiceWindow.document.write(htmlContent);
+      //Wait for the content to load, then print and close the window
+      invoiceWindow.document.close();
+      invoiceWindow.focus();
+      invoiceWindow.print();
+      // invoiceWindow.close();
+
     }
   </script>
 

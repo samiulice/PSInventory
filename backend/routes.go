@@ -65,8 +65,9 @@ func (app *application) routes() http.Handler {
 		mux.Post("/accounts/receive-collection/get-page-details", app.GetReceiveCollectionPageDetails)
 
 		//.......................Inventory Reports.......................
-		mux.Post("/reports/inventory/category-list", app.GetCategoryList)
-		mux.Post("/reports/inventory/product-list", app.GetProductList)
+		mux.Post("/reports/inventory/category-list", app.GetCategoryListReport)
+		mux.Post("/reports/inventory/product-list", app.GetProductListReport)
+		mux.Post("/reports/inventory/product-list", app.GetServiceListReport)
 		// Category List
 		// Product List
 		// Service List

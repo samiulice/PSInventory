@@ -139,7 +139,7 @@ type Supplier struct {
 	UpdatedAt        time.Time `json:"updated_at,omitempty"`
 }
 
-// Product is the type for products
+// HeadAccount is the type for HeadAccount
 type HeadAccount struct {
 	ID            int       `json:"id"`
 	AccountCode   string    `json:"account_code,omitempty"`
@@ -257,4 +257,18 @@ type Warranty struct {
 	SalesInfo        Sale      `json:"sales_info,omitempty"`
 	CustomerInfo     Customer  `json:"customer_info,omitempty"`
 	SupplierInfo     Supplier  `json:"supplier_info,omitempty"`
+}
+
+// Service is the type for services
+type Service struct {
+	//service_code,service_name,service_description,min_charge,discount,status,created_at,updated_at)
+	ID              int                `json:"id"`
+	ServiceCode     string             `json:"service_code"`
+	ServiceName     string             `json:"service_name"`
+	Description     string             `json:"description,omitempty"`
+	ServiceStatus   string               `json:"status"`
+	MinimumCharge        int                `json:"min_charge"`
+	Discount        int                `json:"discount"`
+	CreatedAt       time.Time          `json:"created_at,omitempty"`
+	UpdatedAt       time.Time          `json:"updated_at,omitempty"`
 }

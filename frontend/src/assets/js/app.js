@@ -1,8 +1,73 @@
+/**
+ * Converts a number into its word representation based on the Indian numbering system.
+ * Supports numbers up to 99,99,99,999 (99 crores).
+ *
+ * param {number} num - The number to be converted into words.
+ * returns {string} - The word representation of the given number.
+ *
+ * The function handles the following:
+ * - Converts numbers below 20 and multiples of 10 using predefined word arrays.
+ * - Utilizes place values specific to the Indian numbering system: thousand, lakh, and crore.
+ * - Recursively breaks down the number into groups (hundreds, thousands, lakhs, crores)
+ *   and converts each group to words.
+ * - Combines each group's word representation with the corresponding place value.
+ *
+ * Example:
+ *   numberToWords(12345678) returns "one crore twenty-three lakh forty-five thousand six hundred seventy-eight"
+ */
 
-//prevent user mouse right click
-// document.addEventListener('contextmenu', function (e) {
-//   e.preventDefault();
-// });
+function numberToWords(num) {
+  // Return "zero" immediately if the number is zero
+  if (num === 0) return "zero";
+
+  // Arrays for words of numbers below 20 and multiples of ten
+  const belowTwenty = [
+      "", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", 
+      "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", 
+      "sixteen", "seventeen", "eighteen", "nineteen"
+  ];
+  const tens = [
+      "", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
+  ];
+
+  // Array for place values in the Indian numbering system (thousand, lakh, crore)
+  const units = ["", "thousand", "lakh", "crore"];
+
+  // Helper function to convert numbers below 1000 to words
+  function helper(n) {
+      if (n < 20) 
+          return belowTwenty[n]; // For numbers 0-19, directly return from `belowTwenty` array
+      else if (n < 100) 
+          return tens[Math.floor(n / 10)] + (n % 10 ? " " + belowTwenty[n % 10] : ""); // For numbers 20-99
+      else 
+          return belowTwenty[Math.floor(n / 100)] + " hundred" + (n % 100 ? " " + helper(n % 100) : ""); // For numbers 100-999
+  }
+
+  let word = "";       // Variable to store the final word result
+  let unitIndex = 0;   // Index for tracking the place value (thousand, lakh, crore)
+
+  // Loop through the number in chunks based on Indian numbering system
+  while (num > 0) {
+      // Extract current chunk: hundreds for thousand's place, thousands for lakh and crore
+      let chunk = num % 100;
+      if (unitIndex === 1) chunk = num % 1000; // Special handling for thousand's place (3 digits)
+
+      // If the chunk is not zero, convert it to words and add place value
+      if (chunk > 0) {
+          word = helper(chunk) + (units[unitIndex] ? " " + units[unitIndex] : "") + (word ? " " + word : "");
+      }
+
+      // Remove the processed chunk from `num`
+      num = Math.floor(num / (unitIndex === 1 ? 1000 : 100));
+
+      // Move to the next place value (thousand, lakh, crore)
+      unitIndex++;
+  }
+
+  return word.trim(); // Return the final word result, trimmed of any extra spaces
+}
+
+
 
 // GenerateRandomAlphanumericCode generates a random alphanumeric string of the specified length.
 //
@@ -1762,7 +1827,7 @@ function viewWarrantyHistory(warrantyHistory) {
               </tr>
               <tr>
                 <td>Received By:</td>
-                <td><b>${warrantyHistory.received_by?warrantyHistory.received_by:""}
+                <td><b>${warrantyHistory.received_by?warrantyHistory.received_by:""}</b></td>
               </tr>
               <tr>
                 <td>Receiption Date:</td>
