@@ -1804,9 +1804,9 @@ function viewWarrantyHistory(warrantyHistory) {
   Swal.fire({
     width: 1024,
     title: 'Warranty Information',   // Prompt message
-    showCancelButton: true,            // Show the cancel button
-    confirmButtonText: 'Yes',          // Text for the confirm button
-    cancelButtonText: 'Cancel',        // Text for the cancel button
+    showCancelButton: false,            // Show the cancel button
+    confirmButtonText: 'Ok',          // Text for the confirm button
+    // cancelButtonText: 'Cancel',        // Text for the cancel button
     allowOutsideClick: false,          //disable outside click
     
     html: `<div class="row">
@@ -1885,3 +1885,29 @@ function viewWarrantyHistory(warrantyHistory) {
   }).then((result) => {
   });
 }
+
+/**
+ * Generates a PDF from an HTML element and opens the print dialog.
+ * @param {string} id - The ID of the HTML element to convert to PDF.
+ */
+function generatePDF(id, dpi) {
+  // Get the HTML element by its ID
+  const element = document.getElementById(id);
+
+  // Initialize html2pdf with the target element
+  html2pdf()
+      .from(element)  // Specify the element to convert
+      .set({
+          margin: 1,  // Set a margin of 1 unit around the content
+          filename: 'myContent.pdf',  // Name of the downloaded PDF file
+          html2canvas: { scale: dpi },  // Set the quality of the PDF rendering
+          jsPDF: { format: 'a4', orientation: 'portrait' }  // Set PDF format and orientation
+      })
+      .outputPdf('bloburl')  // Generate the PDF as a blob URL
+      .then((pdfUrl) => {
+          // Open the PDF blob URL in a new tab
+          const pdfWindow = window.open(pdfUrl, '_blank');
+          pdfWindow.print();  // Open the print dialog to print the PDF
+      });
+}
+

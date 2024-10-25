@@ -4,59 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vertical Line with Dynamic Height</title>
-    <link rel="stylesheet" href="./assets/css/custom.min.css">
+    <title>Sales Invoice</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <style>body {
+        margin: 0; /* Remove default margin */
+        font-family: Arial, sans-serif; /* Set a default font */
+    }
+    
+    .sales-invoice-header {
+        width: 100%; /* Full width */
+        background-color: #1c1c1c; /* Dark background color */
+        position: relative; /* Positioning context for pseudo-element */
+        padding: 20px; /* Padding for the text */
+        color: white; /* Text color */
+        text-align: center; /* Center text */
+        overflow: hidden; /* Prevent overflow from pseudo-element */
+    }
+    
+    .sales-invoice-header h1 {
+        margin: 0; /* Remove margin */
+        position: relative; /* Position the text above the pseudo-element */
+        z-index: 1; /* Bring text above the background shape */
+    }
+    
+    .sales-invoice-header::before {
+        content: ''; /* Pseudo-element content */
+        position: absolute; /* Absolute positioning */
+        bottom: 100%; /* Align to the bottom */
+        left: 50%; /* Center horizontally */
+        width: 200%; /* Double the width for a decorative effect */
+        height: 100%; /* Full height */
+        background: #FEA116; /* Use a contrasting color for the shape */
+        border-radius: 50% 50% 0 0; /* Curved top shape */
+        transform: translateX(-50%); /* Center the pseudo-element */
+        z-index: 0; /* Send it to the back */
+    }
+    </style>
 </head>
 
 <body>
-    <div style="scale: 0.5;"></div>
-
-    <script>
-        function daysBetween(givenDate, separator = '-', format = 'mm-dd-yyyy') {
-            // Split the given date using the specified separator
-            const parts = givenDate.split(separator);
-
-            let day, month, year;
-
-            // Assign values based on the specified format
-            if (format === 'mm-dd-yyyy') {
-                month = parseInt(parts[0]) - 1; // Month (0-based)
-                day = parseInt(parts[1]);
-                year = parseInt(parts[2]);
-            } else if (format === 'dd-mm-yyyy') {
-                day = parseInt(parts[0]);
-                month = parseInt(parts[1]) - 1; // Month (0-based)
-                year = parseInt(parts[2]);
-            } else if (format === 'yyyy-mm-dd') {
-                year = parseInt(parts[0]);
-                month = parseInt(parts[1]) - 1; // Month (0-based)
-                day = parseInt(parts[2]);
-            } else {
-                throw new Error('Unsupported date format. Use mm-dd-yyyy, dd-mm-yyyy, or yyyy-mm-dd.');
-            }
-
-            const date = new Date(year, month, day);
-
-            // Get today's date
-            const today = new Date();
-
-            // Calculate the difference in milliseconds
-            const differenceInTime = today - date;
-
-            // Convert milliseconds to days
-            const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-
-            return differenceInDays;
-        }
-
-        // Example usage:
-        const givenDate = '10-19-2024'; // mm-dd-yyyy format
-        const days = daysBetween(givenDate, '-', 'mm-dd-yyyy');
-        console.log(`Days between ${givenDate} and today: ${days}`);
-
-
-    </script>
-
+    <div class="sales-invoice-header">
+        <h1>Sales Invoice</h1>
+    </div>
 </body>
 
 </html>

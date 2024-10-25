@@ -7,40 +7,117 @@
   <title>Document</title>
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <!-- NProgress -->
+  <link href="assets/vendors/nprogress/nprogress.css" rel="stylesheet">
+  <!-- iCheck -->
+  <link href="assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link href="assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+  <!-- JQVMap -->
+  <link href="assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+  <!-- bootstrap-daterangepicker -->
+  <link href="assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
   <!-- Custom Theme Style -->
   <link href="assets/css/custom.min.css" rel="stylesheet">
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Redressed&family=Ubuntu:wght@400;700&display=swap");
 
     :root {
       --white: #fff;
       --primary-clr: #2f2929;
-      --secondary-clr: #5265a7;
+      --secondary-clr: #212841;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Ubuntu", sans-serif;
+      font-family: 'IBMPlexSans-Regular', sans-serif;
     }
 
     body {
+      font-family: 'IBMPlexSans-Regular';
       font-size: 12px;
       line-height: 20px;
       color: var(--primary-clr);
 
     }
 
+    td {
+      font-family: 'IBMPlexSans-Regular', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+
+    td>div {
+      font-family: 'IBMPlexSans-Regular', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+
+
+    .invoice_title {
+      font-size: 20px;
+      padding: 5px;
+      margin-top: 5px;
+      color: #fff;
+      background-color: rgba(52, 73, 94, .94);
+      height: 30px;
+      width: 100%;
+      text-align: center;
+    }
+
     .invoice {
-      width: 90%;
-      max-width: 95%;
+      width: 100%;
       height: auto;
       background: var(--white);
-      padding: 50px 60px;
+      padding: 10px 10px;
       position: relative;
-      margin: 20px auto;
     }
+
+    .invoice-header {
+      border: 1px solid #a5a5a7;
+      /* Dark border */
+      border-radius: 8px;
+      padding: 15px;
+      width: 300px;
+      background-color: #FFFFFF;
+      /* White background */
+      /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); */
+    }
+
+    .invoice-title {
+      text-align: center;
+      margin: 0;
+      color: #0F172B;
+      /* Dark color for title */
+    }
+
+    .divider {
+      border: 1px dashed #9e9e9e;
+      /* Dark divider */
+      margin: 10px 0;
+    }
+
+    .customer-info {
+      margin-top: 10px;
+    }
+
+    .customer-id,
+    .customer-name,
+    .customer-address,
+    .contact-number {
+      margin: 5px 0;
+      font-size: 14px;
+      /* Adjust font size */
+      color: #0F172B;
+      /* Dark color for text */
+    }
+
+    strong {
+      color: #36332e;
+      /* Yellow for labels */
+    }
+
 
 
     .w_5 {
@@ -110,6 +187,7 @@
     .p_title {
       font-weight: 700;
       font-size: 14px;
+      text-decoration-line: underline;
     }
 
     .i_row {
@@ -131,6 +209,8 @@
     .p_title {
       font-weight: 700;
       font-size: 14px;
+      margin-bottom: 10px;
+      text-decoration-line: none;
     }
 
     .i_row {
@@ -150,11 +230,8 @@
       align-items: flex-end;
     }
 
-    .invoice .header .i_row .i_logo p {
-      font-family: "Redressed", cursive;
-    }
     .invoice .header .i_row .i_logo span {
-      font-family: "Redressed", cursive;
+      font-family: 'Redressed-Regular', 'Satisfy', 'Pacifico';
     }
 
     .invoice .header .i_row .i_logo p,
@@ -170,84 +247,57 @@
       font-size: 12px;
     }
 
-    .invoice .body .i_table .i_col p {
-      font-weight: 700;
-    }
-
-    .invoice .body .i_table .i_row .i_col {
-      padding: 12px 5px;
-    }
-
-    .invoice .body .i_table .i_table_head .i_row {
-      border: 2px solid;
-      border-color: var(--primary-clr) transparent var(--primary-clr) transparent;
-    }
-
-    .invoice .body .i_table .i_table_body .i_row:last-child {
-      border-bottom: 2px solid var(--primary-clr);
-    }
-
-    .invoice .body .i_table .i_table_foot .grand_total_wrap {
-      margin-top: 20px;
-    }
-
-    .invoice .body .i_table .i_table_foot .grand_total_wrap .grand_total {
-      background: var(--secondary-clr);
-      color: var(--white);
-      padding: 10px 15px;
-    }
-
-    .invoice .body .i_table .i_table_foot .grand_total_wrap .grand_total p {
-      display: flex;
-      justify-content: space-between;
-    }
-
     .invoice .footer {
       margin-top: 30px;
     }
 
-    .top_line,
-    .bottom_line {
-      width: 25px;
-      height: 175px;
-      z-index: 1;
-      position: absolute;
-      background: var(--secondary-clr);
-    }
-
-    .top_line {
-      top: 0;
-      left: 0;
-    }
-
-    .bottom_line {
-      bottom: 0;
-      right: 0;
-    }
-
-    .top_line:before,
-    .bottom_line:before {
-      content: "";
-      position: absolute;
-      border: 13px solid;
-    }
-
-    .top_line:before {
-      bottom: 0;
-      left: 0px;
-      border-color: transparent var(--white) var(--white) transparent;
-    }
-
-    .bottom_line:before {
-      top: 0;
-      left: 0px;
-      border-color: var(--white) transparent transparent var(--white);
-    }
-
-    .sn-line-height {
+    .sn-line {
+      font-size: 10px;
       line-height: 1.25;
     }
 
+    /* company info section */
+    .company-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .company-info .logo {
+      width: 80px;
+      height: 80px;
+      margin-right: 10px;
+      border-radius: 10%;
+    }
+
+    .text-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slogan {
+      font-size: 0.9em;
+      color: #666;
+      /* Adjust color as needed */
+      margin-top: 2px;
+      /* Fine-tune the spacing */
+      text-align: right;
+      text-decoration-line: underline;
+    }
+
+    .company-info .contact-info {
+      font-size: 0.9em;
+      color: #000000;
+      /* Adjust color as needed */
+      margin-top: 2px;
+      /* Fine-tune the spacing */
+      text-align: right;
+    }
+
+    /* End of company info section */
+    .product-deatils {
+      font-size: 10px;
+      line-height: 1.25em;
+    }
 
     /* Force background graphics for printing */
     @media print {
@@ -268,161 +318,270 @@
 </head>
 
 <body>
-  <section>
-    <div class="invoice">
-      <div class="top_line"></div>
-      <div class="header">
-        <div class="i_row">
-          <div class="i_col"></div>
-          <div class="i_col text_left" style="padding-left: 10px;">
-            <!-- Company Logo here -->
-            <div class="i_logo">
-              <img src="assets/icons/logo.jpeg" alt="" width="50px" height="">
-              <span style="padding-left: 10px;">
-                ProjuktiSheba Inventory <br>
-              <span>
-            </div>
-          </div>
-        </div>
-        <div class="i_row">
-          <div class="w_50 text_right">
-            <!-- Customer Info Here  -->
-            <div class="i_address text_right">
-              <p>TO</p>
-              <p class="p_title">
-                Facebook <br />
-                <span>Menlo Park, California</span><br />
-                <span>United States</span>
-              </p>
-            </div>
-          </div>
+  <div id="content">
+    <section>
+      <div class="invoice_title">Sales Invoice</div>
 
-        </div>
-        <div class="i_row">
-          <div class="w_50 text_left">
-            <div class="i_number">
-              <p class="p_title">INVOICE NO: 3452324</p>
-            </div>
-          </div>
-          <div class="w_50 text_right">
-            <div class="i_number">
-              <p class="p_title">April 20, 2023</p>
-            </div>
-          </div>
+      <div class="invoice">
+        <div class="header">
+          <div class="i_row">
+            <div class="i_col text_left">
+              <!-- Company Logo here -->
+              <div class="invoice-header">
+                <div class="customer-info">
+                  <div class="p_title">Customer Infomation</div>
+                  <!-- <div class="divider"></div> -->
+                  <p class="customer-id"><strong>ID:</strong> #C-0001</p>
+                  <p class="customer-name"><strong>Name:</strong> Samiul Bashir</p>
+                  <p class="contact-number"><strong>Contact:</strong> +880797331020</p>
+                  <p class="customer-address"><strong>Address:</strong> Mohangonj-2446, Netrakona</p>
+                </div>
+              </div>
 
-        </div>
-      </div>
-      <div class="body">
-        <table style="background-color: #fff; color: #000;" class="table table-bordered no-footer jambo_table">
-          <thead class="bg-primary">
-            <tr>
-              <th class="text_center w_5">No.</th>
-              <th class="text-center w_45">Description</th>
-              <th class="text_center w_10">Warranty</th>
-              <th class="text_center w_10">Quantity</th>
-              <th class="text_center w_15">Unit Price</th>
-              <th class="text_center w_15">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text_center w_5">1</td>
-              <td class="w_45">
-                <div class="row" style="padding-left: 10px;">Samsung 8GB DDR4 RAM</div>
-                <div class="row" style="font-size: 10px; margin-left: 10px;">
-                  <div class="row">S/N:
-                    <span class="sn-line-height" style="width: 200px; margin-right: 10px;">PP-dW6Ka9-99999999</span>
-                    <span class="sn-line-height" style="width: 200px; margin-right: 10px;">PP-dW6Ka9-99999999</span>
-                  </div>
-                  <div class="row sn-line-height" style="margin-left: 12px;">
-                    <span class="sn-line-height" style="width: 200px; margin-right: 10px;">PP-dW6Ka9-99999999</span>
-                    <span class="sn-line-height" style="width: 200px;">PP-dW6Ka9-99999999</span>
+            </div>
+            <div class="i_col text_left" style="padding-left: 10px;">
+              <!-- Company Logo here -->
+              <div class="i_logo">
+                <div class="company-info">
+                  <!-- <img src="assets/icons/logo.jpeg" alt="Company Logo" class="logo"> -->
+                  <div class="text-container">
+                    <span class="text_right">ProjuktiSheba Inventory</span>
+                    <label class="slogan">Track Smarter, Stock Better</label>
+                    <div class="contact-info">
+                      <div class="address">Netrakona, Mymensingh, Bangladesh</div>
+                      <div class="phone">Phone: (123) 456-7890</div>
+                      <div class="email">Email: info@yourcompany.com</div>
+                    </div>
+                    <hr>
+                    <div class="i_number text_right">
+                      <i>
+                        <b>INVOICE NO: </b>#3452324 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                        <b>Date:</b>April 20, 2023
+                      </i>
+                    </div>
                   </div>
                 </div>
-              </td>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <table class="table table-bordered no-footer jambo_table">
+            <thead>
+              <tr>
+                <th class="text_center w_5">SL.</th>
+                <th class="text-center w_50">Description</th>
+                <th class="text-center w_20">Serial Number</th>
+                <th class="text_center w_5">Quantity</th>
+                <th class="text_center w_10">Unit Price</th>
+                <th class="text_center w_10">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text_center w_5">1</td>
+                <td class="w_50">
+                  Intel Core i5 12400 6 cores 12 threads 18MB cache <br>
+                  <span class="product-deatils">
+                    <b>Category: </b>Desktop Processor &nbsp;&nbsp;
+                    <b>Brand: </b>Intel &nbsp;&nbsp;
+                    <b> Warranty: </b> 3 year
+                  </span>
 
-              <td class="text_center w_10">1 year</td>
-              <td class="text_center w_10">4</td>
-              <td class="text_right w_15">&#2547;&nbsp;1500</td> <!-- &#2547; is the unicode for BDT symbol -->
-              <td class="text_right w_15">&#2547;&nbsp;6000</td>
-            </tr>
-            <tr>
-              <td class="text_center">2</td>
-              <td class="w_45">
-                <div class="row" style="padding-left: 10px;">Western Digital 128GB SSD</div>
-                <div class="row" style="font-size: 10px; margin-left: 10px;">
-                  <div class="row">S/N:
-                    <span class="sn-line-height" style="width: 200px; margin-right: 10px;">PP-dW6Ka9-99999999</span>
-                  </div>
-                </div>
-              </td>
-              <td class="text_center w_10">3 years</td>
-              <td class="text_center w_10">1</td>
-              <td class="text_right w_15">&#2547;&nbsp;2000</td> <!-- &#2547; is the unicode for BDT symbol -->
-              <td class="text_right w_15">&#2547;&nbsp;2000</td>
-            </tr>
-            <tr>
-              <td class="text_center">3</td>
-              <td class="w_45">
-                <div class="row" style="padding-left: 10px;">THOSHIBA HDD 1TB</div>
-                <div class="row" style="font-size: 10px; margin-left: 10px;">
-                  <div class="row">S/N:
-                    <span class="sn-line-height" style="width: 200px; margin-right: 10px;">PP-dW6Ka9-99999999</span>
-                    <span class="sn-line-height" style="width: 200px; margin-right: 10px;">PP-dW6Ka9-99999999</span>
-                  </div>
-                </div>
-              </td>
-              <td class="text_center w_10">6 months</td>
-              <td class="text_center w_10">2</td>
-              <td class="text_right w_15">&#2547;&nbsp;3000</td> <!-- &#2547; is the unicode for BDT symbol -->
-              <td class="text_right w_15">&#2547;&nbsp;6000</td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+                <td class="w_20 sn-line">
+                  PP-IPI5-12400875 <br>
+                </td>
+                <td class="text_center w_5">1</td>
+                <td class="text_right w_10">&#2547;&nbsp;15000</td>
+                <!-- &#2547; is the unicode for BDT symbol -->
+                <td class="text_right w_10">&#2547;&nbsp;15000</td>
+              </tr>
+              <tr>
+                <td class="text_center w_5">2</td>
+                <td class="w_50">
+                  MSI B560M PRO-E 10th and 11th Gen Micro ATX Motherboard <br>
+                  <span class="product-deatils">
+                    <b>Category: </b>Desktop Motherboard &nbsp;&nbsp;
+                    <b>Brand: </b>MSI &nbsp;&nbsp;
+                    <b> Warranty: </b> 3 years
+                  </span>
 
-        <!-- Financial Sections -->
-        <div class="i_row">
-          <div class="w_70"></div>
-          <div class="w_30 text_right">
-            <table class="table table-striped jambo_table">
-              <tbody>
-                <tr>
-                  <td class="text_left">SUBTOTAL</td>
-                  <td>
-                    <b>&#2547; 14000</b>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text_left">DISCOUNT</td>
-                  <td><b>&#2547; 1000</b></td>
-                </tr>
-                <tr>
-                  <td class="text_left">TOTAL</td>
-                  <td><b>&#2547; 13000</b>
-                </tr>
-              </tbody>
-            </table>
+                </td>
+                <td class="w_20 sn-line">
+                  PP-MB560-12548965<br>
+                </td>
+                <td class="text_center w_5">1</td>
+                <td class="text_right w_10">&#2547;&nbsp;7600</td>
+                <!-- &#2547; is the unicode for BDT symbol -->
+                <td class="text_right w_10">&#2547;&nbsp;7600</td>
+              </tr>
+              <tr>
+                <td class="text_center w_5">3</td>
+                <td class="w_50">
+                  HP EX900 M.2 250GB PCIe NVMe Internal SSD <br>
+                  <span class="product-deatils">
+                    <b>Category: </b>M.2 NVME SSD &nbsp;&nbsp;
+                    <b>Brand: </b>HP &nbsp;&nbsp;
+                    <b> Warranty: </b> 3 years
+                  </span>
+
+                </td>
+                <td class="w_20 sn-line">
+                  PP-HPEX900-89125464<br>
+                </td>
+                <td class="text_center w_5">1</td>
+                <td class="text_right w_10">&#2547;&nbsp;3400</td>
+                <!-- &#2547; is the unicode for BDT symbol -->
+                <td class="text_right w_10">&#2547;&nbsp;3400</td>
+              </tr>
+              <tr>
+                <td class="text_center w_5">4</td>
+                <td class="w_50">
+                  Corsair Vengeance LPX 16GB 3200MHz DDR4 Desktop RAM <br>
+                  <span class="product-deatils">
+                    <b>Category: </b>Desktop RAM &nbsp;&nbsp;
+                    <b>Brand: </b>Corsair &nbsp;&nbsp;
+                    <b> Warranty: </b> 3 years
+                  </span>
+
+                </td>
+                <td class="w_20 sn-line">
+                  PP-CV163200-96875365<br>
+                  PP-CV163200-65472963
+                </td>
+                <td class="text_center w_5">2</td>
+                <td class="text_right w_10">&#2547;&nbsp;4300</td>
+                <!-- &#2547; is the unicode for BDT symbol -->
+                <td class="text_right w_10">&#2547;&nbsp;8600</td>
+              </tr>
+              <tr>
+                <td class="text_center w_5">5</td>
+                <td class="w_50">
+                  Thermaltake W0422RE Litepower 350W Non Modular Power Supply <br>
+                  <span class="product-deatils">
+                    <b>Category: </b>Desktop Power Supply &nbsp;&nbsp;
+                    <b>Brand: </b>Thermaltake &nbsp;&nbsp;
+                    <b> Warranty: </b> 2 years
+                  </span>
+
+                </td>
+                <td class="w_20 sn-line">
+                  PP-THW0422RE-69754825<br>
+                </td>
+                <td class="text_center w_5">1</td>
+                <td class="text_right w_10">&#2547;&nbsp;2500</td>
+                <!-- &#2547; is the unicode for BDT symbol -->
+                <td class="text_right w_10">&#2547;&nbsp;2500</td>
+              </tr>
+              <tr>
+                <td class="text_center w_5">6</td>
+                <td class="w_50">
+                  Value-Top V200 Micro ATX Casing <br>
+                  <span class="product-deatils">
+                    <b>Category: </b>Desktop Casing &nbsp;&nbsp;
+                    <b>Brand: </b>Value-Top &nbsp;&nbsp;
+                    <b> Warranty: </b> No Warranty
+                  </span>
+
+                </td>
+                <td class="w_20 sn-line"></td>
+                <td class="text_center w_5">1</td>
+                <td class="text_right w_10">&#2547;&nbsp;2000</td>
+                <!-- &#2547; is the unicode for BDT symbol -->
+                <td class="text_right w_10">&#2547;&nbsp;2000</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Financial Sections -->
+          <div class="i_row">
+            <div class="w_75">
+              <div>
+                <span class="p_title">Payment History:</span>
+                <span style="font-weight: 400; margin-left: 20%;">
+                  Total Paid:&nbsp;&nbsp;&#2547;&nbsp;35000 &nbsp;&nbsp;&nbsp;&nbsp; 
+                  Due:&nbsp;&nbsp;&#2547;&nbsp;3000
+                </span>
+              </div>
+              <table class="table table-striped jambo_table">
+                <thead>
+                  <tr>
+                    <th class="text_center w_5">SL.</th>
+                    <th class="text-center w_10">Date</th>
+                    <th class="text-center w_10">Method</th>
+                    <th class="text_center w_40">Details</th>
+                    <th class="text_center w_10">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text_center w_5">1</td>
+                    <td class="text-center w_15">April 20, 2024</td>
+                    <td class="text-center w_10">Cash</td>
+                    <td class="text_center w_35">-</td>
+                    <td class="text_center w_10">&#2547&nbsp;35000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="w_5"></div>
+            <div class="w_20 text_right">
+              <table class="table table-striped jambo_table">
+                <tbody>
+                  <tr>
+                    <td class="text_left">SUBTOTAL</td>
+                    <td>
+                      <b>&#2547; 39100</b>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text_left">DISCOUNT</td>
+                    <td><b>&#2547; 1100</b></td>
+                  </tr>
+                  <tr>
+                    <td class="text_left">TOTAL</td>
+                    <td><b>&#2547; 38000</b>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="i_row">
+            <div class="i_col w_10"></div>
+            <div class="i_col w_40 text_left">
+              Customer's Signature: <sub>....................................................</sub>
+            </div>
+            <div class="i_col w_40 text_right">
+              Seller's Signature: <sub>....................................................</sub>
+            </div>
+            <div class="i_col w_10"></div>
+          </div>
+          <div class="divider">
+
+          </div>
+          <div class="i_row">
+            <div class="i_col">
+              <p class="p_title">Terms and Conditions</p>
+              <ol type="i" style="margin-left: 20px;">
+                <li>No refunds or exchanges.</li>
+                <li>Warranty excludes damage from misuse, consumables, or unauthorized handling</li>
+              </ol>
+            </div>
           </div>
         </div>
       </div>
-      <div class="footer">
-        <div class="i_row">
-          <div class="i_col w_50">
-            <p class="p_title">Payment Method</p>
-            <p style="margin-right:15px ;">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cumque, dicta
-              distinctio! Laudantium
-              voluptatibus est nemo.</p>
-          </div>
-          <div class="i_col w_50 text_right">
-            <p class="p_title">Terms and Conditions</p>
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cumque, dicta distinctio! Laudantium
-              voluptatibus est nemo.</p>
-          </div>
-        </div>
-      </div>
-      <div class="bottom_line"></div>
-    </div>
-  </section>
+    </section>
+  </div>
+  <button onclick="generatePDF('content', 5)">Download PDF</button>
+  <script src="assets/vendors/html2pdf/html2pdf.bundle.min.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+
+  </script>
 </body>
 
 </html>

@@ -40,6 +40,24 @@
     font-weight: bold;
     font-style: normal;
 }
+@font-face {
+    font-family: 'Redressed-Regular';
+    src: url('../fonts/Redressed-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Pacifico';
+    src: url('../fonts/Pacifico-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Satisfy';
+    src: url('../fonts/Satisfy-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 
 /* sweetaler2 styles customization */
 .swal2-popup {

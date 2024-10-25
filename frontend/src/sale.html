@@ -28,7 +28,6 @@
 
   <!-- Custom Theme Style -->
   <link href="assets/css/custom.min.css" rel="stylesheet">
-  <script src="assets/js/app.js"></script>
 </head>
 
 <body class="nav-md">
@@ -271,286 +270,293 @@
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
         <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
-
-        <!-- Page content here -->
-        <form action="#" id="sale-form">
-          <div class="row">
-            <!-- View items Secetion  -->
-            <div class="col-md-5 col-sm-5 col-xs-12">
-              <div class="x_panel bg-gw" style="min-height: 520px; height: 520px; max-height: 850px">
-                <div class="x_title">
-                  <h2>Search Product</h2>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <!-- Category Info -->
-                  <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="row form-group has-feedback">
-                      <label for="category">Product Category * :</label>
-                      <select id="category" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Category</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
-                        aria-hidden="true"></i>
-                    </div>
-                    <!-- Product Info -->
-                    <div class="row form-group has-feedback">
-                      <label for="product">Product Name * :</label>
-                      <select id="product" class="form-control form-select has-feedback-left" required>
-                        <option value="" selected disabled>Select Product</option>
-                        <!--Updated by JS DOM -->
-                      </select>
-                      <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
-                        aria-hidden="true"></i>
-                    </div>
+        <div class="row text-right">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <a href="javascript:void(0);" id="invoiceBtn" style="width: 200px;" onclick="generatePDF('sales-invoice-content', 3)"
+              class="btn btn-danger d-none">Print Invoice</a>
+          </div>
+        </div>
+        <div id="sale-page-content">
+          <!-- Page content here -->
+          <form action="#" id="sale-form">
+            <div class="row">
+              <!-- View items Secetion  -->
+              <div class="col-md-5 col-sm-5 col-xs-12">
+                <div class="x_panel bg-gw" style="min-height: 520px; height: 520px; max-height: 850px">
+                  <div class="x_title">
+                    <h2>Search Product</h2>
+                    <div class="clearfix"></div>
                   </div>
-                </div>
-                <div class="x_content" id="view-items-info-container">
-                  <!-- Table row -->
-                  <table class="table table-striped">
-                    <tbody>
-                      <tr>
-                        <td>Code:</td>
-                      </tr>
-                      <tr>
-                        <td>Name:</td>
-                      </tr>
-                      <tr>
-                        <td>Category:</td>
-                      </tr>
-                      <tr>
-                        <td>Brand:</td>
-                      </tr>
-                      <tr>
-                        <td>Quantity:</td>
-                      </tr>
-                      <tr>
-                        <td>MRP:</td>
-                      </tr>
-                      <tr>
-                        <td>Discount:</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <!-- Payment Details  -->
-            <div class="col-md-7 col-sm-7 col-xs-12">
-              <div class="x_panel bg-gw" style="min-height: 520px; height: fit-content; max-height: 850px;">
-                <div class="x_title">
-                  <div class="title_left">
-                    <div class="col-md-8 col-sm-6 col-xs-6">
-                      <h2>Sale Details</h2>
-                    </div>
-                  </div>
-                  <div class="title_right">
-                    <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search text-right">
-
-                      <a class="btn btn-round btn-xs btn-primary" id="createCustomerBtn">
-                        <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Create Customer</a>
-
-                    </div>
-                  </div>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <div class="row">
-                    <!-- Sale Date -->
-                    <div class="row form-group has-feedback">
-                      <div class="col-md-6 col-sm-6 col-xs-10">
-                        <label for="single_cal4">Sale Date * :</label>
-                        <input type="text" class="form-control has-feedback-left" id="single_cal4"
-                          placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
-                        <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
-                          aria-hidden="true"></i>
-                      </div>
-                      <!-- Customer Account -->
-                      <div class="col-md-6 col-sm-6 col-xs-10">
-                        <label for="customer">Customer * :</label>
-                        <select id="customer" class="form-control form-select has-feedback-left" required>
-                          <option value="" selected disabled>Select Customer Account</option>
+                  <div class="x_content">
+                    <!-- Category Info -->
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <div class="row form-group has-feedback">
+                        <label for="category">Product Category * :</label>
+                        <select id="category" class="form-control form-select has-feedback-left" required>
+                          <option value="" selected disabled>Select Category</option>
                           <!--Updated by JS DOM -->
                         </select>
-                        <span style="color: rgba(0, 0, 0, 1);"
-                          class="form-control-feedback left glyphicon glyphicon-user" aria-hidden="true"></span>
+                        <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
+                          aria-hidden="true"></i>
+                      </div>
+                      <!-- Product Info -->
+                      <div class="row form-group has-feedback">
+                        <label for="product">Product Name * :</label>
+                        <select id="product" class="form-control form-select has-feedback-left" required>
+                          <option value="" selected disabled>Select Product</option>
+                          <!--Updated by JS DOM -->
+                        </select>
+                        <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
+                          aria-hidden="true"></i>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div class="x_title">
-                  <h2>Payment Details</h2>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <div class="row">
-                    <div class="col-md-6 col-sm-6 col-xs-12">
-                      <div class="row">
-                        <!-- Transaction Account -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="account">Account * :</label>
-                            <select id="account" class="form-control form-select has-feedback-left" required>
-                              <option value="" selected disabled>Select Account</option>
-                              <!--Updated by JS DOM -->
-                            </select>
-                            <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-bank"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-
-                        <!-- Chalan No -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="chalan_no">Chalan No :</label>
-                            <input type="text" class="form-control has-feedback-left" id="chalan_no"
-                              placeholder="Chalan No">
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Memo No -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="memo_no">Memo No * :</label>
-                            <input type="text" class="form-control has-feedback-left" id="memo_no" placeholder="Memo No"
-                              disable required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Note -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="note">Note :</label>
-                            <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-comment form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 col-xs-12">
-                      <div class="row">
-                        <!-- Bill Amount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="bill-amount">Bill Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="bill-amount"
-                              placeholder="Bill Amount" value="0" required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Discount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="discount">Discount :</label>
-                            <input type="number" class="form-control has-feedback-left" id="discount" value="0" min="0"
-                              max="100" step="0.01" placeholder="(%)" />
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Total Amount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="total-amount">Total Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="total-amount" value="0"
-                              placeholder="Total Amount" required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                        <!-- Paid Amount -->
-                        <div class="row form-group has-feedback">
-                          <div class="col-md-11 col-sm-11 col-xs-11">
-                            <label for="paid-amount">Paid Amount * :</label>
-                            <input type="number" class="form-control has-feedback-left" id="paid-amount"
-                              placeholder="Paid Amount" required>
-                            <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                              aria-hidden="true">
-                            </i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row form-group text-center py-">
-                      <div id="btns">
-                        <br>
-                        <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Save</button>
-                        <a href="javascript:void(0);" id="invoiceBtn" onclick="printInvoice()"
-                          class="btn btn-primary d-none">Generate
-                          Invoice</a>
-                      </div>
-                    </div>
+                  <div class="x_content" id="view-items-info-container">
+                    <!-- Table row -->
+                    <table class="table table-striped">
+                      <tbody>
+                        <tr>
+                          <td>Code:</td>
+                        </tr>
+                        <tr>
+                          <td>Name:</td>
+                        </tr>
+                        <tr>
+                          <td>Category:</td>
+                        </tr>
+                        <tr>
+                          <td>Brand:</td>
+                        </tr>
+                        <tr>
+                          <td>Quantity:</td>
+                        </tr>
+                        <tr>
+                          <td>MRP:</td>
+                        </tr>
+                        <tr>
+                          <td>Discount:</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="row">
-            <!-- Selected items Secetion  -->
-            <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel bg-gw" style="height: 500px; overflow-x: scroll; overflow-y: scroll;">
-                <div class="x_title">
-                  <div class="title_left">
-                    <div class="col-md-8 col-sm-6 col-xs-6">
-                      <h2>Selected Products</h2>
-                    </div>
-                  </div>
-                  <div class="title_right">
-                    <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search">
-                      <div class="input-group">
-                        <input type="text" class="form-control" id="search-by-serial-number"
-                          placeholder="Search item by serial number">
-                        <span class="input-group-btn">
-                          <button class="btn btn-default btn-default" type="button" onclick="serachBySerial()"><i
-                              class="fa fa-arrow-right">
-                            </i>&nbsp;</button>
-                        </span>
+
+              <!-- Payment Details  -->
+              <div class="col-md-7 col-sm-7 col-xs-12">
+                <div class="x_panel bg-gw" style="min-height: 520px; height: fit-content; max-height: 850px;">
+                  <div class="x_title">
+                    <div class="title_left">
+                      <div class="col-md-8 col-sm-6 col-xs-6">
+                        <h2>Sale Details</h2>
                       </div>
                     </div>
-                  </div>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content" id="selected-items-info">
-                  <!-- Table row -->
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th class="text-center">Product Name</th>
-                        <th class="text-center">Category</th>
-                        <th class="text-center">Brand</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-center">Serial #</th>
-                        <th class="text-center">MRP</th>
-                        <th class="text-center">Total Amount</th>
-                        <th class="text-center">Remove</th>
-                      </tr>
-                    </thead>
-                    <tbody id="selected-items-info-container">
-                      <!-- DOM JS -->
-                    </tbody>
+                    <div class="title_right">
+                      <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search text-right">
+
+                        <a class="btn btn-round btn-xs btn-primary" id="createCustomerBtn">
+                          <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Create Customer</a>
+
+                      </div>
+                    </div>
                     <div class="clearfix"></div>
-                  </table>
+                  </div>
+                  <div class="x_content">
+                    <div class="row">
+                      <!-- Sale Date -->
+                      <div class="row form-group has-feedback">
+                        <div class="col-md-6 col-sm-6 col-xs-10">
+                          <label for="single_cal4">Sale Date * :</label>
+                          <input type="text" class="form-control has-feedback-left" id="single_cal4"
+                            placeholder="Select date" aria-describedby="inputSuccess2Status4" required>
+                          <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left"
+                            aria-hidden="true"></i>
+                        </div>
+                        <!-- Customer Account -->
+                        <div class="col-md-6 col-sm-6 col-xs-10">
+                          <label for="customer">Customer * :</label>
+                          <select id="customer" class="form-control form-select has-feedback-left" required>
+                            <option value="" selected disabled>Select Customer Account</option>
+                            <!--Updated by JS DOM -->
+                          </select>
+                          <span style="color: rgba(0, 0, 0, 1);"
+                            class="form-control-feedback left glyphicon glyphicon-user" aria-hidden="true"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                  <!-- /.col -->
+                  <div class="x_title">
+                    <h2>Payment Details</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <div class="row">
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div class="row">
+                          <!-- Transaction Account -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="account">Account * :</label>
+                              <select id="account" class="form-control form-select has-feedback-left" required>
+                                <option value="" selected disabled>Select Account</option>
+                                <!--Updated by JS DOM -->
+                              </select>
+                              <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-bank"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+
+                          <!-- Chalan No -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="chalan_no">Chalan No :</label>
+                              <input type="text" class="form-control has-feedback-left" id="chalan_no"
+                                placeholder="Chalan No">
+                              <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+                          <!-- Memo No -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="memo_no">Memo No * :</label>
+                              <input type="text" class="form-control has-feedback-left" id="memo_no"
+                                placeholder="Memo No" disable required>
+                              <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+                          <!-- Note -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="note">Note :</label>
+                              <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
+                              <i style="color: rgba(0, 0, 0, 1);" class="fa fa-comment form-control-feedback left"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div class="row">
+                          <!-- Bill Amount -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="bill-amount">Bill Amount * :</label>
+                              <input type="number" class="form-control has-feedback-left" id="bill-amount"
+                                placeholder="Bill Amount" value="0" required>
+                              <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+                          <!-- Discount -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="discount">Discount :</label>
+                              <input type="number" class="form-control has-feedback-left" id="discount" value="0"
+                                min="0" max="100" step="0.01" placeholder="(%)" />
+                              <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+                          <!-- Total Amount -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="total-amount">Total Amount * :</label>
+                              <input type="number" class="form-control has-feedback-left" id="total-amount" value="0"
+                                placeholder="Total Amount" required>
+                              <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+                          <!-- Paid Amount -->
+                          <div class="row form-group has-feedback">
+                            <div class="col-md-11 col-sm-11 col-xs-11">
+                              <label for="paid-amount">Paid Amount * :</label>
+                              <input type="number" class="form-control has-feedback-left" id="paid-amount"
+                                placeholder="Paid Amount" required>
+                              <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                                aria-hidden="true">
+                              </i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row form-group text-center py-">
+                        <div id="btns">
+                          <br>
+                          <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Save</button>
+                          <a href="javascript:void(0);" id="invoiceBtn" onclick="printInvoice()"
+                            class="btn btn-primary d-none">Generate
+                            Invoice</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </form>
+            <div class="row">
+              <!-- Selected items Secetion  -->
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel bg-gw" style="height: 500px; overflow-x: scroll; overflow-y: scroll;">
+                  <div class="x_title">
+                    <div class="title_left">
+                      <div class="col-md-8 col-sm-6 col-xs-6">
+                        <h2>Selected Products</h2>
+                      </div>
+                    </div>
+                    <div class="title_right">
+                      <div class="col-md-4 col-sm-6 col-xs-6 form-group pull-right top_search">
+                        <div class="input-group">
+                          <input type="text" class="form-control" id="search-by-serial-number"
+                            placeholder="Search item by serial number">
+                          <span class="input-group-btn">
+                            <button class="btn btn-default btn-default" type="button" onclick="serachBySerial()"><i
+                                class="fa fa-arrow-right">
+                              </i>&nbsp;</button>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content" id="selected-items-info">
+                    <!-- Table row -->
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th class="text-center">Product Name</th>
+                          <th class="text-center">Category</th>
+                          <th class="text-center">Brand</th>
+                          <th class="text-center">Qty</th>
+                          <th class="text-center">Serial #</th>
+                          <th class="text-center">MRP</th>
+                          <th class="text-center">Total Amount</th>
+                          <th class="text-center">Remove</th>
+                        </tr>
+                      </thead>
+                      <tbody id="selected-items-info-container">
+                        <!-- DOM JS -->
+                      </tbody>
+                      <div class="clearfix"></div>
+                    </table>
+
+                    <!-- /.col -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
       </div> <!-- /page content -->
     </div> <!-- /page content -->
   </div> <!-- /page content -->
@@ -599,6 +605,9 @@
 
   <!-- sweetalert2 script -->
   <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+
+  <!-- HTML to PDF generator -->
+  <script src="assets/vendors/html2pdf/html2pdf.bundle.min.js"></script>
 
   <script>
 
@@ -729,7 +738,278 @@
                   } else {
                     InvoiceData = data;
                     showSuccessMessage(data.message);
-                    document.getElementById("invoiceBtn").classList.remove('d-none');
+                    // Create a <link> element
+                    const cssLink = document.createElement('link');
+
+                    // Set the attributes for the <link> element
+                    cssLink.rel = 'stylesheet'; // Specifies that this link is a stylesheet
+                    cssLink.type = 'text/css';  // Sets the type of the stylesheet
+                    cssLink.href = 'assets/css/invoice_1_Style.css'; // Replace with the path to your CSS file
+
+                    // Append the <link> element to the <head>
+                    document.head.appendChild(cssLink);
+
+                    document.getElementById("sale-page-content").innerHTML = `
+                      <div id="sales-invoice-content">
+                        <section>
+                          <div class="invoice_title">Sales Invoice</div>
+
+                          <div class="invoice">
+                            <div class="header">
+                              <div class="i_row">
+                                <div class="i_col text_left">
+                                  <!-- Company Logo here -->
+                                  <div class="invoice-header">
+                                    <div class="customer-info">
+                                      <div class="p_title">Customer Infomation</div>
+                                      <!-- <div class="divider"></div> -->
+                                      <p class="customer-id"><strong>ID:</strong> #C-0001</p>
+                                      <p class="customer-name"><strong>Name:</strong> Samiul Bashir</p>
+                                      <p class="contact-number"><strong>Contact:</strong> +880797331020</p>
+                                      <p class="customer-address"><strong>Address:</strong> Mohangonj-2446, Netrakona</p>
+                                    </div>
+                                  </div>
+
+                                </div>
+                                <div class="i_col text_left" style="padding-left: 10px;">
+                                  <!-- Company Logo here -->
+                                  <div class="i_logo">
+                                    <div class="company-info">
+                                      <!-- <img src="assets/icons/logo.jpeg" alt="Company Logo" class="logo"> -->
+                                      <div class="text-container">
+                                        <span class="text_right">ProjuktiSheba Inventory</span>
+                                        <label class="slogan">Track Smarter, Stock Better</label>
+                                        <div class="contact-info">
+                                          <div class="address">Netrakona, Mymensingh, Bangladesh</div>
+                                          <div class="phone">Phone: (123) 456-7890</div>
+                                          <div class="email">Email: info@yourcompany.com</div>
+                                        </div>
+                                        <hr>
+                                        <div class="i_number text_right">
+                                          <i>
+                                            <b>INVOICE NO: </b>#3452324 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                                            <b>Date:</b>April 20, 2023
+                                          </i>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="body">
+                              <table class="table table-bordered no-footer jambo_table">
+                                <thead>
+                                  <tr>
+                                    <th class="text_center w_5">SL.</th>
+                                    <th class="text-center w_50">Description</th>
+                                    <th class="text-center w_20">Serial Number</th>
+                                    <th class="text_center w_5">Quantity</th>
+                                    <th class="text_center w_10">Unit Price</th>
+                                    <th class="text_center w_10">Amount</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td class="text_center w_5">1</td>
+                                    <td class="w_50">
+                                      Intel Core i5 12400 6 cores 12 threads 18MB cache <br>
+                                      <span class="product-deatils">
+                                        <b>Category: </b>Desktop Processor &nbsp;&nbsp;
+                                        <b>Brand: </b>Intel &nbsp;&nbsp;
+                                        <b> Warranty: </b> 3 year
+                                      </span>
+
+                                    </td>
+                                    <td class="w_20 sn-line">
+                                      PP-IPI5-12400875 <br>
+                                    </td>
+                                    <td class="text_center w_5">1</td>
+                                    <td class="text_right w_10">&#2547;&nbsp;15000</td>
+                                    <!-- &#2547; is the unicode for BDT symbol -->
+                                    <td class="text_right w_10">&#2547;&nbsp;15000</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text_center w_5">2</td>
+                                    <td class="w_50">
+                                      MSI B560M PRO-E 10th and 11th Gen Micro ATX Motherboard <br>
+                                      <span class="product-deatils">
+                                        <b>Category: </b>Desktop Motherboard &nbsp;&nbsp;
+                                        <b>Brand: </b>MSI &nbsp;&nbsp;
+                                        <b> Warranty: </b> 3 years
+                                      </span>
+
+                                    </td>
+                                    <td class="w_20 sn-line">
+                                      PP-MB560-12548965<br>
+                                    </td>
+                                    <td class="text_center w_5">1</td>
+                                    <td class="text_right w_10">&#2547;&nbsp;7600</td>
+                                    <!-- &#2547; is the unicode for BDT symbol -->
+                                    <td class="text_right w_10">&#2547;&nbsp;7600</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text_center w_5">3</td>
+                                    <td class="w_50">
+                                      HP EX900 M.2 250GB PCIe NVMe Internal SSD <br>
+                                      <span class="product-deatils">
+                                        <b>Category: </b>M.2 NVME SSD &nbsp;&nbsp;
+                                        <b>Brand: </b>HP &nbsp;&nbsp;
+                                        <b> Warranty: </b> 3 years
+                                      </span>
+
+                                    </td>
+                                    <td class="w_20 sn-line">
+                                      PP-HPEX900-89125464<br>
+                                    </td>
+                                    <td class="text_center w_5">1</td>
+                                    <td class="text_right w_10">&#2547;&nbsp;3400</td>
+                                    <!-- &#2547; is the unicode for BDT symbol -->
+                                    <td class="text_right w_10">&#2547;&nbsp;3400</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text_center w_5">4</td>
+                                    <td class="w_50">
+                                      Corsair Vengeance LPX 16GB 3200MHz DDR4 Desktop RAM <br>
+                                      <span class="product-deatils">
+                                        <b>Category: </b>Desktop RAM &nbsp;&nbsp;
+                                        <b>Brand: </b>Corsair &nbsp;&nbsp;
+                                        <b> Warranty: </b> 3 years
+                                      </span>
+
+                                    </td>
+                                    <td class="w_20 sn-line">
+                                      PP-CV163200-96875365<br>
+                                      PP-CV163200-65472963
+                                    </td>
+                                    <td class="text_center w_5">2</td>
+                                    <td class="text_right w_10">&#2547;&nbsp;4300</td>
+                                    <!-- &#2547; is the unicode for BDT symbol -->
+                                    <td class="text_right w_10">&#2547;&nbsp;8600</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text_center w_5">5</td>
+                                    <td class="w_50">
+                                      Thermaltake W0422RE Litepower 350W Non Modular Power Supply <br>
+                                      <span class="product-deatils">
+                                        <b>Category: </b>Desktop Power Supply &nbsp;&nbsp;
+                                        <b>Brand: </b>Thermaltake &nbsp;&nbsp;
+                                        <b> Warranty: </b> 2 years
+                                      </span>
+
+                                    </td>
+                                    <td class="w_20 sn-line">
+                                      PP-THW0422RE-69754825<br>
+                                    </td>
+                                    <td class="text_center w_5">1</td>
+                                    <td class="text_right w_10">&#2547;&nbsp;2500</td>
+                                    <!-- &#2547; is the unicode for BDT symbol -->
+                                    <td class="text_right w_10">&#2547;&nbsp;2500</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text_center w_5">6</td>
+                                    <td class="w_50">
+                                      Value-Top V200 Micro ATX Casing <br>
+                                      <span class="product-deatils">
+                                        <b>Category: </b>Desktop Casing &nbsp;&nbsp;
+                                        <b>Brand: </b>Value-Top &nbsp;&nbsp;
+                                        <b> Warranty: </b> No Warranty
+                                      </span>
+
+                                    </td>
+                                    <td class="w_20 sn-line"></td>
+                                    <td class="text_center w_5">1</td>
+                                    <td class="text_right w_10">&#2547;&nbsp;2000</td>
+                                    <!-- &#2547; is the unicode for BDT symbol -->
+                                    <td class="text_right w_10">&#2547;&nbsp;2000</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+
+                              <!-- Financial Sections -->
+                              <div class="i_row">
+                                <div class="w_75">
+                                  <div>
+                                    <span class="p_title">Payment History:</span>
+                                    <span style="font-weight: 400; margin-left: 20%;">
+                                      Total Paid:&nbsp;&nbsp;&#2547;&nbsp;35000 &nbsp;&nbsp;&nbsp;&nbsp; 
+                                      Due:&nbsp;&nbsp;&#2547;&nbsp;3000
+                                    </span>
+                                  </div>
+                                  <table class="table table-striped jambo_table">
+                                    <thead>
+                                      <tr>
+                                        <th class="text_center w_5">SL.</th>
+                                        <th class="text-center w_10">Date</th>
+                                        <th class="text-center w_10">Method</th>
+                                        <th class="text_center w_40">Details</th>
+                                        <th class="text_center w_10">Amount</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td class="text_center w_5">1</td>
+                                        <td class="text-center w_15">April 20, 2024</td>
+                                        <td class="text-center w_10">Cash</td>
+                                        <td class="text_center w_35">-</td>
+                                        <td class="text_center w_10">&#2547&nbsp;35000</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <div class="w_5"></div>
+                                <div class="w_20 text_right">
+                                  <table class="table table-striped jambo_table">
+                                    <tbody>
+                                      <tr>
+                                        <td class="text_left">SUBTOTAL</td>
+                                        <td>
+                                          <b>&#2547; 39100</b>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td class="text_left">DISCOUNT</td>
+                                        <td><b>&#2547; 1100</b></td>
+                                      </tr>
+                                      <tr>
+                                        <td class="text_left">TOTAL</td>
+                                        <td><b>&#2547; 38000</b>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="footer">
+                              <div class="i_row">
+                                <div class="i_col w_10"></div>
+                                <div class="i_col w_40 text_left">
+                                  Customer's Signature: <sub>....................................................</sub>
+                                </div>
+                                <div class="i_col w_40 text_right">
+                                  Seller's Signature: <sub>....................................................</sub>
+                                </div>
+                                <div class="i_col w_10"></div>
+                              </div>
+                              <div class="divider">
+
+                              </div>
+                              <div class="i_row">
+                                <div class="i_col">
+                                  <p class="p_title">Terms and Conditions</p>
+                                  <ol type="i" style="margin-left: 20px;">
+                                    <li>No refunds or exchanges.</li>
+                                    <li>Warranty excludes damage from misuse, consumables, or unauthorized handling</li>
+                                  </ol>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </section>
+                      </div>                        
+                      `
+                    //show print button
+                    document.getElementById('invoiceBtn').classList.remove('d-none')
                   }
                   // setTimeout(() => {
                   //   location.reload();
@@ -1070,346 +1350,6 @@
 
       // Log all MRP values
       console.log(mrpValues);
-    }
-
-    function printInvoice() {
-      //show and print invoice for the current sale;
-      console.log("invoice-data:", InvoiceData)
-      //create a new temporary window
-      const invoiceWindow = window.open('', '', 1024, 720);
-
-      //Define HTML content for invoice
-      let htmlContent = `<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Redressed&family=Ubuntu:wght@400;700&display=swap");
-
-    :root {
-      --white: #fff;
-      --primary-clr: #2f2929;
-      --secondary-clr: #5265a7;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Ubuntu", sans-serif;
-    }
-
-    body {
-      font-size: 12px;
-      line-height: 20px;
-      color: var(--primary-clr);
-      
-    }
-
-    .invoice {
-      width: 90%;
-      max-width: 95%;
-      height: auto;
-      background: var(--white);
-      padding: 50px 60px;
-      position: relative;
-      margin: 20px auto;
-    }
-
-    .w_15 {
-      width: 15%;
-    }
-
-    .w_50 {
-      width: 50%;
-    }
-
-    .w_55 {
-      width: 55%;
-    }
-
-    .p_title {
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .i_row {
-      display: flex;
-    }
-
-    .text_right {
-      text-align: right;
-    }
-
-    .invoice .header .i_row {
-      justify-content: space-between;
-      margin-bottom: 30px;
-    }
-
-    .invoice .header .i_row:last-child {
-      align-items: flex-end;
-    }
-
-    .invoice .header .i_row .i_logo p {
-      font-family: "Redressed", cursive;
-    }
-
-    .invoice .header .i_row .i_logo p,
-    .invoice .header .i_row .i_title h2 {
-      font-size: 32px;
-      line-height: 38px;
-      color: var(--secondary-clr);
-    }
-
-    .invoice .header .i_row .i_address .p_title span {
-      font-weight: 400;
-      font-size: 12px;
-    }
-
-    .invoice .body .i_table .i_col p {
-      font-weight: 700;
-    }
-
-    .invoice .body .i_table .i_row .i_col {
-      padding: 12px 5px;
-    }
-
-    .invoice .body .i_table .i_table_head .i_row {
-      border: 2px solid;
-      border-color: var(--primary-clr) transparent var(--primary-clr) transparent;
-    }
-
-    .invoice .body .i_table .i_table_body .i_row:last-child {
-      border-bottom: 2px solid var(--primary-clr);
-    }
-
-    .invoice .body .i_table .i_table_foot .grand_total_wrap {
-      margin-top: 20px;
-    }
-
-    .invoice .body .i_table .i_table_foot .grand_total_wrap .grand_total {
-      background: var(--secondary-clr);
-      color: var(--white);
-      padding: 10px 15px;
-    }
-
-    .invoice .body .i_table .i_table_foot .grand_total_wrap .grand_total p {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .invoice .footer {
-      margin-top: 30px;
-    }
-
-    .top_line,
-    .bottom_line {
-      width: 25px;
-      height: 175px;
-      z-index: 1;
-      position: absolute;
-      background: var(--secondary-clr);
-    }
-
-    .top_line {
-      top: 0;
-      left: 0;
-    }
-
-    .bottom_line {
-      bottom: 0;
-      right: 0;
-    }
-
-    .top_line:before,
-    .bottom_line:before {
-      content: "";
-      position: absolute;
-      border: 13px solid;
-    }
-
-    .top_line:before {
-      bottom: 0;
-      left: 0px;
-      border-color: transparent var(--white) var(--white) transparent;
-    }
-
-    .bottom_line:before {
-      top: 0;
-      left: 0px;
-      border-color: var(--white) transparent transparent var(--white);
-    }
-    /* Force background graphics for printing */
-    @media print {
-      body{
-        -webkit-print-color-adjust: exact;
-        -webkit-color-adjust: exact;
-        color-adjust: exact;
-      }
-      * {
-        -webkit-print-color-adjust: exact;
-        -webkit-color-adjust: exact;
-        color-adjust: exact;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <section>
-    <div class="invoice">
-      <div class="top_line"></div>
-      <div class="header">
-        <div class="i_row">
-          <div class="i_logo">
-            <p>Coding Market</p>
-          </div>
-          <div class="i_title">
-            <h2>INVOICE</h2>
-            <p class="p_title text_right">
-              April 20, 2023
-            </p>
-          </div>
-        </div>
-        <div class="i_row">
-          <div class="i_number">
-            <p class="p_title">INVOICE NO: 3452324</p>
-          </div>
-          <div class="i_address text_right">
-            <p>TO</p>
-            <p class="p_title">
-              Facebook <br />
-              <span>Menlo Park, California</span><br />
-              <span>United States</span>
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="body">
-        <div class="i_table">
-          <div class="i_table_head">
-            <div class="i_row">
-              <div class="i_col w_15">
-                <p class="p_title">QTY</p>
-              </div>
-              <div class="i_col w_55">
-                <p class="p_title">DESCRIPTION</p>
-              </div>
-              <div class="i_col w_15">
-                <p class="p_title">PRICE</p>
-              </div>
-              <div class="i_col w_15">
-                <p class="p_title">TOTAL</p>
-              </div>
-            </div>
-          </div>
-          <div class="i_table_body">
-            <div class="i_row">
-              <div class="i_col w_15">
-                <p>3</p>
-              </div>
-              <div class="i_col w_55">
-                <p>Lorem, ipsum.</p>
-                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam, vel.</span>
-              </div>
-              <div class="i_col w_15">
-                <p>$10.00</p>
-              </div>
-              <div class="i_col w_15">
-                <p>$30.00</p>
-              </div>
-            </div>
-            <div class="i_row">
-              <div class="i_col w_15">
-                <p>2</p>
-              </div>
-              <div class="i_col w_55">
-                <p>Lorem, ipsum.</p>
-                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam, vel.</span>
-              </div>
-              <div class="i_col w_15">
-                <p>$10.00</p>
-              </div>
-              <div class="i_col w_15">
-                <p>$20.00</p>
-              </div>
-            </div>
-            <div class="i_row">
-              <div class="i_col w_15">
-                <p>5</p>
-              </div>
-              <div class="i_col w_55">
-                <p>Lorem, ipsum.</p>
-                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam, vel.</span>
-              </div>
-              <div class="i_col w_15">
-                <p>$10.00</p>
-              </div>
-              <div class="i_col w_15">
-                <p>$100.00</p>
-              </div>
-            </div>
-          </div>
-          <div class="i_table_foot">
-            <div class="i_row">
-              <div class="i_col w_15">
-                <p></p>
-              </div>
-              <div class="i_col w_55">
-                <p></p>
-              </div>
-              <div class="i_col w_15">
-                <p>Sub Total</p>
-                <p>Tax 10%</p>
-              </div>
-              <div class="i_col w_15">
-                <p>$150.00</p>
-                <p>$15.00</p>
-              </div>
-            </div>
-            <div class="i_row grand_total_wrap">
-              <div class="i_col w_50">
-              </div>
-              <div class="i_col w_50 grand_total">
-                <p><span>GRAND TOTAL:</span>
-                  <span>$165.00</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="footer">
-        <div class="i_row">
-          <div class="i_col w_50">
-            <p class="p_title">Payment Method</p>
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cumque, dicta distinctio! Laudantium
-              voluptatibus est nemo.</p>
-          </div>
-          <div class="i_col w_50 text_right">
-            <p class="p_title">Terms and Conditions</p>
-            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cumque, dicta distinctio! Laudantium
-              voluptatibus est nemo.</p>
-          </div>
-        </div>
-      </div>
-      <div class="bottom_line"></div>
-    </div>
-  </section>
-</body>
-
-</html>`
-      //Write HTML content to the newly created tmporary window
-      invoiceWindow.document.write(htmlContent);
-      //Wait for the content to load, then print and close the window
-      invoiceWindow.document.close();
-      invoiceWindow.focus();
-      invoiceWindow.print();
-      // invoiceWindow.close();
-
     }
   </script>
 
