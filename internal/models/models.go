@@ -60,6 +60,7 @@ type Brand struct {
 type Category struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name,omitempty"`
+	Status      string    `json:"status,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }

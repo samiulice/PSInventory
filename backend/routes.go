@@ -64,6 +64,18 @@ func (app *application) routes() http.Handler {
 		//accounts
 		mux.Post("/accounts/receive-collection/get-page-details", app.GetReceiveCollectionPageDetails)
 
+		//.......................Inventory Reports.......................
+		mux.Post("/reports/inventory/category-list", app.GetCategoryList)
+		mux.Post("/reports/inventory/product-list", app.GetProductList)
+		// Category List
+		// Product List
+		// Service List
+		// Stock Report
+		// Item History Report
+		// Purchase History
+		// Sales History
+		// Service History
+
 	})
 	return mux
 }

@@ -934,11 +934,8 @@ func (p *postgresDBRepo) GetCategoryList() ([]*models.Category, error) {
 	var categories []*models.Category
 
 	query := `
-		SELECT 
-			id, name, created_at, updated_at
-		FROM
-			categories
-		`
+		SELECT * FROM categories ORDER BY id ASC
+	`
 	var rows *sql.Rows
 	var err error
 
@@ -953,6 +950,7 @@ func (p *postgresDBRepo) GetCategoryList() ([]*models.Category, error) {
 		err = rows.Scan(
 			&c.ID,
 			&c.Name,
+			&c.Status,
 			&c.CreatedAt,
 			&c.UpdatedAt,
 		)
@@ -1993,7 +1991,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 			tx.Rollback()
 			return errors.New("SQLErrorSaleProducts(INSERT sales_history): " + err.Error())
 		}
-		fmt.Println("sale ID: ", sale_id)
+
 		//Update product quantity
 		query = `
 			UPDATE public.products
@@ -2184,8 +2182,6 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(memoPrefix string, serialID int, se
 		return id, fmt.Errorf("DBERROR: RowsAffected: %w", err)
 	}
 
-	fmt.Printf("Rows affected: %d\n", rowsAffected)
-
 	if rowsAffected != 1 {
 		tx.Rollback()
 		return id, errors.New("DBERROR:AddNewWarrantyClaim::no row affected when trying to update product_serial_numbers table")
@@ -2194,7 +2190,6 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(memoPrefix string, serialID int, se
 	if err := tx.Commit(); err != nil {
 		return id, fmt.Errorf("DBERROR: AddNewWarrantyClaim => failed to commit transaction: %w", err)
 	}
-	fmt.Println("AddNewWarrantyClaim:Commit done")
 	return id, nil
 }
 
@@ -2341,6 +2336,8 @@ func (p *postgresDBRepo) DeliveryWarrantyProduct(warrantyHistoryID, productSeria
 	}
 	return nil
 }
+
+//.......................Inventory Reports.......................
 
 // Helper functions
 // CountTotalEntries counts total number of rows in given the table

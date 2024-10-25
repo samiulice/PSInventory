@@ -1148,3 +1148,46 @@ func (app *application) DeliveryWarrantyProduct(w http.ResponseWriter, r *http.R
 	resp.Message = "product delivered to customer successfully"
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
+// .......................Inventory Reports.......................
+// GetCategoryList retrieves the category list
+func (app *application) GetCategoryList(w http.ResponseWriter, r *http.Request) {
+	categories, err := app.DB.GetCategoryList()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetCategoryList: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error      bool               `json:"error"`
+		Message    string             `json:"message"`
+		Categories []*models.Category `json:"categories"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fatched successfully"
+	resp.Categories = categories
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// GetProductList retrieves the product list
+func (app *application) GetProductList(w http.ResponseWriter, r *http.Request) {
+	products, err := app.DB.GetProductList()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetProductList: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error      bool              `json:"error"`
+		Message    string            `json:"message"`
+		Products []*models.Product `json:"products"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fatched successfully"
+	resp.Products = products
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
