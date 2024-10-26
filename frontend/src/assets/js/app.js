@@ -1889,25 +1889,27 @@ function viewWarrantyHistory(warrantyHistory) {
 /**
  * Generates a PDF from an HTML element and opens the print dialog.
  * @param {string} id - The ID of the HTML element to convert to PDF.
+ * @param {number} dpi - The quality of the PDF rendering.
  */
 function generatePDF(id, dpi) {
-  // Get the HTML element by its ID
   const element = document.getElementById(id);
 
-  // Initialize html2pdf with the target element
+  // Configure and generate the PDF with html2pdf
   html2pdf()
-      .from(element)  // Specify the element to convert
+      .from(element)
       .set({
-          margin: 1,  // Set a margin of 1 unit around the content
-          filename: 'myContent.pdf',  // Name of the downloaded PDF file
-          html2canvas: { scale: dpi },  // Set the quality of the PDF rendering
-          jsPDF: { format: 'a4', orientation: 'portrait' }  // Set PDF format and orientation
+          margin: [10,5,10,5],  // Adjust margin as needed (in mm)
+          filename: 'myContent.pdf',
+          html2canvas: { scale: dpi },
+          jsPDF: { format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] }  // Page breaks managed by CSS rules
       })
-      .outputPdf('bloburl')  // Generate the PDF as a blob URL
+      .outputPdf('bloburl')
       .then((pdfUrl) => {
-          // Open the PDF blob URL in a new tab
           const pdfWindow = window.open(pdfUrl, '_blank');
-          pdfWindow.print();  // Open the print dialog to print the PDF
+          pdfWindow.print();
       });
 }
+
+
 

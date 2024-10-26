@@ -114,6 +114,9 @@
   .w_30 {
     width: 30%;
   }
+ .w_35 {
+    width: 35%;
+  }
 
   .w_40 {
     width: 40%;
@@ -224,6 +227,14 @@
 
   .invoice .footer {
     margin-top: 30px;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    page-break-before: auto;
+  }
+  #header {
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    page-break-before: avoid;
   }
 
   .sn-line {
@@ -272,6 +283,11 @@
   .product-deatils {
     font-size: 10px;
     line-height: 1.25em;
+  }
+  tr, td, th {
+    page-break-inside: avoid; 
+    page-break-before: avoid;
+    page-break-after: avoid;
   }
 
   /* Force background graphics for printing */

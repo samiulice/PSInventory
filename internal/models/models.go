@@ -51,156 +51,184 @@ const (
 // Brand is the type for Brand
 type Brand struct {
 	ID        int       `json:"id"`
-	Name      string    `json:"name,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // Category is the type for Category
 type Category struct {
 	ID        int       `json:"id"`
-	Name      string    `json:"name,omitempty"`
-	Status      string    `json:"status,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	Name      string    `json:"name"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // Employee is the type for employees
 type Employee struct {
 	ID            int    `json:"id"`
-	AccountCode   string `json:"account_code,omitempty"`
-	AccountName   string `json:"account_name,omitempty"`
-	ContactPerson string `json:"contact_person,omitempty"`
-	// Gender                string         `json:"gender,omitempty"`
-	// DateOfBith            time.Time      `json:"date_of_birth,omitempty"`
-	// Experties        string         `json:"exparties,omitempty"`
-	Division         string    `json:"division,omitempty"`
-	District         string    `json:"district,omitempty"`
-	Upazila          string    `json:"upazila,omitempty"`
-	Area             string    `json:"area,omitempty"`
-	Mobile           string    `json:"mobile,omitempty"`
+	AccountCode   string `json:"account_code"`
+	AccountName   string `json:"account_name"`
+	ContactPerson string `json:"contact_person"`
+	// Gender                string         `json:"gender"`
+	// DateOfBith            time.Time      `json:"date_of_birth"`
+	// Experties        string         `json:"exparties"`
+	Division         string    `json:"division"`
+	District         string    `json:"district"`
+	Upazila          string    `json:"upazila"`
+	Area             string    `json:"area"`
+	Mobile           string    `json:"mobile"`
 	AmountPayable    int       `json:"amount_payable"`
 	AmountReceivable int       `json:"amount_receivable"`
-	WhatsappAccount  string    `json:"whatsapp_account,omitempty"`
-	Email            string    `json:"email,omitempty"`
-	ImageLink        string    `json:"image_link,omitempty"` //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	WhatsappAccount  string    `json:"whatsapp_account"`
+	Email            string    `json:"email"`
+	ImageLink        string    `json:"image_link"` //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
 	AccountStatus    bool      `json:"account_status"`       //Active = true, Inactive = false
 	MonthlySalary    int       `json:"monthly_salary"`
 	OpeningBalance   int       `json:"opening_balance"`
-	CVLink           string    `json:"cv_link,omitempty"`
-	NIDLink          string    `json:"nid_link,omitempty"`
-	JoiningDate      time.Time `json:"joining_date,omitempty"`
-	CreatedAt        time.Time `json:"created_at,omitempty"`
-	UpdatedAt        time.Time `json:"updated_at,omitempty"`
+	CVLink           string    `json:"cv_link"`
+	NIDLink          string    `json:"nid_link"`
+	JoiningDate      time.Time `json:"joining_date"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 // Customer is the type for customers
 type Customer struct {
 	ID               int       `json:"id"`
-	AccountCode      string    `json:"account_code,omitempty"`
-	AccountName      string    `json:"account_name,omitempty"`
-	ContactPerson    string    `json:"contact_person,omitempty"`
-	Division         string    `json:"division,omitempty"`
-	District         string    `json:"district,omitempty"`
-	Upazila          string    `json:"upazila,omitempty"`
-	Area             string    `json:"area,omitempty"`
-	Mobile           string    `json:"mobile,omitempty"`
+	AccountCode      string    `json:"account_code"`
+	AccountName      string    `json:"account_name"`
+	ContactPerson    string    `json:"contact_person"`
+	Division         string    `json:"division"`
+	District         string    `json:"district"`
+	Upazila          string    `json:"upazila"`
+	Area             string    `json:"area"`
+	Mobile           string    `json:"mobile"`
 	AmountPayable    int       `json:"amount_payable"`
 	AmountReceivable int       `json:"amount_receivable"`
-	Email            string    `json:"email,omitempty"`
-	WhatsappAccount  string    `json:"whatsapp_account,omitempty"`
+	Email            string    `json:"email"`
+	WhatsappAccount  string    `json:"whatsapp_account"`
 	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
 	Discount         int       `json:"discount"`
 	OpeningBalance   int       `json:"opening_balance"`
-	JoiningDate      time.Time `json:"joining_date,omitempty"`
-	CreatedAt        time.Time `json:"created_at,omitempty"`
-	UpdatedAt        time.Time `json:"updated_at,omitempty"`
+	JoiningDate      time.Time `json:"joining_date"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 // Supplier is the type for suppliers
 type Supplier struct {
 	ID               int       `json:"id"`
-	AccountCode      string    `json:"account_code,omitempty"`
-	AccountName      string    `json:"account_name,omitempty"`
-	ContactPerson    string    `json:"contact_person,omitempty"`
-	Division         string    `json:"division,omitempty"`
-	District         string    `json:"district,omitempty"`
-	Upazila          string    `json:"upazila,omitempty"`
-	Area             string    `json:"area,omitempty"`
-	Mobile           string    `json:"mobile,omitempty"`
+	AccountCode      string    `json:"account_code"`
+	AccountName      string    `json:"account_name"`
+	ContactPerson    string    `json:"contact_person"`
+	Division         string    `json:"division"`
+	District         string    `json:"district"`
+	Upazila          string    `json:"upazila"`
+	Area             string    `json:"area"`
+	Mobile           string    `json:"mobile"`
 	AmountPayable    int       `json:"amount_payable"`
 	AmountReceivable int       `json:"amount_receivable"`
-	Email            string    `json:"email,omitempty"`
-	WhatsappAccount  string    `json:"whatsapp_account,omitempty"`
+	Email            string    `json:"email"`
+	WhatsappAccount  string    `json:"whatsapp_account"`
 	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
 	Discount         int       `json:"discount"`
-	JoiningDate      time.Time `json:"joining_date,omitempty"`
-	CreatedAt        time.Time `json:"created_at,omitempty"`
-	UpdatedAt        time.Time `json:"updated_at,omitempty"`
+	JoiningDate      time.Time `json:"joining_date"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 // HeadAccount is the type for HeadAccount
 type HeadAccount struct {
 	ID            int       `json:"id"`
-	AccountCode   string    `json:"account_code,omitempty"`
-	AccountName   string    `json:"account_name,omitempty"`
+	AccountCode   string    `json:"account_code"`
+	AccountName   string    `json:"account_name"`
 	AccoutnStatus bool      `json:"account_status"`
-	CurrentAmount int       `json:"current_amount,omitempty"`
-	CreatedAt     time.Time `json:"created_at,omitempty"`
-	UpdatedAt     time.Time `json:"updated_at,omitempty"`
+	CurrentAmount int       `json:"current_amount"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // Product is the type for products
 type Product struct {
 	ID              int                `json:"id"`
-	ProductCode     string             `json:"product_code,omitempty"`
-	ProductName     string             `json:"product_name,omitempty"`
-	Description     string             `json:"product_description,omitempty"`
+	ProductCode     string             `json:"product_code"`
+	ProductName     string             `json:"product_name"`
+	Description     string             `json:"product_description"`
 	ProductStatus   bool               `json:"product_status"`
 	Quantity        int                `json:"quantity"`
 	CategoryID      int                `json:"category_id"`
 	BrandID         int                `json:"brand_id"`
 	Discount        int                `json:"discount"`
-	CreatedAt       time.Time          `json:"created_at,omitempty"`
-	UpdatedAt       time.Time          `json:"updated_at,omitempty"`
+	CreatedAt       time.Time          `json:"created_at"`
+	UpdatedAt       time.Time          `json:"updated_at"`
 	Category        Category           `json:"category"`
-	Brand           Brand              `json:"brand,omitempty"`
-	ProductMetadata []*ProductMetadata `json:"product_metadata,omitempty"`
+	Brand           Brand              `json:"brand"`
+	ProductMetadata []*ProductMetadata `json:"product_metadata"`
+}
+
+// ProductShortInfo stores short information about product
+type ProductShortInfo struct {
+	ProductID     int      `json:"product_id"`
+	ProductName   string   `json:"product_name"`
+	CategoryName  string   `json:"category_name"`
+	BrandName     string   `json:"brand_name"`
+	SerialNumbers []string `json:"serial_numbers"`
+	Warranty      int      `json:"warranty"`
+	Quantity      int      `json:"quantity"`
+	MRP           int      `json:"mrp"`
+	SubTotal      int      `json:"sub_total"`
+}
+
+// SalesInvoice stores sales data for invoice generation
+type SalesInvoice struct {
+	CustomerInfo    Customer            `json:"customer_info"`
+	HeadAccountInfo Customer            `json:"head_account_info"`
+	ProductItems    []*ProductShortInfo `json:"selected_items"`
+	SaleDate        string              `json:"sale_date"`
+	ChalanNo        string              `json:"chalan_no"`
+	MemoNo          string              `json:"memo_no"`
+	Note            string              `json:"note"`
+	BillAmount      int                 `json:"bill_amount"`
+	Discount        int                 `json:"discount"`
+	TotalAmount     int                 `json:"total_amount"`
+	PaidAmount      int                 `json:"paid_amount"`
 }
 
 // ProductMetadata holds products meta data
 type ProductMetadata struct {
 	ID                     int       `json:"id"`
-	SerialNumber           string    `json:"serial_number,omitempty"`
+	SerialNumber           string    `json:"serial_number"`
 	ProductID              int       `json:"product_id"`
 	PurchaseHistoryID      int       `json:"purchase_history_id"`
-	SalesHistoryID         int       `json:"sales_history_id,omitempty"`
-	Status                 string    `json:"status,,omitempty"`
+	SalesHistoryID         int       `json:"sales_history_id"`
+	Status                 string    `json:"status,"`
 	WarrantyPeriod         int       `json:"warranty"`
-	WarrantyStatus         string    `json:"warranty_status,omitempty"`
+	WarrantyStatus         string    `json:"warranty_status"`
 	LatesWarrantyHistoryID int       `json:"latest_warranty_history_id"`
-	WarrantyHistoryIDs     string    `json:"warranty_history_ids,omitempty"`
+	WarrantyHistoryIDs     string    `json:"warranty_history_ids"`
 	MaxRetailPrice         int       `json:"max_retail_price"` //max_retail_price = total_amount+profit/quantity_purchased
 	PurchaseRate           int       `json:"purchase_rate"`    //purchase_rate = total_amount/quantity_purchased
 	SaleRate               int       `json:"sale_rate"`
-	CreatedAt              time.Time `json:"created_at,omitempty"`
-	UpdatedAt              time.Time `json:"updated_at,omitempty"`
+	CreatedAt              time.Time `json:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at"`
 }
 
 // Purchase is the type for purchase info
 type Purchase struct {
 	ID                int       `json:"id"`
-	PurchaseDate      string    `json:"purchase_date,omitempty"`
+	PurchaseDate      string    `json:"purchase_date"`
 	SupplierID        int       `json:"supplier_id"`
 	ProductID         int       `json:"product_id"`
 	Quantity          int       `json:"quantity"`
 	QuantityPurchased int       `json:"quantity_purchased"`
 	QuantitySold      int       `json:"quantity_sold"`
-	ProductsSerialNo  []string  `json:"products_serial_no,omitempty"`
+	ProductsSerialNo  []string  `json:"products_serial_no"`
 	AccountID         int       `json:"account_id"`
-	ChalanNO          string    `json:"chalan_no,omitempty"`
-	MemoNo            string    `json:"memo_no,omitempty"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
-	Note              string    `json:"note,omitempty"`
+	ChalanNO          string    `json:"chalan_no"`
+	MemoNo            string    `json:"memo_no"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
+	Note              string    `json:"note"`
 	MaxRetailPrice    int       `json:"max_retail_price"`
 	PurchaseRate      int       `json:"purchase_rate"`
 	WarrantyPeriod    int       `json:"warranty"`
@@ -208,67 +236,67 @@ type Purchase struct {
 	Discount          int       `json:"discount"`
 	TotalAmount       int       `json:"total_amount"`
 	PaidAmount        int       `json:"paid_amount"`
-	CreatedAt         time.Time `json:"created_at,omitempty"`
-	UpdatedAt         time.Time `json:"updated_at,omitempty"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 type SelectedItems struct {
 	ProductID     int      `json:"product_id"`
-	SerialNumbers []string `json:"serialNumbers,omitempty"`
+	SerialNumbers []string `json:"serialNumbers"`
 }
 
 // Sale is the type for purchase info
 type Sale struct {
 	ID               int              `json:"id"`
-	SaleDate         string           `json:"sale_date,omitempty"`
+	SaleDate         string           `json:"sale_date"`
 	CustomerID       int              `json:"customer_id"`
-	ProductsSerialNo []string         `json:"products_serial_no,omitempty"`
-	SelectedItems    []*SelectedItems `json:"selected_items,omitempty"`
+	ProductsSerialNo []string         `json:"products_serial_no"`
+	SelectedItems    []*SelectedItems `json:"selected_items"`
 	AccountID        int              `json:"account_id"`
-	ChalanNO         string           `json:"chalan_no,omitempty"`
-	MemoNo           string           `json:"memo_no,omitempty"`
-	Note             string           `json:"note,omitempty"`
+	ChalanNO         string           `json:"chalan_no"`
+	MemoNo           string           `json:"memo_no"`
+	Note             string           `json:"note"`
 	BillAmount       int              `json:"bill_amount"`
 	Discount         int              `json:"discount"`
 	TotalAmount      int              `json:"total_amount"`
 	PaidAmount       int              `json:"paid_amount"`
-	CreatedAt        time.Time        `json:"created_at,omitempty"`
-	UpdatedAt        time.Time        `json:"updated_at,omitempty"`
+	CreatedAt        time.Time        `json:"created_at"`
+	UpdatedAt        time.Time        `json:"updated_at"`
 }
 
 type Warranty struct {
 	ID               int       `json:"id"`
-	Status           string    `json:"status,omitempty"`
+	Status           string    `json:"status"`
 	ProductSerialID  int       `json:"product_serial_id"`
-	PreviousSerialNo string    `json:"previous_serial_no,omitempty"`
-	NewSerialNo      string    `json:"new_serial_no,omitempty"`
-	MemoNo           string    `json:"memo_no,omitempty"`
-	ContactNumber    string    `json:"contact_number,omitempty"`
-	RequestedDate    string    `json:"requested_date,omitempty"`
-	ReportedProblem  string    `json:"reported_problem,omitempty"`
-	ReceivedBy       string    `json:"received_by,omitempty"`
-	CheckoutDate     string    `json:"checkout_date,omitempty"`
-	DeliveryDate     string    `json:"delivery_date,omitempty"`
-	DeliveredBy      string    `json:"delivered_by,omitempty"`
-	Comment          string    `json:"comment,omitempty"`
-	CreatedAt        time.Time `json:"created_at,omitempty"`
-	UpdatedAt        time.Time `json:"updated_at,omitempty"`
-	ProductInfo      Product   `json:"product_info,omitempty"`
-	SalesInfo        Sale      `json:"sales_info,omitempty"`
-	CustomerInfo     Customer  `json:"customer_info,omitempty"`
-	SupplierInfo     Supplier  `json:"supplier_info,omitempty"`
+	PreviousSerialNo string    `json:"previous_serial_no"`
+	NewSerialNo      string    `json:"new_serial_no"`
+	MemoNo           string    `json:"memo_no"`
+	ContactNumber    string    `json:"contact_number"`
+	RequestedDate    string    `json:"requested_date"`
+	ReportedProblem  string    `json:"reported_problem"`
+	ReceivedBy       string    `json:"received_by"`
+	CheckoutDate     string    `json:"checkout_date"`
+	DeliveryDate     string    `json:"delivery_date"`
+	DeliveredBy      string    `json:"delivered_by"`
+	Comment          string    `json:"comment"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
+	ProductInfo      Product   `json:"product_info"`
+	SalesInfo        Sale      `json:"sales_info"`
+	CustomerInfo     Customer  `json:"customer_info"`
+	SupplierInfo     Supplier  `json:"supplier_info"`
 }
 
 // Service is the type for services
 type Service struct {
 	//service_code,service_name,service_description,min_charge,discount,status,created_at,updated_at)
-	ID              int                `json:"id"`
-	ServiceCode     string             `json:"service_code"`
-	ServiceName     string             `json:"service_name"`
-	Description     string             `json:"description,omitempty"`
-	ServiceStatus   string               `json:"status"`
-	MinimumCharge        int                `json:"min_charge"`
-	Discount        int                `json:"discount"`
-	CreatedAt       time.Time          `json:"created_at,omitempty"`
-	UpdatedAt       time.Time          `json:"updated_at,omitempty"`
+	ID            int       `json:"id"`
+	ServiceCode   string    `json:"service_code"`
+	ServiceName   string    `json:"service_name"`
+	Description   string    `json:"description"`
+	ServiceStatus string    `json:"status"`
+	MinimumCharge int       `json:"min_charge"`
+	Discount      int       `json:"discount"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }

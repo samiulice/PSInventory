@@ -45,10 +45,11 @@ func (app *application) routes() http.Handler {
 		mux.Post("/inventory/products/search-products-by-serial", app.FetchProductItembySerialNumber)                //search all type items
 		//memo--supplier
 		mux.Post("/inventory/get-supplier-memo-list", app.GetMemoListBySupplierID)
-		//memo--supplier
+		//memo--customer
 		mux.Post("/inventory/get-customer-memo-list", app.GetMemoListByCustomerID)
 		mux.Post("/inventory/return-product-to-supplier", app.ReturnProductsToSupplier)
 		mux.Post("/inventory/restock-product", app.RestockProduct)
+		//sale
 		mux.Post("/inventory/sale-products", app.SaleProducts)
 		//page details
 		mux.Post("/inventory/purchase/get-page-details", app.GetPurchasePageDetails)

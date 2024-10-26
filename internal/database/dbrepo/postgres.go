@@ -371,7 +371,7 @@ func (p *postgresDBRepo) GetActiveCustomersIDAndName() ([]*models.Customer, erro
 
 	query := `
 		SELECT 
-			id, account_code, account_name
+			id, account_code, account_name, division, district, upazila, area, mobile 
 		FROM
 			public.customers
 		WHERE 
@@ -392,6 +392,11 @@ func (p *postgresDBRepo) GetActiveCustomersIDAndName() ([]*models.Customer, erro
 			&c.ID,
 			&c.AccountCode,
 			&c.AccountName,
+			&c.Division,
+			&c.District,
+			&c.Upazila,
+			&c.Area,
+			&c.Mobile,
 		)
 		if err != nil {
 			return customers, err
@@ -1951,7 +1956,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 }
 
 // RestockProduct update product quantity, store purchase history and product serial numbers
-func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
+func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	tx, err := p.DB.BeginTx(ctx, nil)
@@ -1964,47 +1969,47 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 	//step-2: Update product quantity, Set quantity -= newQuantity where id = {affected row id}
 	//step-3: update product items status and sales_history_id, returnin id affected row id
 
-	//loop over the SelectedProduct array
-	for i, items := range sale.SelectedItems {
-		//Insert sales details to sales history table
-		var sale_id int
-		query := `
-			INSERT INTO public.sales_history (sale_date,customer_id,product_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
-		`
-		row := tx.QueryRowContext(ctx, query,
-			sale.SaleDate,
-			sale.CustomerID,
-			items.ProductID,
-			sale.AccountID,
-			sale.ChalanNO,
-			sale.MemoNo,
-			sale.Note,
-			sale.BillAmount,
-			sale.Discount,
-			sale.TotalAmount,
-			sale.PaidAmount,
-			time.Now(),
-			time.Now(),
-		)
-		if err = row.Scan(&sale_id); err != nil {
-			tx.Rollback()
-			return errors.New("SQLErrorSaleProducts(INSERT sales_history): " + err.Error())
-		}
+	//step-1: Insert sales details to sales history table
+	var sale_id int
+	query := `
+		INSERT INTO public.sales_history (sale_date,customer_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
+	`
+	row := tx.QueryRowContext(ctx, query,
+		sale.SaleDate,
+		sale.CustomerInfo.ID,
+		sale.HeadAccountInfo.ID,
+		sale.ChalanNo,
+		sale.MemoNo,
+		sale.Note,
+		sale.BillAmount,
+		sale.Discount,
+		sale.TotalAmount,
+		sale.PaidAmount,
+		time.Now(),
+		time.Now(),
+	)
+	if err = row.Scan(&sale_id); err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleProducts(INSERT sales_history): " + err.Error())
+	}
 
-		//Update product quantity
-		query = `
+	totalQuantity := 0
+	//loop over the SelectedProduct array
+	for i, items := range sale.ProductItems {
+		//Step-2: Update product quantity
+		query := `
 			UPDATE public.products
 			SET quantity = quantity - $1
 			WHERE id = $2;
 		  `
-		_, err = tx.ExecContext(ctx, query, len(items.SerialNumbers), items.ProductID)
+		_, err = tx.ExecContext(ctx, query, items.Quantity, items.ProductID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("SQLErrorSaleProducts(Update Product Quantity):#%d --%w", i, err)
 		}
-
-		//update product items status and sales_history_id
+		totalQuantity += items.Quantity
+		//Step-3: update product items status and sales_history_id
 		for _, serialNumber := range items.SerialNumbers {
 			query = `
 				UPDATE public.product_serial_numbers
@@ -2022,9 +2027,9 @@ func (p *postgresDBRepo) SaleProducts(sale *models.Sale) error {
 
 	//Tx-3 insert summary about the sales in the inventory_transaction_logs table
 	var inv_tx_log_id int
-	query := `INSERT INTO public.inventory_transaction_logs(job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
+	query = `INSERT INTO public.inventory_transaction_logs(job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
 	VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`
-	err = tx.QueryRowContext(ctx, query, "S-"+sale.MemoNo, "sale", len(sale.ProductsSerialNo), sale.TotalAmount, sale.SaleDate, time.Now(), time.Now()).Scan(&inv_tx_log_id)
+	err = tx.QueryRowContext(ctx, query, "JOB-"+sale.MemoNo+strconv.Itoa(sale_id), "sale", totalQuantity, sale.TotalAmount, sale.SaleDate, time.Now(), time.Now()).Scan(&inv_tx_log_id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("SQLErrorSaleProducts(INSERT inventory_transaction_logs: %w", err)

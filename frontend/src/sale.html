@@ -28,6 +28,7 @@
 
   <!-- Custom Theme Style -->
   <link href="assets/css/custom.min.css" rel="stylesheet">
+  <link href="assets/css/invoice_1_Style.css" rel="stylesheet">
 </head>
 
 <body class="nav-md">
@@ -272,8 +273,8 @@
         <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
         <div class="row text-right">
           <div class="col-md-12 col-sm-12 col-xs-12">
-            <a href="javascript:void(0);" id="invoiceBtn" style="width: 200px;" onclick="generatePDF('sales-invoice-content', 3)"
-              class="btn btn-danger d-none">Print Invoice</a>
+            <a href="javascript:void(0);" id="invoiceBtn" style="width: 200px;"
+              onclick="generatePDF('sales-invoice-content', 3)" class="btn btn-danger d-none">Print Invoice</a>
           </div>
         </div>
         <div id="sale-page-content">
@@ -534,6 +535,7 @@
                     <table class="table table-striped">
                       <thead>
                         <tr>
+                          <th class="text-center">ID</th>
                           <th class="text-center">Product Name</th>
                           <th class="text-center">Category</th>
                           <th class="text-center">Brand</th>
@@ -611,9 +613,7 @@
 
   <script>
 
-    let products, brands, billAmount = 0, totalAmount = 0, lastIndex;
-    let selected_products = [];
-    let InvoiceData;
+    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, InvoiceData, selected_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -638,13 +638,17 @@
                       <h4 class="text-danger">${data.message}</h4>
                       `
           } else {
-            console.log(data)
+            console.log(data);
             //Set memo no(MM-RandomSixDigit)
             document.getElementById("memo_no").value = `MM-SL-${generateRandomAlphanumericCode(6)}`;
             document.getElementById("memo_no").disabled = true;
             updateCustomerDiv(data.customers)
             updateCategoryDiv(data.categories)
             updateAccoutnsDiv(data.head_accounts)
+            customers = data.customers;
+            categories = data.categories;
+            brands = data.brands;
+            headAccounts = data.head_accounts;
             //update product list based on selected category
             category.addEventListener("change", e => {
               product.innerHTML = '<option value="" selected disabled>Select Product</option>';
@@ -670,7 +674,6 @@
               let payload = {
                 product_id: parseInt(product.value)
               }
-              console.log("payload: ", payload);
               const requestOptions = {
                 method: 'post',
                 headers: {
@@ -682,7 +685,6 @@
               fetch('http://localhost:4321/api/inventory/products/get-list-by-id', requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                  console.log(data)
                   if (data.error === true) {
                     showErrorMessage(data.message)
                   } else {
@@ -700,26 +702,20 @@
               event.stopPropagation();
               document.getElementById("submitBtn").classList.add("d-none");
 
-              // Select all span elements with the class 'serial-number'
-              const serialNumbers = document.querySelectorAll('.serial-number');
-              // Extract the text content of each span
-              const serialNumberValues = Array.from(serialNumbers).map(span => span.textContent);
-
               let sale_details = {
+                customer_info: customers[parseInt(document.getElementById("customer").value)],
+                head_account_info: headAccounts[parseInt(document.getElementById("account").value)],
+                selected_items: getSelectedProductList(),
                 sale_date: document.getElementById("single_cal4").value,
-                customer_id: parseInt(document.getElementById("customer").value),
-                account_id: parseInt(document.getElementById("account").value),
                 chalan_no: document.getElementById("chalan_no").value,
                 memo_no: document.getElementById("memo_no").value,
                 note: document.getElementById("note").value,
-                products_serial_no: serialNumberValues,
-                selected_items: selected_products,
                 bill_amount: parseInt(document.getElementById("bill-amount").value),
                 discount: parseInt(document.getElementById("discount").value),
                 total_amount: parseInt(document.getElementById("total-amount").value),
                 paid_amount: parseInt(document.getElementById("paid-amount").value),
               }
-              console.log(sale_details);
+              console.log("sale_details: ", sale_details);
               const requestOptions = {
                 method: 'post',
                 headers: {
@@ -736,18 +732,47 @@
                   if (data.error === true) {
                     showErrorMessage(data.message)
                   } else {
-                    InvoiceData = data;
+                    InvoiceData = data.sales_invoice_data;
                     showSuccessMessage(data.message);
-                    // Create a <link> element
-                    const cssLink = document.createElement('link');
+                    //generate table
+                    let productTable = '';
+                    InvoiceData.selected_items.forEach((item, i) => {
+                      //Concat serial number
+                      let serial = '';
+                      if (item.serial_numbers.length === 1) {
+                        serial = `${item.serial_numbers[0]}`;
+                      } else {
+                        let snLn = item.serial_numbers.length
+                        for (let s = 0; s < snLn - 1; s++) {
+                          serial += `${item.serial_numbers[s]} <br>`;
+                        }
+                        //ensuring that <br> tag is not used after the last serial number
+                        serial += `${item.serial_numbers[snLn - 1]}`
+                      }
 
-                    // Set the attributes for the <link> element
-                    cssLink.rel = 'stylesheet'; // Specifies that this link is a stylesheet
-                    cssLink.type = 'text/css';  // Sets the type of the stylesheet
-                    cssLink.href = 'assets/css/invoice_1_Style.css'; // Replace with the path to your CSS file
+                      productTable += `
+                        <tr>
+                          <td class="text_center w_5">${i}</td>
+                          <td class="w_35">
+                            ${item.product_name}<br>
+                            <span class="product-deatils">
+                              <b>Category: </b>${item.category_name} &nbsp;&nbsp;
+                              <b>Brand: </b>${item.brand_name} &nbsp;&nbsp;<br>
+                              <b> Warranty: </b> ${item.warranty} days
+                            </span>
 
-                    // Append the <link> element to the <head>
-                    document.head.appendChild(cssLink);
+                          </td>
+                          <td class="w_35 sn-line">
+                            ${serial}
+                          </td>
+                          <td class="text_center w_5">${item.quantity}</td>
+                          <td class="text_right w_10">&#2547;&nbsp;${item.mrp}</td>
+                          <!-- &#2547; is the unicode for BDT symbol -->
+                          <td class="text_right w_10">&#2547;&nbsp;${item.sub_total}</td>
+                        </tr>
+                      `
+
+                    })
 
                     document.getElementById("sale-page-content").innerHTML = `
                       <div id="sales-invoice-content">
@@ -755,7 +780,7 @@
                           <div class="invoice_title">Sales Invoice</div>
 
                           <div class="invoice">
-                            <div class="header">
+                            <div class="header" id="header">
                               <div class="i_row">
                                 <div class="i_col text_left">
                                   <!-- Company Logo here -->
@@ -763,10 +788,10 @@
                                     <div class="customer-info">
                                       <div class="p_title">Customer Infomation</div>
                                       <!-- <div class="divider"></div> -->
-                                      <p class="customer-id"><strong>ID:</strong> #C-0001</p>
-                                      <p class="customer-name"><strong>Name:</strong> Samiul Bashir</p>
-                                      <p class="contact-number"><strong>Contact:</strong> +880797331020</p>
-                                      <p class="customer-address"><strong>Address:</strong> Mohangonj-2446, Netrakona</p>
+                                      <p class="customer-id"><strong>ID:</strong> &nbsp;${InvoiceData.customer_info.account_code}</p>
+                                      <p class="customer-name"><strong>Name:</strong> ${InvoiceData.customer_info.account_name}</p>
+                                      <p class="contact-number"><strong>Contact:</strong> ${InvoiceData.customer_info.mobile}</p>
+                                      <p class="customer-address"><strong>Address:</strong> ${InvoiceData.customer_info.upazila}, ${InvoiceData.customer_info.district}</p>
                                     </div>
                                   </div>
 
@@ -787,8 +812,8 @@
                                         <hr>
                                         <div class="i_number text_right">
                                           <i>
-                                            <b>INVOICE NO: </b>#3452324 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-                                            <b>Date:</b>April 20, 2023
+                                            <b>INVOICE NO: </b>${InvoiceData.memo_no} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                                            <b>Date:</b>${formatDate(getCurrentDate(), 'date', "-")}
                                           </i>
                                         </div>
                                       </div>
@@ -798,7 +823,7 @@
                               </div>
                             </div>
                             <div class="body">
-                              <table class="table table-bordered no-footer jambo_table">
+                              <table class="table table-bordered no-footer jambo_table table-container">
                                 <thead>
                                   <tr>
                                     <th class="text_center w_5">SL.</th>
@@ -810,130 +835,19 @@
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <tr>
-                                    <td class="text_center w_5">1</td>
-                                    <td class="w_50">
-                                      Intel Core i5 12400 6 cores 12 threads 18MB cache <br>
-                                      <span class="product-deatils">
-                                        <b>Category: </b>Desktop Processor &nbsp;&nbsp;
-                                        <b>Brand: </b>Intel &nbsp;&nbsp;
-                                        <b> Warranty: </b> 3 year
-                                      </span>
-
-                                    </td>
-                                    <td class="w_20 sn-line">
-                                      PP-IPI5-12400875 <br>
-                                    </td>
-                                    <td class="text_center w_5">1</td>
-                                    <td class="text_right w_10">&#2547;&nbsp;15000</td>
-                                    <!-- &#2547; is the unicode for BDT symbol -->
-                                    <td class="text_right w_10">&#2547;&nbsp;15000</td>
-                                  </tr>
-                                  <tr>
-                                    <td class="text_center w_5">2</td>
-                                    <td class="w_50">
-                                      MSI B560M PRO-E 10th and 11th Gen Micro ATX Motherboard <br>
-                                      <span class="product-deatils">
-                                        <b>Category: </b>Desktop Motherboard &nbsp;&nbsp;
-                                        <b>Brand: </b>MSI &nbsp;&nbsp;
-                                        <b> Warranty: </b> 3 years
-                                      </span>
-
-                                    </td>
-                                    <td class="w_20 sn-line">
-                                      PP-MB560-12548965<br>
-                                    </td>
-                                    <td class="text_center w_5">1</td>
-                                    <td class="text_right w_10">&#2547;&nbsp;7600</td>
-                                    <!-- &#2547; is the unicode for BDT symbol -->
-                                    <td class="text_right w_10">&#2547;&nbsp;7600</td>
-                                  </tr>
-                                  <tr>
-                                    <td class="text_center w_5">3</td>
-                                    <td class="w_50">
-                                      HP EX900 M.2 250GB PCIe NVMe Internal SSD <br>
-                                      <span class="product-deatils">
-                                        <b>Category: </b>M.2 NVME SSD &nbsp;&nbsp;
-                                        <b>Brand: </b>HP &nbsp;&nbsp;
-                                        <b> Warranty: </b> 3 years
-                                      </span>
-
-                                    </td>
-                                    <td class="w_20 sn-line">
-                                      PP-HPEX900-89125464<br>
-                                    </td>
-                                    <td class="text_center w_5">1</td>
-                                    <td class="text_right w_10">&#2547;&nbsp;3400</td>
-                                    <!-- &#2547; is the unicode for BDT symbol -->
-                                    <td class="text_right w_10">&#2547;&nbsp;3400</td>
-                                  </tr>
-                                  <tr>
-                                    <td class="text_center w_5">4</td>
-                                    <td class="w_50">
-                                      Corsair Vengeance LPX 16GB 3200MHz DDR4 Desktop RAM <br>
-                                      <span class="product-deatils">
-                                        <b>Category: </b>Desktop RAM &nbsp;&nbsp;
-                                        <b>Brand: </b>Corsair &nbsp;&nbsp;
-                                        <b> Warranty: </b> 3 years
-                                      </span>
-
-                                    </td>
-                                    <td class="w_20 sn-line">
-                                      PP-CV163200-96875365<br>
-                                      PP-CV163200-65472963
-                                    </td>
-                                    <td class="text_center w_5">2</td>
-                                    <td class="text_right w_10">&#2547;&nbsp;4300</td>
-                                    <!-- &#2547; is the unicode for BDT symbol -->
-                                    <td class="text_right w_10">&#2547;&nbsp;8600</td>
-                                  </tr>
-                                  <tr>
-                                    <td class="text_center w_5">5</td>
-                                    <td class="w_50">
-                                      Thermaltake W0422RE Litepower 350W Non Modular Power Supply <br>
-                                      <span class="product-deatils">
-                                        <b>Category: </b>Desktop Power Supply &nbsp;&nbsp;
-                                        <b>Brand: </b>Thermaltake &nbsp;&nbsp;
-                                        <b> Warranty: </b> 2 years
-                                      </span>
-
-                                    </td>
-                                    <td class="w_20 sn-line">
-                                      PP-THW0422RE-69754825<br>
-                                    </td>
-                                    <td class="text_center w_5">1</td>
-                                    <td class="text_right w_10">&#2547;&nbsp;2500</td>
-                                    <!-- &#2547; is the unicode for BDT symbol -->
-                                    <td class="text_right w_10">&#2547;&nbsp;2500</td>
-                                  </tr>
-                                  <tr>
-                                    <td class="text_center w_5">6</td>
-                                    <td class="w_50">
-                                      Value-Top V200 Micro ATX Casing <br>
-                                      <span class="product-deatils">
-                                        <b>Category: </b>Desktop Casing &nbsp;&nbsp;
-                                        <b>Brand: </b>Value-Top &nbsp;&nbsp;
-                                        <b> Warranty: </b> No Warranty
-                                      </span>
-
-                                    </td>
-                                    <td class="w_20 sn-line"></td>
-                                    <td class="text_center w_5">1</td>
-                                    <td class="text_right w_10">&#2547;&nbsp;2000</td>
-                                    <!-- &#2547; is the unicode for BDT symbol -->
-                                    <td class="text_right w_10">&#2547;&nbsp;2000</td>
-                                  </tr>
+                                  ${productTable}
                                 </tbody>
                               </table>
-
+                            </div>
+                            <div class="footer">
                               <!-- Financial Sections -->
                               <div class="i_row">
                                 <div class="w_75">
                                   <div>
                                     <span class="p_title">Payment History:</span>
                                     <span style="font-weight: 400; margin-left: 20%;">
-                                      Total Paid:&nbsp;&nbsp;&#2547;&nbsp;35000 &nbsp;&nbsp;&nbsp;&nbsp; 
-                                      Due:&nbsp;&nbsp;&#2547;&nbsp;3000
+                                      Total Paid:&nbsp;&nbsp;&#2547;&nbsp;${InvoiceData.paid_amount} &nbsp;&nbsp;&nbsp;&nbsp; 
+                                      Due:&nbsp;&nbsp;&#2547;&nbsp;${InvoiceData.total_amount - InvoiceData.paid_amount}
                                     </span>
                                   </div>
                                   <table class="table table-striped jambo_table">
@@ -949,10 +863,10 @@
                                     <tbody>
                                       <tr>
                                         <td class="text_center w_5">1</td>
-                                        <td class="text-center w_15">April 20, 2024</td>
-                                        <td class="text-center w_10">Cash</td>
-                                        <td class="text_center w_35">-</td>
-                                        <td class="text_center w_10">&#2547&nbsp;35000</td>
+                                        <td class="text-center w_15">${InvoiceData.sale_date}</td>
+                                        <td class="text-center w_10">${InvoiceData.head_account_info.account_name}</td>
+                                        <td class="text_center w_35">${InvoiceData.chalan_no === "" ? "Cash Received" : InvoiceData.chalan_no}</td>
+                                        <td class="text_center w_10">&#2547&nbsp;${InvoiceData.paid_amount}</td>
                                       </tr>
                                     </tbody>
                                   </table>
@@ -964,23 +878,21 @@
                                       <tr>
                                         <td class="text_left">SUBTOTAL</td>
                                         <td>
-                                          <b>&#2547; 39100</b>
+                                          <b>&#2547; ${InvoiceData.bill_amount}</b>
                                         </td>
                                       </tr>
                                       <tr>
                                         <td class="text_left">DISCOUNT</td>
-                                        <td><b>&#2547; 1100</b></td>
+                                        <td><b>&#2547; ${InvoiceData.bill_amount - InvoiceData.total_amount}</b></td>
                                       </tr>
                                       <tr>
                                         <td class="text_left">TOTAL</td>
-                                        <td><b>&#2547; 38000</b>
+                                        <td><b>&#2547; ${InvoiceData.total_amount}</b>
                                       </tr>
                                     </tbody>
                                   </table>
                                 </div>
                               </div>
-                            </div>
-                            <div class="footer">
                               <div class="i_row">
                                 <div class="i_col w_10"></div>
                                 <div class="i_col w_40 text_left">
@@ -1038,8 +950,8 @@
       if (customers) {
         customer.innerHTML = '';
         customer.innerHTML = `<option value="" selected disabled>Select Customer Account</option>`;
-        customers.forEach(s => {
-          customer.innerHTML += `<option value="${s.id}">${s.account_name}(${s.account_code})</option>`;
+        customers.forEach((s, i) => {
+          customer.innerHTML += `<option value="${i}">${s.account_name}(${s.account_code})</option>`;
         });
       } else {
         customer.innerHTML = `<option value="" selected disabled>No Customer Available. Create One</option>`;
@@ -1051,22 +963,11 @@
       if (accoutns) {
         account.innerHTML = '';
         account.innerHTML = `<option value="" selected disabled>Select Account</option>`;
-        accoutns.forEach(ac => {
-          account.innerHTML += `<option value=${ac.id}>${ac.account_name}</option>`;
+        accoutns.forEach((ac, i) => {
+          account.innerHTML += `<option value=${i}>${ac.account_name}</option>`;
         });
       } else {
         account.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-      }
-    }
-
-
-    //toggleBtn changes button state in between show and hide
-    function toggleBtn(id) {
-      let elem = document.getElementById("showBtn-" + id)
-      if (elem.innerHTML.includes("Show")) {
-        elem.innerHTML = `<i class="fa fa-eye-slash"></i>&nbsp;&nbsp;Hide`;
-      } else {
-        elem.innerHTML = `<i class="fa fa-eye"></i>&nbsp;&nbsp;Show`;
       }
     }
 
@@ -1151,10 +1052,12 @@
     }
 
 
-    // Function to remove a product by product_id
+    // removeProduct removes a product by product_id
     function removeProduct(productIdToRemove) {
       selected_products = selected_products.filter(item => item.product_id !== productIdToRemove);
     }
+
+    // removeSerialNumber removes a serial number
     function removeSerialNumber(productId, serialNumberToRemove) {
       // Find the product by product_id
       const p = selected_products.find(item => item.product_id === productId);
@@ -1164,10 +1067,10 @@
         p.serialNumbers = p.serialNumbers.filter(
           serialNumber => serialNumber !== serialNumberToRemove
         );
-      } else {
-        console.log(`Product with ID ${productId} not found.`);
       }
     }
+
+    //insertSerialNumber insert new serial with product id
     function insertSerialNumber(productId, newSerialNumber) {
       // Find the product by product_id
       const p = selected_products.find(item => item.product_id === productId);
@@ -1176,9 +1079,6 @@
         // Check if the new serial number already exists
         if (!p.serialNumbers.includes(newSerialNumber)) {
           p.serialNumbers.push(newSerialNumber);
-          console.log(`Serial number ${newSerialNumber} added to product ${productId}.`);
-        } else {
-          console.log(`Serial number ${newSerialNumber} already exists for product ${productId}.`);
         }
       } else {
         // If the product doesn't exist, create a new one
@@ -1187,11 +1087,10 @@
           serialNumbers: [newSerialNumber]
         };
         selected_products.push(newProduct);
-        console.log(`Product ${productId} created with serial number ${newSerialNumber}.`);
       }
     }
 
-
+    // deleteFromSelectItems removes items from the selected section
     function deleteFromSelectItems(id) {
       let parentDiv = document.getElementById("selected-items-info-container");
       let item = document.getElementById("selected-product-" + id);
@@ -1220,7 +1119,8 @@
       }
       document.getElementById("selected-items-info-container").innerHTML += `
       <tr id="selected-product-${id}">
-        <th class="text-center">${products.product_name}</th>
+        <th class="text-center">${products.id}</th>
+        <th class="text-center">${products.product_name}<span class="d-none" id="product-warranty-${products.id}">${products.product_metadata[0].warranty}</span></th>
         <th class="text-center">${products.category.name}</th>
         <th class="text-center">${products.brand.name}</th>
         <th class="text-center" id="selected-product-qty-${id}">${quantity}</th>
@@ -1268,20 +1168,33 @@
 
     //upadate total amount when discount is changed
     document.getElementById("discount").addEventListener('change', e => {
-      document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(document.getElementById("discount").value) / 100.0));
-      totalAmount = parseInt(document.getElementById("total-amount").value);
-      //updata max input of paid-amount field
-      document.getElementById("paid-amount").max = `${totalAmount}`;
+      let d = document.getElementById("discount");
+      if (d.value === "" || Number(d.value) === 0) {
+        document.getElementById("total-amount").value = billAmount;
+        document.getElementById("paid-amount").max = billAmount;
+      } else {
+        document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(d.value) / 100.0));
+        totalAmount = parseInt(document.getElementById("total-amount").value);
+        //updata max input of paid-amount field
+        document.getElementById("paid-amount").max = `${totalAmount}`;
+      }
     })
+
     //upadate discount when total amount is changed
     document.getElementById("total-amount").addEventListener('change', e => {
-      let discount = 100.0 - 100 * parseFloat(document.getElementById('total-amount').value) / billAmount;
-      document.getElementById("discount").value = (discount % 1 === 0) ? discount : discount.toFixed(2);;
+      let t = document.getElementById('total-amount');
+      if (t.value === "" || Number(t.value) === 0) {
+        document.getElementById("discount").value = 100
+        document.getElementById("paid-amount").max = 0
+      } else {
+        let discount = 100.0 - 100 * parseFloat(t.value) / billAmount;
+        document.getElementById("discount").value = (discount % 1 === 0) ? discount : discount.toFixed(2);;
+        totalAmount = parseInt(t.value);
+        //updata max input of paid-amount field
+        document.getElementById("paid-amount").max = `${totalAmount}`;
+      }
 
-      totalAmount = parseInt(document.getElementById("total-amount").value);
 
-      //updata max input of paid-amount field
-      document.getElementById("paid-amount").max = `${totalAmount}`;
     })
 
     //serachBySerial()
@@ -1306,7 +1219,6 @@
         fetch('http://localhost:4321/api/inventory/products/search-instock-products-by-serial', requestOptions)
           .then(response => response.json())
           .then(data => {
-            console.log(data);
             if (data.error === true) {
               //showErrorMessage(data.message)
               if (data.message.includes("no rows in result set")) {
@@ -1330,26 +1242,30 @@
       }
     }
 
-    //checkProductExitance check the id exist or not in the selected items table
-    //if it exist then serial number will be pushed to the serial_number col
-    //otherwise add item as new
-    function checkProductExitance(id) {
+    //getSelectedProductList iterate over the table rows and extract the product info with serial number
+    function getSelectedProductList() {
+      let selectedProducts = [];
       // Get all rows from the table body
       const rows = document.querySelectorAll('#selected-items-info-container tr');
-
-      // Array to store MRP values
-      const mrpValues = [];
-
       // Loop through each row and get the 6th column (MRP)
       rows.forEach(row => {
-        const mrpCell = row.cells[5]; // Get the MRP cell (6th column, 0-indexed)
-        if (mrpCell) {
-          mrpValues.push(mrpCell.textContent.trim()); // Add the MRP value to the array
+        let sn = row.cells[5].innerText.split("\n").filter(line => line.trim() !== "");
+        let item = {
+          product_id: parseInt(row.cells[0].innerText),
+          product_name: row.cells[1].innerText,
+          category_name: row.cells[2].innerText,
+          brand_name: row.cells[3].innerText,
+          quantity: parseInt(row.cells[4].innerText),
+          serial_numbers: sn,
+          mrp: parseInt(row.cells[6].innerText),
+          warranty: parseInt(document.getElementById('product-warranty-' + row.cells[0].innerText).innerText),
+          sub_total: parseInt(row.cells[7].innerText)
         }
+        selectedProducts.push(item)
       });
 
-      // Log all MRP values
-      console.log(mrpValues);
+      // return the selected products list
+      return selectedProducts;
     }
   </script>
 
