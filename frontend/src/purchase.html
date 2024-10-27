@@ -522,7 +522,7 @@
                       <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random Serial No.
                     </a>
                     <a class="btn btn-round btn-xs btn-primary d-none" id="printRandomCodesBtn">
-                      <span class="glyphicon glyphicon-print"></span>&nbsp;&nbsp;Save Serial No.
+                      <span class="glyphicon glyphicon-print"></span>&nbsp;&nbsp;Print Serial Tags.
                     </a>
                   </div>
                 </div>
@@ -539,8 +539,6 @@
             <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
               <br>
               <button type="submit" id="submitBtn" class="btn btn-round btn-success">Save</button>
-              <a href="javascript:void(0);" id="processingBtn" class="btn btn-round btn-success d-none">Processing...</a>
-              <a href="javascript:void(0);" id="invoiceBtn" class="btn btn-round btn-success">Generate Invoice</a>
             </div>
           </div>
         </form>
@@ -589,13 +587,14 @@
     <!-- Custom Theme Scripts -->
     <script src="assets/js/custom.js"></script>
     <script src="assets/js/app.js"></script>
+    <script src="assets/js/swal-popup-form.js"></script>
 
     <!-- sweetalert2 script -->
     <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
     <script>
 
-      let products, brands, supplier, category, headaccount;
+      let products;
 
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
@@ -656,9 +655,6 @@
                               `
             } else {
               console.log(data)
-              supplier = data.supplier
-              category = data.categories
-              headaccount = data.head_accounts
               updateSupplierDiv(data.suppliers)
               updateCategoryDiv(data.categories)
               updateAccoutnsDiv(data.head_accounts)
@@ -750,7 +746,6 @@
                   total_amount: parseInt(totalAmount.value),
                   paid_amount: parseInt(paidAmount.value),
                 }
-                console.log(purchase_details);
                 submitBtn.classList.add("d-none");
                 const requestOptions = {
                   method: 'post',
@@ -764,15 +759,15 @@
                 fetch('http://localhost:4321/api/inventory/restock-product', requestOptions)
                   .then(response => response.json())
                   .then(data => {
-                    console.log("Restock Product: ", data)
                     if (data.error === true) {
                       showErrorMessage(data.message)
                     } else {
                       showSuccessMessage(data.message);
                     }
-                    // setTimeout(() => {
-                    //   location.reload();
-                    // }, 5000);
+                    //refresh the UI
+                    setTimeout(() => {
+                      location.reload();
+                    }, 5000);
                   });
               })
               //account 
