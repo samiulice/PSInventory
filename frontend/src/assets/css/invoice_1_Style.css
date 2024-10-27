@@ -95,6 +95,10 @@
 
 
 
+  .w_3 {
+    width: 3%;
+  }
+
   .w_5 {
     width: 5%;
   }
@@ -102,9 +106,20 @@
   .w_10 {
     width: 10%;
   }
+  .w_12 {
+    width: 12%;
+  }
 
   .w_15 {
     width: 15%;
+  }
+  
+  .w_18 {
+    width: 18%;
+  }
+  
+  .w_20 {
+    width: 20%;
   }
 
   .w_25 {
@@ -113,6 +128,9 @@
 
   .w_30 {
     width: 30%;
+  }
+  .w_32 {
+    width: 32%;
   }
  .w_35 {
     width: 35%;
@@ -226,10 +244,10 @@
   }
 
   .invoice .footer {
-    margin-top: 30px;
+    margin-top: 10px;
     page-break-inside: avoid;
     page-break-after: avoid;
-    page-break-before: auto;
+    page-break-before: avoid;
   }
   #header {
     page-break-inside: avoid;
@@ -238,8 +256,8 @@
   }
 
   .sn-line {
-    font-size: 10px;
-    line-height: 1.25;
+    font-size: 12px;
+    line-height: 1;
   }
 
   /* company info section */
@@ -281,14 +299,39 @@
 
   /* End of company info section */
   .product-deatils {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.25em;
+  }
+  table {
+    page-break-inside: auto; 
+    page-break-before: avoid;
+    page-break-after: avoid;
   }
   tr, td, th {
     page-break-inside: avoid; 
     page-break-before: avoid;
     page-break-after: avoid;
   }
+
+  .shrink-text {
+    white-space: nowrap;            /* Prevents line wrapping */
+    overflow: hidden;               /* Hides overflow */
+    text-overflow: ellipsis;        /* Adds '...' for long text */
+    font-size: 2rem;                /* Base font-size */
+  }
+  
+  .shrink-text:before {
+    content: attr(data-text);       /* Use attribute for scaling */
+    visibility: hidden;             /* Hide, acts as size reference */
+    position: absolute;
+  }
+  
+  .shrink-text span {
+    display: block;
+    font-size: 1rem;              /* Adjust font range */
+    min-width: 80%;                 /* Minimum scaling size */
+  }
+  
 
   /* Force background graphics for printing */
   @media print {

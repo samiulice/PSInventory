@@ -595,7 +595,7 @@
 
     <script>
 
-      let products, brands;
+      let products, brands, supplier, category, headaccount;
 
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
@@ -656,6 +656,9 @@
                               `
             } else {
               console.log(data)
+              supplier = data.supplier
+              category = data.categories
+              headaccount = data.head_accounts
               updateSupplierDiv(data.suppliers)
               updateCategoryDiv(data.categories)
               updateAccoutnsDiv(data.head_accounts)

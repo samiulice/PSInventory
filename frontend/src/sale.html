@@ -740,20 +740,20 @@
                       //Concat serial number
                       let serial = '';
                       if (item.serial_numbers.length === 1) {
-                        serial = `${item.serial_numbers[0]}`;
+                        serial = `<span>${item.serial_numbers[0]}</span>`;
                       } else {
                         let snLn = item.serial_numbers.length
                         for (let s = 0; s < snLn - 1; s++) {
-                          serial += `${item.serial_numbers[s]} <br>`;
+                          serial += `<span>${item.serial_numbers[s]} </span>`;
                         }
                         //ensuring that <br> tag is not used after the last serial number
-                        serial += `${item.serial_numbers[snLn - 1]}`
+                        serial += `<span>${item.serial_numbers[snLn - 1]}</span>`
                       }
 
                       productTable += `
                         <tr>
-                          <td class="text_center w_5">${i}</td>
-                          <td class="w_35">
+                          <td class="text_center w_3">${i}</td>
+                          <td class="w_32">
                             ${item.product_name}<br>
                             <span class="product-deatils">
                               <b>Category: </b>${item.category_name} &nbsp;&nbsp;
@@ -762,13 +762,13 @@
                             </span>
 
                           </td>
-                          <td class="w_35 sn-line">
+                          <td class="w_30 sn-line shrink-text">
                             ${serial}
                           </td>
                           <td class="text_center w_5">${item.quantity}</td>
-                          <td class="text_right w_10">&#2547;&nbsp;${item.mrp}</td>
+                          <td class="text_right w_12">&nbsp;${item.mrp}</td>
                           <!-- &#2547; is the unicode for BDT symbol -->
-                          <td class="text_right w_10">&#2547;&nbsp;${item.sub_total}</td>
+                          <td class="text_right w_18">&nbsp;${item.sub_total}</td>
                         </tr>
                       `
 
@@ -826,12 +826,12 @@
                               <table class="table table-bordered no-footer jambo_table table-container">
                                 <thead>
                                   <tr>
-                                    <th class="text_center w_5">SL.</th>
-                                    <th class="text-center w_50">Description</th>
-                                    <th class="text-center w_20">Serial Number</th>
+                                    <th class="text_center w_3">SL.</th>
+                                    <th class="text-center w_32">Description</th>
+                                    <th class="text-center w_30">Serial Number</th>
                                     <th class="text_center w_5">Quantity</th>
-                                    <th class="text_center w_10">Unit Price</th>
-                                    <th class="text_center w_10">Amount</th>
+                                    <th class="text_center w_12">Unit Price</th>
+                                    <th class="text_center w_18">Amount</th>
                                   </tr>
                                 </thead>
                                 <tbody>
