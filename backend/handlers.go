@@ -451,7 +451,7 @@ func (app *application) FetchPurchaseMemoProductItems(w http.ResponseWriter, r *
 // FetchPurchaseMemoProductItems retrive purchased products list of a memo
 func (app *application) FetchSalesMemoProductItems(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
-		MemoNo string `json:"memo_no"`
+		ID int `json:"sales_history_id"`
 	}
 	err := app.readJSON(w, r, &payload) //read json body
 	if err != nil {
@@ -459,37 +459,29 @@ func (app *application) FetchSalesMemoProductItems(w http.ResponseWriter, r *htt
 		return
 	}
 	//get purchase history associated with memo_no
-	salesHistory, err := app.DB.GetSalesHistoryByMemoNo(payload.MemoNo)
+	salesHistory, err := app.DB.GetSalesHistoryByID(payload.ID)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ErrorSalesHistory:: %v", err))
-	}
-	//Get product ids for this memo with associated purchase_id for the given memo
-	//get detailed Product info for these ids
-	//retrive all product-serial of each product_id && purchase_id
-	var products []*models.Product
-	for _, v := range salesHistory {
-		product, err := app.DB.GetSoldProductListBySalesIDAndProductID(v.ID, v.SelectedItems[0].ProductID)
-		if err != nil {
-			app.badRequest(w, fmt.Errorf("ErrorProducts:: %v", err))
-		}
-		products = append(products, product)
-	}
-
-	if err != nil {
-		app.badRequest(w, err)
 		return
 	}
 
+	//get product details by sales id
+	productDetails, err := app.DB.GetProductItemsDetailsBySalesHistoryID(salesHistory.ID)
+
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("DBERROR:=>GetProductItemsDetailsBySalesHistoryID: %w", err))
+		return
+	}
 	var resp struct {
-		Error        bool              `json:"error,omitempty"`
-		Message      string            `json:"message,omitempty"`
-		Products     []*models.Product `json:"products,omitempty"`
-		SalesHistory []*models.Sale    `json:"sales_history,omitempty"`
+		Error          bool              `json:"error,omitempty"`
+		Message        string            `json:"message,omitempty"`
+		ProductDetails []*models.Product `json:"product_details,omitempty"`
+		SalesHistory   models.Sale       `json:"sales_history,omitempty"`
 	}
 	resp.Error = false
 	resp.Message = "Data fetched succefully"
-	resp.Products = products
-	// resp.SalesHistory = saleHistory
+	resp.ProductDetails = productDetails
+	resp.SalesHistory = salesHistory
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
@@ -710,7 +702,10 @@ func (app *application) GetMemoListByCustomerID(w http.ResponseWriter, r *http.R
 	//retrive memo list for given supplier id from sales_history talble
 	sale, err := app.DB.GetMemoListByCustomerID(payload.CustomerID)
 	if err == sql.ErrNoRows {
-		resp.Message += "||No Memo Available For this selected customer||"
+		resp.Error = true
+		resp.Message = "No Memo Available For this selected customer"
+		app.writeJSON(w, http.StatusOK, resp) //send error response
+		return
 	} else if err != nil {
 		app.badRequest(w, err) //send error response
 		return
@@ -718,7 +713,7 @@ func (app *application) GetMemoListByCustomerID(w http.ResponseWriter, r *http.R
 
 	//TODO: Retrive accounts and send to frontend
 	resp.Error = false
-	resp.Message += "data Succesfully fetched"
+	resp.Message = "data Succesfully fetched"
 	resp.Sale = sale
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -795,8 +790,8 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var resp struct {
-		Error   bool   `json:"error"`
-		Message string `json:"message"`
+		Error            bool                 `json:"error"`
+		Message          string               `json:"message"`
 		SalesInvoiceData *models.SalesInvoice `json:"sales_invoice_data"`
 	}
 

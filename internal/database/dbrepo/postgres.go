@@ -1522,7 +1522,7 @@ func (p *postgresDBRepo) GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale
 	//Get product ids for this memo with associated purchase_id for the given memo from purchase_history table
 	query := `
 		SELECT
-			id, sale_date, customer_id, product_id, account_id, chalan_no, memo_no, note, bill_amount, discount, total_amount, paid_amount, created_at, updated_at
+			id, sale_date, customer_id, account_id, chalan_no, memo_no, note, bill_amount, discount, total_amount, paid_amount, created_at, updated_at
 		FROM
 			public.sales_history 
 		WHERE
@@ -1541,7 +1541,6 @@ func (p *postgresDBRepo) GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale
 			&sale.ID,
 			&sale.SaleDate,
 			&sale.CustomerID,
-			&si.ProductID,
 			&sale.AccountID,
 			&sale.ChalanNO,
 			&sale.MemoNo,
@@ -1570,7 +1569,7 @@ func (p *postgresDBRepo) GetSalesHistoryByID(id int) (models.Sale, error) {
 
 	query := `
 		SELECT
-			id, sale_date, customer_id, product_id, account_id, chalan_no, memo_no, note, bill_amount, discount, total_amount, paid_amount, created_at, updated_at
+			id, sale_date, customer_id, account_id, chalan_no, memo_no, note, bill_amount, discount, total_amount, paid_amount, created_at, updated_at
 		FROM
 			public.sales_history 
 		WHERE
@@ -1582,7 +1581,6 @@ func (p *postgresDBRepo) GetSalesHistoryByID(id int) (models.Sale, error) {
 		&salesHistory.ID,
 		&salesHistory.SaleDate,
 		&salesHistory.CustomerID,
-		&si.ProductID,
 		&salesHistory.AccountID,
 		&salesHistory.ChalanNO,
 		&salesHistory.MemoNo,
@@ -1703,6 +1701,88 @@ func (p *postgresDBRepo) GetSoldProductListBySalesIDAndProductID(salesID, produc
 	}
 	pr.ProductMetadata = metadata
 	product = &pr
+	return product, nil
+}
+
+// GetProductListBySalesIDAndProductID returns products list associated with salesID and ProductID
+func (p *postgresDBRepo) GetProductItemsDetailsBySalesHistoryID(id int) ([]*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var product []*models.Product
+	var metadata []*models.ProductMetadata
+
+	//get metadata from product_serial_numbers
+	query := `
+		SELECT
+			id, serial_number, product_id, purchase_history_id, sales_history_id, status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
+		FROM
+			public.product_serial_numbers
+		WHERE
+			status = 'sold' AND sales_history_id = $1
+	`
+	rows, err := p.DB.QueryContext(ctx, query, id)
+	if err != nil {
+		return product, err
+	}
+	for rows.Next() {
+		var pm models.ProductMetadata
+		err = rows.Scan(
+			&pm.ID,
+			&pm.SerialNumber,
+			&pm.ProductID,
+			&pm.PurchaseHistoryID,
+			&pm.SalesHistoryID,
+			&pm.Status,
+			&pm.WarrantyPeriod,
+			&pm.MaxRetailPrice,
+			&pm.PurchaseRate,
+			&pm.CreatedAt,
+			&pm.UpdatedAt,
+		)
+		if err != nil {
+			return product, err
+		}
+		metadata = append(metadata, &pm)
+	}
+
+	//Goruping productmetadata with corresponding product
+	idMap := make(map[int]models.Product)
+	for _, v := range metadata {
+		// Check if an element exists in the map
+		_, exists := idMap[v.ProductID]
+		if !exists {
+			//get product info
+			pr, err := p.GetProductByID(v.ProductID)
+			if err != nil {
+				return product, err
+			}
+			//push the product info
+			idMap[v.ProductID] = pr
+		}
+	}
+	for _, v := range metadata {
+		// Check if an element exists in the map
+		node, exists := idMap[v.ProductID]
+		if !exists {
+			//get product info
+			pr, err := p.GetProductByID(v.ProductID)
+			if err != nil {
+				return product, err
+			}
+			//append current metadata to the productmetada
+			pr.ProductMetadata = append(pr.ProductMetadata, v)
+			//push the product info
+			idMap[v.ProductID] = pr
+		} else {
+			node.ProductMetadata = append(node.ProductMetadata, v)
+			idMap[v.ProductID] = node
+		}
+	}
+
+	for _, v := range idMap {
+		product = append(product, &v)
+	}
 	return product, nil
 }
 
@@ -1834,7 +1914,7 @@ func (p *postgresDBRepo) GetMemoListByCustomerID(customerID int) ([]*models.Sale
 	var sales []*models.Sale
 
 	query := `
-		SELECT DISTINCT memo_no
+		SELECT id, customer_id, memo_no
 		FROM 
 			public.sales_history
 		WHERE 
@@ -1850,6 +1930,8 @@ func (p *postgresDBRepo) GetMemoListByCustomerID(customerID int) ([]*models.Sale
 	for rows.Next() {
 		var s models.Sale
 		err = rows.Scan(
+			&s.ID,
+			&s.CustomerID,
 			&s.MemoNo,
 		)
 		if err != nil {

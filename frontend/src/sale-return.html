@@ -531,20 +531,20 @@
                             if (data.sales) {
                                 memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
                                 data.sales.forEach(m => {
-                                    memoDiv.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.memo_no}">${m.memo_no}</option>`
+                                    memoDiv.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.id}">${m.memo_no}</option>`
                                 })
                             }
                            }
                         })
 
                     // on changing memo, fetch associated products details with serial number list for the memo and populate product list dropdown 
-                    memo.addEventListener('change', e => {
+                    memoDiv.addEventListener('change', e => {
                         productListContainer.innerHTML = '';
                         returnedID = [];
                         total_returned_values = 0;
                         total_returned_items = 0;
                         let memoBody = {
-                            memo_no: memo.value
+                            sales_history_id: parseInt(memoDiv.value)
                         }
                         const requestOptions = {
                             method: "post",
