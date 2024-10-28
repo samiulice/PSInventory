@@ -49,7 +49,7 @@
                         </div>
                         <div class="profile_info">
                             <span>Welcome,</span>
-                            <h2>John Doe</h2>
+                            <h2>Samiul Bashir</h2>
                         </div>
                     </div>
                     <!-- /menu profile quick info -->
@@ -152,7 +152,7 @@
                             <li class="">
                                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                     aria-expanded="false">
-                                    <img src="assets/images/samiul-photo.jpg" alt="">John Doe
+                                    <img src="assets/images/samiul-photo.jpg" alt="">Samiul Bashir
                                     <span class=" fa fa-angle-down"></span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -464,7 +464,7 @@
 
         <!-- Step-2: -->
         <!-- Input serial field to search sold product and add it to the product list table if available -->
-        <!-- 'http://localhost:4321/api/inventory/products/search-instock-products-by-serial' -->
+        <!-- 'http://localhost:4321/api/inventory/products/search-sold-products-by-serial' -->
         <!-- data structure: products: [
         {
             id,product_code,product_name,quantity,category_id,created_at,updated_at,
@@ -485,15 +485,15 @@
                     method: "post"
                 }
                 fetch('http://localhost:4321/api/mis/get-customer-id-name-list', requestOptions)
-                    .then(resposne => resposne.json())
+                    .then(response => response.json())
                     .then(data => {
                         console.log(data)
                         customers = data.customers
                         if (data.error === true) {
                             document.getElementById("page-content").innerHTML = `
-                      <h4 class="text-info">Please contact to the app provider</h4>
-                      <br>
-                      <h4 class="text-danger">${data.message}</h4>`
+                                <h4 class="text-info">Please contact to the app provider</h4>
+                                <br>
+                                <h4 class="text-danger">${data.message}</h4>`
                         } else {
                             customerDiv.innerHTML = '<option value="" selected disabled>Select Customer Account</option>';
                             if (customers) {
@@ -519,14 +519,22 @@
                         body: JSON.stringify(customerID)
                     }
                     fetch('http://localhost:4321/api/inventory/get-customer-memo-list', requestOptions)
-                        .then(resposne => resposne.json())
+                        .then(response => response.json())
                         .then(data => {
-                            memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
+                           if(data.error === true){
+                            document.getElementById("page-content").innerHTML = `
+                                <h4 class="text-info">Please contact to the app provider</h4>
+                                <br>
+                                <h4 class="text-danger">${data.message}</h4>`
+                           } else {
+                            memoDiv.innerHTML = '<option value="" selected disabled>No memo available for this supplier</option>'
                             if (data.sales) {
+                                memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
                                 data.sales.forEach(m => {
                                     memoDiv.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.memo_no}">${m.memo_no}</option>`
                                 })
                             }
+                           }
                         })
 
                     // on changing memo, fetch associated products details with serial number list for the memo and populate product list dropdown 

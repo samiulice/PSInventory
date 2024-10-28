@@ -271,7 +271,7 @@ func (app *application) GetSuppliers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetActiveSuppliersIDAndName retruns a list of supplier's id and name
+// GetActiveSuppliersIDAndName returns a list of supplier's id and name
 func (app *application) GetActiveSuppliersIDAndName(w http.ResponseWriter, r *http.Request) {
 	//supplier
 	var resp struct {
@@ -280,7 +280,7 @@ func (app *application) GetActiveSuppliersIDAndName(w http.ResponseWriter, r *ht
 		Suppliers []*models.Supplier `json:"suppliers,omitempty"`
 	}
 
-	//retrive suppliers from the database
+	//retrieve suppliers from the database
 	suppliers, err := app.DB.GetActiveSuppliersIDAndName()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Supplier Available||"
