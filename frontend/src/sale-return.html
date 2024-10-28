@@ -86,7 +86,7 @@
                                     <ul class="nav child_menu">
                                         <li><a href="sale.html">Sale</a></li>
                                         <li><a href="sale-return.html">Sale Return</a></li>
-                                                          <li><a href="purchase.html">Purchase</a></li>
+                                        <li><a href="purchase.html">Purchase</a></li>
                                         <li><a href="purchase-return.html">Purchase Return</a></li>
                                         <li><a href="warranty.html">Warranty</a></li>
                                         <li><a href="#repair.html">Repair</a></li>
@@ -252,7 +252,7 @@
                 <!-- Content Title -->
                 <h2 class="text-center text-warning fa-2x"><label>Sale Return</label></h2>
                 <!-- Page content here -->
-                <form action="#" id="saleReturnForm">
+                <form action="#" id="salesReturnForm">
                     <!-- Sale Details Secetion  -->
                     <div class="x_panel bg-gw">
                         <div class="x_content">
@@ -320,7 +320,7 @@
                                         <div class="col-md-6 col-sm-6 col-xs-12">
                                             <button type="submit" id="submitBtn" class="btn btn-primary">Save</button>
                                         </div>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <div class="col-md-6 col-sm-6 col-xs-12 d-none">
                                             <a href="javascript:void(0);" id="invoiceBtn"
                                                 class="btn btn-primary">Generate Invoice</a>
                                         </div>
@@ -358,7 +358,7 @@
                                                 <!-- Table row -->
                                                 <div class="row">
                                                     <div class="col-xs-12 table">
-                                                        <table class="table table-striped">
+                                                        <table class="table table-striped bulk_action">
                                                             <thead>
                                                                 <tr>
                                                                     <th>No.</th>
@@ -368,8 +368,7 @@
                                                                     <th>Brand</th>
                                                                     <th>Qty</th>
                                                                     <th>Sale Date</th>
-                                                                    <th class="text-center" style="width: 33%">Serial #
-                                                                    </th>
+                                                                    <th class="text-center" style="width: 33%">Serial #</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody id="product-list-container">
@@ -474,7 +473,7 @@
         },] -->
 
         <script>
-            let customers, products;
+            let customers, products, salesHistory;
             let returnedID = [], total_returned_values = 0, total_returned_items = 0;
             window.addEventListener("DOMContentLoaded", e => {
                 let customerDiv = document.getElementById("customer");
@@ -485,32 +484,32 @@
                     method: "post"
                 }
                 fetch('http://localhost:4321/api/mis/get-customer-id-name-list', requestOptions)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data)
-                        customers = data.customers
-                        if (data.error === true) {
-                            document.getElementById("page-content").innerHTML = `
-                                <h4 class="text-info">Please contact to the app provider</h4>
-                                <br>
-                                <h4 class="text-danger">${data.message}</h4>`
-                        } else {
-                            customerDiv.innerHTML = '<option value="" selected disabled>Select Customer Account</option>';
-                            if (customers) {
-                                customers.forEach(c => {
-                                    customerDiv.innerHTML += `<option value="${c.id}">${c.account_name}(${c.account_code})</option>`
-                                });
-                            }
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    customers = data.customers
+                    if (data.error === true) {
+                        document.getElementById("page-content").innerHTML = `
+                            <h4 class="text-info">Please contact to the app provider</h4>
+                            <br>
+                            <h4 class="text-danger">${data.message}</h4>`
+                    } else {
+                        customerDiv.innerHTML = '<option value="" selected disabled>Select Customer Account</option>';
+                        if (customers) {
+                            customers.forEach((c,i) => {
+                                customerDiv.innerHTML += `<option value="${i}">${c.account_name}(${c.account_code})</option>`
+                            });
                         }
-                    })
+                    }
+                })
                 //End fetch-1
                 //Start fetch-2: on changing customer, fetch associated memo list for the customer and populate memo dropdown 
                 customerDiv.addEventListener('change', e => {
-                    memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
-                    productListContainer.innerHTML = '';
+                    //refresh UI
+                    refreshContent()
 
                     let customerID = {
-                        customer_id: parseInt(customerDiv.value)
+                        customer_id: customers[parseInt(customerDiv.value)].id
                     }
                     const requestOptions = {
                         method: 'post',
@@ -519,14 +518,17 @@
                         body: JSON.stringify(customerID)
                     }
                     fetch('http://localhost:4321/api/inventory/get-customer-memo-list', requestOptions)
-                        .then(response => response.json())
-                        .then(data => {
-                           if(data.error === true){
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Memo: ", data)
+                        if (data.error === true) {
                             document.getElementById("page-content").innerHTML = `
-                                <h4 class="text-info">Please contact to the app provider</h4>
-                                <br>
-                                <h4 class="text-danger">${data.message}</h4>`
-                           } else {
+                            <h4 class="text-info">Please contact to the app provider</h4>
+                            <br>
+                            <h4 class="text-danger">${data.message}</h4>`
+                        } else if(data.message.includes("No Memo Available")){
+                            memoDiv.innerHTML = '<option value="" selected disabled>No memo available for this supplier</option>'
+                        } else {
                             memoDiv.innerHTML = '<option value="" selected disabled>No memo available for this supplier</option>'
                             if (data.sales) {
                                 memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
@@ -534,15 +536,13 @@
                                     memoDiv.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.id}">${m.memo_no}</option>`
                                 })
                             }
-                           }
-                        })
+                        }
+                    })
 
                     // on changing memo, fetch associated products details with serial number list for the memo and populate product list dropdown 
                     memoDiv.addEventListener('change', e => {
-                        productListContainer.innerHTML = '';
-                        returnedID = [];
-                        total_returned_values = 0;
-                        total_returned_items = 0;
+                        //refresh UI
+                        refreshContent()
                         let memoBody = {
                             sales_history_id: parseInt(memoDiv.value)
                         }
@@ -553,96 +553,82 @@
                             body: JSON.stringify(memoBody)
                         }
                         fetch('http://localhost:4321/api/inventory/memo/get-sales-product-list', requestOptions)
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data)
-                                if (data.error === true) {
-                                    document.getElementById("page-content").innerHTML = `
-                                    <h4 class="text-info">Please contact to the app provider</h4>
-                                    <br>
-                                    <h4 class="text-danger">${data.message}</h4>
-                                    `
-                                } else {
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("sales:", data)
+                            if (data.error === true) {
+                                document.getElementById("page-content").innerHTML = `
+                                <h4 class="text-info">Please contact to the app provider</h4>
+                                <br>
+                                <h4 class="text-danger">${data.message}</h4>
+                                `
+                            } else {
 
-                                    if (data.products) {
-
-                                        products = data.products
-                                        console.log(typeof data.products)
-                                        // <tr>
-                                        //     <th>No.</th>
-                                        //     <th>Product Code</th>
-                                        //     <th>Product Name</th>
-                                        //     <th>Category</th>
-                                        //     <th>Brand</th>
-                                        //     <th>Qty</th>
-                                        //     <th>Sale Date</th>
-                                        //     <th class="text-center" style="width: 33%">Serial #
-                                        //     </th>
-                                        // </tr>
-                                        document.getElementById("product-list-container").innerHTML = '';
-                                        data.products.forEach((pr, i) => {
-                                            if (pr.product_metadata.length > 0) {
-                                                let serial = ''
-                                                pr.product_metadata.forEach(pm => {
-                                                    serial += `<input type="checkbox" id="${pm.id}">&nbsp;&nbsp;${pm.serial_number}</b></br>`
-                                                })
-                                                document.getElementById("product-list-container").innerHTML += `
-                                                    <tr id="${pr.id}">  
-                                                        <td>${i + 1}</td>
-                                                        <td>${pr.product_code}</td>
-                                                        <td>${pr.product_name}</td>
-                                                        <td>${pr.category.name}</td>
-                                                        <td>${pr.brand.name}</td>
-                                                        <td>${pr.product_metadata.length}</td>
-                                                        <td>${pr.sales_date}</td>
-                                                        <td id="serial-${pr.id}" class="text-center" style="width: 33%"><button type="button" class="btn btn-xs btn-dark" id="selection-btn-${i}" onclick=ItemSelection(${i})>Select All</button><br>${serial}
-                                                        </td>
-                                                    </tr>
-                                                `
-
-                                                //adding event listener to each serial number checkbox
-                                                pr.product_metadata.forEach(pm => {
-                                                    document.getElementById(`${pm.id}`).addEventListener("change", e => {
-                                                        if (e.target.checked) {
-                                                            //insert item id to the array 
-                                                            returnedID.push(pm.id)
-                                                            total_returned_items += 1;
-                                                            total_returned_values += pm.max_retail_price;
-                                                        } else {
-                                                            //remove item id from the array
-                                                            returnedID = returnedID.filter(num => num !== pm.id)
-                                                            total_returned_items -= 1;
-                                                            total_returned_values -= pm.max_retail_price;
-                                                        }
-                                                        //set disabled field values
-                                                        document.getElementById("total_return_items").value = total_returned_items;
-                                                        document.getElementById("total_return_values").value = total_returned_values;
-                                                        //set button state
-                                                        let btn = document.getElementById(`selection-btn-${i}`);
-                                                        if (pr.product_metadata.length === total_returned_items) {
-                                                            btn.innerText = "Deselect All";
-                                                            btn.classList.remove("btn-dark");
-                                                            btn.classList.add("btn-danger");
-                                                        } else if (total_returned_items === 0) {
-                                                            btn.innerText = "Select All";
-                                                            btn.classList.remove("btn-danger");
-                                                            btn.classList.add("btn-dark");
-                                                        }
-
-                                                    })
-                                                })
-
-                                            }
-                                        })
-                                    }
+                                if (data.products) {
+                                    products = data.products
+                                    salesHistory = data.sales_history
+                                    document.getElementById("product-list-container").innerHTML = '';
+                                    products.forEach((pr, i) => {
+                                        if (pr.product_metadata.length > 0) {
+                                            let serial = ''
+                                            pr.product_metadata.forEach(pm => {
+                                                serial += `<input type="checkbox" id="${pm.id}" onclick="singleItemSelection(this, ${pm.id}, ${pm.max_retail_price})">&nbsp;&nbsp;${pm.serial_number}</b></br>`
+                                            })
+                                            document.getElementById("product-list-container").innerHTML += `
+                                                <tr id="${pr.id}">  
+                                                    <td>${i + 1}</td>
+                                                    <td>${pr.product_code}</td>
+                                                    <td>${pr.product_name}</td>
+                                                    <td>${pr.category.name}</td>
+                                                    <td>${pr.brand.name}</td>
+                                                    <td>${pr.product_metadata.length}</td>
+                                                    <td>${formatDate(salesHistory.sale_date, "date", "-")}</td>
+                                                    <td id="serial-${pr.id}" class="text-center" style="width: 33%">
+                                                        <button type="button" class="btn btn-xs btn-dark" id="selection-btn-${i}" onclick=ItemSelection(${i})>
+                                                            Select All
+                                                        </button>
+                                                        <br>
+                                                        ${serial}
+                                                    </td>
+                                                </tr>
+                                            `
+                                        } else {
+                                            document.getElementById("product-list-container").innerHTML = '<tr><td colspan="5">No items available</td>';
+                                        }
+                                    })
                                 }
-                            })
+                            }
+                        })
                     })
-                    //  Products list table should have add option 
                 })
-
             })
-
+            function singleItemSelection(checkBox, id, mrp){
+                if (checkBox.checked) {
+                    //insert item id to the array 
+                    returnedID.push(id)
+                    total_returned_items += 1;
+                    total_returned_values += (mrp*(1-salesHistory.discount/100));
+                } else {
+                    //remove item id from the array
+                    returnedID = returnedID.filter(num => num !== id)
+                    total_returned_items -= 1;
+                    total_returned_values -= (mrp*(1-salesHistory.discount/100));
+                }
+                //set disabled field values
+                document.getElementById("total_return_items").value = total_returned_items;
+                document.getElementById("total_return_values").value = total_returned_values;
+                //set button state
+                let btn = document.getElementById(`selection-btn-${i}`);
+                if (pr.product_metadata.length === total_returned_items) {
+                    btn.innerText = "Deselect All";
+                    btn.classList.remove("btn-dark");
+                    btn.classList.add("btn-danger");
+                } else if (total_returned_items === 0) {
+                    btn.innerText = "Select All";
+                    btn.classList.remove("btn-danger");
+                    btn.classList.add("btn-dark");
+                }
+            }
             function ItemSelection(index) {
                 metadata = products[index].product_metadata;
                 let btn = document.getElementById(`selection-btn-${index}`);
@@ -654,10 +640,11 @@
                         if (checkBox) {
                             if (checkBox.checked) {
                                 checkBox.checked = false;
+                                returnedID = returnedID.filter(num => num !== pi.id)
                                 //decrease total_return_item by 1
                                 total_returned_items -= 1;
                                 //increase total_return_value by sales_price
-                                total_returned_values -= pi.max_retail_price;
+                                total_returned_values -= (pi.max_retail_price*(1-salesHistory.discount/100));;
                             }
                         }
                     })
@@ -671,11 +658,12 @@
                         if (checkBox) {
                             if (!checkBox.checked) {
                                 checkBox.checked = true;
+                                returnedID.push(pi.id);
                                 //increase total_return_item by 1
                                 total_returned_items += 1;
 
-                                //increse total_return_value by sales_price
-                                total_returned_values += pi.max_retail_price;
+                                //increase total_return_value by sales_price
+                                total_returned_values += (pi.max_retail_price*(1-salesHistory.discount/100));;
                             }
                         }
                     })
@@ -687,6 +675,65 @@
                 document.getElementById("total_return_items").value = total_returned_items;
                 document.getElementById("total_return_values").value = total_returned_values;
             }
+
+            //refresh the UI
+            function refreshContent(){
+                document.getElementById("product-list-container").innerHTML = '';
+                returnedID = [];
+                total_returned_values = 0;
+                total_returned_items = 0;
+                document.getElementById("total_return_items").value = 0;
+                document.getElementById("total_return_values").value = 0;
+            }
+        </script>
+
+        <script>
+            document.getElementById("salesReturnForm").addEventListener('submit', function (event) {
+              event.preventDefault();
+              event.stopPropagation();
+              document.getElementById("submitBtn").classList.add("d-none");
+
+              let sales_return_details = {
+                customer_info: customers[parseInt(document.getElementById("customer").value)],
+                selected_items: returnedID,
+                sale_date: document.getElementById("single_cal4").value,
+                chalan_no: document.getElementById("chalan_no").value,
+                memo_no: document.getElementById("memo_no").value,
+                note: document.getElementById("note").value,
+                bill_amount: parseInt(document.getElementById("bill-amount").value),
+                discount: parseInt(document.getElementById("discount").value),
+                total_amount: parseInt(document.getElementById("total-amount").value),
+                paid_amount: parseInt(document.getElementById("paid-amount").value),
+              }
+              console.log("sale_details: ", sale_details);
+              const requestOptions = {
+                method: 'post',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(sale_details),
+              }
+
+              fetch('http://localhost:4321/api/inventory/sale-products', requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                  console.log("Sale Products: ", data)
+                  if (data.error === true) {
+                    showErrorMessage(data.message)
+                  } else {
+                    InvoiceData = data.sales_invoice_data;
+                    showSuccessMessage(data.message);
+                    //generate table
+                    renderSalesInvoicePage(InvoiceData)
+                    //show print button
+                    document.getElementById('invoiceBtn').classList.remove('d-none')
+                  }
+                  // setTimeout(() => {
+                  //   location.reload();
+                  // }, 5000);
+                });
+            })
         </script>
 
 </body>

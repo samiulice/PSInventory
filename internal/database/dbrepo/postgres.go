@@ -1140,7 +1140,7 @@ func (p *postgresDBRepo) GetProductByID(id int) (models.Product, error) {
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.discount, b.id, b.name, c.id, c.name
+			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.brand_id, i.discount, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
@@ -1154,6 +1154,7 @@ func (p *postgresDBRepo) GetProductByID(id int) (models.Product, error) {
 		&product.ProductName,
 		&product.Quantity,
 		&product.CategoryID,
+		&product.BrandID,
 		&product.Discount,
 		&product.Brand.ID,
 		&product.Brand.Name,
@@ -1709,7 +1710,7 @@ func (p *postgresDBRepo) GetProductItemsDetailsBySalesHistoryID(id int) ([]*mode
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	var product []*models.Product
+	var products []*models.Product
 	var metadata []*models.ProductMetadata
 
 	//get metadata from product_serial_numbers
@@ -1719,11 +1720,13 @@ func (p *postgresDBRepo) GetProductItemsDetailsBySalesHistoryID(id int) ([]*mode
 		FROM
 			public.product_serial_numbers
 		WHERE
-			status = 'sold' AND sales_history_id = $1
+			sales_history_id = $1 AND status = 'sold'  AND warranty_status = 'no issue'
+		ORDER BY
+			product_id ASC
 	`
 	rows, err := p.DB.QueryContext(ctx, query, id)
 	if err != nil {
-		return product, err
+		return products, err
 	}
 	for rows.Next() {
 		var pm models.ProductMetadata
@@ -1741,12 +1744,12 @@ func (p *postgresDBRepo) GetProductItemsDetailsBySalesHistoryID(id int) ([]*mode
 			&pm.UpdatedAt,
 		)
 		if err != nil {
-			return product, err
+			return products, err
 		}
 		metadata = append(metadata, &pm)
 	}
 
-	//Goruping productmetadata with corresponding product
+	//Grouping product metadata with corresponding product
 	idMap := make(map[int]models.Product)
 	for _, v := range metadata {
 		// Check if an element exists in the map
@@ -1755,35 +1758,21 @@ func (p *postgresDBRepo) GetProductItemsDetailsBySalesHistoryID(id int) ([]*mode
 			//get product info
 			pr, err := p.GetProductByID(v.ProductID)
 			if err != nil {
-				return product, err
+				return products, err
 			}
 			//push the product info
 			idMap[v.ProductID] = pr
+			products = append(products, &pr)
 		}
 	}
 	for _, v := range metadata {
-		// Check if an element exists in the map
-		node, exists := idMap[v.ProductID]
-		if !exists {
-			//get product info
-			pr, err := p.GetProductByID(v.ProductID)
-			if err != nil {
-				return product, err
+		for _, product := range products {
+			if v.ProductID == product.ID {
+				product.ProductMetadata = append(product.ProductMetadata, v)
 			}
-			//append current metadata to the productmetada
-			pr.ProductMetadata = append(pr.ProductMetadata, v)
-			//push the product info
-			idMap[v.ProductID] = pr
-		} else {
-			node.ProductMetadata = append(node.ProductMetadata, v)
-			idMap[v.ProductID] = node
 		}
 	}
-
-	for _, v := range idMap {
-		product = append(product, &v)
-	}
-	return product, nil
+	return products, nil
 }
 
 // UpdateProductQuantityByProductID increases product quantity, to reduce product quantity pass negetive quantity number
@@ -1978,7 +1967,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	// Discount         int
 	// TotalAmount      int
 	// PaidAmount       int
-	var purhcase_id int
+	var purchase_id int
 	query = `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id
 	`
@@ -1998,7 +1987,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		time.Now(),
 		time.Now(),
 	)
-	if err = row.Scan(&purhcase_id); err != nil {
+	if err = row.Scan(&purchase_id); err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Insert purchase_history):" + err.Error())
 	}
@@ -2020,7 +2009,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,0,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purhcase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.WarrantyPeriod, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,0,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.WarrantyPeriod, createdAt, updatedAt))
 	}
 
 	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,sales_history_id,max_retail_price,purchase_rate,warranty_period,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
@@ -2041,15 +2030,22 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
+	//get the last index of sales_history table
+	id, err := p.LastIndex("sales_history")
+	if err != nil {
+		return err
+	}
+	//append id to the memo_no
+	sale.MemoNo = sale.MemoNo + strconv.Itoa(id+1)
+
 	tx, err := p.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-
-	//Tx-1:
 	//step-1: Insert sales details to sales history table
 	//step-2: Update product quantity, Set quantity -= newQuantity where id = {affected row id}
-	//step-3: update product items status and sales_history_id, returnin id affected row id
+	//step-3: update product items status and sales_history_id, returning id affected row id
 
 	//step-1: Insert sales details to sales history table
 	var sale_id int

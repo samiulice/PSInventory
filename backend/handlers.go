@@ -305,7 +305,7 @@ func (app *application) GetActiveCustomersIDAndName(w http.ResponseWriter, r *ht
 		Customers []*models.Customer `json:"customers,omitempty"`
 	}
 
-	//retrive suppliers from the database
+	//retrieve suppliers from the database
 	customers, err := app.DB.GetActiveCustomersIDAndName()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Customer Available||"
@@ -397,13 +397,13 @@ func (app *application) AddProduct(w http.ResponseWriter, r *http.Request) {
 	product.ID = id
 	var resp = JSONResponse{
 		Error:   false,
-		Message: "Product Added Succesfully",
+		Message: "Product Added Successfully",
 		Result:  product,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchPurchaseMemoProductItems retrive purchased products list of a memo
+// FetchPurchaseMemoProductItems retrieve purchased products list of a memo
 func (app *application) FetchPurchaseMemoProductItems(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		MemoNo string `json:"memo_no"`
@@ -420,7 +420,7 @@ func (app *application) FetchPurchaseMemoProductItems(w http.ResponseWriter, r *
 	}
 	//Get product ids for this memo with associated purchase_id for the given memo
 	//get detailed Product info for these ids
-	//retrive all product-serial of each product_id && purchase_id
+	//retrieve all product-serial of each product_id && purchase_id
 	var products []*models.Product
 	for _, v := range purchaseHistory {
 		product, err := app.DB.GetInstockProductListByPurchaseIDAndProductID(v.ID, v.ProductID)
@@ -442,14 +442,14 @@ func (app *application) FetchPurchaseMemoProductItems(w http.ResponseWriter, r *
 		PurchaseHistory []*models.Purchase `json:"purchase_history,omitempty"`
 	}
 	resp.Error = false
-	resp.Message = "Data fetched succefully"
+	resp.Message = "Data fetched successfully"
 	resp.Product = products
 	resp.PurchaseHistory = purchaseHistory
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchPurchaseMemoProductItems retrive purchased products list of a memo
-func (app *application) FetchSalesMemoProductItems(w http.ResponseWriter, r *http.Request) {
+// FetchProductItemsBySalesHistory retrieve purchased products list of a memo
+func (app *application) FetchProductItemsBySalesHistory(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		ID int `json:"sales_history_id"`
 	}
@@ -466,27 +466,27 @@ func (app *application) FetchSalesMemoProductItems(w http.ResponseWriter, r *htt
 	}
 
 	//get product details by sales id
-	productDetails, err := app.DB.GetProductItemsDetailsBySalesHistoryID(salesHistory.ID)
+	products, err := app.DB.GetProductItemsDetailsBySalesHistoryID(salesHistory.ID)
 
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("DBERROR:=>GetProductItemsDetailsBySalesHistoryID: %w", err))
 		return
 	}
 	var resp struct {
-		Error          bool              `json:"error,omitempty"`
-		Message        string            `json:"message,omitempty"`
-		ProductDetails []*models.Product `json:"product_details,omitempty"`
-		SalesHistory   models.Sale       `json:"sales_history,omitempty"`
+		Error        bool              `json:"error"`
+		Message      string            `json:"message"`
+		Products     []*models.Product `json:"products"`
+		SalesHistory models.Sale       `json:"sales_history"`
 	}
 	resp.Error = false
-	resp.Message = "Data fetched succefully"
-	resp.ProductDetails = productDetails
+	resp.Message = "Data fetched successfully"
+	resp.Products = products
 	resp.SalesHistory = salesHistory
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchProductItemsbyProductID retrive instock product items
-func (app *application) FetchProductItemsbyProductID(w http.ResponseWriter, r *http.Request) {
+// FetchProductItemsByProductID retrieve in stock product items
+func (app *application) FetchProductItemsByProductID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		ProductID int `json:"product_id"`
 	}
@@ -507,13 +507,13 @@ func (app *application) FetchProductItemsbyProductID(w http.ResponseWriter, r *h
 		ProductItems *models.Product `json:"product_items,omitempty"`
 	}
 	resp.Error = false
-	resp.Message = "Data fetched succefully"
+	resp.Message = "Data fetched successfully"
 	resp.ProductItems = productItems
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchProductItembySerialNumber retrive product item by serial number
-func (app *application) FetchInstockProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
+// FetchProductItemBySerialNumber retrieve product item by serial number
+func (app *application) FetchInstockProductItemBySerialNumber(w http.ResponseWriter, r *http.Request) {
 
 	//Define struct for JSON object
 	var payload struct {
@@ -537,20 +537,20 @@ func (app *application) FetchInstockProductItembySerialNumber(w http.ResponseWri
 	productItem, err := app.DB.GetInStockItemDetailsBySerialNumber(payload.SerialNumber)
 	if err != nil {
 		resp.Error = true
-		resp.Message = "Error retriving data from database: " + err.Error()
+		resp.Message = "Error retrieving data from database: " + err.Error()
 		app.writeJSON(w, http.StatusOK, resp)
 		return
 	}
 	//Get product details for the product id
 
 	resp.Error = false
-	resp.Message = "Data fetched succefully"
+	resp.Message = "Data fetched successfully"
 	resp.ProductItems = productItem
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchSoldProductItembySerialNumber retrive sold product item by serial number
-func (app *application) FetchSoldProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
+// FetchSoldProductItemBySerialNumber retrieve sold product item by serial number
+func (app *application) FetchSoldProductItemBySerialNumber(w http.ResponseWriter, r *http.Request) {
 
 	//Define struct for JSON object
 	var payload struct {
@@ -609,15 +609,15 @@ func (app *application) FetchSoldProductItembySerialNumber(w http.ResponseWriter
 	}
 
 	resp.Error = false
-	resp.Message = "Data fetched succefully"
+	resp.Message = "Data fetched successfully"
 	resp.ProductItem = productItem
 	resp.SalesHistory = &salesHistory
 	resp.Customer = &customer
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// FetchProductItembySerialNumber retrive product item by serial number
-func (app *application) FetchProductItembySerialNumber(w http.ResponseWriter, r *http.Request) {
+// FetchProductItemBySerialNumber retrieve product item by serial number
+func (app *application) FetchProductItemBySerialNumber(w http.ResponseWriter, r *http.Request) {
 
 	//Define struct for JSON object
 	var payload struct {
@@ -640,13 +640,13 @@ func (app *application) FetchProductItembySerialNumber(w http.ResponseWriter, r 
 	productItem, err := app.DB.GetItemDetailsBySerialNumber(payload.SerialNumber)
 	if err != nil {
 		resp.Error = true
-		resp.Message = "Error retriving data from database: " + err.Error()
+		resp.Message = "Error retrieving data from database: " + err.Error()
 		app.writeJSON(w, http.StatusOK, resp)
 		return
 	}
 	//Get product details for the product id
 	resp.Error = false
-	resp.Message = "Data fetched succefully"
+	resp.Message = "Data fetched successfully"
 	resp.ProductItems = productItem
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -666,7 +666,7 @@ func (app *application) GetMemoListBySupplierID(w http.ResponseWriter, r *http.R
 		Purchase []*models.Purchase `json:"purchase,omitempty"`
 	}
 
-	//retrive suppliers from the database
+	//retrieve suppliers from the database
 	purchase, err := app.DB.GetMemoListBySupplierID(supplier.ID)
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Memo Available For this selected supplier||"
@@ -675,9 +675,9 @@ func (app *application) GetMemoListBySupplierID(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	//TODO: Retrive accounts and send to frontend
+	//TODO: Retrieve accounts and send to frontend
 	resp.Error = false
-	resp.Message += "data Succesfully fetched"
+	resp.Message = "data Succesfully fetched"
 	resp.Purchase = purchase
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -699,11 +699,10 @@ func (app *application) GetMemoListByCustomerID(w http.ResponseWriter, r *http.R
 		Sale    []*models.Sale `json:"sales,omitempty"`
 	}
 
-	//retrive memo list for given supplier id from sales_history talble
+	//retrieve memo list for given supplier id from sales_history table
 	sale, err := app.DB.GetMemoListByCustomerID(payload.CustomerID)
 	if err == sql.ErrNoRows {
-		resp.Error = true
-		resp.Message = "No Memo Available For this selected customer"
+		resp.Message = "No Memo Available"
 		app.writeJSON(w, http.StatusOK, resp) //send error response
 		return
 	} else if err != nil {
@@ -711,7 +710,7 @@ func (app *application) GetMemoListByCustomerID(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	//TODO: Retrive accounts and send to frontend
+	//TODO: Retrieve accounts and send to frontend
 	resp.Error = false
 	resp.Message = "data Succesfully fetched"
 	resp.Sale = sale
@@ -773,7 +772,7 @@ func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// SaleProducts sale products, update product items state from instock to sold in the database
+// SaleProducts sale products, update product items state from in stock to sold in the database
 func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var salesInfo models.SalesInvoice
@@ -818,7 +817,7 @@ func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Re
 		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
 	}
 
-	//retrive suppliers from the database
+	//retrieve suppliers from the database
 	suppliers, err := app.DB.GetActiveSuppliersIDAndName()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Supplier Available||"
@@ -826,7 +825,7 @@ func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive categories from the database
+	//retrieve categories from the database
 	categories, err := app.DB.GetActiveCategoryList()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Category Available||"
@@ -834,7 +833,7 @@ func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive brands from the database
+	//retrieve brands from the database
 	brands, err := app.DB.GetActiveBrands()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Brand Available||"
@@ -842,7 +841,7 @@ func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive products from the database
+	//retrieve products from the database
 	products, err := app.DB.GetActiveProducts()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Product Available||"
@@ -850,7 +849,7 @@ func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive accounts from the database
+	//retrieve accounts from the database
 	headAccounts, err := app.DB.GetAvailableHeadAccounts()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Accounts Available||"
@@ -883,7 +882,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
 	}
 
-	//retrive suppliers from the database
+	//retrieve suppliers from the database
 	customers, err := app.DB.GetActiveCustomersIDAndName()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Supplier Available||"
@@ -891,7 +890,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive categories from the database
+	//retrieve categories from the database
 	categories, err := app.DB.GetActiveCategoryList()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Category Available||"
@@ -899,7 +898,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive brands from the database
+	//retrieve brands from the database
 	brands, err := app.DB.GetActiveBrands()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Brand Available||"
@@ -907,7 +906,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive products from the database
+	//retrieve products from the database
 	products, err := app.DB.GetActiveProducts()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Product Available||"
@@ -915,7 +914,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		app.badRequest(w, err) //send error response
 		return
 	}
-	//retrive accounts from the database
+	//retrieve accounts from the database
 	headAccounts, err := app.DB.GetAvailableHeadAccounts()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Accounts Available||"
@@ -959,7 +958,7 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
 	}
 
-	//retrive suppliers from the database
+	//retrieve suppliers from the database
 	customers, err := app.DB.GetCreditCustomersDetails()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Supplier Available||"
@@ -968,7 +967,7 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 		return
 	}
 
-	//retrive accounts from the database
+	//retrieve accounts from the database
 	headAccounts, err := app.DB.GetAvailableHeadAccounts()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Accounts Available||"

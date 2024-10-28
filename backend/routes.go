@@ -21,7 +21,7 @@ func (app *application) routes() http.Handler {
 	mux.Route("/api", func(mux chi.Router) {
 		// mux.Use(app.AuthAdmin)
 
-		//HR Managenment
+		//HR Management
 		mux.Post("/hr/view-employee/{type}", app.GetEmployees)
 		mux.Post("/hr/add-employee", app.AddEmployee)
 		//MIS
@@ -38,17 +38,21 @@ func (app *application) routes() http.Handler {
 		mux.Post("/inventory/add-product", app.AddProduct)
 		//memo--products list
 		mux.Post("/inventory/memo/get-purchase-product-list", app.FetchPurchaseMemoProductItems)
-		mux.Post("/inventory/memo/get-sales-product-list", app.FetchSalesMemoProductItems)
-		mux.Post("/inventory/products/get-list-by-id", app.FetchProductItemsbyProductID)
-		mux.Post("/inventory/products/search-instock-products-by-serial", app.FetchInstockProductItembySerialNumber) //search in-stock items
-		mux.Post("/inventory/products/search-sold-products-by-serial", app.FetchSoldProductItembySerialNumber)       //search sale/sold items
-		mux.Post("/inventory/products/search-products-by-serial", app.FetchProductItembySerialNumber)                //search all type items
+		
+		mux.Post("/inventory/products/get-list-by-id", app.FetchProductItemsByProductID)
+		mux.Post("/inventory/products/search-instock-products-by-serial", app.FetchInstockProductItemBySerialNumber) //search in-stock items
+		mux.Post("/inventory/products/search-sold-products-by-serial", app.FetchSoldProductItemBySerialNumber)       //search sale/sold items
+		mux.Post("/inventory/products/search-products-by-serial", app.FetchProductItemBySerialNumber)                //search all type items
 		//memo--supplier
 		mux.Post("/inventory/get-supplier-memo-list", app.GetMemoListBySupplierID)
 		//memo--customer
+		//sale-return page
+		mux.Post("/inventory/memo/get-sales-product-list", app.FetchProductItemsBySalesHistory)
 		mux.Post("/inventory/get-customer-memo-list", app.GetMemoListByCustomerID)
-		mux.Post("/inventory/return-product-to-supplier", app.ReturnProductsToSupplier)
+		//purchase
 		mux.Post("/inventory/restock-product", app.RestockProduct)
+		//purchase-return
+		mux.Post("/inventory/return-product-to-supplier", app.ReturnProductsToSupplier)
 		//sale
 		mux.Post("/inventory/sale-products", app.SaleProducts)
 		//page details

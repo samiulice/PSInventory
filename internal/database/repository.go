@@ -50,7 +50,7 @@ type DatabaseRepo interface {
 	GetInStockItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
 	GetSoldItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
 	GetItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
-	GetProductItemsDetailsBySalesHistoryID(id int)([]*models.Product, error)
+	GetProductItemsDetailsBySalesHistoryID(id int) ([]*models.Product, error)
 
 	UpdateProductQuantityByProductID(quantity, productID int) error
 	UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error
