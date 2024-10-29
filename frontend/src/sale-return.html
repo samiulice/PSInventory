@@ -314,6 +314,16 @@
                                             class="fa fa-money form-control-feedback left" aria-hidden="true"></i>
                                     </div>
                                 </div>
+                                <!-- Memo No -->
+                                <div class="row form-group has-feedback">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label for="memo_prefix">Memo Prefix * :</label>
+                                        <input type="text" class="form-control has-feedback-left" id="memo_prefix" disable required>
+                                        <i style="color: rgba(0, 0, 0, 1);"
+                                            class="fa fa-file-word-o form-control-feedback left" aria-hidden="true">
+                                        </i>
+                                    </div>
+                                </div>
                                 <div id="btns" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
                                     <br>
                                     <div class="row">
@@ -336,20 +346,7 @@
                                 <div class="col-md-12">
                                     <div class="x_panel bg-gw">
                                         <div class="x_title">
-                                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                                <h2>Returned Product list</h2>
-                                            </div>
-                                            <div class="col-md-6 col-sm-6 col-xs-12 form-group pull-right top_search">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" id="search-by-serial-number"
-                                                        placeholder="Search item by S/N or memo number">
-                                                    <span class="input-group-btn">
-                                                        <button class="btn btn-default" type="button" id="search-btn"><i
-                                                                class="fa fa-arrow-right">
-                                                            </i>&nbsp;</button>
-                                                    </span>
-                                                </div>
-                                            </div>
+                                            <h2>Returned Product list</h2>
                                             <div class="clearfix"></div>
                                         </div>
                                         <div class="x_content">
@@ -368,7 +365,8 @@
                                                                     <th>Brand</th>
                                                                     <th>Qty</th>
                                                                     <th>Sale Date</th>
-                                                                    <th class="text-center" style="width: 33%">Serial #</th>
+                                                                    <th class="text-center" style="width: 33%">Serial #
+                                                                    </th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody id="product-list-container">
@@ -483,25 +481,27 @@
                 let requestOptions = {
                     method: "post"
                 }
+                document.getElementById("memo_prefix").value = `MM-SR-${generateRandomAlphanumericCode(6)}`;
+                document.getElementById("memo_prefix").disabled = true;
                 fetch('http://localhost:4321/api/mis/get-customer-id-name-list', requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data)
-                    customers = data.customers
-                    if (data.error === true) {
-                        document.getElementById("page-content").innerHTML = `
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data)
+                        customers = data.customers
+                        if (data.error === true) {
+                            document.getElementById("page-content").innerHTML = `
                             <h4 class="text-info">Please contact to the app provider</h4>
                             <br>
                             <h4 class="text-danger">${data.message}</h4>`
-                    } else {
-                        customerDiv.innerHTML = '<option value="" selected disabled>Select Customer Account</option>';
-                        if (customers) {
-                            customers.forEach((c,i) => {
-                                customerDiv.innerHTML += `<option value="${i}">${c.account_name}(${c.account_code})</option>`
-                            });
+                        } else {
+                            customerDiv.innerHTML = '<option value="" selected disabled>Select Customer Account</option>';
+                            if (customers) {
+                                customers.forEach((c, i) => {
+                                    customerDiv.innerHTML += `<option value="${i}">${c.account_name}(${c.account_code})</option>`
+                                });
+                            }
                         }
-                    }
-                })
+                    })
                 //End fetch-1
                 //Start fetch-2: on changing customer, fetch associated memo list for the customer and populate memo dropdown 
                 customerDiv.addEventListener('change', e => {
@@ -518,26 +518,26 @@
                         body: JSON.stringify(customerID)
                     }
                     fetch('http://localhost:4321/api/inventory/get-customer-memo-list', requestOptions)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Memo: ", data)
-                        if (data.error === true) {
-                            document.getElementById("page-content").innerHTML = `
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Memo: ", data)
+                            if (data.error === true) {
+                                document.getElementById("page-content").innerHTML = `
                             <h4 class="text-info">Please contact to the app provider</h4>
                             <br>
                             <h4 class="text-danger">${data.message}</h4>`
-                        } else if(data.message.includes("No Memo Available")){
-                            memoDiv.innerHTML = '<option value="" selected disabled>No memo available for this supplier</option>'
-                        } else {
-                            memoDiv.innerHTML = '<option value="" selected disabled>No memo available for this supplier</option>'
-                            if (data.sales) {
-                                memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
-                                data.sales.forEach(m => {
-                                    memoDiv.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.id}">${m.memo_no}</option>`
-                                })
+                            } else if (data.message.includes("No Memo Available")) {
+                                memoDiv.innerHTML = '<option value="" selected disabled>No memo available for this supplier</option>'
+                            } else {
+                                memoDiv.innerHTML = '<option value="" selected disabled>No memo available for this supplier</option>'
+                                if (data.sales) {
+                                    memoDiv.innerHTML = '<option value="" selected disabled>Select Memo No</option>'
+                                    data.sales.forEach(m => {
+                                        memoDiv.innerHTML += `<option style="color: rgba(0, 0, 0, 1); font-weight: bold;" value="${m.id}">${m.memo_no}</option>`
+                                    })
+                                }
                             }
-                        }
-                    })
+                        })
 
                     // on changing memo, fetch associated products details with serial number list for the memo and populate product list dropdown 
                     memoDiv.addEventListener('change', e => {
@@ -553,28 +553,28 @@
                             body: JSON.stringify(memoBody)
                         }
                         fetch('http://localhost:4321/api/inventory/memo/get-sales-product-list', requestOptions)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("sales:", data)
-                            if (data.error === true) {
-                                document.getElementById("page-content").innerHTML = `
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log("sales:", data)
+                                if (data.error === true) {
+                                    document.getElementById("page-content").innerHTML = `
                                 <h4 class="text-info">Please contact to the app provider</h4>
                                 <br>
                                 <h4 class="text-danger">${data.message}</h4>
                                 `
-                            } else {
+                                } else {
 
-                                if (data.products) {
-                                    products = data.products
-                                    salesHistory = data.sales_history
-                                    document.getElementById("product-list-container").innerHTML = '';
-                                    products.forEach((pr, i) => {
-                                        if (pr.product_metadata.length > 0) {
-                                            let serial = ''
-                                            pr.product_metadata.forEach(pm => {
-                                                serial += `<input type="checkbox" id="${pm.id}" onclick="singleItemSelection(this, ${pm.id}, ${pm.max_retail_price})">&nbsp;&nbsp;${pm.serial_number}</b></br>`
-                                            })
-                                            document.getElementById("product-list-container").innerHTML += `
+                                    if (data.products) {
+                                        products = data.products
+                                        salesHistory = data.sales_history
+                                        document.getElementById("product-list-container").innerHTML = '';
+                                        products.forEach((pr, i) => {
+                                            if (pr.product_metadata.length > 0) {
+                                                let serial = ''
+                                                pr.product_metadata.forEach(pm => {
+                                                    serial += `<input type="checkbox" id="${pm.id}" onclick="singleItemSelection(this, ${pm.id}, ${pm.max_retail_price})">&nbsp;&nbsp;${pm.serial_number}</b></br>`
+                                                })
+                                                document.getElementById("product-list-container").innerHTML += `
                                                 <tr id="${pr.id}">  
                                                     <td>${i + 1}</td>
                                                     <td>${pr.product_code}</td>
@@ -592,42 +592,31 @@
                                                     </td>
                                                 </tr>
                                             `
-                                        } else {
-                                            document.getElementById("product-list-container").innerHTML = '<tr><td colspan="5">No items available</td>';
-                                        }
-                                    })
+                                            } else {
+                                                document.getElementById("product-list-container").innerHTML = '<tr><td colspan="5">No items available</td>';
+                                            }
+                                        })
+                                    }
                                 }
-                            }
-                        })
+                            })
                     })
                 })
             })
-            function singleItemSelection(checkBox, id, mrp){
+            function singleItemSelection(checkBox, id, mrp) {
                 if (checkBox.checked) {
                     //insert item id to the array 
                     returnedID.push(id)
                     total_returned_items += 1;
-                    total_returned_values += (mrp*(1-salesHistory.discount/100));
+                    total_returned_values += (mrp * (1 - salesHistory.discount / 100));
                 } else {
                     //remove item id from the array
                     returnedID = returnedID.filter(num => num !== id)
                     total_returned_items -= 1;
-                    total_returned_values -= (mrp*(1-salesHistory.discount/100));
+                    total_returned_values -= (mrp * (1 - salesHistory.discount / 100));
                 }
                 //set disabled field values
                 document.getElementById("total_return_items").value = total_returned_items;
                 document.getElementById("total_return_values").value = total_returned_values;
-                //set button state
-                let btn = document.getElementById(`selection-btn-${i}`);
-                if (pr.product_metadata.length === total_returned_items) {
-                    btn.innerText = "Deselect All";
-                    btn.classList.remove("btn-dark");
-                    btn.classList.add("btn-danger");
-                } else if (total_returned_items === 0) {
-                    btn.innerText = "Select All";
-                    btn.classList.remove("btn-danger");
-                    btn.classList.add("btn-dark");
-                }
             }
             function ItemSelection(index) {
                 metadata = products[index].product_metadata;
@@ -644,7 +633,7 @@
                                 //decrease total_return_item by 1
                                 total_returned_items -= 1;
                                 //increase total_return_value by sales_price
-                                total_returned_values -= (pi.max_retail_price*(1-salesHistory.discount/100));;
+                                total_returned_values -= (pi.max_retail_price * (1 - salesHistory.discount / 100));;
                             }
                         }
                     })
@@ -663,7 +652,7 @@
                                 total_returned_items += 1;
 
                                 //increase total_return_value by sales_price
-                                total_returned_values += (pi.max_retail_price*(1-salesHistory.discount/100));;
+                                total_returned_values += (pi.max_retail_price * (1 - salesHistory.discount / 100));;
                             }
                         }
                     })
@@ -677,7 +666,7 @@
             }
 
             //refresh the UI
-            function refreshContent(){
+            function refreshContent() {
                 document.getElementById("product-list-container").innerHTML = '';
                 returnedID = [];
                 total_returned_values = 0;
@@ -689,50 +678,48 @@
 
         <script>
             document.getElementById("salesReturnForm").addEventListener('submit', function (event) {
-              event.preventDefault();
-              event.stopPropagation();
-              document.getElementById("submitBtn").classList.add("d-none");
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById("submitBtn").classList.add("d-none");
 
-              let sales_return_details = {
-                customer_info: customers[parseInt(document.getElementById("customer").value)],
-                selected_items: returnedID,
-                sale_date: document.getElementById("single_cal4").value,
-                chalan_no: document.getElementById("chalan_no").value,
-                memo_no: document.getElementById("memo_no").value,
-                note: document.getElementById("note").value,
-                bill_amount: parseInt(document.getElementById("bill-amount").value),
-                discount: parseInt(document.getElementById("discount").value),
-                total_amount: parseInt(document.getElementById("total-amount").value),
-                paid_amount: parseInt(document.getElementById("paid-amount").value),
-              }
-              console.log("sale_details: ", sale_details);
-              const requestOptions = {
-                method: 'post',
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(sale_details),
-              }
+                let sales_return_details = {
+                    customer_info: customers[parseInt(document.getElementById("customer").value)],
+                    product_Items: products,
+                    sales_history: salesHistory,
+                    selected_items: returnedID,
+                    sale_return_date: document.getElementById("single_cal4").value,
+                    return_items_number: total_returned_items,
+                    return_items_amount: total_returned_values,
+                    memo_no: document.getElementById("memo_prefix").value
+                }
+                console.log("sale_return_details: ", sales_return_details);
+                const requestOptions = {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(sales_return_details),
+                }
 
-              fetch('http://localhost:4321/api/inventory/sale-products', requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                  console.log("Sale Products: ", data)
-                  if (data.error === true) {
-                    showErrorMessage(data.message)
-                  } else {
-                    InvoiceData = data.sales_invoice_data;
-                    showSuccessMessage(data.message);
-                    //generate table
-                    renderSalesInvoicePage(InvoiceData)
-                    //show print button
-                    document.getElementById('invoiceBtn').classList.remove('d-none')
-                  }
-                  // setTimeout(() => {
-                  //   location.reload();
-                  // }, 5000);
-                });
+                fetch('http://localhost:4321/api/inventory/sale/return-products', requestOptions)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Result: ", data)
+                        if (data.error === true) {
+                            showErrorMessage(data.message)
+                        } else {
+                            InvoiceData = data.sales_invoice_data;
+                            showSuccessMessage(data.message);
+                            //generate table
+                            renderSalesInvoicePage(InvoiceData)
+                            //show print button
+                            document.getElementById('invoiceBtn').classList.remove('d-none')
+                        }
+                        // setTimeout(() => {
+                        //   location.reload();
+                        // }, 5000);
+                    });
             })
         </script>
 

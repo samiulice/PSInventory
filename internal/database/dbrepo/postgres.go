@@ -1600,6 +1600,68 @@ func (p *postgresDBRepo) GetSalesHistoryByID(id int) (models.Sale, error) {
 	return salesHistory, nil
 }
 
+func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID []int, SaleReturnDate string, ReturnItemsCount int, ReturnAmount int, MemoNo string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//tx start
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to begin transaction %w", err)
+	}
+	//step:1 iterate over the SelectedItemsID slice and update the associated row(id) , set status="in stock", updated_at = time.Now()
+	for _, id := range SelectedItemsID {
+		query := `
+			UPDATE 
+				public.product_serial_numbers
+			SET
+				status='in stock', updated_at=$1
+			WHERE
+				id = $2		
+		`
+		result, err := tx.ExecContext(ctx, query, time.Now(), id)
+		if err != nil {
+			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE SQL %w", err)
+		}
+		if n, err := result.RowsAffected(); err != nil || n != 1 {
+			return fmt.Errorf("DBERROR:=>SaleReturnDB: Number of affected row is not equal to 1:  %w", err)
+		}
+	}
+
+	//step:2 insert sale return data to the sale_return_history
+	//get the last index of sales_return_history Table
+	lastID, err := p.LastIndex("sales_return_history")
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to get last index of sales_return_history table:  %w", err)
+	}
+	MemoNo = MemoNo + strconv.FormatInt(lastID+1, 10) //update memo no
+	//return_items_id in string, separated by '-'
+	returnItemsID := strconv.Itoa(SelectedItemsID[0])
+	ln := len(SelectedItemsID)
+	for i := 1; i < ln; i++ {
+		returnItemsID += "-" + strconv.Itoa(SelectedItemsID[i])
+	}
+	query := `
+		INSERT INTO public.sales_return_history(sale_return_date,customer_id ,sales_history_id ,memo_no,returned_product_ids,total_returned_count,total_returned_amount, created_at, updated_at)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	`
+	result, err := tx.ExecContext(ctx, query, SaleReturnDate, SalesHistory.CustomerID, SalesHistory.ID, MemoNo, returnItemsID, ReturnItemsCount, ReturnAmount, time.Now(), time.Now())
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE SQL %w", err)
+	}
+	if n, err := result.RowsAffected(); err != nil || n != 1 {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Number of affected row is not equal to 1:  %w", err)
+	}
+
+	//tx commit
+	err = tx.Commit()
+
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to commit transaction:  %w", err)
+	}
+	return nil
+}
+
 // GetProductListByPurchaseIDAndProductID returns products list associated with purchaseID and ProductID
 func (p *postgresDBRepo) GetInstockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -2037,7 +2099,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		return err
 	}
 	//append id to the memo_no
-	sale.MemoNo = sale.MemoNo + strconv.Itoa(id+1)
+	sale.MemoNo = sale.MemoNo + strconv.FormatInt(id+int64(1), 10)
 
 	tx, err := p.DB.BeginTx(ctx, nil)
 	if err != nil {
@@ -2545,16 +2607,23 @@ func (p *postgresDBRepo) CountRows(tableName string) (int, error) {
 	var c int
 	query := "SELECT COUNT(id) FROM " + tableName
 	err := p.DB.QueryRowContext(ctx, query).Scan(&c)
+	fmt.Println(c)
 	return c, err
 }
 
 // LastIndex returns the last index of a given database table
-func (p *postgresDBRepo) LastIndex(tableName string) (int, error) {
+func (p *postgresDBRepo) LastIndex(tableName string) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	var lastId int
+	var lastID sql.NullInt64
 	query := "SELECT MAX(id) AS last_id FROM " + tableName
-	err := p.DB.QueryRowContext(ctx, query).Scan(&lastId)
-	return lastId, err
+	err := p.DB.QueryRowContext(ctx, query).Scan(&lastID)
+
+	// If lastID is NULL, set it to 0
+	id := int64(0) // Default to 0
+	if lastID.Valid {
+		id = lastID.Int64
+	}
+	return id, err
 }

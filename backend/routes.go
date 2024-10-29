@@ -49,6 +49,7 @@ func (app *application) routes() http.Handler {
 		//sale-return page
 		mux.Post("/inventory/memo/get-sales-product-list", app.FetchProductItemsBySalesHistory)
 		mux.Post("/inventory/get-customer-memo-list", app.GetMemoListByCustomerID)
+		mux.Post("/inventory/sale/return-products", app.ReturnProductsFromCustomer)
 		//purchase
 		mux.Post("/inventory/restock-product", app.RestockProduct)
 		//purchase-return

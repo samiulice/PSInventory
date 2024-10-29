@@ -65,6 +65,8 @@ type DatabaseRepo interface {
 	GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale, error)
 	SaleProducts(sale *models.SalesInvoice) error
 	GetSalesHistoryByID(id int) (models.Sale, error)
+	//sale return
+	SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID []int, SaleReturnDate string, ReturnItemsCount int, ReturnAmount int, MemoNo string) error
 	//warranty
 	AddNewWarrantyClaim(memoPrefix string, serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) (int, error)
 	GetWarrantyList(SearchType string) ([]*models.Warranty, error)
@@ -83,5 +85,5 @@ type DatabaseRepo interface {
 
 	//Helper functions
 	CountRows(tableName string) (int, error)
-	LastIndex(tableName string) (int, error)
+	LastIndex(tableName string) (int64, error)
 }

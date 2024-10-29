@@ -83,8 +83,8 @@ type Employee struct {
 	AmountReceivable int       `json:"amount_receivable"`
 	WhatsappAccount  string    `json:"whatsapp_account"`
 	Email            string    `json:"email"`
-	ImageLink        string    `json:"image_link"` //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
-	AccountStatus    bool      `json:"account_status"`       //Active = true, Inactive = false
+	ImageLink        string    `json:"image_link"`     //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
 	MonthlySalary    int       `json:"monthly_salary"`
 	OpeningBalance   int       `json:"opening_balance"`
 	CVLink           string    `json:"cv_link"`
@@ -184,7 +184,7 @@ type ProductShortInfo struct {
 // SalesInvoice stores sales data for invoice generation
 type SalesInvoice struct {
 	CustomerInfo    Customer            `json:"customer_info"`
-	HeadAccountInfo Customer            `json:"head_account_info"`
+	HeadAccountInfo HeadAccount         `json:"head_account_info"`
 	ProductItems    []*ProductShortInfo `json:"selected_items"`
 	SaleDate        string              `json:"sale_date"`
 	ChalanNo        string              `json:"chalan_no"`

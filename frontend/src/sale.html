@@ -423,9 +423,8 @@
                           <!-- Memo No -->
                           <div class="row form-group has-feedback">
                             <div class="col-md-11 col-sm-11 col-xs-11">
-                              <label for="memo_no">Memo No * :</label>
-                              <input type="text" class="form-control has-feedback-left" id="memo_no"
-                                placeholder="Memo No" disable required>
+                              <label for="memo_no">Memo No. * :</label>
+                              <input type="text" class="form-control has-feedback-left" id="memo_no" disable required>
                               <i style="color: rgba(0, 0, 0, 1);" class="fa fa-file-word-o form-control-feedback left"
                                 aria-hidden="true">
                               </i>
@@ -506,7 +505,7 @@
               </div>
             </div>
             <div class="row">
-              <!-- Selected items Secetion  -->
+              <!-- Selected items Section  -->
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel bg-gw" style="height: 500px; overflow-x: scroll; overflow-y: scroll;">
                   <div class="x_title">
@@ -521,7 +520,7 @@
                           <input type="text" class="form-control" id="search-by-serial-number"
                             placeholder="Search item by serial number">
                           <span class="input-group-btn">
-                            <button class="btn btn-default btn-default" type="button" onclick="serachBySerial()"><i
+                            <button class="btn btn-default btn-default" type="button" onclick="searchBySerial()"><i
                                 class="fa fa-arrow-right">
                               </i>&nbsp;</button>
                           </span>
@@ -643,10 +642,9 @@
             console.log(data);
             //Set memo no(MM-RandomSixDigit)
             document.getElementById("memo_no").value = `MM-SL-${generateRandomAlphanumericCode(6)}`;
-            document.getElementById("memo_no").disabled = true;
             updateCustomerDiv(data.customers)
             updateCategoryDiv(data.categories)
-            updateAccoutnsDiv(data.head_accounts)
+            updateAccountsDiv(data.head_accounts)
             customers = data.customers;
             categories = data.categories;
             brands = data.brands;
@@ -776,12 +774,12 @@
       }
     }
 
-    //updateAccoutnsDiv updates account selection options with the fetched data 
-    function updateAccoutnsDiv(accoutns) {
-      if (accoutns) {
+    //updateAccountsDiv updates account selection options with the fetched data 
+    function updateAccountsDiv(accounts) {
+      if (accounts) {
         account.innerHTML = '';
         account.innerHTML = `<option value="" selected disabled>Select Account</option>`;
-        accoutns.forEach((ac, i) => {
+        accounts.forEach((ac, i) => {
           account.innerHTML += `<option value=${i}>${ac.account_name}</option>`;
         });
       } else {
@@ -921,7 +919,7 @@
     }
 
     //markSingleItemAsSelected add multiple items to the selected items section
-    function markItemsAsSeleced(id, quantity) {
+    function markItemsAsSelected(id, quantity) {
       //remove if this item already exist
       deleteFromSelectItems(id);
       if (quantity === 0) {
@@ -970,7 +968,7 @@
           updateBillAmount();
         }
       } else {
-        markItemsAsSeleced(id, 1)
+        markItemsAsSelected(id, 1)
       }
     }
 
@@ -980,11 +978,11 @@
       document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(document.getElementById("discount").value) / 100.0));
       totalAmount = parseInt(document.getElementById("total-amount").value);
 
-      //updata max input of paid-amount field
+      //update max input of paid-amount field
       document.getElementById("paid-amount").max = `${totalAmount}`;
     }
 
-    //upadate total amount when discount is changed
+    //update total amount when discount is changed
     document.getElementById("discount").addEventListener('change', e => {
       let d = document.getElementById("discount");
       if (d.value === "" || Number(d.value) === 0) {
@@ -993,12 +991,12 @@
       } else {
         document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(d.value) / 100.0));
         totalAmount = parseInt(document.getElementById("total-amount").value);
-        //updata max input of paid-amount field
+        //update max input of paid-amount field
         document.getElementById("paid-amount").max = `${totalAmount}`;
       }
     })
 
-    //upadate discount when total amount is changed
+    //uprate discount when total amount is changed
     document.getElementById("total-amount").addEventListener('change', e => {
       let t = document.getElementById('total-amount');
       if (t.value === "" || Number(t.value) === 0) {
@@ -1008,15 +1006,15 @@
         let discount = 100.0 - 100 * parseFloat(t.value) / billAmount;
         document.getElementById("discount").value = (discount % 1 === 0) ? discount : discount.toFixed(2);;
         totalAmount = parseInt(t.value);
-        //updata max input of paid-amount field
+        //update max input of paid-amount field
         document.getElementById("paid-amount").max = `${totalAmount}`;
       }
 
 
     })
 
-    //serachBySerial()
-    function serachBySerial() {
+    //searchBySerial()
+    function searchBySerial() {
       let serial_number = document.getElementById("search-by-serial-number").value.trim();
       if (serial_number === "") {
         Swal.fire({

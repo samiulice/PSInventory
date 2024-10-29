@@ -799,6 +799,52 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 	resp.SalesInvoiceData = &salesInfo
 	app.writeJSON(w, http.StatusOK, resp)
 }
+// ReturnProductsFromCustomer updates database for returned products
+func (app *application) ReturnProductsFromCustomer(w http.ResponseWriter, r *http.Request) {
+	var SaleReturnPayload struct{
+		Customer *models.Customer `json:"customer_info"`
+		Products []*models.Product `json:"product_Items"`
+		SalesHistory *models.Sale `json:"sales_history"`
+		SelectedItemsID []int `json:"selected_items"`
+		SaleReturnDate string `json:"sale_return_date"`
+		ReturnItemsCount int `json:"return_items_number"`
+		ReturnAmount int `json:"return_items_amount"`
+		MemoNo string `json:"memo_no"`
+	}
+	// customer_info: customers[parseInt(document.getElementById("customer").value)],
+	// product_Items: products,
+	// sales_history: salesHistory,
+	// selected_items: returnedID,
+	// sale_return_date: document.getElementById("single_cal4").value,
+	// return_items_number: total_returned_items,
+	// return_items_amount: total_returned_values,
+	// memo_no: document.getElementById("memo").value
+
+	err := app.readJSON(w, r, &SaleReturnPayload)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:=>ReturnProductsFromCustomer: Unable to read JSON : %w",err))
+		return
+	}
+	fmt.Println(SaleReturnPayload)
+	err = app.DB.SaleReturnDB(
+		SaleReturnPayload.SalesHistory,
+		SaleReturnPayload.SelectedItemsID,
+		SaleReturnPayload.SaleReturnDate,
+		SaleReturnPayload.ReturnItemsCount,
+		SaleReturnPayload.ReturnAmount,
+		SaleReturnPayload.MemoNo,
+	)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	var resp = JSONResponse{
+		Error: false,
+		Message: "Successful",
+		Result: SaleReturnPayload,
+	}
+	app.writeJSON(w, http.StatusOK, resp)
+}
 
 // GetPurchasePageDetails scrape data from the database to initialize purchase page
 func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Request) {
