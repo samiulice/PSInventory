@@ -219,13 +219,13 @@ type ProductMetadata struct {
 type Purchase struct {
 	ID                int       `json:"id"`
 	PurchaseDate      string    `json:"purchase_date"`
-	SupplierID        int       `json:"supplier_id"`
-	ProductID         int       `json:"product_id"`
+	Supplier        Supplier       `json:"supplier_info"`
+	Product         Product       `json:"product_info"`
 	Quantity          int       `json:"quantity"`
 	QuantityPurchased int       `json:"quantity_purchased"`
 	QuantitySold      int       `json:"quantity_sold"`
 	ProductsSerialNo  []string  `json:"products_serial_no"`
-	AccountID         int       `json:"account_id"`
+	HeadAccount         HeadAccount       `json:"head_account_info"`
 	ChalanNO          string    `json:"chalan_no"`
 	MemoNo            string    `json:"memo_no"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
 	Note              string    `json:"note"`

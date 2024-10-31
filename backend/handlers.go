@@ -423,7 +423,7 @@ func (app *application) FetchPurchaseMemoProductItems(w http.ResponseWriter, r *
 	//retrieve all product-serial of each product_id && purchase_id
 	var products []*models.Product
 	for _, v := range purchaseHistory {
-		product, err := app.DB.GetInstockProductListByPurchaseIDAndProductID(v.ID, v.ProductID)
+		product, err := app.DB.GetInstockProductListByPurchaseIDAndProductID(v.ID, v.Product.ID)
 		if err != nil {
 			app.badRequest(w, fmt.Errorf("ErrorProducts:: %v", err))
 		}

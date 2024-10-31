@@ -1487,9 +1487,9 @@ func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.P
 		err = rows.Scan(
 			&purchase.ID,
 			&purchase.PurchaseDate,
-			&purchase.SupplierID,
-			&purchase.ProductID,
-			&purchase.AccountID,
+			&purchase.Supplier.ID,
+			&purchase.Product.ID,
+			&purchase.HeadAccount.ID,
 			&purchase.ChalanNO,
 			&purchase.MemoNo,
 			&purchase.Note,
@@ -1878,9 +1878,9 @@ func (p *postgresDBRepo) AddToPurchaseHistory(purchase *models.Purchase) (int, e
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		purchase.PurchaseDate,
-		purchase.SupplierID,
-		purchase.ProductID,
-		purchase.AccountID,
+		purchase.Supplier.ID,
+		purchase.Product.ID,
+		purchase.HeadAccount.ID,
 		purchase.ChalanNO,
 		purchase.MemoNo,
 		purchase.Note,
@@ -1913,7 +1913,7 @@ func (p *postgresDBRepo) AddProductSerialNumbers(purchase *models.Purchase) erro
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase.MaxRetailPrice, purchase.PurchaseRate, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,%d,'%s','%s')", serial_number, purchase.Product.ID, purchase.MaxRetailPrice, purchase.PurchaseRate, createdAt, updatedAt))
 	}
 
 	query := "INSERT INTO public.product_serial_numbers (serial_number,product_id,max_retail_price,purchase_rate,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
@@ -2010,7 +2010,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
           WHERE id = $2;`
 
 	// Execute the query with parameters
-	_, err = tx.ExecContext(ctx, query, purchase.Quantity, purchase.ProductID)
+	_, err = tx.ExecContext(ctx, query, purchase.Quantity, purchase.Product.ID)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
@@ -2035,9 +2035,9 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	`
 	row := tx.QueryRowContext(ctx, query,
 		purchase.PurchaseDate,
-		purchase.SupplierID,
-		purchase.ProductID,
-		purchase.AccountID,
+		purchase.Supplier.ID,
+		purchase.Product.ID,
+		purchase.HeadAccount.ID,
 		purchase.ChalanNO,
 		purchase.MemoNo,
 		purchase.Note,
@@ -2071,7 +2071,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	updatedAt := purchase.UpdatedAt.Format("2006-01-02 15:04:05 -07:00")
 
 	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,0,%d,%d,%d,'%s','%s')", serial_number, purchase.ProductID, purchase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.WarrantyPeriod, createdAt, updatedAt))
+		values = append(values, fmt.Sprintf("('%s',%d,%d,0,%d,%d,%d,'%s','%s')", serial_number, purchase.Product.ID, purchase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.WarrantyPeriod, createdAt, updatedAt))
 	}
 
 	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,sales_history_id,max_retail_price,purchase_rate,warranty_period,created_at,updated_at) VALUES " + strings.Join(values, ",") + ";"
@@ -2277,7 +2277,7 @@ func (p *postgresDBRepo) GetWarrantyList(searchType string) ([]*models.Warranty,
 	return warrantyHistory, nil
 }
 
-// AddNewWarrantyClaim handles database opetions for completing claim warranty procedues
+// AddNewWarrantyClaim handles database operations for completing claim warranty procedures
 func (p *postgresDBRepo) AddNewWarrantyClaim(memoPrefix string, serialID int, serialNumber, contactNumber, reportedProblem, receivedBy, warrantyHistoryIds string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
