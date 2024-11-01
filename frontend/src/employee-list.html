@@ -63,11 +63,14 @@
       background-color: #ffffff;
       /* White for odd rows */
     }
+
     .datatable-buttons th {
-      background-color: #008080; /* Teal header */
+      background-color: #008080;
+      /* Teal header */
       color: white;
       font-weight: 400;
     }
+
     .datatable-buttons th,
     .datatable-buttons td {
       white-space: nowrap;
@@ -228,20 +231,9 @@
             <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
               <!-- start project list -->
               <div class="bg-white">
-                <table id=""
-                  class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+                <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
                   cellspacing="0" width="100%">
-                  <thead>
-                    <tr>
-                      <th>Account Code</th>
-                      <th>Account Name</th>
-                      <th>Mobile</th>
-                      <th>Account Status</th>
-                      <th>Monthly Salary</th>
-                      <th>Joining Date</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
+                  <!-- Will be updated by JS DOM -->
                 </table>
               </div>
               <div class="row">
@@ -369,7 +361,7 @@
               {
                 extend: "print",
                 className: "btn-sm",
-                text: "Custom Print", // Change button text
+                text: "Print", // Change button text
                 action: function (e, dt, node, config) {
                   customPrintFunction(reportData); // Call custom function with returnedData
                 }
@@ -420,74 +412,139 @@
       TableManageButtons.init();
 
     };
+    function customPrintFunction() {
+  let n = reportData.length;
+  let tBody = '';
 
-    function customPrintFunction(data) {
-      let content = `
-      <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teal and Gray Table</title>
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: Arial, sans-serif;
+  if (n > 0) {
+    for (let i = 0; i < n; i++) {
+      const e = reportData[i];
+      tBody += `
+        <tr>
+          <td>${e.account_code}</td>
+          <td>${e.account_name}</td>
+          <td>${e.mobile}</td>
+          <td>${e.account_status}</td>
+          <td>${e.monthly_salary ? e.monthly_salary : "0"}</td>
+          <td>${formatDate(e.joining_date, "date", "-")}</td>
+        </tr>`;
     }
-    th, td {
-      padding: 5px;
-      font-size: 12px;
-      text-align: left;
-      border: 0.1em solid #000; /* Dark gray for borders */
-    }
-    th {
-      background-color: #008080; /* Teal header */
-      color: white;
-    }
-    tr:nth-child(even) {
-      background-color: rgba(0, 128, 128, 0.1); /* Light teal for even rows */
-    }
-    tr:nth-child(odd) {
-      background-color: #ffffff; /* White for odd rows */
-    }
-  </style>
-</head>
-<body>
+  } else {
+    tBody = `
+      <tr><td colspan=6 style="text-align:center;">No data available</td></tr>`;
+  }
 
-<table >
-  <thead>
-    <tr>
-      <th>Header 1</th>
-      <th>Header 2</th>
-      <th>Header 3</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Data 1</td>
-      <td>Data 2</td>
-      <td>Data 3</td>
-    </tr>
-    <tr>
-      <td>Data 4</td>
-      <td>Data 5</td>
-      <td>Data 6</td>
-    </tr>
-    <tr>
-      <td>Data 7</td>
-      <td>Data 8</td>
-      <td>Data 9</td>
-    </tr>
-  </tbody>
-</table>
-
-</body>
-</html>
-
+  const content = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Company Report</title>
+      <link rel="stylesheet" type="text/css" href="styles.css">
+      <style>
+        /* Header styling */
+        .header {
+          text-align: center;
+          margin-bottom: 20px;
+          padding: 20px;
+          border-bottom: 2px solid #008080;
+        }
+        .header h1 {
+          font-size: 28px;
+          color: #008080;
+          font-weight: bold;
+          margin: 0;
+          text-transform: uppercase;
+        }
+        .header h2 {
+          font-size: 16px;
+          color: #444;
+          margin: 5px 0 15px 0;
+          font-style: italic;
+          font-weight: normal;
+        }
+        .header p {
+          margin: 3px 0;
+          font-size: 14px;
+          color: #666;
+        }
+        /* Table styling */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-family: Arial, sans-serif;
+        }
+        th, td {
+          padding: 8px;
+          font-size: 12px;
+          text-align: left;
+          border: 0.1em solid #000;
+        }
+        th {
+          background-color: #008080;
+          color: white;
+        }
+        tr:nth-child(even) {
+          background-color: rgba(0, 128, 128, 0.1);
+        }
+        tr:nth-child(odd) {
+          background-color: #ffffff;
+        }
+      </style>
+    </head>
+    <body>
+      <!-- Header Section -->
+      <div class="header">
+        ${reportData.company? 
+        `<h1>${reportData.company.name ? reportData.company.name :""}</h1>
+        <h2>${reportData.company.slogan ? reportData.company.slogan :""}</h2>
+        <p>${reportData.company.address ? reportData.company.address :""}</p>
+        <p>Mobile: ${reportData.company.mobile ? reportData.company.mobile:"" } | Email: ${reportData.company.email ? reportData.company.email:"" }</p>
       `
-      htmlStringToPDF(content, 5);
-    }
+        :`
+        <h1> ProjuktiSheba Inventory</h1>
+        <h2> Track Smarter, Stock Better </h2>
+        <p> Teri Bazar,Netrakona Shadar, Netrakona, Mymensingh </p>
+        <p>Mobile: +8801742135093" | Email: psi@projuktisheba.com</p>
+      
+        `}
+      </div>
+
+      <!-- Table Section -->
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Status</th>
+            <th>Monthly Salary</th>
+            <th>Joining Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tBody}
+        </tbody>
+      </table>
+    </body>
+    </html>`;
+
+  // Create an iframe to load the content
+  const iframe = document.createElement('iframe');
+  document.body.appendChild(iframe);
+  iframe.style.display = 'none';
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(content);
+  doc.close();
+
+  // Wait for content to load and then print
+  iframe.onload = () => {
+    iframe.contentWindow.print();
+    document.body.removeChild(iframe);
+  };
+}
+
   </script>
 
 
