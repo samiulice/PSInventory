@@ -23,11 +23,14 @@ func (app *application) routes() http.Handler {
 
 		//HR Management
 		mux.Post("/hr/view-employee/{type}", app.GetEmployees)
+		mux.Post("/hr/view-all-employee", app.GetAllEmployees)
 		mux.Post("/hr/add-employee", app.AddEmployee)
 		//MIS
 		mux.Post("/mis/view-customer/{type}", app.GetCustomers)
+		mux.Post("/mis/view-all-customer", app.GetAllCustomers)
 		mux.Post("/mis/add-customer", app.AddCustomer)
 		mux.Post("/mis/view-supplier/{type}", app.GetSuppliers)
+		mux.Post("/mis/view-all-supplier", app.GetAllSuppliers)
 		mux.Post("/mis/get-supplier-id-name-list", app.GetActiveSuppliersIDAndName)
 		mux.Post("/mis/get-customer-id-name-list", app.GetActiveCustomersIDAndName)
 		mux.Post("/mis/add-supplier", app.AddSupplier)
@@ -38,7 +41,7 @@ func (app *application) routes() http.Handler {
 		mux.Post("/inventory/add-product", app.AddProduct)
 		//memo--products list
 		mux.Post("/inventory/memo/get-purchase-product-list", app.FetchPurchaseMemoProductItems)
-		
+
 		mux.Post("/inventory/products/get-list-by-id", app.FetchProductItemsByProductID)
 		mux.Post("/inventory/products/search-instock-products-by-serial", app.FetchInstockProductItemBySerialNumber) //search in-stock items
 		mux.Post("/inventory/products/search-sold-products-by-serial", app.FetchSoldProductItemBySerialNumber)       //search sale/sold items

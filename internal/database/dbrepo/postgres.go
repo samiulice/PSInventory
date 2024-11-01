@@ -286,6 +286,56 @@ func (p *postgresDBRepo) GetEmployeeListPaginated(accountType string, pageSize, 
 	return employees, totalRecords, nil
 }
 
+// GetAllEmployeesList returns a list of all employees
+func (p *postgresDBRepo) GetAllEmployeesList() ([]*models.Employee, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var employees []*models.Employee
+
+	// Prepare the base query for selecting employees
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, monthly_salary, opening_balance, joining_date, created_at, updated_at
+		FROM
+			employees
+		`
+	rows, err := p.DB.QueryContext(ctx, query)
+
+	if err != nil {
+		return employees, err
+	}
+	defer rows.Close()
+
+	// Scan the rows into employee struct
+	for rows.Next() {
+		var e models.Employee
+		err = rows.Scan(
+			&e.ID,
+			&e.AccountCode,
+			&e.AccountName,
+			&e.ContactPerson,
+			&e.Division,
+			&e.District,
+			&e.Upazila,
+			&e.Area,
+			&e.Mobile,
+			&e.Email,
+			&e.AccountStatus,
+			&e.MonthlySalary,
+			&e.OpeningBalance,
+			&e.JoiningDate,
+			&e.CreatedAt,
+			&e.UpdatedAt,
+		)
+		if err != nil {
+			return employees, err
+		}
+		employees = append(employees, &e)
+	}
+
+	return employees, nil
+}
+
 // .......................MIS.......................
 // AddCustomer inserts new customer information to the database
 func (p *postgresDBRepo) AddCustomer(customer models.Customer) (int, error) {
@@ -656,6 +706,51 @@ func (p *postgresDBRepo) GetCustomerListPaginated(accountType string, pageSize, 
 	}
 	return customers, totalRecords, nil
 }
+func (p *postgresDBRepo) GetAllCustomersList() ([]*models.Customer, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var customers []*models.Customer
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, discount, opening_balance, joining_date, created_at, updated_at
+		FROM
+			customers
+		ORDER BY
+			id asc`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return customers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c models.Customer
+		err = rows.Scan(
+			&c.ID,
+			&c.AccountCode,
+			&c.AccountName,
+			&c.ContactPerson,
+			&c.Division,
+			&c.District,
+			&c.Upazila,
+			&c.Area,
+			&c.Mobile,
+			&c.Email,
+			&c.AccountStatus,
+			&c.Discount,
+			&c.OpeningBalance,
+			&c.JoiningDate,
+			&c.CreatedAt,
+			&c.UpdatedAt,
+		)
+		if err != nil {
+			return customers, err
+		}
+		customers = append(customers, &c)
+	}
+	return customers, nil
+}
 
 // AddSupplier inserts new supplier information to the database
 func (p *postgresDBRepo) AddSupplier(supplier models.Supplier) (int, error) {
@@ -808,6 +903,51 @@ func (p *postgresDBRepo) GetSupplierListPaginated(accountType string, pageSize, 
 		return suppliers, 0, err
 	}
 	return suppliers, totalRecords, nil
+}
+func (p *postgresDBRepo) GetAllSuppliersList() ([]*models.Supplier, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var suppliers []*models.Supplier
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, discount, joining_date, created_at, updated_at
+		FROM
+			suppliers
+		`
+	var rows *sql.Rows
+	var err error
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return suppliers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s models.Supplier
+		err = rows.Scan(
+			&s.ID,
+			&s.AccountCode,
+			&s.AccountName,
+			&s.ContactPerson,
+			&s.Division,
+			&s.District,
+			&s.Upazila,
+			&s.Area,
+			&s.Mobile,
+			&s.Email,
+			&s.AccountStatus,
+			&s.Discount,
+			&s.JoiningDate,
+			&s.CreatedAt,
+			&s.UpdatedAt,
+		)
+		if err != nil {
+			return suppliers, err
+		}
+		suppliers = append(suppliers, &s)
+	}
+	return suppliers, nil
 }
 
 //.......................Inventory.......................

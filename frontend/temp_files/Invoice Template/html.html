@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Template</title>
+    <style>
+        /* Basic Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+        }
+        .header, .billing-section, .totals, .remarks {
+            margin-bottom: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .company-info {
+            font-size: 1.3em;
+            color: #333;
+            line-height: 1.5;
+        }
+        .invoice-details {
+            text-align: right;
+            font-size: 1em;
+            color: #555;
+        }
+        .invoice-details span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .billing-section h2 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        .billing-details, .company-address {
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.5;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .items-table th, .items-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #333;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #f3f3f3;
+            color: #555;
+        }
+        .items-table td {
+            text-align: right;
+        }
+        .items-table td:first-child, .items-table th:first-child {
+            text-align: left;
+        }
+        .totals {
+            text-align: right;
+            font-size: 1em;
+            color: #333;
+        }
+        .totals .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        .totals .total-row:last-child {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .remarks {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header with Company and Invoice Information -->
+        <div class="header">
+            <div class="company-info">
+                <strong>Your Company Name</strong><br>
+                Your Address<br>
+                Your Contact Details
+            </div>
+            <div class="invoice-details">
+                <span><strong>INVOICE NO:</strong> #12345</span>
+                <span><strong>DATE:</strong> YYYY-MM-DD</span>
+            </div>
+        </div>
+
+        <!-- Bill To Section -->
+        <div class="billing-section">
+            <h2>BILL TO:</h2>
+            <div class="billing-details">
+                Contact Name<br>
+                Address<br>
+                Phone
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>QTY</th>
+                    <th>DESCRIPTION</th>
+                    <th>UNIT PRICE</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Item Description</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Item Description</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <!-- Additional rows as needed -->
+            </tbody>
+        </table>
+
+        <!-- Totals Section -->
+        <div class="totals">
+            <div class="total-row"><span>SUBTOTAL</span><span>$0.00</span></div>
+            <div class="total-row"><span>DISCOUNT</span><span>$0.00</span></div>
+            <div class="total-row"><span>SUBTOTAL LESS DISCOUNT</span><span>$0.00</span></div>
+            <div class="total-row"><span>TAX RATE</span><span>0.00%</span></div>
+            <div class="total-row"><span>TOTAL TAX</span><span>$0.00</span></div>
+            <div class="total-row"><span>SHIPPING/HANDLING</span><span>$0.00</span></div>
+            <div class="total-row"><span><strong>Balance Due</strong></span><span><strong>$0.00</strong></span></div>
+        </div>
+
+        <!-- Remarks Section -->
+        <div class="remarks">
+            <strong>Remarks / Payment Instructions:</strong><br>
+            Please include any specific payment terms, or additional instructions.
+        </div>
+    </div>
+</body>
+</html>

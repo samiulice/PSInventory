@@ -38,7 +38,7 @@
                         padding: 30px;
                         background-color: #fff;
                         border-radius: 8px;
-                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
                     }
                     .header {
                         display: flex;
@@ -52,7 +52,7 @@
                     .company-info {
                         font-family: 'Georgia', serif;
                         font-size: 1.2em;
-                        color: #333;
+                        color: #222;
                         font-weight: bold;
                         line-height: 1.5;
                         display: flex;
@@ -79,27 +79,29 @@
                         margin-bottom: 10px;
                     }
                     .vendor-details, .invoice-details {
-                        font-size: 0.9em;
-                        color: #666;
+                        font-size: 0.95em;
+                        color: #333;
                         line-height: 1.5;
+                        font-weight: 500;
                     }
                     .invoice-details span {
                         display: block;
                         margin-bottom: 5px;
                         color: #4a90e2;
                         font-family: 'Arial', sans-serif;
+
                     }
                     .items-table {
                         width: 100%;
                         border-collapse: collapse;
                         margin-top: 20px;
-                        font-size: 0.9em;
+                        font-size: 0.95em;
                         font-family: 'Tahoma', sans-serif;
                     }
                     .items-table th, .items-table td {
                         padding: 10px;
-                        border: 1px solid #ddd;
-                        color: #333;
+                        border: 1px solid #333;
+                        color: #222;
                     }
                     .items-table th {
                         background-color: #eaf2fb;
@@ -121,7 +123,7 @@
                     }
                     .totals, .payment-info {
                         flex: 1;
-                        font-size: 0.85em;
+                        font-size: 0.9em;
                         color: #333;
                         font-family: 'Verdana', sans-serif;
                     }
@@ -131,29 +133,29 @@
                         padding: 5px 0;
                     }
                     .totals .total-row:last-child {
-                        font-weight: bold;
                         font-size: 1em;
                         color: #4a90e2;
                     }
                     .totals .total-label, .payment-info .info-label {
-                        color: #666;
+                        color: #222;
                     }
                     .payment-info {
-                        background-color: #f9f9f9;
+                        background-color: #f1f1f1;
                         padding: 8px;
                         border-radius: 5px;
-                        border: 1px solid #ddd;
+                        border: 1px solid #333;
                     }
                     .remarks {
                         font-family: 'Georgia', serif;
                         font-size: 0.9em;
-                        color: #555;
+                        color: #333;
                         line-height: 1.6;
                         background-color: #f9f9f9;
                         padding: 15px;
                         border-radius: 5px;
                         border-left: 3px solid #4a90e2;
                         margin-top: 20px;
+                        font-weight: 400;
                     }
 
                     /* Print Styling for A4 Page */
@@ -184,6 +186,8 @@
                         }
                     }
                 </style>
+
+
             </head>
             <body>
                 <div class="invoice-container">

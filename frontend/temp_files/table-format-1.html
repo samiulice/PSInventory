@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dark Green and Sage Table</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #333333; /* Dark gray for borders */
+    }
+    th {
+      background-color: #2e7d32; /* Dark green header */
+      color: white;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: rgba(46, 125, 10, 0.1); /* Light sage green for even rows */
+    }
+    tr:nth-child(odd) {
+      background-color: #ffffff; /* White for odd rows */
+    }
+  </style>
+</head>
+<body>
+
+<table>
+  <thead>
+    <tr>
+      <th>Header 1</th>
+      <th>Header 2</th>
+      <th>Header 3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Data 1</td>
+      <td>Data 2</td>
+      <td>Data 3</td>
+    </tr>
+    <tr>
+      <td>Data 4</td>
+      <td>Data 5</td>
+      <td>Data 6</td>
+    </tr>
+    <tr>
+      <td>Data 7</td>
+      <td>Data 8</td>
+      <td>Data 9</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

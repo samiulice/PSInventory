@@ -79,6 +79,9 @@ type DatabaseRepo interface {
 	RestockProduct(purchase *models.Purchase) error
 
 	//Inventory Reports
+	GetAllEmployeesList() ([]*models.Employee, error)
+	GetAllSuppliersList() ([]*models.Supplier, error)
+	GetAllCustomersList() ([]*models.Customer, error)
 	GetCategoryListReport() ([]*models.Category, error)
 	GetProductListReport() ([]*models.Product, error)
 	GetServiceListReport() ([]*models.Service, error)

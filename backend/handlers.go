@@ -65,7 +65,29 @@ func (app *application) GetEmployees(w http.ResponseWriter, r *http.Request) {
 		app.writeJSON(w, http.StatusOK, Resp)
 	}
 }
-
+// GetAllEmployees returns list of all employees info from the database
+func (app *application) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
+	var Resp struct {
+		Error     bool               `json:"error,omitempty"`
+		Message   string             `json:"message,omitempty"`
+		Employees []*models.Employee `json:"employees,omitempty"`
+	}
+	employees, err := app.DB.GetAllEmployeesList()
+	if err == sql.ErrNoRows {
+		Resp.Error = false
+		Resp.Message = "No Data available"
+		app.writeJSON(w, http.StatusOK, Resp)
+		return
+	}
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	Resp.Error = false
+	Resp.Message = "Data successfully fetched"
+	Resp.Employees = employees
+	app.writeJSON(w, http.StatusOK, Resp)
+}
 // AddEmployee add new employee info to the database
 func (app *application) AddEmployee(w http.ResponseWriter, r *http.Request) {
 	var employee models.Employee
@@ -187,6 +209,30 @@ func (app *application) GetCustomers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetAllCustomers returns list of all customers info from the database
+func (app *application) GetAllCustomers(w http.ResponseWriter, r *http.Request) {
+	var Resp struct {
+		Error     bool               `json:"error,omitempty"`
+		Message   string             `json:"message,omitempty"`
+		Customers []*models.Customer `json:"customers,omitempty"`
+	}
+	customers, err := app.DB.GetAllCustomersList()
+	if err == sql.ErrNoRows {
+		Resp.Error = false
+		Resp.Message = "No Data available"
+		app.writeJSON(w, http.StatusOK, Resp)
+		return
+	}
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	Resp.Error = false
+	Resp.Message = "Data successfully fetched"
+	Resp.Customers = customers
+	app.writeJSON(w, http.StatusOK, Resp)
+}
+
 // AddSupplier add new supplier info to the database
 func (app *application) AddSupplier(w http.ResponseWriter, r *http.Request) {
 	var supplier models.Supplier
@@ -269,6 +315,30 @@ func (app *application) GetSuppliers(w http.ResponseWriter, r *http.Request) {
 		Resp.Suppliers = suppliers
 		app.writeJSON(w, http.StatusOK, Resp)
 	}
+}
+// GetSuppliers returns list of suppliers to the corresponded category in JSON format
+func (app *application) GetAllSuppliers(w http.ResponseWriter, r *http.Request) {
+	
+	var Resp struct {
+		Error     bool               `json:"error,omitempty"`
+		Message   string             `json:"message,omitempty"`
+		Suppliers []*models.Supplier `json:"suppliers,omitempty"`
+	}
+	suppliers, err := app.DB.GetAllSuppliersList()
+	if err == sql.ErrNoRows {
+		Resp.Error = false
+		Resp.Message = "No Data available"
+		app.writeJSON(w, http.StatusOK, Resp)
+		return
+	}
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	Resp.Error = false
+	Resp.Message = "Data successfully fetched"
+	Resp.Suppliers = suppliers
+	app.writeJSON(w, http.StatusOK, Resp)
 }
 
 // GetActiveSuppliersIDAndName returns a list of supplier's id and name
@@ -799,17 +869,18 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 	resp.SalesInvoiceData = &salesInfo
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
 // ReturnProductsFromCustomer updates database for returned products
 func (app *application) ReturnProductsFromCustomer(w http.ResponseWriter, r *http.Request) {
-	var SaleReturnPayload struct{
-		Customer *models.Customer `json:"customer_info"`
-		Products []*models.Product `json:"product_Items"`
-		SalesHistory *models.Sale `json:"sales_history"`
-		SelectedItemsID []int `json:"selected_items"`
-		SaleReturnDate string `json:"sale_return_date"`
-		ReturnItemsCount int `json:"return_items_number"`
-		ReturnAmount int `json:"return_items_amount"`
-		MemoNo string `json:"memo_no"`
+	var SaleReturnPayload struct {
+		Customer         *models.Customer  `json:"customer_info"`
+		Products         []*models.Product `json:"product_Items"`
+		SalesHistory     *models.Sale      `json:"sales_history"`
+		SelectedItemsID  []int             `json:"selected_items"`
+		SaleReturnDate   string            `json:"sale_return_date"`
+		ReturnItemsCount int               `json:"return_items_number"`
+		ReturnAmount     int               `json:"return_items_amount"`
+		MemoNo           string            `json:"memo_no"`
 	}
 	// customer_info: customers[parseInt(document.getElementById("customer").value)],
 	// product_Items: products,
@@ -822,7 +893,7 @@ func (app *application) ReturnProductsFromCustomer(w http.ResponseWriter, r *htt
 
 	err := app.readJSON(w, r, &SaleReturnPayload)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR:=>ReturnProductsFromCustomer: Unable to read JSON : %w",err))
+		app.badRequest(w, fmt.Errorf("ERROR:=>ReturnProductsFromCustomer: Unable to read JSON : %w", err))
 		return
 	}
 	fmt.Println(SaleReturnPayload)
@@ -839,9 +910,9 @@ func (app *application) ReturnProductsFromCustomer(w http.ResponseWriter, r *htt
 		return
 	}
 	var resp = JSONResponse{
-		Error: false,
+		Error:   false,
 		Message: "Successful",
-		Result: SaleReturnPayload,
+		Result:  SaleReturnPayload,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
 }
