@@ -83,6 +83,7 @@ type DatabaseRepo interface {
 	GetAllSuppliersList() ([]*models.Supplier, error)
 	GetAllCustomersList() ([]*models.Customer, error)
 	GetCategoryListReport() ([]*models.Category, error)
+	GetBrandListReport() ([]*models.Brand, error)
 	GetProductListReport() ([]*models.Product, error)
 	GetServiceListReport() ([]*models.Service, error)
 

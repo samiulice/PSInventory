@@ -1,4 +1,21 @@
 /**
+ * Converts a given string to title case format.
+ * Title case format means the first letter of each word is capitalized.
+ * 
+ * @param {string} str - The input string to be converted.
+ * @returns {string} - The string in title case format.
+ */
+function toTitleCase(str) {
+  return str
+    .toLowerCase() // Convert the entire string to lowercase for uniformity.
+    .split(' ') // Split the string into an array of words using spaces as delimiters.
+    .map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1) // Capitalize the first letter of each word and append the rest of the word.
+    )
+    .join(' '); // Join the array of words back into a single string with spaces between them.
+}
+
+/**
  * Converts a number into its word representation based on the Indian numbering system.
  * Supports numbers up to 99,99,99,999 (99 crores).
  *
@@ -223,7 +240,7 @@ function formatDate(time, format, separator) {
   const date = new Date(time);
 
   // Define arrays for month names and zero-padding for formatting
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const pad = (num) => num.toString().padStart(2, '0');
 
   // Extract date components
@@ -289,6 +306,17 @@ function getCurrentDate() {
   const year = today.getFullYear();
 
   return `${month}-${day}-${year}`; // Format as MM-DD-YYYY
+}
+
+//getShortDate returns current date in 25-Jun-2024 format
+function getShortDate(){
+  const options = { day: '2-digit', month: 'short', year: 'numeric' };
+  return new Date().toLocaleDateString('en-GB', options).replace(/ /g, '-');
+}
+//getLongDate returns current date in 25-June-2024 format
+function getLongDate(){
+  const options = { day: '2-digit', month: 'long', year: 'numeric' };
+  return new Date().toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
 
 // Example usage:

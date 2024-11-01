@@ -224,7 +224,7 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">Employee List</h2>
+        <h2 class="text-center text-warning fa-2x text-bold">List of Employees</h2>
         <!-- Page content here -->
         <div class="x_panel bg-gw">
           <div class="x_content">
@@ -413,137 +413,164 @@
 
     };
     function customPrintFunction() {
-  let n = reportData.length;
-  let tBody = '';
+      let n = reportData.length;
+      let tBody = '';
 
-  if (n > 0) {
-    for (let i = 0; i < n; i++) {
-      const e = reportData[i];
-      tBody += `
-        <tr>
-          <td>${e.account_code}</td>
-          <td>${e.account_name}</td>
-          <td>${e.mobile}</td>
-          <td>${e.account_status}</td>
-          <td>${e.monthly_salary ? e.monthly_salary : "0"}</td>
-          <td>${formatDate(e.joining_date, "date", "-")}</td>
-        </tr>`;
+      if (n > 0) {
+        for (let i = 0; i < n; i++) {
+          const e = reportData[i];
+          tBody += `
+            <tr>
+              <td>${e.account_code}</td>
+              <td>${e.account_name}</td>
+              <td>${e.mobile}</td>
+              <td>${e.account_status}</td>
+              <td>${e.monthly_salary ? e.monthly_salary : "0"}</td>
+              <td>${formatDate(e.joining_date, "date", "-")}</td>
+            </tr>`;
+        }
+      } else {
+        tBody = `
+          <tr><td colspan=6 style="text-align:center;">No data available</td></tr>`;
+      }
+
+      const content = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Company Report</title>
+          <link rel="stylesheet" type="text/css" href="styles.css">
+          <style>
+            /* Header styling */
+            .header {
+              text-align: center;
+              margin-bottom: 20px;
+              padding: 10px;
+              border-bottom: 2px solid #008080;
+            }
+            .header .current-date{
+              text-align: left;
+              font-size:12px;
+              font-weight:600;
+              color:#2F4F4F;
+            }
+            .header h1 {
+              font-size: 28px;
+              color: #008080;
+              font-weight: bold;
+              margin: 0;
+              text-transform: uppercase;
+            }
+            .header h2 {
+              font-size: 16px;
+              color: #444;
+              margin: 5px 0 15px 0;
+              font-style: italic;
+              font-weight: normal;
+            }
+            .header p {
+              margin: 3px 0;
+              font-size: 14px;
+              color: #666;
+            }
+            /* table caption and printing date section */
+            .caption-section {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 14px;
+              color: #444;
+              padding-top: 10px;
+              padding-bottom:0px
+            }
+            .caption-section .caption {
+              font-weight: bold;
+              color: #008080;
+            }
+            .caption-section .print-date {
+              font-style: italic;
+              color: #666;
+            }
+            /* Table styling */
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-family: Arial, sans-serif;
+            }
+            th, td {
+              padding: 8px;
+              font-size: 12px;
+              text-align: left;
+              border: 0.1em solid #000;
+            }
+            th {
+              background-color: #008080;
+              color: white;
+            }
+            tr:nth-child(even) {
+              background-color: rgba(0, 128, 128, 0.1);
+            }
+            tr:nth-child(odd) {
+              background-color: #ffffff;
+            }
+          </style>
+        </head>
+        <body>
+          <!-- Header Section -->
+          <div class="header">
+            ${reportData.company ? `
+              <h1>${reportData.company.name || ""}</h1>
+              <h2>${reportData.company.slogan || ""}</h2>
+              <p>${reportData.company.address || ""}</p>
+              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
+            ` : `
+              <h1>ProjuktiSheba Inventory</h1>
+              <h2>Track Smarter, Stock Better</h2>
+              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
+              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
+            `}
+            
+            <!-- Line with Caption and Print Date -->
+            <div class="caption-section">
+              <div class="caption">List of Employees</div>
+              <div class="print-date">Printed on: ${getShortDate()}</div>
+            </div>
+          </div>
+          <!-- Table Section -->
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Status</th>
+                <th>Monthly Salary</th>
+                <th>Joining Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tBody}
+            </tbody>
+          </table>
+        </body>
+        </html>`;
+
+      // Create an iframe to load the content
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframe.style.display = 'none';
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(content);
+      doc.close();
+
+      // Wait for content to load and then print
+      iframe.onload = () => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      };
     }
-  } else {
-    tBody = `
-      <tr><td colspan=6 style="text-align:center;">No data available</td></tr>`;
-  }
-
-  const content = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <title>Company Report</title>
-      <link rel="stylesheet" type="text/css" href="styles.css">
-      <style>
-        /* Header styling */
-        .header {
-          text-align: center;
-          margin-bottom: 20px;
-          padding: 20px;
-          border-bottom: 2px solid #008080;
-        }
-        .header h1 {
-          font-size: 28px;
-          color: #008080;
-          font-weight: bold;
-          margin: 0;
-          text-transform: uppercase;
-        }
-        .header h2 {
-          font-size: 16px;
-          color: #444;
-          margin: 5px 0 15px 0;
-          font-style: italic;
-          font-weight: normal;
-        }
-        .header p {
-          margin: 3px 0;
-          font-size: 14px;
-          color: #666;
-        }
-        /* Table styling */
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          font-family: Arial, sans-serif;
-        }
-        th, td {
-          padding: 8px;
-          font-size: 12px;
-          text-align: left;
-          border: 0.1em solid #000;
-        }
-        th {
-          background-color: #008080;
-          color: white;
-        }
-        tr:nth-child(even) {
-          background-color: rgba(0, 128, 128, 0.1);
-        }
-        tr:nth-child(odd) {
-          background-color: #ffffff;
-        }
-      </style>
-    </head>
-    <body>
-      <!-- Header Section -->
-      <div class="header">
-        ${reportData.company? 
-        `<h1>${reportData.company.name ? reportData.company.name :""}</h1>
-        <h2>${reportData.company.slogan ? reportData.company.slogan :""}</h2>
-        <p>${reportData.company.address ? reportData.company.address :""}</p>
-        <p>Mobile: ${reportData.company.mobile ? reportData.company.mobile:"" } | Email: ${reportData.company.email ? reportData.company.email:"" }</p>
-      `
-        :`
-        <h1> ProjuktiSheba Inventory</h1>
-        <h2> Track Smarter, Stock Better </h2>
-        <p> Teri Bazar,Netrakona Shadar, Netrakona, Mymensingh </p>
-        <p>Mobile: +8801742135093" | Email: psi@projuktisheba.com</p>
-      
-        `}
-      </div>
-
-      <!-- Table Section -->
-      <table>
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Status</th>
-            <th>Monthly Salary</th>
-            <th>Joining Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tBody}
-        </tbody>
-      </table>
-    </body>
-    </html>`;
-
-  // Create an iframe to load the content
-  const iframe = document.createElement('iframe');
-  document.body.appendChild(iframe);
-  iframe.style.display = 'none';
-  const doc = iframe.contentDocument || iframe.contentWindow.document;
-  doc.open();
-  doc.write(content);
-  doc.close();
-
-  // Wait for content to load and then print
-  iframe.onload = () => {
-    iframe.contentWindow.print();
-    document.body.removeChild(iframe);
-  };
-}
 
   </script>
 

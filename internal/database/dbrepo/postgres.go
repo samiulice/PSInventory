@@ -2657,6 +2657,40 @@ func (p *postgresDBRepo) GetCategoryListReport() ([]*models.Category, error) {
 	}
 	return categories, nil
 }
+// GetBrandListReport returns a list of all brands with detailed info from brands table
+func (p *postgresDBRepo) GetBrandListReport() ([]*models.Brand, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var brands []*models.Brand
+
+	query := `
+		SELECT * FROM public.brands
+	`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return brands, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var b models.Brand
+		err = rows.Scan(
+			&b.ID,
+			&b.Name,
+			&b.Status,
+			&b.CreatedAt,
+			&b.UpdatedAt,
+		)
+		if err != nil {
+			return brands, err
+		}
+		brands = append(brands, &b)
+	}
+	return brands, nil
+}
 
 // GetProductListReport returns a list of all products with detailed info from products table
 func (p *postgresDBRepo) GetProductListReport() ([]*models.Product, error) {
@@ -2665,7 +2699,12 @@ func (p *postgresDBRepo) GetProductListReport() ([]*models.Product, error) {
 	var product []*models.Product
 
 	query := `
-		SELECT * FROM public.products ORDER BY id ASC
+		SELECT 
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
+		FROM 
+			public.products i
+			INNER JOIN brands b ON (b.id = i.brand_id) 
+			INNER JOIN categories c ON (c.id = i.category_id)
 	`
 	var rows *sql.Rows
 	var err error
@@ -2690,6 +2729,10 @@ func (p *postgresDBRepo) GetProductListReport() ([]*models.Product, error) {
 			&p.Discount,
 			&p.CreatedAt,
 			&p.UpdatedAt,
+			&p.Brand.ID,
+			&p.Brand.Name,
+			&p.Category.ID,
+			&p.Category.Name,
 		)
 		if err != nil {
 			return product, err

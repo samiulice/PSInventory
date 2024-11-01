@@ -52,6 +52,7 @@ const (
 type Brand struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
+	Status    string    `json:"status"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -217,27 +218,27 @@ type ProductMetadata struct {
 
 // Purchase is the type for purchase info
 type Purchase struct {
-	ID                int       `json:"id"`
-	PurchaseDate      string    `json:"purchase_date"`
-	Supplier        Supplier       `json:"supplier_info"`
-	Product         Product       `json:"product_info"`
-	Quantity          int       `json:"quantity"`
-	QuantityPurchased int       `json:"quantity_purchased"`
-	QuantitySold      int       `json:"quantity_sold"`
-	ProductsSerialNo  []string  `json:"products_serial_no"`
-	HeadAccount         HeadAccount       `json:"head_account_info"`
-	ChalanNO          string    `json:"chalan_no"`
-	MemoNo            string    `json:"memo_no"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
-	Note              string    `json:"note"`
-	MaxRetailPrice    int       `json:"max_retail_price"`
-	PurchaseRate      int       `json:"purchase_rate"`
-	WarrantyPeriod    int       `json:"warranty"`
-	BillAmount        int       `json:"bill_amount"`
-	Discount          int       `json:"discount"`
-	TotalAmount       int       `json:"total_amount"`
-	PaidAmount        int       `json:"paid_amount"`
-	CreatedAt         time.Time `json:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	ID                int         `json:"id"`
+	PurchaseDate      string      `json:"purchase_date"`
+	Supplier          Supplier    `json:"supplier_info"`
+	Product           Product     `json:"product_info"`
+	Quantity          int         `json:"quantity"`
+	QuantityPurchased int         `json:"quantity_purchased"`
+	QuantitySold      int         `json:"quantity_sold"`
+	ProductsSerialNo  []string    `json:"products_serial_no"`
+	HeadAccount       HeadAccount `json:"head_account_info"`
+	ChalanNO          string      `json:"chalan_no"`
+	MemoNo            string      `json:"memo_no"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
+	Note              string      `json:"note"`
+	MaxRetailPrice    int         `json:"max_retail_price"`
+	PurchaseRate      int         `json:"purchase_rate"`
+	WarrantyPeriod    int         `json:"warranty"`
+	BillAmount        int         `json:"bill_amount"`
+	Discount          int         `json:"discount"`
+	TotalAmount       int         `json:"total_amount"`
+	PaidAmount        int         `json:"paid_amount"`
+	CreatedAt         time.Time   `json:"created_at"`
+	UpdatedAt         time.Time   `json:"updated_at"`
 }
 
 type SelectedItems struct {

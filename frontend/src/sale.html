@@ -725,7 +725,7 @@
               <td class="text-left" style="transform:translate(0,-5px)">
                 <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
               </td>
-              <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markItemsAsSeleced(${items.id}, 0)">Add Items</a></td>
+              <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markItemsAsSelected(${items.id}, 0)">Add Items</a></td>
             </tr>`
         }
       } else {
@@ -733,7 +733,7 @@
           `<tr style="transform:translate(0,5px);">
           <td class="text-primary"><b>Add Item:</b></td>
           <td class="text-primary"><b>${products.product_metadata[0].serial_number}</b></td>
-          <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markSingleItemAsSelected(${items.id})">Add Item</a></td>
+          <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markItemsAsSelected(${items.id})">Add Item</a></td>
         </tr>`
       }
 

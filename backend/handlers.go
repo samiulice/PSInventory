@@ -1280,6 +1280,26 @@ func (app *application) GetCategoryListReport(w http.ResponseWriter, r *http.Req
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+// GetBrandListReport retrieves the brand list
+func (app *application) GetBrandListReport(w http.ResponseWriter, r *http.Request) {
+	brands, err := app.DB.GetBrandListReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetBrandList: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error      bool               `json:"error"`
+		Message    string             `json:"message"`
+		Brands []*models.Brand `json:"brands"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fatched successfully"
+	resp.Brands = brands
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
 
 // GetProductListReport retrieves the product list
 func (app *application) GetProductListReport(w http.ResponseWriter, r *http.Request) {

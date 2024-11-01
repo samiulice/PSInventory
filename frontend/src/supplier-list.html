@@ -63,11 +63,14 @@
       background-color: #ffffff;
       /* White for odd rows */
     }
+
     .datatable-buttons th {
-      background-color: #008080; /* Teal header */
+      background-color: #008080;
+      /* Teal header */
       color: white;
       font-weight: 400;
     }
+
     .datatable-buttons th,
     .datatable-buttons td {
       white-space: nowrap;
@@ -221,15 +224,14 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">Supplier List</h2>
+        <h2 class="text-center text-warning fa-2x text-bold">List of Suppliers</h2>
         <!-- Page content here -->
         <div class="x_panel bg-gw">
           <div class="x_content">
             <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
               <!-- start project list -->
               <div class="bg-white">
-                <table id=""
-                  class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+                <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
                   cellspacing="0" width="100%">
                   <!-- Will be updated by JS DOM -->
                 </table>
@@ -379,9 +381,9 @@
                   console.log(responseData)
                   reportData = responseData.suppliers;
                   //Format date in the received data
-                  responseData.suppliers.forEach(emp => {
-                    emp.account_status = emp.account_status ? `<b style="text-align:center;">Active</b>` : "Inactive";
-                    emp.joining_date = formatDate(emp.joining_date, "date", "-");
+                  responseData.suppliers.forEach(sup => {
+                    sup.account_status = (sup.account_status==1) ? `<b style="text-align:center;">Active</b>` : "Inactive";
+                    sup.joining_date = formatDate(sup.joining_date, "date", "-");
                   });
                   // Wrap the data in the expected format
                   const returnData = {
@@ -411,81 +413,179 @@
 
     };
 
-    function customPrintFunction(data) {
-      console.log("Print: ",data);
-      let n = data.length;
+    function customPrintFunction() {
+      let n = reportData.length;
       let tBody = '';
-      if (n>0){
+
+      if (n > 0) {
         for (let i = 0; i < n; i++) {
-          const e = data[i];
+          const s = reportData[i];
           tBody += `
-          <tr>
-            <td>${e.account_code}</td>
-            <td>${e.account_name}</td>
-            <td>${e.mobile}</td>
-            <td>${e.account_status}</td>
-            <td>${formatDate(e.joining_date, "date", "-")}</td>
-          </tr>`
+            <tr>
+              <td>${s.account_code}</td>
+              <td>${s.account_name}</td>
+              <td>${s.mobile}</td>
+              <td>${s.account_status}</td>
+              <td>${s.due_amount || "0"}</td>
+              <td>${formatDate(s.joining_date, "date", "-")}</td>
+            </tr>`;
         }
       } else {
         tBody = `
-        <tr><td colspan=5 style="text-align:center;">No data available</td></tr>
-        `;
+          <tr><td colspan=6 style="text-align:center; color:#DC143C">No data available</td></tr>`;
       }
-      let content = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Teal and Gray Table</title>
-        <style>
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-          }
-          th, td {
-            padding: 5px;
-            font-size: 12px;
-            text-align: left;
-            border: 0.1em solid #000; /* Dark gray for borders */
-          }
-          th {
-            background-color: #008080; /* Teal header */
-            color: white;
-          }
-          tr:nth-child(even) {
-            background-color: rgba(0, 128, 128, 0.1); /* Light teal for even rows */
-          }
-          tr:nth-child(odd) {
-            background-color: #ffffff; /* White for odd rows */
-          }
-        </style>
-      </head>
-      <body>
 
-      <table >
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Status</th>
-            <th>Joining Date</th>
-          </tr>
-        </thead
-          <tbody>
-            ${tBody}
-          </tbody>
-      </table>
+      const currentDate = new Date().toLocaleDateString();
+      const content = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Company Report</title>
+          <link rel="stylesheet" type="text/css" href="styles.css">
+          <style>
+            /* General print styling */
+            @media print {
+              body {
+                margin: 0;
+                padding: 10px;
+                box-sizing: border-box;
+              }
+              table {
+                width: 100%;
+              }
+            }
+            /* Header styling */
+            .header {
+              text-align: center;
+              margin-bottom: 20px;
+              padding: 10px;
+              border-bottom: 2px solid #008080;
+            }
+            .header .current-date{
+              text-align: left;
+              font-size:10px;
+              font-weight:600;
+              color:#2F4F4F;
+            }
+            .header h1 {
+              font-size: 28px;
+              color: #008080;
+              font-weight: bold;
+              margin: 0;
+              text-transform: uppercase;
+            }
+            .header h2 {
+              font-size: 16px;
+              color: #444;
+              margin: 5px 0 15px 0;
+              font-style: italic;
+              font-weight: normal;
+            }
+            .header p {
+              margin: 3px 0;
+              font-size: 14px;
+              color: #666;
+            }
+            /* table caption and printing date section */
+            .caption-section {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 14px;
+              color: #444;
+              padding-top: 10px;
+              padding-bottom:0px
+            }
+            .caption-section .caption {
+              font-weight: bold;
+              color: #008080;
+            }
+            .caption-section .print-date {
+              font-style: italic;
+              color: #666;
+            }
+            /* Table styling */
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-family: Arial, sans-serif;
+            }
+            th, td {
+              padding: 8px;
+              font-size: 12px;
+              text-align: left;
+              border: 0.1em solid #000;
+            }
+            th {
+              background-color: #008080;
+              color: white;
+            }
+            tr:nth-child(even) {
+              background-color: rgba(0, 128, 128, 0.1);
+            }
+            tr:nth-child(odd) {
+              background-color: #ffffff;
+            }
+          </style>
+        </head>
+        <body>
+          <!-- Header Section -->
+          <div class="header">
+            ${reportData.company ? `
+              <h1>${reportData.company.name || ""}</h1>
+              <h2>${reportData.company.slogan || ""}</h2>
+              <p>${reportData.company.address || ""}</p>
+              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
+            ` : `
+              <h1>ProjuktiSheba Inventory</h1>
+              <h2>Track Smarter, Stock Better</h2>
+              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
+              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
+            `}
+            
+            <!-- Line with Caption and Print Date -->
+            <div class="caption-section">
+              <div class="caption">List of Suppliers</div>
+              <div class="print-date">Printed on: ${getShortDate()}</div>
+            </div>
+          </div>
 
-      </body>
-      </html>
+          <!-- Table Section -->
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Status</th>
+                <th>Monthly Salary</th>
+                <th>Joining Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tBody}
+            </tbody>
+          </table>
+        </body>
+        </html>`;
 
-      `
-      htmlStringToPDF(content, 5);
+      // Create an iframe to load the content
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframe.style.display = 'none';
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(content);
+      doc.close();
+
+      // Wait for content to load and then print
+      iframe.onload = () => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      };
     }
+
   </script>
 
 
