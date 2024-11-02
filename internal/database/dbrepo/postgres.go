@@ -1152,7 +1152,7 @@ func (p *postgresDBRepo) AddProduct(i models.Product) (int, error) {
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.products (product_code, product_name, product_description, product_status, quantity, category_id, brand_id, discount, created_at, updated_at) 
+	stmt := `INSERT INTO public.products (product_code, product_name, product_description, product_status, quantity_purchased, quantity_sold,, category_id, brand_id, discount, created_at, updated_at) 
 				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
@@ -1160,7 +1160,8 @@ func (p *postgresDBRepo) AddProduct(i models.Product) (int, error) {
 		i.ProductName,
 		i.Description,
 		i.ProductStatus,
-		i.Quantity,
+		i.QuantityPurchased,
+		i.QuantitySold,
 		i.CategoryID,
 		i.BrandID,
 		i.Discount,
@@ -1183,7 +1184,7 @@ func (p *postgresDBRepo) GetProductList() ([]*models.Product, error) {
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity_purchased, i.quantity_sold, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
@@ -1206,7 +1207,8 @@ func (p *postgresDBRepo) GetProductList() ([]*models.Product, error) {
 			&i.ProductName,
 			&i.Description,
 			&i.ProductStatus,
-			&i.Quantity,
+			&i.QuantityPurchased,
+			&i.QuantitySold,
 			&i.CategoryID,
 			&i.BrandID,
 			&i.Discount,
@@ -1233,13 +1235,13 @@ func (p *postgresDBRepo) GetActiveProducts() ([]*models.Product, error) {
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.discount, b.id, b.name, c.id, c.name
+			i.id, i.product_code, i.product_name, i.quantity_purchased, i.quantity_sold, i.category_id, i.discount, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
 			INNER JOIN categories c ON (c.id = i.category_id)
 		WHERE 
-			product_status = true; 
+			i.product_status = true; 
 		`
 	var rows *sql.Rows
 	var err error
@@ -1256,7 +1258,8 @@ func (p *postgresDBRepo) GetActiveProducts() ([]*models.Product, error) {
 			&i.ID,
 			&i.ProductCode,
 			&i.ProductName,
-			&i.Quantity,
+			&i.QuantityPurchased,
+			&i.QuantitySold,
 			&i.CategoryID,
 			&i.Discount,
 			&i.Brand.ID,
@@ -1280,7 +1283,7 @@ func (p *postgresDBRepo) GetProductByID(id int) (models.Product, error) {
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.quantity, i.category_id, i.brand_id, i.discount, b.id, b.name, c.id, c.name
+			i.id, i.product_code, i.product_name, i.quantity_purchased, i.quantity_sold, i.category_id, i.brand_id, i.discount, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
@@ -1292,7 +1295,8 @@ func (p *postgresDBRepo) GetProductByID(id int) (models.Product, error) {
 		&product.ID,
 		&product.ProductCode,
 		&product.ProductName,
-		&product.Quantity,
+		&product.QuantityPurchased,
+		&product.QuantitySold,
 		&product.CategoryID,
 		&product.BrandID,
 		&product.Discount,
@@ -1313,13 +1317,13 @@ func (p *postgresDBRepo) GetAvailableProductsDetails() ([]*models.Product, error
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity_purchased, i.quantity_sold, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
 			INNER JOIN categories c ON (c.id = i.category_id)
 		WHERE 
-			product_status = true AND quantity > 0; 
+			i.product_status = true AND i.quantity_purchased - i.quantity_sold > 0; 
 		`
 	var rows *sql.Rows
 	var err error
@@ -1338,7 +1342,8 @@ func (p *postgresDBRepo) GetAvailableProductsDetails() ([]*models.Product, error
 			&i.ProductName,
 			&i.Description,
 			&i.ProductStatus,
-			&i.Quantity,
+			&i.QuantityPurchased,
+			&i.QuantitySold,
 			&i.CategoryID,
 			&i.BrandID,
 			&i.Discount,
@@ -1365,13 +1370,13 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity_purchased, i.quantity_sold, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
 			INNER JOIN categories c ON (c.id = i.category_id)
 		WHERE 
-			product_status = true AND quantity > 0 AND category_id = $1; 
+			i.product_status = true AND i.quantity_purchased - i.quantity_sold, > 0 AND i.category_id = $1; 
 		`
 	var rows *sql.Rows
 	var err error
@@ -1390,7 +1395,8 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 			&i.ProductName,
 			&i.Description,
 			&i.ProductStatus,
-			&i.Quantity,
+			&i.QuantityPurchased,
+			&i.QuantitySold,
 			&i.CategoryID,
 			&i.BrandID,
 			&i.Discount,
@@ -1409,8 +1415,59 @@ func (p *postgresDBRepo) GetAvailableProductsByCategoryID(cat_id int) ([]*models
 	return products, nil
 }
 
-// GetProductItemsListByProductID returns a list of product items corresponds to productID
-func (p *postgresDBRepo) GetProductItemsListByProductID(productID int) (*models.Product, error) {
+// GetAllProductsByCategoryID returns a list of all product that related to category ID from the database
+func (p *postgresDBRepo) GetAllProductsByCategoryID(cat_id int) ([]*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var products []*models.Product
+
+	query := `
+		SELECT 
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
+		FROM 
+			public.products i
+			INNER JOIN brands b ON (b.id = i.brand_id) 
+			INNER JOIN categories c ON (c.id = i.category_id)
+		WHERE 
+			category_id = $1; 
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query, cat_id)
+	if err != nil {
+		return products, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.Product
+		err = rows.Scan(
+			&i.ID,
+			&i.ProductCode,
+			&i.ProductName,
+			&i.Description,
+			&i.ProductStatus,
+			&i.CategoryID,
+			&i.BrandID,
+			&i.Discount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Brand.ID,
+			&i.Brand.Name,
+			&i.Category.ID,
+			&i.Category.Name,
+		)
+		if err != nil {
+			return products, err
+		}
+		products = append(products, &i)
+	}
+	return products, nil
+}
+
+// GetInStockProductItemsListByProductID returns a instock list of product items corresponds to productID
+func (p *postgresDBRepo) GetInStockProductItemsListByProductID(productID int) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -1610,11 +1667,11 @@ func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.P
 	//Get product ids for this memo with associated purchase_id for the given memo from purchase_history table
 	query := `
 		SELECT
-			ph.id, ph.purchase_date, ph.supplier_id, ph.product_id, ph.account_id, ph.chalan_no, ph.memo_no, ph.note, ph.quantity_purchased, ph.quantity_sold, ph.bill_amount, ph.discount, ph.total_amount, ph.paid_amount, ph.created_at, ph.updated_at
+			ph.id, ph.purchase_date, ph.supplier_id, ph.product_id, ph.account_id, ph.chalan_no, ph.memo_no, ph.note, ph.bill_amount, ph.discount, ph.total_amount, ph.paid_amount, ph.created_at, ph.updated_at
 		FROM
 			public.purchase_history ph
 		WHERE
-			ph.quantity_purchased>ph.quantity_sold AND ph.memo_no = $1
+			ph.memo_no = $1
 	`
 	rows, err := p.DB.QueryContext(ctx, query, memo_no)
 	if err != nil {
@@ -1633,8 +1690,6 @@ func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.P
 			&purchase.ChalanNO,
 			&purchase.MemoNo,
 			&purchase.Note,
-			&purchase.QuantityPurchased,
-			&purchase.QuantitySold,
 			&purchase.BillAmount,
 			&purchase.Discount,
 			&purchase.TotalAmount,
@@ -1751,20 +1806,31 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	}
 	//step:1 iterate over the SelectedItemsID slice and update the associated row(id) , set status="in stock", updated_at = time.Now()
 	for _, id := range SelectedItemsID {
+		var productItemID int
 		query := `
 			UPDATE 
 				public.product_serial_numbers
 			SET
 				status='in stock', updated_at=$1
 			WHERE
-				id = $2		
+				id = $2
+			RETURNING product_id		
 		`
-		result, err := tx.ExecContext(ctx, query, time.Now(), id)
+		err := tx.QueryRowContext(ctx, query, time.Now(), id).Scan(&productItemID)
 		if err != nil {
-			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE SQL %w", err)
+			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in product_serial_numbers table SQL %w", err)
 		}
-		if n, err := result.RowsAffected(); err != nil || n != 1 {
-			return fmt.Errorf("DBERROR:=>SaleReturnDB: Number of affected row is not equal to 1:  %w", err)
+		query = `
+			UPDATE 
+				public.products
+			SET
+				quantity_sold = quantity_sold - 1
+			WHERE
+				id = $1		
+		`
+		_, err = tx.ExecContext(ctx, query, productItemID)
+		if err != nil {
+			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in products table SQL %w", err)
 		}
 	}
 
@@ -1802,8 +1868,8 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	return nil
 }
 
-// GetProductListByPurchaseIDAndProductID returns products list associated with purchaseID and ProductID
-func (p *postgresDBRepo) GetInstockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error) {
+// GetInStockProductListByPurchaseIDAndProductID returns products list associated with purchaseID and ProductID
+func (p *postgresDBRepo) GetInStockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -1977,21 +2043,6 @@ func (p *postgresDBRepo) GetProductItemsDetailsBySalesHistoryID(id int) ([]*mode
 	return products, nil
 }
 
-// UpdateProductQuantityByProductID increases product quantity, to reduce product quantity pass negetive quantity number
-func (p *postgresDBRepo) UpdateProductQuantityByProductID(quantity, productID int) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	stmt := `UPDATE public.products
-        SET quantity = quantity + $1
-        WHERE id = $2;`
-	// Execute the query
-	_, err := p.DB.ExecContext(ctx, stmt, quantity, productID)
-	if err != nil {
-		return errors.New("SQLErrorUpdateProductQuantity:" + err.Error())
-	}
-	return nil
-}
-
 // UpdateProductItemStatusByProductSerialNumber updates the status of the product unit in product_serial_numbers Table
 func (p *postgresDBRepo) UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -2076,7 +2127,7 @@ func (p *postgresDBRepo) GetMemoListBySupplierID(supplierID int) ([]*models.Purc
 		FROM 
 			public.purchase_history
 		WHERE 
-			quantity_purchased > quantity_sold AND supplier_id = $1 ; 
+			supplier_id = $1 ; 
 		`
 
 	rows, err := p.DB.QueryContext(ctx, query, supplierID)
@@ -2146,11 +2197,11 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	//Tx-1: Update product quantity
 	//Set quantity += newQuantity
 	query := `UPDATE public.products
-          SET quantity = quantity + $1
+          SET quantity_purchased = quantity_purchased + $1
           WHERE id = $2;`
 
 	// Execute the query with parameters
-	_, err = tx.ExecContext(ctx, query, purchase.Quantity, purchase.Product.ID)
+	_, err = tx.ExecContext(ctx, query, purchase.QuantityPurchased, purchase.Product.ID)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
@@ -2170,8 +2221,8 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	// TotalAmount      int
 	// PaidAmount       int
 	var purchase_id int
-	query = `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id
+	query = `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
 	`
 	row := tx.QueryRowContext(ctx, query,
 		purchase.PurchaseDate,
@@ -2181,7 +2232,6 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		purchase.ChalanNO,
 		purchase.MemoNo,
 		purchase.Note,
-		purchase.Quantity,
 		purchase.BillAmount,
 		purchase.Discount,
 		purchase.TotalAmount,
@@ -2280,7 +2330,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		//Step-2: Update product quantity
 		query := `
 			UPDATE public.products
-			SET quantity = quantity - $1
+			SET quantity_sold = quantity_sold + $1
 			WHERE id = $2;
 		  `
 		_, err = tx.ExecContext(ctx, query, items.Quantity, items.ProductID)
@@ -2332,18 +2382,26 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(JobID string, transactionD
 	}
 
 	// Prepare the SQL update query
-	query := `UPDATE public.product_serial_numbers SET status = $1 WHERE id = $2`
+	q1 := `DELETE FROM public.product_serial_numbers WHERE id = $1 returning product_id`
+	q2 := `UPDATE public.products SET quantity_purchased = quantity_purchased - 1 WHERE id = $1`
 
 	// Execute updates within the transaction
 	for _, unitsID := range ProductUnitsID {
-		_, err := tx.ExecContext(ctx, query, "purchase-returned", unitsID)
+		var productItemID int
+		err := tx.QueryRowContext(ctx, q1, unitsID).Scan(&productItemID)
 		if err != nil {
 			tx.Rollback() // Rollback on error
-			return id, fmt.Errorf("failed to update record with id %d: %w", unitsID, err)
+			return id, fmt.Errorf("failed to update record in product_serial_numbers table with id %d: %w", unitsID, err)
+		}
+		//update product amount in products table
+		_, err = tx.ExecContext(ctx, q2, productItemID)
+		if err != nil {
+			tx.Rollback() // Rollback on error
+			return id, fmt.Errorf("failed to update record in products table with id %d: %w", unitsID, err)
 		}
 	}
 
-	query = `INSERT INTO public.inventory_transaction_logs (job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
+	query := `INSERT INTO public.inventory_transaction_logs (job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
 			VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id
 		`
 
@@ -2657,6 +2715,7 @@ func (p *postgresDBRepo) GetCategoryListReport() ([]*models.Category, error) {
 	}
 	return categories, nil
 }
+
 // GetBrandListReport returns a list of all brands with detailed info from brands table
 func (p *postgresDBRepo) GetBrandListReport() ([]*models.Brand, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -2700,7 +2759,7 @@ func (p *postgresDBRepo) GetProductListReport() ([]*models.Product, error) {
 
 	query := `
 		SELECT 
-			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
+			i.id, i.product_code, i.product_name, i.product_description, i.product_status, i.quantity_purchased, i.quantity_sold, i.category_id, i.brand_id, i.discount, i.created_at, i.updated_at, b.id, b.name, c.id, c.name
 		FROM 
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
@@ -2723,7 +2782,8 @@ func (p *postgresDBRepo) GetProductListReport() ([]*models.Product, error) {
 			&p.ProductName,
 			&p.Description,
 			&p.ProductStatus,
-			&p.Quantity,
+			&p.QuantityPurchased,
+			&p.QuantitySold,
 			&p.CategoryID,
 			&p.BrandID,
 			&p.Discount,
@@ -2767,8 +2827,9 @@ func (p *postgresDBRepo) GetServiceListReport() ([]*models.Service, error) {
 			&p.ServiceCode,
 			&p.ServiceName,
 			&p.Description,
-			&p.MinimumCharge,
+			&p.BaseFee,
 			&p.Discount,
+			&p.TrackRecord,
 			&p.ServiceStatus,
 			&p.CreatedAt,
 			&p.UpdatedAt,

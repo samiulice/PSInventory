@@ -42,17 +42,16 @@ type DatabaseRepo interface {
 	GetProductByID(id int) (models.Product, error)
 	GetActiveProducts() ([]*models.Product, error)
 	GetAvailableProductsByCategoryID(cat_id int) ([]*models.Product, error)
+	GetAllProductsByCategoryID(cat_id int) ([]*models.Product, error)
 	GetAvailableProductsDetails() ([]*models.Product, error)
 
-	GetInstockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
+	GetInStockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
 	GetSoldProductListBySalesIDAndProductID(SalesID, productID int) (*models.Product, error)
-	GetProductItemsListByProductID(productID int) (*models.Product, error)
+	GetInStockProductItemsListByProductID(productID int) (*models.Product, error)
 	GetInStockItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
 	GetSoldItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
 	GetItemDetailsBySerialNumber(serialNumber string) (*models.Product, error)
 	GetProductItemsDetailsBySalesHistoryID(id int) ([]*models.Product, error)
-
-	UpdateProductQuantityByProductID(quantity, productID int) error
 	UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error
 
 	AddProductSerialNumbers(purchase *models.Purchase) error

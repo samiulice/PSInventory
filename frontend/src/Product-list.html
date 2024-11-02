@@ -179,8 +179,9 @@
                   <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li class="sub_menu"><a href="category-list.html">Category List</a></li>
-                    <li class="sub_menu"><a href="product-list.html">Product List</a></li>
                     <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
+                    <li class="sub_menu"><a href="product-list.html">Product List</a></li>
+
                     <li class="sub_menu"><a href="service-list.html">Service List</a></li>
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
                     <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
@@ -351,7 +352,6 @@
               { data: "product_code", title: "ID", className: "product-code" },
               { data: "product_name", title: "Name", className: "product-name" },
               { data: "product_status", title: "Status", className: "product-status" },
-              { data: "quantity", title: "Available Quantity", className: "available-quantity" },
               { data: "category_id", title: "Category", className: "category-name" },
               { data: "brand_id", title: "Brand", className: "brand-name" },
               { data: "created_at", title: "First Release", className: "created-at" },
@@ -429,7 +429,6 @@
               <td>${p.product_code || "-"}</td>
               <td>${p.product_name || "-"}</td>
               <td>${p.product_status || "-"}</td>
-              <td>${p.quantity || "0"}</td>
               <td>${p.category_id || "-"}</td>
               <td>${p.brand_id || "-"}</td>
               <td>${formatDate(p.created_at, "date", "-") || "-"}</td>
@@ -562,7 +561,6 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>Status</th>
-                <th>Avail. Qty</th>
                 <th>Category</th>
                 <th>Brand</th>
                 <th>First Release</th>

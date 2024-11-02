@@ -153,20 +153,22 @@ type HeadAccount struct {
 
 // Product is the type for products
 type Product struct {
-	ID              int                `json:"id"`
-	ProductCode     string             `json:"product_code"`
-	ProductName     string             `json:"product_name"`
-	Description     string             `json:"product_description"`
-	ProductStatus   bool               `json:"product_status"`
-	Quantity        int                `json:"quantity"`
-	CategoryID      int                `json:"category_id"`
-	BrandID         int                `json:"brand_id"`
-	Discount        int                `json:"discount"`
-	CreatedAt       time.Time          `json:"created_at"`
-	UpdatedAt       time.Time          `json:"updated_at"`
-	Category        Category           `json:"category"`
-	Brand           Brand              `json:"brand"`
-	ProductMetadata []*ProductMetadata `json:"product_metadata"`
+	ID                int                `json:"id"`
+	ProductCode       string             `json:"product_code"`
+	ProductName       string             `json:"product_name"`
+	Description       string             `json:"product_description"`
+	ProductStatus     bool               `json:"product_status"`
+	QuantityPurchased int                `json:"quantity_purchased"`
+	QuantitySold      int                `json:"quantity_sold"`
+	QuantityInStock   int                `json:"quantity_in_stock"`
+	CategoryID        int                `json:"category_id"`
+	BrandID           int                `json:"brand_id"`
+	Discount          int                `json:"discount"`
+	CreatedAt         time.Time          `json:"created_at"`
+	UpdatedAt         time.Time          `json:"updated_at"`
+	Category          Category           `json:"category"`
+	Brand             Brand              `json:"brand"`
+	ProductMetadata   []*ProductMetadata `json:"product_metadata"`
 }
 
 // ProductShortInfo stores short information about product
@@ -294,9 +296,10 @@ type Service struct {
 	ID            int       `json:"id"`
 	ServiceCode   string    `json:"service_code"`
 	ServiceName   string    `json:"service_name"`
-	Description   string    `json:"description"`
-	ServiceStatus string    `json:"status"`
-	MinimumCharge int       `json:"min_charge"`
+	Description   string    `json:"service_description"`
+	ServiceStatus string    `json:"service_status"`
+	BaseFee       int       `json:"base_fee"`
+	TrackRecord   int       `json:"track_record"`
 	Discount      int       `json:"discount"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`

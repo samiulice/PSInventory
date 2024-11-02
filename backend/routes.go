@@ -73,11 +73,13 @@ func (app *application) routes() http.Handler {
 		//accounts
 		mux.Post("/accounts/receive-collection/get-page-details", app.GetReceiveCollectionPageDetails)
 
+		mux.NotFound(app.PathNotFound)
 		//.......................Inventory Reports.......................
 		mux.Post("/reports/inventory/category-list", app.GetCategoryListReport)
 		mux.Post("/reports/inventory/brand-list", app.GetBrandListReport)
 		mux.Post("/reports/inventory/product-list", app.GetProductListReport)
 		mux.Post("/reports/inventory/service-list", app.GetServiceListReport)
+		mux.Post("/reports/inventory/stock-report", app.GetProductListReport)
 		// Category List
 		// Product List
 		// Service List

@@ -18,6 +18,11 @@ type JSONResponse struct {
 	Result  interface{} `json:"result,omitempty"`
 }
 
+func(app *application) PathNotFound(w http.ResponseWriter, r *http.Request){
+	// Serve the custom 404 HTML page
+	http.ServeFile(w, r, "frontend/src/404.html")
+}
+
 // .....................HR Management Panel Handlers......................
 // GetEmployeeList return list of employees to the corresponded category in JSON format
 func (app *application) GetEmployees(w http.ResponseWriter, r *http.Request) {
@@ -493,7 +498,7 @@ func (app *application) FetchPurchaseMemoProductItems(w http.ResponseWriter, r *
 	//retrieve all product-serial of each product_id && purchase_id
 	var products []*models.Product
 	for _, v := range purchaseHistory {
-		product, err := app.DB.GetInstockProductListByPurchaseIDAndProductID(v.ID, v.Product.ID)
+		product, err := app.DB.GetInStockProductListByPurchaseIDAndProductID(v.ID, v.Product.ID)
 		if err != nil {
 			app.badRequest(w, fmt.Errorf("ErrorProducts:: %v", err))
 		}
@@ -566,7 +571,7 @@ func (app *application) FetchProductItemsByProductID(w http.ResponseWriter, r *h
 		return
 	}
 	//get purchase history associated with memo_no
-	productItems, err := app.DB.GetProductItemsListByProductID(payload.ProductID)
+	productItems, err := app.DB.GetInStockProductItemsListByProductID(payload.ProductID)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ErrorPurchaseHistory:: %v", err))
 	}
@@ -747,7 +752,7 @@ func (app *application) GetMemoListBySupplierID(w http.ResponseWriter, r *http.R
 
 	//TODO: Retrieve accounts and send to frontend
 	resp.Error = false
-	resp.Message = "data Succesfully fetched"
+	resp.Message = "data Successfully fetched"
 	resp.Purchase = purchase
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -1275,7 +1280,7 @@ func (app *application) GetCategoryListReport(w http.ResponseWriter, r *http.Req
 	}
 
 	resp.Error = false
-	resp.Message = "Data fatched successfully"
+	resp.Message = "Data fetched successfully"
 	resp.Categories = categories
 
 	app.writeJSON(w, http.StatusOK, resp)
@@ -1295,7 +1300,7 @@ func (app *application) GetBrandListReport(w http.ResponseWriter, r *http.Reques
 	}
 
 	resp.Error = false
-	resp.Message = "Data fatched successfully"
+	resp.Message = "Data fetched successfully"
 	resp.Brands = brands
 
 	app.writeJSON(w, http.StatusOK, resp)
@@ -1316,7 +1321,7 @@ func (app *application) GetProductListReport(w http.ResponseWriter, r *http.Requ
 	}
 
 	resp.Error = false
-	resp.Message = "Data fatched successfully"
+	resp.Message = "Data fetched successfully"
 	resp.Products = products
 
 	app.writeJSON(w, http.StatusOK, resp)
@@ -1326,7 +1331,7 @@ func (app *application) GetProductListReport(w http.ResponseWriter, r *http.Requ
 func (app *application) GetServiceListReport(w http.ResponseWriter, r *http.Request) {
 	services, err := app.DB.GetServiceListReport()
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR:GetservicesList: %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR:GetServicesList: %w", err))
 		return
 	}
 
@@ -1337,7 +1342,7 @@ func (app *application) GetServiceListReport(w http.ResponseWriter, r *http.Requ
 	}
 
 	resp.Error = false
-	resp.Message = "Data fatched successfully"
+	resp.Message = "Data fetched successfully"
 	resp.Services = services
 
 	app.writeJSON(w, http.StatusOK, resp)
