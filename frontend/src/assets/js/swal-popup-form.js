@@ -1,5 +1,5 @@
 //addNewBrand show a popup form and then make an api call to insert brand data to the database table
-function addNewBrand(page) {
+function addNewBrand(page, brand) {
     Swal.fire({
       title: 'Add New Brand',
       width: 600,
@@ -106,9 +106,10 @@ function addNewBrand(page) {
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+              brand.push(data.result)
               if (page === "purchase") {
                 document.getElementById("brand").innerHTML = '';
-                document.getElementById("brand").innerHTML = `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
+                document.getElementById("brand").innerHTML = `<option value="${brand.length-1}" selected>${data.result.name}</option>`;;
                 document.getElementById("brand").disabled = true;
               }
             }
@@ -274,13 +275,13 @@ function addNewBrand(page) {
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
-  
+              products.push(data.result)
               if (page === "purchase") {
                 document.getElementById("category").innerHTML = '';
                 document.getElementById("category").innerHTML = `<option value="${product.category_id}" selected>${categoryName}</option>`;
                 document.getElementById("category").disabled = true;
                 document.getElementById("product").innerHTML = '';
-                document.getElementById("product").innerHTML = `<option value="${data.result.id}" selected>${data.result.product_name}</option>`;
+                document.getElementById("product").innerHTML = `<option value="${products.length-1}" selected>${data.result.product_name}</option>`;
                 document.getElementById("product").disabled = true;
                 products.push(data.result);
               }
@@ -396,14 +397,12 @@ function addNewBrand(page) {
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
+              categories.push(data.result);
               showSuccessMessage(data.message);
               if (page === "purchase") {
                 document.getElementById("category").innerHTML = '';
-                document.getElementById("category").innerHTML = `<option value="${data.result.id}" selected>${data.result.name}</option>`;;
+                document.getElementById("category").innerHTML = `<option value="${categories.length-1}" selected>${data.result.name}</option>`;;
                 document.getElementById("category").disabled = true;
-                if (categories) {
-                  categories.push(data.result);
-                }
               }
             }
           });
@@ -411,7 +410,7 @@ function addNewBrand(page) {
     });
   }
   //addNewCustomer show a popup form and then make an api call to insert customer data to the database table
-  function addNewCustomer(page) {
+  function addNewCustomer(page, customers) {
     Swal.fire({
       title: 'Add Customer',
       width: 400,
@@ -627,19 +626,19 @@ function addNewBrand(page) {
         fetch('http://localhost:4321/api/mis/add-customer', requestOptions)
           .then(response => response.json())
           .then(data => {
-            if (page === "") {
-              setTimeout(function () {
-                location.reload();
-              }, 3000); // Adjust the delay as needed 
-            }
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+              customers.push(data.result)
               if (page === "sale") {
                 document.getElementById("customer").innerHTML = '';
-                document.getElementById("customer").innerHTML = `<option value="${data.result.id}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
+                document.getElementById("customer").innerHTML = `<option value="${customers.length-1}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
                 document.getElementById("customer").disabled = true;
+              } else {
+                setTimeout(function () {
+                  location.reload();
+                }, 3000); // Adjust the delay as needed 
               }
             }
           });
@@ -647,7 +646,7 @@ function addNewBrand(page) {
     });
   }
   //addNewEmployee show a popup form and then make an api call to insert employee data to the database table
-  function addNewEmployee(page) {
+  function addNewEmployee(page, employees) {
     Swal.fire({
       title: 'Add Employee',
       width: 400,
@@ -871,6 +870,7 @@ function addNewBrand(page) {
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
+              employees.push(data.result)
               showSuccessMessage(data.message);
             }
           });
@@ -878,7 +878,7 @@ function addNewBrand(page) {
     });
   }
   //addNewSupplier show a popup form and then make an api call to insert supplier data to the database table
-  function addNewSupplier(page) {
+  function addNewSupplier(page, suppliers) {
     Swal.fire({
       title: 'Add Supplier',
       width: 400,
@@ -1085,19 +1085,21 @@ function addNewBrand(page) {
         fetch('http://localhost:4321/api/mis/add-supplier', requestOptions)
           .then(response => response.json())
           .then(data => {
-            if (page === "") {
-              setTimeout(function () {
-                location.reload();
-              }, 3000); // Adjust the delay as needed 
-            }
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
+              console.log("PopUp:",data.result)
+              suppliers.push(data.result)
+              console.log("PopUp:",suppliers)
               showSuccessMessage(data.message);
               if (page === "purchase") {
                 document.getElementById("supplier").innerHTML = '';
-                document.getElementById("supplier").innerHTML = `<option value="${data.result.id}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
+                document.getElementById("supplier").innerHTML = `<option value="${suppliers.length-1}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
                 document.getElementById("supplier").disabled = true;
+              } else{
+                setTimeout(function () {
+                  location.reload();
+                }, 3000); // Adjust the delay as needed 
               }
             }
           });

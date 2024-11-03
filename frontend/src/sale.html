@@ -569,7 +569,7 @@
             });
             // show popup form for adding new customer
             createCustomerBtn.addEventListener("click", e => {
-              addNewCustomer("sale");
+              addNewCustomer("sale", customers);
             });
 
             //fetch in-stock products list for specific product id under a specific category
@@ -978,7 +978,7 @@
           serial_numbers: sn,
           mrp: parseInt(row.cells[6].innerText),
           warranty: parseInt(document.getElementById('product-warranty-' + row.cells[0].innerText).innerText),
-          sub_total: parseInt(row.cells[7].innerText)
+          sub_total: Math.round(parseInt(row.cells[7].innerText)*(1-parseInt(document.getElementById("discount").value)/100.00))
         }
         selectedProducts.push(item)
       });

@@ -18,7 +18,7 @@ type JSONResponse struct {
 	Result  interface{} `json:"result,omitempty"`
 }
 
-func(app *application) PathNotFound(w http.ResponseWriter, r *http.Request){
+func (app *application) PathNotFound(w http.ResponseWriter, r *http.Request) {
 	// Serve the custom 404 HTML page
 	http.ServeFile(w, r, "frontend/src/404.html")
 }
@@ -70,6 +70,7 @@ func (app *application) GetEmployees(w http.ResponseWriter, r *http.Request) {
 		app.writeJSON(w, http.StatusOK, Resp)
 	}
 }
+
 // GetAllEmployees returns list of all employees info from the database
 func (app *application) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
 	var Resp struct {
@@ -93,6 +94,7 @@ func (app *application) GetAllEmployees(w http.ResponseWriter, r *http.Request) 
 	Resp.Employees = employees
 	app.writeJSON(w, http.StatusOK, Resp)
 }
+
 // AddEmployee add new employee info to the database
 func (app *application) AddEmployee(w http.ResponseWriter, r *http.Request) {
 	var employee models.Employee
@@ -255,7 +257,7 @@ func (app *application) AddSupplier(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	supplier.AccountStatus = true
-	_, err = app.DB.AddSupplier(supplier)
+	id, err := app.DB.AddSupplier(supplier)
 
 	if err != nil {
 		resp = JSONResponse{
@@ -266,6 +268,7 @@ func (app *application) AddSupplier(w http.ResponseWriter, r *http.Request) {
 		app.writeJSON(w, http.StatusInternalServerError, resp)
 		return
 	}
+	supplier.ID = id
 	resp = JSONResponse{
 		Error:   false,
 		Message: "Supplier added successfully",
@@ -321,9 +324,10 @@ func (app *application) GetSuppliers(w http.ResponseWriter, r *http.Request) {
 		app.writeJSON(w, http.StatusOK, Resp)
 	}
 }
+
 // GetSuppliers returns list of suppliers to the corresponded category in JSON format
 func (app *application) GetAllSuppliers(w http.ResponseWriter, r *http.Request) {
-	
+
 	var Resp struct {
 		Error     bool               `json:"error,omitempty"`
 		Message   string             `json:"message,omitempty"`
@@ -796,6 +800,7 @@ func (app *application) GetMemoListByCustomerID(w http.ResponseWriter, r *http.R
 func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.Request) {
 	var ReturnProductsInfo struct {
 		JobID          string `json:"job_id"`
+		PurchaseHistory   models.Purchase `json:"purchase_history"`
 		ReturnedDate   string `json:"returned_date"`
 		SupplierID     int    `json:"supplier_id"`
 		ProductUnitsID []int  `json:"product_units_id"`
@@ -809,7 +814,7 @@ func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.
 		return
 	}
 	//Update product_serial_numbers
-	id, err := app.DB.ReturnProductUnitsToSupplier(ReturnProductsInfo.JobID, ReturnProductsInfo.ReturnedDate, ReturnProductsInfo.ProductUnitsID, ReturnProductsInfo.TotalUnits, ReturnProductsInfo.TotalPrices)
+	id, err := app.DB.ReturnProductUnitsToSupplier(ReturnProductsInfo.PurchaseHistory, ReturnProductsInfo.JobID, ReturnProductsInfo.ReturnedDate, ReturnProductsInfo.ProductUnitsID, ReturnProductsInfo.TotalUnits, ReturnProductsInfo.TotalPrices)
 	var resp struct {
 		Error   bool   `json:"error,omitempty"`
 		Message string `json:"message,omitempty"`
@@ -1285,6 +1290,7 @@ func (app *application) GetCategoryListReport(w http.ResponseWriter, r *http.Req
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
 // GetBrandListReport retrieves the brand list
 func (app *application) GetBrandListReport(w http.ResponseWriter, r *http.Request) {
 	brands, err := app.DB.GetBrandListReport()
@@ -1294,9 +1300,9 @@ func (app *application) GetBrandListReport(w http.ResponseWriter, r *http.Reques
 	}
 
 	var resp struct {
-		Error      bool               `json:"error"`
-		Message    string             `json:"message"`
-		Brands []*models.Brand `json:"brands"`
+		Error   bool            `json:"error"`
+		Message string          `json:"message"`
+		Brands  []*models.Brand `json:"brands"`
 	}
 
 	resp.Error = false

@@ -432,6 +432,7 @@
                               `
               } else {
                 product_data = data;
+                purchase_data = data.purchase_history;
                 console.log(product_data);
                 //Update selected product counter and price to zero for each memo
                 totalUnits = 0;
@@ -516,6 +517,7 @@
           });
           let returned_products_details = {
             job_id: `PR-${memoID}`,
+            purchase_history: purchase_data[0],
             returned_date: single_cal4.value,
             product_units_id: returnedProducts,
             total_units: totalUnits,
@@ -578,9 +580,6 @@
         let productMetaData = product_data.product[id].product_metadata;
         if (productMetaData) {
           if (btn.innerHTML.includes("Deselect")) {
-            btn.classList.remove("btn-danger");
-            btn.classList.add("btn-success");
-            btn.innerHTML = `<i class="fa fa-check"></i>&nbsp;&nbsp;Select All`;
             productMetaData.forEach(pm => {
               let elem = document.getElementById(`${pm.serial_number}`);
               if (elem.checked) {
@@ -590,13 +589,10 @@
                 totalPrices -= pm.purchase_rate;
               }
             })
+            btn.classList.remove("btn-danger");
+            btn.classList.add("btn-success");
+            btn.innerHTML = `<i class="fa fa-check"></i>&nbsp;&nbsp;Select All`;
           } else {
-            btn.classList.remove("btn-success");
-            btn.classList.add("btn-danger");
-            btn.innerHTML = `<i class="fa fa-close"></i>&nbsp;&nbsp;Deselect All`;
-
-            //total checks
-            c = 0;
             productMetaData.forEach(pm => {
               let elem = document.getElementById(`${pm.serial_number}`);
               if (!elem.checked) {
@@ -606,6 +602,9 @@
                 totalPrices += pm.purchase_rate;
               }
             })
+            btn.classList.remove("btn-success");
+            btn.classList.add("btn-danger");
+            btn.innerHTML = `<i class="fa fa-close"></i>&nbsp;&nbsp;Deselect All`;
           }
           //update counter fields values
           updateTotaUnitsAndPricesFields(totalUnits, totalPrices);

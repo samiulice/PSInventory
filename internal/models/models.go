@@ -159,7 +159,9 @@ type Product struct {
 	Description       string             `json:"product_description"`
 	ProductStatus     bool               `json:"product_status"`
 	QuantityPurchased int                `json:"quantity_purchased"`
+	PurchaseCost      int                `json:"purchase_cost"`
 	QuantitySold      int                `json:"quantity_sold"`
+	SoldPrice         int                `json:"sold_price"`
 	QuantityInStock   int                `json:"quantity_in_stock"`
 	CategoryID        int                `json:"category_id"`
 	BrandID           int                `json:"brand_id"`

@@ -574,6 +574,7 @@
               headAccounts = data.head_accounts
               products = data.products
               suppliers = data.suppliers
+              console.log(suppliers)
               updateSupplierDiv()
               updateCategoryDiv()
               updateAccountsDiv()
@@ -598,15 +599,15 @@
 
               //show popup form for adding new supplier
               createSupplierBtn.addEventListener("click", e => {
-                addNewSupplier("purchase");
+                addNewSupplier("purchase", suppliers);
               });
               //show popup form for adding new product category
               createCategoryBtn.addEventListener("click", e => {
-                addNewCategory("purchase", data.categories);
+                addNewCategory("purchase", categories);
               });
               //show popup form for adding new product type
               createProductBtn.addEventListener("click", e => {
-                addNewProduct("purchase", data.brands, data.categories, data.products);
+                addNewProduct("purchase", brands, categories, products);
               });
 
               quantity.addEventListener("change", e => {
@@ -674,11 +675,11 @@
                   },
                   body: JSON.stringify(purchase_details),
                 }
-
+                console.log("Purchase Payload: ", purchase_details)
                 fetch('http://localhost:4321/api/inventory/restock-product', requestOptions)
                   .then(response => response.json())
                   .then(data => {
-                    console.log("Purchase Data: ", data)
+                    console.log("Purchase Result: ", data)
                     if (data.error === true) {
                       showErrorMessage(data.message)
                     } else {

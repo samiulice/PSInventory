@@ -382,6 +382,7 @@
               fetch('http://localhost:4321/api/reports/inventory/product-list', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
+                  console.log(responseData)
                   reportData = responseData.products;
                   //Format date in the received data
                   responseData.products.forEach(pr => {
@@ -427,18 +428,26 @@
       if (n > 0) {
         for (let i = 0; i < n; i++) {
           const p = reportData[i];
+          let purchase_rate = "-",sale_rate = "-"; 
+          if (p.quantity_purchased != 0){
+            let prate = p.purchase_cost/p.quantity_purchased;
+            purchase_rate = `${prate.toFixed(2)}`
+          }
+          if (p.quantity_sold != 0) {
+            let srate = p.sold_price/p.quantity_sold;
+            sale_rate = `${srate.toFixed(2)}`
+          }
           tBody += `
             <tr>
               <td>${p.product_code || "-"}</td>
               <td>${p.product_name || "-"}</td>
-              <td>${p.product_status || "-"}</td>
               <td>${p.quantity_in_stock}</td>
               <td>${p.quantity_purchased}</td>
-              <td>Purchase Rate</td>
-              <td>Total Purchase Cost</td>
+              <td>${purchase_rate}</td>
+              <td>${p.purchase_cost}</td>
               <td>${p.quantity_sold}</td>
-              <td>Sale Rate</td>
-              <td>Total Sale Price</td>
+              <td>${sale_rate}</td>
+              <td>${p.sold_price}</td>
             </tr>
           `;
         }
@@ -566,7 +575,7 @@
               <tr>
                 <th>Code</th>
                 <th>Name</th>
-                <th>Available Qty</th>
+                <th>Stock</th>
                 <th>Purchase Qty</th>
                 <th>Purchase Rate</th>
                 <th>Total Purchase Cost</th>

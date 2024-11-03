@@ -37,7 +37,7 @@ type DatabaseRepo interface {
 	GetCategoryList() ([]*models.Category, error)
 	GetActiveCategoryList() ([]*models.Category, error)
 	AddProduct(i models.Product) (int, error)
-	ReturnProductUnitsToSupplier(JobID string, transactionDate string, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error)
+	ReturnProductUnitsToSupplier(PurchaseHistory models.Purchase, JobID string, transactionDate string, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error)
 	GetProductList() ([]*models.Product, error)
 	GetProductByID(id int) (models.Product, error)
 	GetActiveProducts() ([]*models.Product, error)
