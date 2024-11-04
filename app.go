@@ -38,7 +38,6 @@ func (a *App) startup(ctx context.Context) {
 	if err != nil {
 		return
 	}
-
 }
 
 // domReady is called after front-end resources have been loaded
