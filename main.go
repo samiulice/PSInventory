@@ -1,7 +1,6 @@
 package main
 
 import (
-	"PSInventory/internal/license"
 	"embed"
 	"fmt"
 
@@ -14,6 +13,7 @@ import (
 var assets embed.FS
 
 func main() {
+	var err error
 	// motherboardSerial, err := license.GetMotherboardSerial()
 	// if err != nil || motherboardSerial != "07D2212_L91D104769" {
 	// 	fmt.Println("Invalid Motherboard Serial")

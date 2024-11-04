@@ -545,6 +545,7 @@
             console.log(data);
             //Set memo no(MM-RandomSixDigit)
             document.getElementById("memo_no").value = `MM-SL-${generateRandomAlphanumericCode(6)}`;
+            document.getElementById("memo_no").disabled = true;
             updateCustomerDiv(data.customers)
             updateCategoryDiv(data.categories)
             updateAccountsDiv(data.head_accounts)

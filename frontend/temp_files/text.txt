@@ -1,0 +1,35 @@
+Type Of accounts:
+....................
+Cash & Bank Accounts
+Expense Accounts
+Capital Accounts
+Loan Accounts
+Revenue Accounts
+Current Assets
+Fixed Assets
+
+UI in the software:
+....................
+Receive & Collection
+Payment
+Cash Transfer
+Amount Receivable
+Amount Payable
+Expense
+Adjustment
+
+Generated Report from the software:
+Transaction History
+Cash & Bank Statement
+Ledger Book(Summary)
+Ledger Book(Details)
+Expense History
+Gross Profit Report
+Income Statement
+Customer Due Report
+Supplier Due Report
+TOP Sheet
+Trail Balance
+Balance Sheet
+
+

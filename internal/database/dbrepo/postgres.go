@@ -2207,7 +2207,19 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
 	}
 
-	//Tx-2: Insert data to purchase history table
+	//Tx-2: Update total_amount, due_amount(if available) in suppliers table
+	query = `
+		UPDATE Public.suppliers
+		SET total_amount = total_amount + $1, due_amount = due_amount + $2
+		WHERE id = $3
+	`
+	_, err = tx.ExecContext(ctx, query, purchase.TotalAmount, purchase.TotalAmount-purchase.PaidAmount)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Update suppliers):" + err.Error())
+	}
+
+	//Tx-3: Insert data to purchase history table
 	//.........insert the following data into purchase_history table.........
 	// PurchaseDate     string
 	// SupplierID       int
@@ -2244,7 +2256,32 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		return errors.New("SQLErrorRestockProduct(Insert purchase_history):" + err.Error())
 	}
 
-	//Tx-3: store product serial numbers
+	//Tx-4: store financial_transactions
+	var financial_transactions_id int
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
+	VALUES ('Receive & Collection','Account',$1, 'Supplier', $2, $3, $4, $5, $6, $7) RETURNING id
+	`
+	purchaseDate, err := time.Parse("01/02/2006", purchase.PurchaseDate)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(unable to parse time from string):" + err.Error())
+	}
+	purchaseDescription := "cash payment / Bank Transfer"
+	row = tx.QueryRowContext(ctx, query,
+		&purchase.HeadAccount.ID,
+		&purchase.Supplier.ID,
+		&purchase.PaidAmount,
+		&purchase.PurchaseDate,
+		&purchaseDate,
+		&purchaseDescription,
+		time.Now(),
+		time.Now(),
+	)
+	if err = row.Scan(&financial_transactions_id); err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Insert financial_transactions):" + err.Error())
+	}
+	//Tx-5: store product serial numbers
 	//.........insert the following data into product_serial_numbers table............//
 	//ProductID        int
 	// ProductsSerialNo []string
@@ -2401,7 +2438,26 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 		}
 	}
 
-	query := `INSERT INTO public.inventory_transaction_logs (job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
+	//Update total_amount, due_amount(if available) in suppliers table
+	query := `
+		UPDATE Public.suppliers
+		SET total_amount = total_amount - $1, due_amount = due_amount - $2
+		WHERE id = $3
+	`
+	lessDue := 0
+	totalDue := PurchaseHistory.TotalAmount - PurchaseHistory.PaidAmount
+	if TotalPrices == PurchaseHistory.TotalAmount {
+		lessDue = totalDue
+	} else if TotalPrices < PurchaseHistory.TotalAmount {
+		lessDue = PurchaseHistory.TotalAmount - TotalPrices
+	}
+	_, err = tx.ExecContext(ctx, query, TotalPrices)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Update suppliers):" + err.Error())
+	}
+
+	query = `INSERT INTO public.inventory_transaction_logs (job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
 			VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id
 		`
 
