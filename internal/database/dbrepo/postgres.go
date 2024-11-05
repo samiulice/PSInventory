@@ -20,7 +20,7 @@ func (p *postgresDBRepo) AddHeadAccount(ha models.HeadAccount) (int, error) {
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.head_accounts (account_code,account_name,account_status,current_amount,created_at,updated_at) 
+	stmt := `INSERT INTO public.head_accounts (account_code,account_name,account_status,current_balance,created_at,updated_at) 
 				VALUES($1, $2, $3, $4, $5, $6) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
@@ -47,7 +47,7 @@ func (p *postgresDBRepo) GetAvailableHeadAccounts() ([]*models.HeadAccount, erro
 
 	query := `
 		SELECT 
-			id, account_code, account_name, current_amount, created_at, updated_at
+			id, account_code, account_name, current_balance, created_at, updated_at
 		FROM
 			public.head_accounts
 		WHERE 
@@ -1795,79 +1795,6 @@ func (p *postgresDBRepo) GetSalesHistoryByID(id int) (models.Sale, error) {
 	return salesHistory, nil
 }
 
-func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID []int, SaleReturnDate string, ReturnItemsCount int, ReturnAmount int, MemoNo string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	//tx start
-	tx, err := p.DB.BeginTx(ctx, nil)
-	if err != nil {
-		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to begin transaction %w", err)
-	}
-	//step:1 iterate over the SelectedItemsID slice and update the associated row(id) , set status="in stock", updated_at = time.Now()
-	for _, id := range SelectedItemsID {
-		var productItemID, mrp int
-		query := `
-			UPDATE 
-				public.product_serial_numbers
-			SET
-				status='in stock', updated_at=$1
-			WHERE
-				id = $2
-			RETURNING product_id, max_retail_price		
-		`
-		err := tx.QueryRowContext(ctx, query, time.Now(), id).Scan(&productItemID, &mrp)
-		if err != nil {
-			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in product_serial_numbers table SQL %w", err)
-		}
-		query = `
-			UPDATE 
-				public.products
-			SET
-				quantity_sold = quantity_sold - 1, sold_price = sold_price - $1
-			WHERE
-				id = $2		
-		`
-		_, err = tx.ExecContext(ctx, query, int(mrp-mrp*SalesHistory.Discount/100), productItemID)
-		if err != nil {
-			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in products table SQL %w", err)
-		}
-	}
-
-	//step:2 insert sale return data to the sale_return_history
-	//get the last index of sales_return_history Table
-	lastID, err := p.LastIndex("sales_return_history")
-	if err != nil {
-		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to get last index of sales_return_history table:  %w", err)
-	}
-	MemoNo = MemoNo + strconv.FormatInt(lastID+1, 10) //update memo no
-	//return_items_id in string, separated by '-'
-	returnItemsID := strconv.Itoa(SelectedItemsID[0])
-	ln := len(SelectedItemsID)
-	for i := 1; i < ln; i++ {
-		returnItemsID += "-" + strconv.Itoa(SelectedItemsID[i])
-	}
-	query := `
-		INSERT INTO public.sales_return_history(sale_return_date,customer_id ,sales_history_id ,memo_no,returned_product_ids,total_returned_count,total_returned_amount, created_at, updated_at)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
-	`
-	result, err := tx.ExecContext(ctx, query, SaleReturnDate, SalesHistory.CustomerID, SalesHistory.ID, MemoNo, returnItemsID, ReturnItemsCount, ReturnAmount, time.Now(), time.Now())
-	if err != nil {
-		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE SQL %w", err)
-	}
-	if n, err := result.RowsAffected(); err != nil || n != 1 {
-		return fmt.Errorf("DBERROR:=>SaleReturnDB: Number of affected row is not equal to 1:  %w", err)
-	}
-
-	//tx commit
-	err = tx.Commit()
-
-	if err != nil {
-		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to commit transaction:  %w", err)
-	}
-	return nil
-}
-
 // GetInStockProductListByPurchaseIDAndProductID returns products list associated with purchaseID and ProductID
 func (p *postgresDBRepo) GetInStockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -2213,7 +2140,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		SET total_amount = total_amount + $1, due_amount = due_amount + $2
 		WHERE id = $3
 	`
-	_, err = tx.ExecContext(ctx, query, purchase.TotalAmount, purchase.TotalAmount-purchase.PaidAmount)
+	_, err = tx.ExecContext(ctx, query, purchase.TotalAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.Supplier.ID)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Update suppliers):" + err.Error())
@@ -2259,7 +2186,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	//Tx-4: store financial_transactions
 	var financial_transactions_id int
 	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
-	VALUES ('Receive & Collection','Account',$1, 'Supplier', $2, $3, $4, $5, $6, $7) RETURNING id
+	VALUES ('Payment','Account',$1, 'Supplier', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
 	`
 	purchaseDate, err := time.Parse("01/02/2006", purchase.PurchaseDate)
 	if err != nil {
@@ -2271,7 +2198,6 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		&purchase.HeadAccount.ID,
 		&purchase.Supplier.ID,
 		&purchase.PaidAmount,
-		&purchase.PurchaseDate,
 		&purchaseDate,
 		&purchaseDescription,
 		time.Now(),
@@ -2362,6 +2288,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 	}
 
 	totalQuantity := 0
+	totalPrice := 0
 	//loop over the SelectedProduct array
 	for i, items := range sale.ProductItems {
 		//Step-2: Update product quantity
@@ -2376,6 +2303,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 			return fmt.Errorf("SQLErrorSaleProducts(Update Product Quantity):#%d --%w", i, err)
 		}
 		totalQuantity += items.Quantity
+		totalPrice += items.SubTotal
 		//Step-3: update product items status and sales_history_id
 		for _, serialNumber := range items.SerialNumbers {
 			query = `
@@ -2392,6 +2320,18 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		//
 	}
 
+	//Tx-2: Update total_amount, due_amount(if available) in suppliers table
+	query = `
+		UPDATE Public.customers
+		SET total_amount = total_amount + $1, due_amount = due_amount + $2
+		WHERE id = $3
+	`
+	_, err = tx.ExecContext(ctx, query, sale.TotalAmount, sale.TotalAmount-sale.PaidAmount, sale.CustomerInfo.ID)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleProducts(Update cutomers):" + err.Error())
+	}
+
 	//Tx-3 insert summary about the sales in the inventory_transaction_logs table
 	var inv_tx_log_id int
 	query = `INSERT INTO public.inventory_transaction_logs(job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
@@ -2401,6 +2341,32 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		tx.Rollback()
 		return fmt.Errorf("SQLErrorSaleProducts(INSERT inventory_transaction_logs: %w", err)
 	}
+
+	//Tx-4: store financial_transactions
+	var financial_transactions_id int
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
+	VALUES ('Receive & Collection','Customer',$1, 'Account', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	`
+	saleDate, err := time.Parse("01/02/2006", sale.SaleDate)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleProducts(unable to parse time from string):" + err.Error())
+	}
+	description := "cash Sale / Bank Transfer"
+	row = tx.QueryRowContext(ctx, query,
+		&sale.CustomerInfo.ID,
+		&sale.HeadAccountInfo.ID,
+		&sale.PaidAmount,
+		&saleDate,
+		&description,
+		time.Now(),
+		time.Now(),
+	)
+	if err = row.Scan(&financial_transactions_id); err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleProducts(Insert financial_transactions):" + err.Error())
+	}
+
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
 		return errors.New("SQLErrorSaleProducts(Commit):" + err.Error())
@@ -2446,17 +2412,38 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	`
 	lessDue := 0
 	totalDue := PurchaseHistory.TotalAmount - PurchaseHistory.PaidAmount
-	if TotalPrices == PurchaseHistory.TotalAmount {
+	if totalDue <= TotalPrices {
 		lessDue = totalDue
-	} else if TotalPrices < PurchaseHistory.TotalAmount {
-		lessDue = PurchaseHistory.TotalAmount - TotalPrices
+	} else {
+		lessDue = TotalPrices
 	}
-	_, err = tx.ExecContext(ctx, query, TotalPrices)
+	_, err = tx.ExecContext(ctx, query, TotalPrices, lessDue, PurchaseHistory.Supplier.ID)
 	if err != nil {
 		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Update suppliers):" + err.Error())
+		return id, fmt.Errorf("SQLErrorRestockProduct(Update suppliers): %w", err)
 	}
 
+	//Insert Financial transaction
+	var financial_transactions_id int
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
+	VALUES ('Cash Transfer','Supplier',$1, 'Account', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	`
+	description := "cash return due to returning product to the supplier"
+	err = tx.QueryRowContext(ctx, query,
+		&PurchaseHistory.Supplier.ID,
+		&PurchaseHistory.HeadAccount.ID,
+		&TotalPrices,
+		time.Now(),
+		&description,
+		time.Now(),
+		time.Now(),
+	).Scan(&financial_transactions_id)
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("SQLErrorRestockProduct(Insert financial_transactions): %w", err)
+	}
+
+	//Insert inventory transaction logs
 	query = `INSERT INTO public.inventory_transaction_logs (job_id, transaction_type, quantity, price, transaction_date, created_at, updated_at)
 			VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id
 		`
@@ -2481,6 +2468,118 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	}
 
 	return id, nil
+}
+
+func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID []int, SaleReturnDate string, ReturnItemsCount int, ReturnAmount int, MemoNo string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//tx start
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to begin transaction %w", err)
+	}
+	//step:1 iterate over the SelectedItemsID slice and update the associated row(id) , set status="in stock", updated_at = time.Now()
+	for _, id := range SelectedItemsID {
+		var productItemID, mrp int
+		query := `
+			UPDATE 
+				public.product_serial_numbers
+			SET
+				status='in stock', updated_at=$1
+			WHERE
+				id = $2
+			RETURNING product_id, max_retail_price		
+		`
+		err := tx.QueryRowContext(ctx, query, time.Now(), id).Scan(&productItemID, &mrp)
+		if err != nil {
+			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in product_serial_numbers table SQL %w", err)
+		}
+		query = `
+			UPDATE 
+				public.products
+			SET
+				quantity_sold = quantity_sold - 1, sold_price = sold_price - $1
+			WHERE
+				id = $2		
+		`
+		_, err = tx.ExecContext(ctx, query, int(mrp-mrp*SalesHistory.Discount/100), productItemID)
+		if err != nil {
+			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in products table SQL %w", err)
+		}
+	}
+
+	//step:2 insert sale return data to the sale_return_history
+	//get the last index of sales_return_history Table
+	lastID, err := p.LastIndex("sales_return_history")
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to get last index of sales_return_history table:  %w", err)
+	}
+	MemoNo = MemoNo + strconv.FormatInt(lastID+1, 10) //update memo no
+	//return_items_id in string, separated by '-'
+	returnItemsID := strconv.Itoa(SelectedItemsID[0])
+	ln := len(SelectedItemsID)
+	for i := 1; i < ln; i++ {
+		returnItemsID += "-" + strconv.Itoa(SelectedItemsID[i])
+	}
+	query := `
+		INSERT INTO public.sales_return_history(sale_return_date,customer_id ,sales_history_id ,memo_no,returned_product_ids,total_returned_count,total_returned_amount, created_at, updated_at)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	`
+	result, err := tx.ExecContext(ctx, query, SaleReturnDate, SalesHistory.CustomerID, SalesHistory.ID, MemoNo, returnItemsID, ReturnItemsCount, ReturnAmount, time.Now(), time.Now())
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE SQL %w", err)
+	}
+	if n, err := result.RowsAffected(); err != nil || n != 1 {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Number of affected row is not equal to 1:  %w", err)
+	}
+
+	//Update total_amount, due_amount(if available) in suppliers table
+	query = `
+		UPDATE Public.customers
+		SET total_amount = total_amount - $1, due_amount = due_amount - $2
+		WHERE id = $3
+	`
+	lessDue := 0
+	totalDue := SalesHistory.TotalAmount - SalesHistory.PaidAmount
+	if totalDue <= ReturnAmount {
+		lessDue = totalDue
+	} else {
+		lessDue = ReturnAmount
+	}
+	_, err = tx.ExecContext(ctx, query, ReturnAmount, lessDue, SalesHistory.CustomerID)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("SQLErrorSaleReturnDB(Update customer): %w", err)
+	}
+
+	//Insert Financial transaction
+	var financial_transactions_id int
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
+	VALUES ('Cash Transfer','Account',$1, 'Customer', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	`
+	description := "cash return due to returning product from the customer"
+	err = tx.QueryRowContext(ctx, query,
+		&SalesHistory.AccountID,
+		&SalesHistory.CustomerID,
+		&ReturnAmount,
+		time.Now(),
+		&description,
+		time.Now(),
+		time.Now(),
+	).Scan(&financial_transactions_id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("SQLErrorSaleReturn(Insert financial_transactions): %w", err)
+	}
+
+	//tx commit
+	err = tx.Commit()
+
+	if err != nil {
+		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to commit transaction:  %w", err)
+	}
+	return nil
 }
 
 // GetWarrantyList retrieves a slice of warranty history from warranty_history_table
