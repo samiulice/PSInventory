@@ -75,69 +75,66 @@ type Employee struct {
 	// Gender                string         `json:"gender"`
 	// DateOfBith            time.Time      `json:"date_of_birth"`
 	// Experties        string         `json:"exparties"`
-	Division         string    `json:"division"`
-	District         string    `json:"district"`
-	Upazila          string    `json:"upazila"`
-	Area             string    `json:"area"`
-	Mobile           string    `json:"mobile"`
-	AmountPayable    int       `json:"amount_payable"`
-	AmountReceivable int       `json:"amount_receivable"`
-	WhatsappAccount  string    `json:"whatsapp_account"`
-	Email            string    `json:"email"`
-	ImageLink        string    `json:"image_link"`     //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
-	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
-	MonthlySalary    int       `json:"monthly_salary"`
-	OpeningBalance   int       `json:"opening_balance"`
-	CVLink           string    `json:"cv_link"`
-	NIDLink          string    `json:"nid_link"`
-	JoiningDate      time.Time `json:"joining_date"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	Division        string    `json:"division"`
+	District        string    `json:"district"`
+	Upazila         string    `json:"upazila"`
+	Area            string    `json:"area"`
+	Mobile          string    `json:"mobile"`
+	DueAmount       int       `json:"due_amount"`
+	WhatsappAccount string    `json:"whatsapp_account"`
+	Email           string    `json:"email"`
+	ImageLink       string    `json:"image_link"`     //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	AccountStatus   bool      `json:"account_status"` //Active = true, Inactive = false
+	MonthlySalary   int       `json:"monthly_salary"`
+	OpeningBalance  int       `json:"opening_balance"`
+	CVLink          string    `json:"cv_link"`
+	NIDLink         string    `json:"nid_link"`
+	JoiningDate     time.Time `json:"joining_date"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
 
 // Customer is the type for customers
 type Customer struct {
-	ID               int       `json:"id"`
-	AccountCode      string    `json:"account_code"`
-	AccountName      string    `json:"account_name"`
-	ContactPerson    string    `json:"contact_person"`
-	Division         string    `json:"division"`
-	District         string    `json:"district"`
-	Upazila          string    `json:"upazila"`
-	Area             string    `json:"area"`
-	Mobile           string    `json:"mobile"`
-	AmountPayable    int       `json:"amount_payable"`
-	AmountReceivable int       `json:"amount_receivable"`
-	Email            string    `json:"email"`
-	WhatsappAccount  string    `json:"whatsapp_account"`
-	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
-	Discount         int       `json:"discount"`
-	OpeningBalance   int       `json:"opening_balance"`
-	JoiningDate      time.Time `json:"joining_date"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	ID              int       `json:"id"`
+	AccountCode     string    `json:"account_code"`
+	AccountName     string    `json:"account_name"`
+	ContactPerson   string    `json:"contact_person"`
+	Division        string    `json:"division"`
+	District        string    `json:"district"`
+	Upazila         string    `json:"upazila"`
+	Area            string    `json:"area"`
+	Mobile          string    `json:"mobile"`
+	DueAmount       int       `json:"due_amount"`
+	Email           string    `json:"email"`
+	WhatsappAccount string    `json:"whatsapp_account"`
+	AccountStatus   bool      `json:"account_status"` //Active = true, Inactive = false
+	Discount        int       `json:"discount"`
+	OpeningBalance  int       `json:"opening_balance"`
+	JoiningDate     time.Time `json:"joining_date"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
 
 // Supplier is the type for suppliers
 type Supplier struct {
-	ID               int       `json:"id"`
-	AccountCode      string    `json:"account_code"`
-	AccountName      string    `json:"account_name"`
-	ContactPerson    string    `json:"contact_person"`
-	Division         string    `json:"division"`
-	District         string    `json:"district"`
-	Upazila          string    `json:"upazila"`
-	Area             string    `json:"area"`
-	Mobile           string    `json:"mobile"`
-	AmountPayable    int       `json:"amount_payable"`
-	AmountReceivable int       `json:"amount_receivable"`
-	Email            string    `json:"email"`
-	WhatsappAccount  string    `json:"whatsapp_account"`
-	AccountStatus    bool      `json:"account_status"` //Active = true, Inactive = false
-	Discount         int       `json:"discount"`
-	JoiningDate      time.Time `json:"joining_date"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	ID              int       `json:"id"`
+	AccountCode     string    `json:"account_code"`
+	AccountName     string    `json:"account_name"`
+	ContactPerson   string    `json:"contact_person"`
+	Division        string    `json:"division"`
+	District        string    `json:"district"`
+	Upazila         string    `json:"upazila"`
+	Area            string    `json:"area"`
+	Mobile          string    `json:"mobile"`
+	DueAmount       int       `json:"due_amount"`
+	Email           string    `json:"email"`
+	WhatsappAccount string    `json:"whatsapp_account"`
+	AccountStatus   bool      `json:"account_status"` //Active = true, Inactive = false
+	Discount        int       `json:"discount"`
+	JoiningDate     time.Time `json:"joining_date"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
 
 // HeadAccount is the type for HeadAccount
@@ -145,7 +142,8 @@ type HeadAccount struct {
 	ID            int       `json:"id"`
 	AccountCode   string    `json:"account_code"`
 	AccountName   string    `json:"account_name"`
-	AccoutnStatus bool      `json:"account_status"`
+	AccountType   string    `json:"account_type"`
+	AccountStatus bool      `json:"account_status"`
 	CurrentAmount int       `json:"current_amount"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
@@ -305,4 +303,16 @@ type Service struct {
 	Discount      int       `json:"discount"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+// ReceptionSummary is the definition for Receive & Collection form
+type ReceptionSummary struct {
+	VoucherNo          string       `json:"voucher_no"`
+	ReceivedDate       string       `json:"received_date"`
+	ReceivedAmount     int          `json:"received_amount"`
+	SourceAccount      *Customer    `json:"source_account"`
+	DestinationAccount *HeadAccount `json:"destination_account"`
+	ChequeNo           string       `json:"cheque_no"`
+	Carrier            string       `json:"carrier_info"`
+	Description        string       `json:"description"`
 }

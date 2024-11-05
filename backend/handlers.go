@@ -799,13 +799,13 @@ func (app *application) GetMemoListByCustomerID(w http.ResponseWriter, r *http.R
 // ReturnProductsToSupplier read json and update product items state from purchase to purchase-return
 func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.Request) {
 	var ReturnProductsInfo struct {
-		JobID          string `json:"job_id"`
-		PurchaseHistory   models.Purchase `json:"purchase_history"`
-		ReturnedDate   string `json:"returned_date"`
-		SupplierID     int    `json:"supplier_id"`
-		ProductUnitsID []int  `json:"product_units_id"`
-		TotalUnits     int    `json:"total_units"`
-		TotalPrices    int    `json:"total_prices"`
+		JobID           string          `json:"job_id"`
+		PurchaseHistory models.Purchase `json:"purchase_history"`
+		ReturnedDate    string          `json:"returned_date"`
+		SupplierID      int             `json:"supplier_id"`
+		ProductUnitsID  []int           `json:"product_units_id"`
+		TotalUnits      int             `json:"total_units"`
+		TotalPrices     int             `json:"total_prices"`
 	}
 	err := app.readJSON(w, r, &ReturnProductsInfo)
 
@@ -977,7 +977,7 @@ func (app *application) GetPurchasePageDetails(w http.ResponseWriter, r *http.Re
 		return
 	}
 	//retrieve accounts from the database
-	headAccounts, err := app.DB.GetAvailableHeadAccounts()
+	headAccounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Accounts Available||"
 	} else if err != nil {
@@ -1042,7 +1042,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	//retrieve accounts from the database
-	headAccounts, err := app.DB.GetAvailableHeadAccounts()
+	headAccounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Accounts Available||"
 	} else if err != nil {
@@ -1064,19 +1064,6 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 
 // GetReceiveCollectionPageDetails scrape data from the database to initialize receive-collection page
 func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r *http.Request) {
-	/* input : nill
-	output :
-	data = {
-		accounts :[
-		head_accounts = {
-			id, account_name, account_code
-		},
-		customers = {
-			id, account_name, account_code, amount_payable, amount_receivable
-		}
-		]
-	}
-	*/
 	app.infoLog.Println("Hit receive-collection handler")
 	var resp struct {
 		Error        bool                  `json:"error,omitempty"`
@@ -1095,7 +1082,7 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 	}
 
 	//retrieve accounts from the database
-	headAccounts, err := app.DB.GetAvailableHeadAccounts()
+	headAccounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Accounts Available||"
 	} else if err != nil {
@@ -1112,7 +1099,23 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// ClaimWarrantyBySerialID handels claiming warranty process for a specific product item with serial ID
+// CompleteReceiveCollection handles for completing receiption process of that day
+func (app *application) CompleteReceiveCollection(w http.ResponseWriter, r *http.Request) {
+	var resp struct {
+		Error   bool                     `json:"error,omitempty"`
+		Message string                   `json:"message,omitempty"`
+		Summary *models.ReceptionSummary `json:"reception_summary"`
+	}
+
+	//TODO::::::::::::::::::::::::::::::::::::::::::
+	//complete the process
+	resp.Error = false
+	resp.Message += "||data Succesfully fetched||"
+	fmt.Println("completed receive collections")
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// ClaimWarrantyBySerialID handles claiming warranty process for a specific product item with serial ID
 func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		ReportedProblem string           `json:"reported_problem"`

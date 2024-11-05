@@ -26,7 +26,7 @@ func (p *postgresDBRepo) AddHeadAccount(ha models.HeadAccount) (int, error) {
 	err := p.DB.QueryRowContext(ctx, stmt,
 		ha.AccountCode,
 		ha.AccountName,
-		ha.AccoutnStatus,
+		ha.AccountStatus,
 		ha.CurrentAmount,
 		time.Now(),
 		time.Now(),
@@ -47,7 +47,7 @@ func (p *postgresDBRepo) GetAvailableHeadAccounts() ([]*models.HeadAccount, erro
 
 	query := `
 		SELECT 
-			id, account_code, account_name, current_balance, created_at, updated_at
+			id, account_code, account_name, account_type, account_status, current_balance, created_at, updated_at
 		FROM
 			public.head_accounts
 		WHERE 
@@ -68,6 +68,51 @@ func (p *postgresDBRepo) GetAvailableHeadAccounts() ([]*models.HeadAccount, erro
 			&ha.ID,
 			&ha.AccountCode,
 			&ha.AccountName,
+			&ha.AccountType,
+			&ha.AccountStatus,
+			&ha.CurrentAmount,
+			&ha.CreatedAt,
+			&ha.UpdatedAt,
+		)
+		if err != nil {
+			return headAccounts, err
+		}
+		headAccounts = append(headAccounts, &ha)
+	}
+	return headAccounts, nil
+}
+
+// GetCashBankHead
+func (p *postgresDBRepo) GetAvailableHeadAccountsByType(accountType string) ([]*models.HeadAccount, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var headAccounts []*models.HeadAccount
+
+	query := `
+		SELECT 
+			id, account_code, account_name, account_type, account_status, current_balance, created_at, updated_at
+		FROM
+			public.head_accounts
+		WHERE 
+			account_status = true AND account_type = $1
+		`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = p.DB.QueryContext(ctx, query, accountType)
+	if err != nil {
+		return headAccounts, errors.New("100: " + err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var ha models.HeadAccount
+		err = rows.Scan(
+			&ha.ID,
+			&ha.AccountCode,
+			&ha.AccountName,
+			&ha.AccountType,
+			&ha.AccountStatus,
 			&ha.CurrentAmount,
 			&ha.CreatedAt,
 			&ha.UpdatedAt,
@@ -378,7 +423,7 @@ func (p *postgresDBRepo) GetCustomerByID(id int) (models.Customer, error) {
 
 	query := `
 		SELECT 
-			id, account_code, account_name, contact_person, division, district, upazila, area, amount_payable, amount_receivable, mobile, whatsapp_account, email, account_status, discount, opening_balance, joining_date, created_at, updated_at
+			id, account_code, account_name, contact_person, division, district, upazila, area, due_amount, mobile, whatsapp_account, email, account_status, discount, opening_balance, joining_date, created_at, updated_at
 		FROM
 			public.customers
 		WHERE
@@ -394,8 +439,7 @@ func (p *postgresDBRepo) GetCustomerByID(id int) (models.Customer, error) {
 		&customer.District,
 		&customer.Upazila,
 		&customer.Area,
-		&customer.AmountPayable,
-		&customer.AmountReceivable,
+		&customer.DueAmount,
 		&customer.Mobile,
 		&customer.WhatsappAccount,
 		&customer.Email,
@@ -456,7 +500,7 @@ func (p *postgresDBRepo) GetActiveCustomersIDAndName() ([]*models.Customer, erro
 	return customers, nil
 }
 
-// GetCreditCustomersDetails returns a slice of customers details who have due amount(amount_payable > 0) from the customers table
+// GetCreditCustomersDetails returns a slice of customers details who have due amount(due_amount > 0) from the customers table
 func (p *postgresDBRepo) GetCreditCustomersDetails() ([]*models.Customer, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -464,11 +508,11 @@ func (p *postgresDBRepo) GetCreditCustomersDetails() ([]*models.Customer, error)
 
 	query := `
 		SELECT 
-			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+			id, account_code, account_name, contact_person, due_amount, mobile
 		FROM
 			public.customers
 		WHERE 
-			amount_payable > 0
+			due_amount > 0
 		`
 	var rows *sql.Rows
 	var err error
@@ -486,8 +530,7 @@ func (p *postgresDBRepo) GetCreditCustomersDetails() ([]*models.Customer, error)
 			&c.AccountCode,
 			&c.AccountName,
 			&c.ContactPerson,
-			&c.AmountPayable,
-			&c.AmountReceivable,
+			&c.DueAmount,
 			&c.Mobile,
 		)
 		if err != nil {
@@ -498,7 +541,7 @@ func (p *postgresDBRepo) GetCreditCustomersDetails() ([]*models.Customer, error)
 	return customers, nil
 }
 
-// GetDebitCustomersDetails returns a slice of customers details who have amount receivable(amount_receivable > 0) from the customers table
+// GetDebitCustomersDetails returns a slice of customers details who have amount receivable(due_amount > 0) from the customers table
 func (p *postgresDBRepo) GetDebitCustomersDetails() ([]*models.Customer, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -506,11 +549,11 @@ func (p *postgresDBRepo) GetDebitCustomersDetails() ([]*models.Customer, error) 
 
 	query := `
 		SELECT 
-			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+			id, account_code, account_name, contact_person, due_amount, mobile
 		FROM
 			public.customers
 		WHERE 
-			amount_receivable > 0
+			due_amount > 0
 		`
 	var rows *sql.Rows
 	var err error
@@ -528,8 +571,7 @@ func (p *postgresDBRepo) GetDebitCustomersDetails() ([]*models.Customer, error) 
 			&c.AccountCode,
 			&c.AccountName,
 			&c.ContactPerson,
-			&c.AmountPayable,
-			&c.AmountReceivable,
+			&c.DueAmount,
 			&c.Mobile,
 		)
 		if err != nil {
@@ -540,7 +582,7 @@ func (p *postgresDBRepo) GetDebitCustomersDetails() ([]*models.Customer, error) 
 	return customers, nil
 }
 
-// GetCreditCustomersDetails returns a slice of suppliers details who have due amount(amount_receivable > 0) from the supplier table
+// GetCreditCustomersDetails returns a slice of suppliers details who have due amount(due_amount > 0) from the supplier table
 func (p *postgresDBRepo) GetCreditSuppliersDetails() ([]*models.Supplier, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -548,11 +590,11 @@ func (p *postgresDBRepo) GetCreditSuppliersDetails() ([]*models.Supplier, error)
 
 	query := `
 		SELECT 
-			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+			id, account_code, account_name, contact_person, due_amount, mobile
 		FROM
 			public.suppliers
 		WHERE 
-			amount_receivable > 0
+			due_amount > 0
 		`
 	var rows *sql.Rows
 	var err error
@@ -570,8 +612,7 @@ func (p *postgresDBRepo) GetCreditSuppliersDetails() ([]*models.Supplier, error)
 			&s.AccountCode,
 			&s.AccountName,
 			&s.ContactPerson,
-			&s.AmountPayable,
-			&s.AmountReceivable,
+			&s.DueAmount,
 			&s.Mobile,
 		)
 		if err != nil {
@@ -582,7 +623,7 @@ func (p *postgresDBRepo) GetCreditSuppliersDetails() ([]*models.Supplier, error)
 	return suppliers, nil
 }
 
-// GetDebitSuppliersDetails returns a slice of suppliers details who have amount receivable(amount_payable > 0) from the suppliers table
+// GetDebitSuppliersDetails returns a slice of suppliers details who have amount receivable(due_amount > 0) from the suppliers table
 func (p *postgresDBRepo) GetDebitSuppliersDetails() ([]*models.Supplier, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -590,11 +631,11 @@ func (p *postgresDBRepo) GetDebitSuppliersDetails() ([]*models.Supplier, error) 
 
 	query := `
 		SELECT 
-			id, account_code, account_name, contact_person, amount_payable, amount_receivable, mobile
+			id, account_code, account_name, contact_person, due_amount, mobile
 		FROM
 			public.suppliers
 		WHERE 
-			amount_payable > 0
+			due_amount > 0
 		`
 	var rows *sql.Rows
 	var err error
@@ -612,8 +653,7 @@ func (p *postgresDBRepo) GetDebitSuppliersDetails() ([]*models.Supplier, error) 
 			&s.AccountCode,
 			&s.AccountName,
 			&s.ContactPerson,
-			&s.AmountPayable,
-			&s.AmountReceivable,
+			&s.DueAmount,
 			&s.Mobile,
 		)
 		if err != nil {
@@ -2320,7 +2360,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		//
 	}
 
-	//Tx-2: Update total_amount, due_amount(if available) in suppliers table
+	//Tx-2: Update total_amount, due_amount(if available) in customers table
 	query = `
 		UPDATE Public.customers
 		SET total_amount = total_amount + $1, due_amount = due_amount + $2
@@ -2410,14 +2450,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 		SET total_amount = total_amount - $1, due_amount = due_amount - $2
 		WHERE id = $3
 	`
-	lessDue := 0
-	totalDue := PurchaseHistory.TotalAmount - PurchaseHistory.PaidAmount
-	if totalDue <= TotalPrices {
-		lessDue = totalDue
-	} else {
-		lessDue = TotalPrices
-	}
-	_, err = tx.ExecContext(ctx, query, TotalPrices, lessDue, PurchaseHistory.Supplier.ID)
+	_, err = tx.ExecContext(ctx, query, TotalPrices, PurchaseHistory.TotalAmount-PurchaseHistory.PaidAmount, PurchaseHistory.Supplier.ID)
 	if err != nil {
 		tx.Rollback()
 		return id, fmt.Errorf("SQLErrorRestockProduct(Update suppliers): %w", err)
@@ -2534,20 +2567,13 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		return fmt.Errorf("DBERROR:=>SaleReturnDB: Number of affected row is not equal to 1:  %w", err)
 	}
 
-	//Update total_amount, due_amount(if available) in suppliers table
+	//Update total_amount, due_amount(if available) in customers table
 	query = `
 		UPDATE Public.customers
 		SET total_amount = total_amount - $1, due_amount = due_amount - $2
 		WHERE id = $3
 	`
-	lessDue := 0
-	totalDue := SalesHistory.TotalAmount - SalesHistory.PaidAmount
-	if totalDue <= ReturnAmount {
-		lessDue = totalDue
-	} else {
-		lessDue = ReturnAmount
-	}
-	_, err = tx.ExecContext(ctx, query, ReturnAmount, lessDue, SalesHistory.CustomerID)
+	_, err = tx.ExecContext(ctx, query, ReturnAmount, SalesHistory.TotalAmount-SalesHistory.PaidAmount, SalesHistory.CustomerID)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("SQLErrorSaleReturnDB(Update customer): %w", err)

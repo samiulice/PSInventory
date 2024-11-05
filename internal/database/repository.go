@@ -8,6 +8,7 @@ type DatabaseRepo interface {
 	//Head Accounts
 	AddHeadAccount(ha models.HeadAccount) (int, error)
 	GetAvailableHeadAccounts() ([]*models.HeadAccount, error)
+	GetAvailableHeadAccountsByType(accountType string) ([]*models.HeadAccount, error)
 	// HR Management
 	AddEmployee(employee models.Employee) (int, error)
 	GetEmployeeByID(id int) (models.Employee, error)
