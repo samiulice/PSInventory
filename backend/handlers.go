@@ -1090,7 +1090,7 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 		return
 	}
 
-	//TODO: Retrive accounts and send to frontend
+	//TODO: Retrieve accounts and send to frontend
 	resp.Error = false
 	resp.Message += "||data Succesfully fetched||"
 	resp.Customers = customers
@@ -1099,18 +1099,39 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// CompleteReceiveCollection handles for completing receiption process of that day
+// CompleteReceiveCollection handles for completing reception process of that day
 func (app *application) CompleteReceiveCollection(w http.ResponseWriter, r *http.Request) {
+	var Summary []*models.ReceptionSummary
 	var resp struct {
 		Error   bool                     `json:"error,omitempty"`
 		Message string                   `json:"message,omitempty"`
-		Summary *models.ReceptionSummary `json:"reception_summary"`
+		Summary []*models.ReceptionSummary `json:"reception_summary"`
 	}
 
+	err := app.readJSON(w,r,&Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w,http.StatusAccepted, resp)
+		return
+	}
+	
+	//update Cash-Bank account
+	//set current_balance += received_amount
+	// err := app.DB.UpdateHeadAccountBalance(payload.Summary.DestinationAccount.ID, payload.Summary.ReceivedAmount)
+	//update customer account
+	//set due_mount -= received_amount
 	//TODO::::::::::::::::::::::::::::::::::::::::::
+	err = app.DB.CompleteReceiveCollectionTransactions(Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to complete receive and collection process: " + err.Error()
+		app.writeJSON(w,http.StatusAccepted, resp)
+		return
+	}
 	//complete the process
 	resp.Error = false
-	resp.Message += "||data Succesfully fetched||"
+	resp.Message = "Amount received successfully"
 	fmt.Println("completed receive collections")
 	app.writeJSON(w, http.StatusOK, resp)
 }

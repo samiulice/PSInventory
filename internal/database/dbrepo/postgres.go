@@ -125,6 +125,23 @@ func (p *postgresDBRepo) GetAvailableHeadAccountsByType(accountType string) ([]*
 	return headAccounts, nil
 }
 
+// UpdateHeadAccountBalance updates the current balance of an head account
+func (p *postgresDBRepo) UpdateHeadAccountBalance(id, balance int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		UPDATE public.head_accounts
+		SET current_balance = current_balance + $1
+		WHERE id = $2`
+
+	_, err := p.DB.ExecContext(ctx, stmt, balance, id)
+	if err != nil {
+		return fmt.Errorf("DBERROR: Unable to update current_balance in head_accounts table: %w", err)
+	}
+	return nil
+}
+
 //.......................HR Management.......................
 
 // AddEmployee inserts new employee information to the database
@@ -2857,6 +2874,69 @@ func (p *postgresDBRepo) DeliveryWarrantyProduct(warrantyHistoryID, productSeria
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: DeliveryWarrantyProduct: Unable to commit changes => %w", err)
+	}
+	return nil
+}
+
+// .......................Accounts.......................
+func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models.ReceptionSummary) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//Begin transaction
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to begin transaction: %w", err)
+	}
+
+	for _, sum := range summary {
+		//update Cash-Bank account
+		//set current_balance += received_amount
+		stmt := `
+			UPDATE public.head_accounts
+			SET current_balance = current_balance + $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.ReceivedAmount, time.Now(), sum.DestinationAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to update current_balance in head_accounts table: %w", err)
+		}
+
+		//convert receivedDate into go supported date
+		txDate, err := time.Parse("01/02/2006", sum.ReceivedDate)
+		if err != nil {
+			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable parse time in go supported format: %w", err)
+		}
+		//insert to financial transactions
+		stmt = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Receive & Collection', 'Customer', $1, 'Account', $2, $3, $4, $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.ReceivedAmount, txDate, sum.VoucherNo, sum.Description)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable Insert into financial_transaction table: %w", err)
+		}
+		//update customer account
+		//set due_mount -= received_amount
+		stmt = `
+			UPDATE public.customers
+			SET due_amount = due_amount - $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.ReceivedAmount, time.Now(), sum.SourceAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to update due_amount in customers table: %w", err)
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to commit: %w", err)
 	}
 	return nil
 }

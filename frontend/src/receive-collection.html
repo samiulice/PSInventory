@@ -362,7 +362,6 @@
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
-              console.log(data)
               accounts = data.head_accounts;
               customers = data.customers;
               updatePage();
@@ -419,6 +418,7 @@
           carrier_info: carrier.value,
           description: description.value,
         }
+        //push data to the array
         reception_summary.push(ps);
         //push to table
         if (paymentDate == "") {
@@ -469,7 +469,6 @@
           </tr>
         `;
         //clear the input field values
-        console.log(reception_summary);
         voucherNo = "";
         source.value = "";
         destination.value = "";
@@ -496,11 +495,14 @@
         document.getElementById("submitBtn").classList.add("d-none");
 
         const requestOptions = {
-          method: "post",
-          "Accept": "application/json",
-          "Content-Type": "application/json"
+          method: 'post',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(reception_summary),
         }
-
+        console.log(reception_summary)
         fetch('http://localhost:4321/api/accounts/receive-collection/complete-submission', requestOptions)
           .then(response => response.json())
           .then(data => {

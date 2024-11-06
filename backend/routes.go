@@ -71,6 +71,7 @@ func (app *application) routes() http.Handler {
 		mux.Post("/inventory/products/warranty/get-history", app.GetClaimWarrantyList)
 
 		//accounts
+		//Receive & Collection
 		mux.Post("/accounts/receive-collection/get-page-details", app.GetReceiveCollectionPageDetails)
 		mux.Post("/accounts/receive-collection/complete-submission", app.CompleteReceiveCollection)
 
