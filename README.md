@@ -4,8 +4,17 @@
 
 This template uses plain JS / HTML and CSS.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+# Frontend Technology:
+- HTML5
+- CSS3
+- Plain JS
+- Font Awesome v6.6.0
+# Backend Technology:
+-  Golang 1.21
+- PostgreSQL 16
+# Framework:
+- Wails
+
 
 ## Live Development
 

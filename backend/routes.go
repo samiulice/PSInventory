@@ -73,7 +73,15 @@ func (app *application) routes() http.Handler {
 		//accounts
 		//Receive & Collection
 		mux.Post("/accounts/receive-collection/get-page-details", app.GetReceiveCollectionPageDetails)
-		mux.Post("/accounts/receive-collection/complete-submission", app.CompleteReceiveCollection)
+		mux.Post("/accounts/receive-collection/complete-submission", app.CompleteReceiveCollectionProcess)
+
+		//payment
+		mux.Post("/accounts/payment/get-page-details", app.GetPaymentPageDetails)
+		mux.Post("/accounts/payment/complete-submission", app.CompletePaymentProcess)
+
+		//Amount Transfer
+		mux.Post("/accounts/amount-transfer/get-page-details", app.GetAmountTransferPageDetails)
+		mux.Post("/accounts/amount-transfer/complete-submission", app.CompleteAmountTransferProcess)
 
 		mux.NotFound(app.PathNotFound)
 		//.......................Inventory Reports.......................

@@ -144,7 +144,7 @@ type HeadAccount struct {
 	AccountName   string    `json:"account_name"`
 	AccountType   string    `json:"account_type"`
 	AccountStatus bool      `json:"account_status"`
-	CurrentAmount int       `json:"current_amount"`
+	CurrentBalance int       `json:"current_balance"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
@@ -305,13 +305,37 @@ type Service struct {
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
-// ReceptionSummary is the definition for Receive & Collection form
+// ReceptionSummary is the definition for Receive & Collection info
 type ReceptionSummary struct {
 	VoucherNo          string       `json:"voucher_no"`
 	ReceivedDate       string       `json:"received_date"`
 	ReceivedAmount     int          `json:"received_amount"`
 	SourceAccount      *Customer    `json:"source_account"`
 	DestinationAccount *HeadAccount `json:"destination_account"`
+	ChequeNo           string       `json:"cheque_no"`
+	Carrier            string       `json:"carrier_info"`
+	Description        string       `json:"description"`
+}
+
+// PaymentSummary is the definition for payment info
+type PaymentSummary struct {
+	VoucherNo          string       `json:"voucher_no"`
+	PaymentDate        string       `json:"payment_date"`
+	PaidAmount         int          `json:"paid_amount"`
+	SourceAccount      *HeadAccount `json:"source_account"`
+	DestinationAccount *Supplier    `json:"destination_account"`
+	ChequeNo           string       `json:"cheque_no"`
+	Carrier            string       `json:"carrier_info"`
+	Description        string       `json:"description"`
+}
+
+// AmountTransferSummary is the definition for amount transfer info
+type AmountTransferSummary struct {
+	VoucherNo          string       `json:"voucher_no"`
+	TransactionDate        string       `json:"transaction_date"`
+	TransferAmount         int          `json:"transfer_amount"`
+	SourceAccount      *HeadAccount `json:"source_account"`
+	DestinationAccount *HeadAccount    `json:"destination_account"`
 	ChequeNo           string       `json:"cheque_no"`
 	Carrier            string       `json:"carrier_info"`
 	Description        string       `json:"description"`

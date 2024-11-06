@@ -181,11 +181,8 @@
             <div class="col-md-4 col-sm-4 col-xs-4">
               <h2>Due History</h2>
             </div>
-            <div class="col-md-4 col-sm-4 col-xs-4" style="color: rgb(255, 0, 0);">Due: &nbsp;&#2547; <label
-                id="due_amount">0</b></label></div>
-            <div class="col-md-4 col-sm-4 col-xs-4"><button type="button" style="float: right;" class="btn btn-primary"
-                id="add-transaction-info" onclick="addToSummary()">Add</button></div>
-
+            <div style="color: rgb(255, 0, 0); float: right;">Due: &nbsp;&#2547; <label id="due_amount">0</b></label>
+            </div>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -265,6 +262,11 @@
                   placeholder="Enter payment details(optional)">
                 <i style="color:rgba(0, 0, 0, 1);" class="fa fa-bars form-control-feedback left" aria-hidden="true"></i>
               </div>
+            </div>
+            <div class="row text-center">
+              <button type="button" class="btn btn-primary"
+                id="add-transaction-info" onclick="addToSummary()"><i class="fa fa-arrow-down"></i> Add
+              </button>
             </div>
           </div>
         </div>
@@ -436,7 +438,7 @@
         }
         else if (destination.value === "") {
           Swal.fire({
-            title: "Select Cash-bank Account Account",
+            title: "Select Cash-bank Account",
             icon: "error"
           });
           return

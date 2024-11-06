@@ -9,7 +9,7 @@ type DatabaseRepo interface {
 	AddHeadAccount(ha models.HeadAccount) (int, error)
 	GetAvailableHeadAccounts() ([]*models.HeadAccount, error)
 	GetAvailableHeadAccountsByType(accountType string) ([]*models.HeadAccount, error)
-	UpdateHeadAccountBalance(int, int)(error)
+	UpdateHeadAccountBalance(int, int) error
 	// HR Management
 	AddEmployee(employee models.Employee) (int, error)
 	GetEmployeeByID(id int) (models.Employee, error)
@@ -81,7 +81,11 @@ type DatabaseRepo interface {
 
 	//accounts
 	//Receive & Collection
-	CompleteReceiveCollectionTransactions(summary []*models.ReceptionSummary)(error)
+	CompleteReceiveCollectionTransactions(summary []*models.ReceptionSummary) error
+	//Payment
+	CompletePaymentTransactions(summary []*models.PaymentSummary) error
+	//Amount Transfer
+	CompleteAmountTransferTransactions(summary []*models.AmountTransferSummary) error
 	//Inventory Reports
 	GetAllEmployeesList() ([]*models.Employee, error)
 	GetAllSuppliersList() ([]*models.Supplier, error)

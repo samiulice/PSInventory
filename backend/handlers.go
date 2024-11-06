@@ -862,7 +862,6 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 		app.badRequest(w, err)
 		return
 	}
-	fmt.Println(salesInfo)
 	err = app.DB.SaleProducts(&salesInfo)
 	if err != nil {
 		app.badRequest(w, err)
@@ -906,7 +905,6 @@ func (app *application) ReturnProductsFromCustomer(w http.ResponseWriter, r *htt
 		app.badRequest(w, fmt.Errorf("ERROR:=>ReturnProductsFromCustomer: Unable to read JSON : %w", err))
 		return
 	}
-	fmt.Println(SaleReturnPayload)
 	err = app.DB.SaleReturnDB(
 		SaleReturnPayload.SalesHistory,
 		SaleReturnPayload.SelectedItemsID,
@@ -1050,7 +1048,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	//TODO: Retrive accounts and send to frontend
+	//TODO: Retrieve accounts and send to frontend
 	resp.Error = false
 	resp.Message += "||data Succesfully fetched||"
 	resp.Customers = customers
@@ -1100,22 +1098,22 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 }
 
 // CompleteReceiveCollection handles for completing reception process of that day
-func (app *application) CompleteReceiveCollection(w http.ResponseWriter, r *http.Request) {
+func (app *application) CompleteReceiveCollectionProcess(w http.ResponseWriter, r *http.Request) {
 	var Summary []*models.ReceptionSummary
 	var resp struct {
-		Error   bool                     `json:"error,omitempty"`
-		Message string                   `json:"message,omitempty"`
+		Error   bool                       `json:"error,omitempty"`
+		Message string                     `json:"message,omitempty"`
 		Summary []*models.ReceptionSummary `json:"reception_summary"`
 	}
 
-	err := app.readJSON(w,r,&Summary)
+	err := app.readJSON(w, r, &Summary)
 	if err != nil {
 		resp.Error = true
 		resp.Message = "Unable to read JSON: " + err.Error()
-		app.writeJSON(w,http.StatusAccepted, resp)
+		app.writeJSON(w, http.StatusAccepted, resp)
 		return
 	}
-	
+
 	//update Cash-Bank account
 	//set current_balance += received_amount
 	// err := app.DB.UpdateHeadAccountBalance(payload.Summary.DestinationAccount.ID, payload.Summary.ReceivedAmount)
@@ -1126,13 +1124,126 @@ func (app *application) CompleteReceiveCollection(w http.ResponseWriter, r *http
 	if err != nil {
 		resp.Error = true
 		resp.Message = "Unable to complete receive and collection process: " + err.Error()
-		app.writeJSON(w,http.StatusAccepted, resp)
+		app.writeJSON(w, http.StatusAccepted, resp)
 		return
 	}
 	//complete the process
 	resp.Error = false
 	resp.Message = "Amount received successfully"
-	fmt.Println("completed receive collections")
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// GetPaymentPageDetails scrape data from the database to initialize payment page
+func (app *application) GetPaymentPageDetails(w http.ResponseWriter, r *http.Request) {
+	app.infoLog.Println("Hit receive-collection handler")
+	var resp struct {
+		Error        bool                  `json:"error,omitempty"`
+		Message      string                `json:"message,omitempty"`
+		Suppliers    []*models.Supplier    `json:"suppliers,omitempty"`
+		HeadAccounts []*models.HeadAccount `json:"head_accounts,omitempty"`
+	}
+
+	//retrieve suppliers from the database
+	suppliers, err := app.DB.GetDebitSuppliersDetails()
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Supplier Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//retrieve accounts from the database
+	headAccounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
+	if err == sql.ErrNoRows {
+		resp.Message += "||No Accounts Available||"
+	} else if err != nil {
+		app.badRequest(w, err) //send error response
+		return
+	}
+
+	//TODO: Retrieve accounts and send to frontend
+	resp.Error = false
+	resp.Message += "||data Succesfully fetched||"
+	resp.Suppliers = suppliers
+	resp.HeadAccounts = headAccounts
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// CompletePaymentProcess handles for completing payment process of that day
+func (app *application) CompletePaymentProcess(w http.ResponseWriter, r *http.Request) {
+	var Summary []*models.PaymentSummary
+	var resp struct {
+		Error   bool                     `json:"error,omitempty"`
+		Message string                   `json:"message,omitempty"`
+		Summary []*models.PaymentSummary `json:"payment_summary"`
+	}
+
+	err := app.readJSON(w, r, &Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	err = app.DB.CompletePaymentTransactions(Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to complete payment transaction process: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	//complete the process
+	resp.Error = false
+	resp.Message = "Amount paid successfully"
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// GetAmountTransferPageDetails handle amount transfer between to accounts
+func (app *application) GetAmountTransferPageDetails(w http.ResponseWriter, r *http.Request) {
+	var resp struct {
+		Error    bool                  `json:"error,omitempty"`
+		Message  string                `json:"message,omitempty"`
+		Accounts []*models.HeadAccount `json:"head_accounts"`
+	}
+
+	accounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAmountTransferPageDetails => %w", err))
+		return
+	}
+	resp.Message = "Data fetched successfully"
+	resp.Accounts = accounts
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// CompleteAmountTransferProcess handles for completing amount transfer process of that day
+func (app *application) CompleteAmountTransferProcess(w http.ResponseWriter, r *http.Request) {
+	var Summary []*models.AmountTransferSummary
+
+	var resp struct {
+		Error   bool                            `json:"error,omitempty"`
+		Message string                          `json:"message,omitempty"`
+		Summary []*models.AmountTransferSummary `json:"transaction_summary"`
+	}
+
+	err := app.readJSON(w, r, &Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	err = app.DB.CompleteAmountTransferTransactions(Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to complete amount transfer process: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	//complete the process
+	resp.Error = false
+	resp.Message = "Amount transferred successfully"
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
@@ -1160,7 +1271,7 @@ func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.R
 	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
 	// 	step-2 : update latest_warranty_history_id = pkid of warranty_history, warranty_history_ids = concat{warranty_history_ids,pkid of warranty_history}, updated_at = time.Now() in product_serial_number
 
-	//MM-WC-randomAlphanumeriac(6)+CurrentIndexOfWarrantyHistory Table //Warranty Claimed
+	//MM-WC-randomAlphanumeric(6)+CurrentIndexOfWarrantyHistory Table //Warranty Claimed
 	//generate 6 digits random Alphanumeric
 	randomCode, err := app.GenerateRandomAlphanumericCode(6)
 	if err != nil {

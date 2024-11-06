@@ -27,7 +27,7 @@ func (p *postgresDBRepo) AddHeadAccount(ha models.HeadAccount) (int, error) {
 		ha.AccountCode,
 		ha.AccountName,
 		ha.AccountStatus,
-		ha.CurrentAmount,
+		ha.CurrentBalance,
 		time.Now(),
 		time.Now(),
 	).Scan(&id)
@@ -70,7 +70,7 @@ func (p *postgresDBRepo) GetAvailableHeadAccounts() ([]*models.HeadAccount, erro
 			&ha.AccountName,
 			&ha.AccountType,
 			&ha.AccountStatus,
-			&ha.CurrentAmount,
+			&ha.CurrentBalance,
 			&ha.CreatedAt,
 			&ha.UpdatedAt,
 		)
@@ -113,7 +113,7 @@ func (p *postgresDBRepo) GetAvailableHeadAccountsByType(accountType string) ([]*
 			&ha.AccountName,
 			&ha.AccountType,
 			&ha.AccountStatus,
-			&ha.CurrentAmount,
+			&ha.CurrentBalance,
 			&ha.CreatedAt,
 			&ha.UpdatedAt,
 		)
@@ -611,7 +611,7 @@ func (p *postgresDBRepo) GetCreditSuppliersDetails() ([]*models.Supplier, error)
 		FROM
 			public.suppliers
 		WHERE 
-			due_amount > 0
+			due_amount < 0
 		`
 	var rows *sql.Rows
 	var err error
@@ -2919,7 +2919,7 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable Insert into financial_transaction table: %w", err)
 		}
 		//update customer account
-		//set due_mount -= received_amount
+		//set due_amount -= received_amount
 		stmt = `
 			UPDATE public.customers
 			SET due_amount = due_amount - $1, updated_at = $2
@@ -2937,6 +2937,134 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to commit: %w", err)
+	}
+	return nil
+}
+func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.PaymentSummary) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//Begin transaction
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to begin transaction: %w", err)
+	}
+
+	//update Cash-Bank account
+	//set current_balance -= paid_amount
+	//update supplier account
+	//set due_mount -= paid_amount
+
+	for _, sum := range summary {
+		//update Cash-Bank account
+		//set current_balance += received_amount
+		stmt := `
+			UPDATE public.head_accounts
+			SET current_balance = current_balance - $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.SourceAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to update current_balance in head_accounts table: %w", err)
+		}
+
+		//convert receivedDate into go supported date
+		txDate, err := time.Parse("01/02/2006", sum.PaymentDate)
+		if err != nil {
+			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable parse time in go supported format: %w", err)
+		}
+		//insert to financial transactions
+		stmt = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Payment', 'Account', $1, 'Supplier', $2, $3, $4, $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable Insert into financial_transaction table: %w", err)
+		}
+		//update customer account
+		//set due_mount -= received_amount
+		stmt = `
+			UPDATE public.suppliers
+			SET due_amount = due_amount - $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.DestinationAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to update due_amount in suppliers table: %w", err)
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to commit: %w", err)
+	}
+	return nil
+}
+
+func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.AmountTransferSummary) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//Begin transaction
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable to begin transaction: %w", err)
+	}
+
+	for _, sum := range summary {
+		//update Source account
+		//set current_balance -= received_amount
+		stmt := `
+			UPDATE public.head_accounts
+			SET current_balance = current_balance - $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, time.Now(), sum.SourceAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable to update current_balance in source_account table: %w", err)
+		}
+		//update Destination account
+		//set current_balance -= received_amount
+		stmt = `
+			UPDATE public.head_accounts
+			SET current_balance = current_balance + $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, time.Now(), sum.DestinationAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable to update current_balance in destination_account table: %w", err)
+		}
+
+		//convert receivedDate into go supported date
+		txDate, err := time.Parse("01/02/2006", sum.TransactionDate)
+		if err != nil {
+			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable parse time in go supported format: %w", err)
+		}
+		//insert to financial transactions
+		stmt = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Payment', 'Account', $1, 'Account', $2, $3, $4, $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.TransferAmount, txDate, sum.VoucherNo, sum.Description)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable Insert into financial_transaction table: %w", err)
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable to commit: %w", err)
 	}
 	return nil
 }
@@ -3114,7 +3242,6 @@ func (p *postgresDBRepo) CountRows(tableName string) (int, error) {
 	var c int
 	query := "SELECT COUNT(id) FROM " + tableName
 	err := p.DB.QueryRowContext(ctx, query).Scan(&c)
-	fmt.Println(c)
 	return c, err
 }
 
