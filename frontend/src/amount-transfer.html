@@ -394,29 +394,20 @@
 
         let destination = document.getElementById("destination");
         let flag = false;
-        // destination.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
-        // if (accounts) {
-        //   accounts.forEach((ac, i) => {
-        //     if (ac.current_balance > 0 && sourceValue !== i) {
-        //       destination.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
-        //       flag = true
-        //     }
-        //   });
-        // }
-        // if (flag === true){
-        //   destination.disabled = false;
-        // } else {
-        //   destination.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-        //   destination.disabled =  true;
-        // }
         destination.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
         if (accounts) {
           accounts.forEach((ac, i) => {
-            if (ac.current_balance > 0) {
+            if (ac.current_balance > 0 && sourceValue !== i) {
               destination.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
-              destination.disabled = false;
+              flag = true
             }
           });
+        }
+        if (flag === true){
+          destination.disabled = false;
+        } else {
+          destination.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
+          destination.disabled =  true;
         }
       })
 
@@ -428,7 +419,7 @@
         let chqNo = document.getElementById("chq-no");
         let carrier = document.getElementById("carrier");
         let description = document.getElementById("description");
-        let voucherNo = `V-RC-${generateRandomAlphanumericCode(6)}`
+        let voucherNo = `V-AMT-${generateRandomAlphanumericCode(6)}`
         let sm = {
           voucher_no: voucherNo,
           transaction_date: transactionDate,

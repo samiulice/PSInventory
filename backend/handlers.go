@@ -1247,6 +1247,34 @@ func (app *application) CompleteAmountTransferProcess(w http.ResponseWriter, r *
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// GetAmountPayableDetails handle amount payable between to accounts
+func (app *application) GetAmountPayableDetails(w http.ResponseWriter, r *http.Request) {
+	var resp struct {
+		Error    bool                  `json:"error,omitempty"`
+		Message  string                `json:"message,omitempty"`
+		Suppliers []*models.Supplier `json:"suppliers"`
+		Customers []*models.Customer `json:"customers"`
+	}
+
+	suppliers, err := app.DB.GetActiveSuppliersIDAndName()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAmountPayableDetails => %w", err))
+		return
+	}
+	customers, err := app.DB.GetActiveCustomersIDAndName()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAmountPayableDetails => %w", err))
+		return
+	}
+	resp.Message = "Data fetched successfully"
+	resp.Suppliers = suppliers
+	resp.Customers = customers
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+func (app *application)CompleteAmountPayableProcess(w http.ResponseWriter, r *http.Request){
+	
+}
 // ClaimWarrantyBySerialID handles claiming warranty process for a specific product item with serial ID
 func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {

@@ -139,14 +139,14 @@ type Supplier struct {
 
 // HeadAccount is the type for HeadAccount
 type HeadAccount struct {
-	ID            int       `json:"id"`
-	AccountCode   string    `json:"account_code"`
-	AccountName   string    `json:"account_name"`
-	AccountType   string    `json:"account_type"`
-	AccountStatus bool      `json:"account_status"`
+	ID             int       `json:"id"`
+	AccountCode    string    `json:"account_code"`
+	AccountName    string    `json:"account_name"`
+	AccountType    string    `json:"account_type"`
+	AccountStatus  bool      `json:"account_status"`
 	CurrentBalance int       `json:"current_balance"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 // Product is the type for products
@@ -332,11 +332,25 @@ type PaymentSummary struct {
 // AmountTransferSummary is the definition for amount transfer info
 type AmountTransferSummary struct {
 	VoucherNo          string       `json:"voucher_no"`
-	TransactionDate        string       `json:"transaction_date"`
-	TransferAmount         int          `json:"transfer_amount"`
+	TransactionDate    string       `json:"transaction_date"`
+	TransferAmount     int          `json:"transfer_amount"`
 	SourceAccount      *HeadAccount `json:"source_account"`
-	DestinationAccount *HeadAccount    `json:"destination_account"`
+	DestinationAccount *HeadAccount `json:"destination_account"`
 	ChequeNo           string       `json:"cheque_no"`
 	Carrier            string       `json:"carrier_info"`
 	Description        string       `json:"description"`
+}
+
+// AmountPayableSummary is the definition for amount payable info
+type AmountPayableSummary struct {
+	VoucherNo     string `json:"voucher_no"`
+	Date          string `json:"date"`
+	PayableAmount int    `json:"payable_amount"`
+	Reason        string `json:"reason"`
+	AccountType   string `json:"account_type"`
+	AccountID     int    `json:"account_id"`
+	AccountName   string `json:"account_name"`
+	ChequeNo      string `json:"cheque_no"`
+	Carrier       string `json:"carrier_info"`
+	Description   string `json:"description"`
 }
