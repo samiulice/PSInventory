@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Amount Receivable</title>
+  <title>Amount Payable</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -176,29 +176,24 @@
         <h2 class="text-center text-warning fa-2x"><label>AMOUNT RECEIVABLE</label></h2>
         <!-- Page content here -->
         <!-- ReceiveCollection Details Section  -->
-        <div class="x_panel bg-gw">
-          <div class="x_title">
-            <div style="color: rgb(4, 83, 185); float: right;">Current Balance: &nbsp;&#2547; <label
-                id="current_balance">0</b></label></div>
-            <div class="clearfix"></div>
-          </div>
+        <div class="x_panel bg-gw" id="form-content">
           <div class="x_content">
             <div class="row">
               <!-- first col -->
               <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="source">Reason *: </label>
-                    <select class="form-control  has-feedback-left" id="source" required>   
-                        <option value="" selected disabled>Select a reason</option>
-                        <option value="1">Miscellaneous Income</option>
-                        <option value="2">Product Sales</option>
-                        <option value="3">Delayed Payments</option>
-                        <option value="4">Service Charges</option>
-                        <option value="4">Labour Charges</option>
-                        <option value="5">Refunds Due</option>
-                        <option value="6">Uncollected Rental Income</option>
-                        <option value="7">Delayed Invoice Payment</option>
+                    <label for="reason">Reason *: </label>
+                    <select class="form-control  has-feedback-left" id="reason" required>
+                      <option value="" selected disabled>Select a reason</option>
+                      <option value="1">Miscellaneous Income</option>
+                      <option value="2">Product Sales</option>
+                      <option value="3">Delayed Payments</option>
+                      <option value="4">Service Charges</option>
+                      <option value="4">Labour Charges</option>
+                      <option value="5">Refunds Due</option>
+                      <option value="6">Uncollected Rental Income</option>
+                      <option value="7">Delayed Invoice Payment</option>
                     </select>
                     <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
                       aria-hidden="true"></i>
@@ -206,8 +201,8 @@
                 </div>
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="destination">From *: </label>
-                    <select class="form-control  has-feedback-left" id="destination" required disabled>
+                    <label for="source">From Whom *: </label>
+                    <select class="form-control  has-feedback-left" id="source" required>
                       <option value="" selected disabled>Select An Account</option>
                     </select>
                     <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
@@ -276,7 +271,7 @@
 
           </div>
         </div>
-        <form action="#" id="amountTransferForm">
+        <form action="#" id="amountReceivableForm">
           <!-- /page content -->
           <!-- Received section -->
           <!-- Table row -->
@@ -285,13 +280,13 @@
             <thead style="background-color: rgba(4, 209, 209, 0.1);">
               <tr>
                 <th>Voucher No.</th>
+                <th>Reason</th>
                 <th>From</th>
-                <th>To</th>
                 <th>Amount</th>
                 <th>Receipt No</th>
                 <th>Carrier</th>
                 <th>Description</th>
-                <th>Transaction Date</th>
+                <th>Date</th>
                 <th>Remove</th>
               </tr>
             </thead>
@@ -303,7 +298,7 @@
           <div class="row">
             <div class="col-md-12 com-sm-12 col-xs-12 text-center">
               <button id="submitBtn" class="btn btn-dark" type="submit">Submit</button>
-              <button id="printInvoice" class="btn btn-dark d-none" type="button"
+              <button id="printInvoice" class="btn btn-warning d-none" type="button"
                 onclick="renderPrintWindow()">Print</button>
             </div>
           </div>
@@ -357,19 +352,20 @@
     <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
     <script>
-      let accounts, currentBalance, transaction_summary = [];
+      let customers, suppliers, receivable_summary = [];
       window.addEventListener("DOMContentLoaded", () => {
-        // fetch-1: On load window Get accounts for destination and suppliers who have due amount
+        // fetch-1: On load window Get accounts for source and suppliers who have due amount
         const requestOptions = {
           method: 'post'
         }
-        fetch('http://localhost:4321/api/accounts/amount-transfer/get-page-details', requestOptions)
+        fetch('http://localhost:4321/api/accounts/amount-receivable/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
-              accounts = data.head_accounts;
+              customers = data.customers;
+              suppliers = data.suppliers;
               console.log(data)
               updatePage();
             }
@@ -379,126 +375,105 @@
       function updatePage() {
         let source = document.getElementById("source");
         source.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
-        if (accounts) {
-          accounts.forEach((ac, i) => {
-            if (ac.current_balance > 0) {
-              source.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
-            }
+        let availability = false;
+        if (suppliers) {
+          suppliers.forEach((ac, i) => {
+            source.innerHTML += `<option value="s-${i}">${ac.account_name}-${ac.account_code}</option>`;
+            availability = true;
           });
-        } else {
+        }
+        if (customers) {
+          customers.forEach((ac, i) => {
+            source.innerHTML += `<option value="c-${i}">${ac.account_name}-${ac.account_code}</option>`;
+            availability = true;
+          });
+        }
+        
+        if (!availability) {
           source.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-          source.ariaDisabled = true;
+          source.disabled = true;
         }
       }
 
-      //change due_amount section on changing customer selection
-      document.getElementById("source").addEventListener("change", () => {
-        let source = document.getElementById("source");
-        let sourceValue = parseInt(source.value);
-        currentBalance = accounts[sourceValue].current_balance;
-        document.getElementById("current_balance").innerText = currentBalance;
-        document.getElementById("amount").max = currentBalance;
-
-        let destination = document.getElementById("destination");
-        let flag = false;
-        // destination.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
-        // if (accounts) {
-        //   accounts.forEach((ac, i) => {
-        //     if (ac.current_balance > 0 && sourceValue !== i) {
-        //       destination.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
-        //       flag = true
-        //     }
-        //   });
-        // }
-        // if (flag === true){
-        //   destination.disabled = false;
-        // } else {
-        //   destination.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-        //   destination.disabled =  true;
-        // }
-        destination.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
-        if (accounts) {
-          accounts.forEach((ac, i) => {
-            if (ac.current_balance > 0) {
-              destination.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
-              destination.disabled = false;
-            }
-          });
-        }
-      })
-
       function addToSummary() {
-        let transactionDate = document.getElementById("single_cal4").value;
+        let date = document.getElementById("single_cal4").value;
         let amount = document.getElementById("amount");
-        let source = document.getElementById("source");
-        let destination = document.getElementById("destination");
+        let reason = document.getElementById("reason");
+        let source = document.getElementById("source").value;
         let chqNo = document.getElementById("chq-no");
         let carrier = document.getElementById("carrier");
         let description = document.getElementById("description");
-        let voucherNo = `V-RC-${generateRandomAlphanumericCode(6)}`
+        let voucherNo = `V-AMP-${generateRandomAlphanumericCode(6)}`
+
+        let dInfo = source.split("-");
+        let accountID, accountName, accountType;
+        if(dInfo[0] === "c"){
+          accountType = "Customer";
+          accountID = customers[parseInt(dInfo[1])].id;
+          accountName = customers[parseInt(dInfo[1])].account_name;
+        } else {
+          accountType = "Supplier"
+          accountID = suppliers[parseInt(dInfo[1])].id;
+          accountName = suppliers[parseInt(dInfo[1])].account_name;
+        }
         let sm = {
           voucher_no: voucherNo,
-          transaction_date: transactionDate,
-          transfer_amount: parseInt(amount.value),
-          source_account: accounts[parseInt(source.value)],
-          destination_account: accounts[parseInt(destination.value)],
+          date: date,
+          receivable_amount: parseInt(amount.value),
+          reason: reason.value,
+          account_type:accountType,
+          account_id:accountID,
+          account_name:accountName,
           cheque_no: chqNo.value,
           carrier_info: carrier.value,
           description: description.value,
         }
-        //push data to the array
-        transaction_summary.push(sm);
+        console.log("push: ", receivable_summary)
         //push to table
-        if (transactionDate == "") {
+        if (date == "") {
           Swal.fire({
             title: "Select transaction date",
             icon: "error"
           });
           return
+        } else if (reason.value === "") {
+          Swal.fire({
+            title: "Select Reason",
+            icon: "error"
+          });
+          return
         } else if (source.value === "") {
           Swal.fire({
-            title: "Select Cash-bank(From) Account",
+            title: "Select Account",
             icon: "error"
           });
           return
-        }
-        else if (destination.value === "") {
-          Swal.fire({
-            title: "Select Cash-bank(To) Account",
-            icon: "error"
-          });
-          return
-        }
-        else if (amount.value === '') {
+        } else if (amount.value === '') {
           Swal.fire({
             title: "Amount must be greater than 0",
             icon: "error"
           });
           return
-        } else if (amount.value > currentBalance) {
-          Swal.fire({
-            title: `Amount exceeds max limit(&#2547; ${currentBalance})`,
-            icon: "error"
-          });
-          return
         }
+        //push data to the array
+        receivable_summary.push(sm);
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
-            <td>${accounts[parseInt(source.value)].account_name}</td>
-            <td>${accounts[parseInt(destination.value)].account_name}</td> 
+            <td>${reason.value}</td>
+            <td>${accountType}-${accountName}</td> 
             <td>${amount.value}</td>
             <td>${chqNo.value}</td>
             <td>${carrier.value}</td>
             <td>${description.value}</td>
-            <td>${transactionDate}</td>
+            <td>${date}</td>
             <td><button class="btn btn-xs btn-dark" onclick="removeFromSummary('${voucherNo}')">Remove</button></td>
           </tr>
         `;
         //clear the input field values
         voucherNo = "";
+        reason.value = "";
         source.value = "";
-        destination.value = "";
         amount.value = "";
         chqNo.value = "";
         carrier.value = "";
@@ -511,14 +486,24 @@
         if (r) {
           r.remove()//removing row
         }
-        //remove entry from the transaction_summary
-        transaction_summary = transaction_summary.filter(item => item.voucher_no !== vcr_no)
+        //remove entry from the receivable_summary
+        receivable_summary = receivable_summary.filter(item => item.voucher_no !== vcr_no)
+        
+        console.log("Pop: ", receivable_summary)
       }
 
       //submit the form
-      document.getElementById("amountTransferForm").addEventListener("submit", event => {
+      document.getElementById("amountReceivableForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
+        //check empty list
+        if(receivable_summary.length === 0){
+          Swal.fire({
+            title: "Empty Transaction list",
+            icon: "error"
+          });
+          return
+        }
         document.getElementById("submitBtn").classList.add("d-none");
 
         const requestOptions = {
@@ -527,10 +512,10 @@
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(transaction_summary),
+          body: JSON.stringify(receivable_summary),
         }
-        console.log(transaction_summary)
-        fetch('http://localhost:4321/api/accounts/amount-transfer/complete-submission', requestOptions)
+        console.log(receivable_summary)
+        fetch('http://localhost:4321/api/accounts/amount-receivable/complete-submission', requestOptions)
           .then(response => response.json())
           .then(data => {
             console.log("resp : ", data)
@@ -538,6 +523,8 @@
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+              //hide form fields
+              document.getElementById("form-content").style.display = 'none'
               //show print button
               document.getElementById('printInvoice').classList.remove('d-none')
             }
@@ -547,19 +534,19 @@
 
       //renderPrintWindow renders printing window 
       function renderPrintWindow() {
-        let n = transaction_summary.length;
+        let n = receivable_summary.length;
         let tBody = '';
 
         if (n > 0) {
           for (let i = 0; i < n; i++) {
-            const ps = transaction_summary[i];
+            const ps = receivable_summary[i];
             tBody += `
             <tr>
               <td>${ps.voucher_no || "-"}</td>
-              <td>${ps.source_account.account_name || "-"}</td>
-              <td>${ps.destination_account.account_name || "-"}</td>
-              <td>${ps.transfer_amount || "-"}</td>
-              <td>${ps.transaction_date ? formatDate(ps.transaction_date, "date", "-") : "-"}</td>
+              <td>${ps.account_type}-${ps.account_name || "-"}</td>
+              <td>${ps.receivable_amount || "-"}</td>
+              <td>${ps.reason || "-"}</td>
+              <td>${ps.date ? formatDate(ps.date, "date", "-") : "-"}</td>
               <td>${ps.cheque_no || "-"}</td>
               <td>${ps.carrier_info || "-"}</td>
               <td>${ps.description || "-"}</td>
@@ -665,11 +652,11 @@
         <body>
           <!-- Header Section -->
           <div class="header">
-            ${transaction_summary.company ? `
-              <h1>${transaction_summary.company.name || ""}</h1>
-              <h2>${transaction_summary.company.slogan || ""}</h2>
-              <p>${transaction_summary.company.address || ""}</p>
-              <p>Mobile: ${transaction_summary.company.mobile || ""} | Email: ${summary.company.email || ""}</p>
+            ${receivable_summary.company ? `
+              <h1>${receivable_summary.company.name || ""}</h1>
+              <h2>${receivable_summary.company.slogan || ""}</h2>
+              <p>${receivable_summary.company.address || ""}</p>
+              <p>Mobile: ${receivable_summary.company.mobile || ""} | Email: ${summary.company.email || ""}</p>
             ` : `
               <h1>ProjuktiSheba Inventory</h1>
               <h2>Track Smarter, Stock Better</h2>
@@ -679,7 +666,7 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Payment Summary</div>
+              <div class="caption">Payable Amount Summary</div>
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>
@@ -690,9 +677,9 @@
               <tr>
                 <th>Voucher No#</th>
                 <th>From</th>
-                <th>To</th>
                 <th>Amount</th>
-                <th>Transaction Date</th>
+                <th>Reason</th>
+                <th>Date</th>
                 <th>Receipt No.</th>
                 <th>Carrier</th>
                 <th>Description</th>

@@ -176,7 +176,7 @@
         <h2 class="text-center text-warning fa-2x"><label>AMOUNT PAYABLE</label></h2>
         <!-- Page content here -->
         <!-- ReceiveCollection Details Section  -->
-        <div class="x_panel bg-gw">
+        <div class="x_panel bg-gw" id="form-content">
           <div class="x_content">
             <div class="row">
               <!-- first col -->
@@ -271,7 +271,7 @@
 
           </div>
         </div>
-        <form action="#" id="amountTransferForm">
+        <form action="#" id="amountPayableForm">
           <!-- /page content -->
           <!-- Received section -->
           <!-- Table row -->
@@ -298,7 +298,7 @@
           <div class="row">
             <div class="col-md-12 com-sm-12 col-xs-12 text-center">
               <button id="submitBtn" class="btn btn-dark" type="submit">Submit</button>
-              <button id="printInvoice" class="btn btn-dark d-none" type="button"
+              <button id="printInvoice" class="btn btn-warning d-none" type="button"
                 onclick="renderPrintWindow()">Print</button>
             </div>
           </div>
@@ -375,20 +375,21 @@
       function updatePage() {
         let destination = document.getElementById("destination");
         destination.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
-        let availability = true;
-        if (customers) {
-          customers.forEach((ac, i) => {
-            destination.innerHTML += `<option value="c-${i}">${ac.account_name}-${ac.account_code}</option>`;
-            availability = false;
-          });
-        }
+        let availability = false;
         if (suppliers) {
           suppliers.forEach((ac, i) => {
             destination.innerHTML += `<option value="s-${i}">${ac.account_name}-${ac.account_code}</option>`;
-            availability = false;
+            availability = true;
           });
         }
-        if (availability) {
+        if (customers) {
+          customers.forEach((ac, i) => {
+            destination.innerHTML += `<option value="c-${i}">${ac.account_name}-${ac.account_code}</option>`;
+            availability = true;
+          });
+        }
+
+        if (!availability) {
           destination.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
           destination.disabled = true;
         }
@@ -406,12 +407,12 @@
 
         let dInfo = destination.split("-");
         let accountID, accountName, accountType;
-        if(dInfo[0] === "c"){
+        if (dInfo[0] === "c") {
           accountType = "Customer";
           accountID = customers[parseInt(dInfo[1])].id;
           accountName = customers[parseInt(dInfo[1])].account_name;
         } else {
-          destinationAccountType = "Supplier"
+          accountType = "Supplier"
           accountID = suppliers[parseInt(dInfo[1])].id;
           accountName = suppliers[parseInt(dInfo[1])].account_name;
         }
@@ -420,15 +421,14 @@
           date: date,
           payable_amount: parseInt(amount.value),
           reason: reason.value,
-          account_type:accountType,
-          account_id:accountID,
-          account_name:accountName,
+          account_type: accountType,
+          account_id: accountID,
+          account_name: accountName,
           cheque_no: chqNo.value,
           carrier_info: carrier.value,
           description: description.value,
         }
-        //push data to the array
-        payable_summary.push(sm);
+        console.log("push: ", payable_summary)
         //push to table
         if (date == "") {
           Swal.fire({
@@ -455,11 +455,13 @@
           });
           return
         }
+        //push data to the array
+        payable_summary.push(sm);
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
             <td>${reason.value}</td>
-            <td>${destinationAccount.account_name}</td> 
+            <td>${accountType}-${accountName}</td> 
             <td>${amount.value}</td>
             <td>${chqNo.value}</td>
             <td>${carrier.value}</td>
@@ -486,12 +488,22 @@
         }
         //remove entry from the payable_summary
         payable_summary = payable_summary.filter(item => item.voucher_no !== vcr_no)
+
+        console.log("Pop: ", payable_summary)
       }
 
       //submit the form
-      document.getElementById("amountTransferForm").addEventListener("submit", event => {
+      document.getElementById("amountPayableForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
+        //check empty list
+        if (payable_summary.length === 0) {
+          Swal.fire({
+            title: "Empty Transaction list",
+            icon: "error"
+          });
+          return
+        }
         document.getElementById("submitBtn").classList.add("d-none");
 
         const requestOptions = {
@@ -511,6 +523,8 @@
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+              //hide form fields
+              document.getElementById("form-content").style.display = 'none'
               //show print button
               document.getElementById('printInvoice').classList.remove('d-none')
             }
@@ -529,9 +543,9 @@
             tBody += `
             <tr>
               <td>${ps.voucher_no || "-"}</td>
-              <td>${ps.reason || "-"}</td>
-              <td>${ps.destination_account.account_name || "-"}</td>
+              <td>${ps.account_type}-${ps.account_name || "-"}</td>
               <td>${ps.payable_amount || "-"}</td>
+              <td>${ps.reason || "-"}</td>
               <td>${ps.date ? formatDate(ps.date, "date", "-") : "-"}</td>
               <td>${ps.cheque_no || "-"}</td>
               <td>${ps.carrier_info || "-"}</td>
@@ -662,9 +676,9 @@
             <thead>
               <tr>
                 <th>Voucher No#</th>
-                <th>Reason</th>
                 <th>Paid To</th>
                 <th>Amount</th>
+                <th>Reason</th>
                 <th>Date</th>
                 <th>Receipt No.</th>
                 <th>Carrier</th>

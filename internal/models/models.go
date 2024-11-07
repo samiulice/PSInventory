@@ -354,3 +354,16 @@ type AmountPayableSummary struct {
 	Carrier       string `json:"carrier_info"`
 	Description   string `json:"description"`
 }
+// AmountReceivableSummary is the definition for amount receivable info
+type AmountReceivableSummary struct {
+	VoucherNo     string `json:"voucher_no"`
+	Date          string `json:"date"`
+	ReceivableAmount int    `json:"receivable_amount"`
+	Reason        string `json:"reason"`
+	AccountType   string `json:"account_type"`
+	AccountID     int    `json:"account_id"`
+	AccountName   string `json:"account_name"`
+	ChequeNo      string `json:"cheque_no"`
+	Carrier       string `json:"carrier_info"`
+	Description   string `json:"description"`
+}

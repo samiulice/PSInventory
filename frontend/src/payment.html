@@ -176,7 +176,7 @@
         <h2 class="text-center text-warning fa-2x"><label>PAYMENT</label></h2>
         <!-- Page content here -->
         <!-- ReceiveCollection Details Section  -->
-        <div class="x_panel bg-gw">
+        <div class="x_panel bg-gw" id="form-content">
           <div class="x_title">
             <h2>Due History</h2>
             <div style="color: rgb(255, 0, 0); float: right;">Due: &nbsp;&#2547; <label
@@ -419,8 +419,6 @@
           carrier_info: carrier.value,
           description: description.value,
         }
-        //push data to the array
-        payment_summary.push(ps);
         //push to table
         if (paymentDate == "") {
           Swal.fire({
@@ -455,6 +453,8 @@
           });
           return
         }
+        //push data to the array
+        payment_summary.push(ps);
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
@@ -493,6 +493,14 @@
       document.getElementById("paymentForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
+        //check empty list
+        if(payment_summary.length === 0){
+          Swal.fire({
+            title: "Empty Transaction list",
+            icon: "error"
+          });
+          return
+        }
         document.getElementById("submitBtn").classList.add("d-none");
 
         const requestOptions = {
@@ -512,6 +520,8 @@
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+              //hide form fields
+              document.getElementById("form-content").style.display = 'none'
               //show print button
               document.getElementById('printInvoice').classList.remove('d-none')
             }

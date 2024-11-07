@@ -176,7 +176,7 @@
         <h2 class="text-center text-warning fa-2x"><label>RECEIVE & COLLECTION</label></h2>
         <!-- Page content here -->
         <!-- ReceiveCollection Details Section  -->
-        <div class="x_panel bg-gw">
+        <div class="x_panel bg-gw" id="form-content">
           <div class="x_title">
             <div class="col-md-4 col-sm-4 col-xs-4">
               <h2>Due History</h2>
@@ -264,8 +264,8 @@
               </div>
             </div>
             <div class="row text-center">
-              <button type="button" class="btn btn-primary"
-                id="add-transaction-info" onclick="addToSummary()"><i class="fa fa-arrow-down"></i> Add
+              <button type="button" class="btn btn-primary" id="add-transaction-info" onclick="addToSummary()"><i
+                  class="fa fa-arrow-down"></i> Add
               </button>
             </div>
           </div>
@@ -420,8 +420,6 @@
           carrier_info: carrier.value,
           description: description.value,
         }
-        //push data to the array
-        reception_summary.push(ps);
         //push to table
         if (paymentDate == "") {
           Swal.fire({
@@ -456,6 +454,8 @@
           });
           return
         }
+        //push data to the array
+        reception_summary.push(ps);
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
@@ -494,6 +494,14 @@
       document.getElementById("receiveCollectionForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
+        //check empty list
+        if (reception_summary.length === 0) {
+          Swal.fire({
+            title: "Empty Transaction list",
+            icon: "error"
+          });
+          return
+        }
         document.getElementById("submitBtn").classList.add("d-none");
 
         const requestOptions = {
@@ -513,6 +521,8 @@
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+              //hide form fields
+              document.getElementById("form-content").style.display = 'none'
               //show print button
               document.getElementById('printInvoice').classList.remove('d-none')
             }

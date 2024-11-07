@@ -176,7 +176,7 @@
         <h2 class="text-center text-warning fa-2x"><label>AMOUNT TRANSFER</label></h2>
         <!-- Page content here -->
         <!-- ReceiveCollection Details Section  -->
-        <div class="x_panel bg-gw">
+        <div class="x_panel bg-gw" id="form-content">
           <div class="x_title">
             <h2>Transfer Form</h2>
             <div style="color: rgb(255, 0, 0); float: right;">Current Balance: &nbsp;&#2547; <label
@@ -430,8 +430,6 @@
           carrier_info: carrier.value,
           description: description.value,
         }
-        //push data to the array
-        transaction_summary.push(sm);
         //push to table
         if (transactionDate == "") {
           Swal.fire({
@@ -466,6 +464,9 @@
           });
           return
         }
+        
+        //push data to the array
+        transaction_summary.push(sm);
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
@@ -503,6 +504,14 @@
       document.getElementById("amountTransferForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
+        //check empty list
+        if(transaction_summary.length === 0){
+          Swal.fire({
+            title: "Empty Transaction list",
+            icon: "error"
+          });
+          return
+        }
         document.getElementById("submitBtn").classList.add("d-none");
 
         const requestOptions = {
@@ -522,6 +531,8 @@
               showErrorMessage(data.message)
             } else {
               showSuccessMessage(data.message);
+              //hide form fields
+              document.getElementById("form-content").style.display = 'none'
               //show print button
               document.getElementById('printInvoice').classList.remove('d-none')
             }

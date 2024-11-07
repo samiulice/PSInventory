@@ -1101,9 +1101,8 @@ func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r
 func (app *application) CompleteReceiveCollectionProcess(w http.ResponseWriter, r *http.Request) {
 	var Summary []*models.ReceptionSummary
 	var resp struct {
-		Error   bool                       `json:"error,omitempty"`
-		Message string                     `json:"message,omitempty"`
-		Summary []*models.ReceptionSummary `json:"reception_summary"`
+		Error   bool   `json:"error,omitempty"`
+		Message string `json:"message,omitempty"`
 	}
 
 	err := app.readJSON(w, r, &Summary)
@@ -1174,9 +1173,8 @@ func (app *application) GetPaymentPageDetails(w http.ResponseWriter, r *http.Req
 func (app *application) CompletePaymentProcess(w http.ResponseWriter, r *http.Request) {
 	var Summary []*models.PaymentSummary
 	var resp struct {
-		Error   bool                     `json:"error,omitempty"`
-		Message string                   `json:"message,omitempty"`
-		Summary []*models.PaymentSummary `json:"payment_summary"`
+		Error   bool   `json:"error,omitempty"`
+		Message string `json:"message,omitempty"`
 	}
 
 	err := app.readJSON(w, r, &Summary)
@@ -1222,9 +1220,8 @@ func (app *application) CompleteAmountTransferProcess(w http.ResponseWriter, r *
 	var Summary []*models.AmountTransferSummary
 
 	var resp struct {
-		Error   bool                            `json:"error,omitempty"`
-		Message string                          `json:"message,omitempty"`
-		Summary []*models.AmountTransferSummary `json:"transaction_summary"`
+		Error   bool   `json:"error,omitempty"`
+		Message string `json:"message,omitempty"`
 	}
 
 	err := app.readJSON(w, r, &Summary)
@@ -1247,11 +1244,11 @@ func (app *application) CompleteAmountTransferProcess(w http.ResponseWriter, r *
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// GetAmountPayableDetails handle amount payable between to accounts
+// GetAmountPayableDetails scarp data amount payable page
 func (app *application) GetAmountPayableDetails(w http.ResponseWriter, r *http.Request) {
 	var resp struct {
-		Error    bool                  `json:"error,omitempty"`
-		Message  string                `json:"message,omitempty"`
+		Error     bool               `json:"error,omitempty"`
+		Message   string             `json:"message,omitempty"`
 		Suppliers []*models.Supplier `json:"suppliers"`
 		Customers []*models.Customer `json:"customers"`
 	}
@@ -1272,9 +1269,83 @@ func (app *application) GetAmountPayableDetails(w http.ResponseWriter, r *http.R
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-func (app *application)CompleteAmountPayableProcess(w http.ResponseWriter, r *http.Request){
-	
+// CompleteAmountPayableProcess completes amount payable process
+func (app *application) CompleteAmountPayableProcess(w http.ResponseWriter, r *http.Request) {
+	var amountPayableSummary []*models.AmountPayableSummary
+	var resp struct {
+		Error   bool   `json:"error,omitempty"`
+		Message string `json:"message,omitempty"`
+	}
+	err := app.readJSON(w, r, &amountPayableSummary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+
+	err = app.DB.CompleteAmountPayableTransactions(amountPayableSummary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	resp.Message = "Success"
+	app.writeJSON(w, http.StatusOK, resp)
 }
+
+// GetAmountReceivableDetails scarp data amount receivable page
+func (app *application) GetAmountReceivableDetails(w http.ResponseWriter, r *http.Request) {
+	var resp struct {
+		Error     bool               `json:"error,omitempty"`
+		Message   string             `json:"message,omitempty"`
+		Suppliers []*models.Supplier `json:"suppliers"`
+		Customers []*models.Customer `json:"customers"`
+	}
+
+	suppliers, err := app.DB.GetActiveSuppliersIDAndName()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAmountReceivableDetails => %w", err))
+		return
+	}
+	customers, err := app.DB.GetActiveCustomersIDAndName()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAmountReceivableDetails => %w", err))
+		return
+	}
+	resp.Message = "Data fetched successfully"
+	resp.Suppliers = suppliers
+	resp.Customers = customers
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// CompleteAmountReceivableProcess completes amount receivable process
+func (app *application) CompleteAmountReceivableProcess(w http.ResponseWriter, r *http.Request) {
+	var amountReceivableSummary []*models.AmountReceivableSummary
+	var resp struct {
+		Error   bool   `json:"error,omitempty"`
+		Message string `json:"message,omitempty"`
+	}
+	err := app.readJSON(w, r, &amountReceivableSummary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+
+	err = app.DB.CompleteAmountReceivableTransactions(amountReceivableSummary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	resp.Message = "Success"
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // ClaimWarrantyBySerialID handles claiming warranty process for a specific product item with serial ID
 func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {

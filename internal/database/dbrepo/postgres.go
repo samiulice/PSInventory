@@ -2293,6 +2293,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	}
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
+		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Commit):" + err.Error())
 	}
 	return nil
@@ -2426,6 +2427,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
+		tx.Rollback()
 		return errors.New("SQLErrorSaleProducts(Commit):" + err.Error())
 	}
 	return nil
@@ -2514,6 +2516,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	}
 	// Commit the transaction
 	if err := tx.Commit(); err != nil {
+		tx.Rollback()
 		return id, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
@@ -2543,6 +2546,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		`
 		err := tx.QueryRowContext(ctx, query, time.Now(), id).Scan(&productItemID, &mrp)
 		if err != nil {
+			tx.Rollback()
 			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in product_serial_numbers table SQL %w", err)
 		}
 		query = `
@@ -2555,6 +2559,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		`
 		_, err = tx.ExecContext(ctx, query, int(mrp-mrp*SalesHistory.Discount/100), productItemID)
 		if err != nil {
+			tx.Rollback()
 			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in products table SQL %w", err)
 		}
 	}
@@ -2563,6 +2568,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	//get the last index of sales_return_history Table
 	lastID, err := p.LastIndex("sales_return_history")
 	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to get last index of sales_return_history table:  %w", err)
 	}
 	MemoNo = MemoNo + strconv.FormatInt(lastID+1, 10) //update memo no
@@ -2578,6 +2584,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	`
 	result, err := tx.ExecContext(ctx, query, SaleReturnDate, SalesHistory.CustomerID, SalesHistory.ID, MemoNo, returnItemsID, ReturnItemsCount, ReturnAmount, time.Now(), time.Now())
 	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE SQL %w", err)
 	}
 	if n, err := result.RowsAffected(); err != nil || n != 1 {
@@ -2620,6 +2627,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	err = tx.Commit()
 
 	if err != nil {
+		tx.Rollback()
 		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to commit transaction:  %w", err)
 	}
 	return nil
@@ -2729,6 +2737,7 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(memoPrefix string, serialID int, se
 	}
 	// Commit the transaction
 	if err := tx.Commit(); err != nil {
+		tx.Rollback()
 		return id, fmt.Errorf("DBERROR: AddNewWarrantyClaim => failed to commit transaction: %w", err)
 	}
 	return id, nil
@@ -2745,7 +2754,7 @@ func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSeria
 	defer cancel()
 
 	//begin a transaction
-	tx, err := p.DB.Begin()
+	tx, err := p.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to begin transaction => %w", err)
 	}
@@ -2906,6 +2915,7 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.ReceivedDate)
 		if err != nil {
+			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable parse time in go supported format: %w", err)
 		}
 		//insert to financial transactions
@@ -2972,6 +2982,7 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.PaymentSu
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.PaymentDate)
 		if err != nil {
+			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable parse time in go supported format: %w", err)
 		}
 		//insert to financial transactions
@@ -3046,6 +3057,7 @@ func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.Am
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.TransactionDate)
 		if err != nil {
+			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable parse time in go supported format: %w", err)
 		}
 		//insert to financial transactions
@@ -3065,6 +3077,111 @@ func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.Am
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable to commit: %w", err)
+	}
+	return nil
+}
+func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.AmountPayableSummary) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//Begin transaction
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to begin transaction: %w", err)
+	}
+
+	for _, sum := range summary {
+		tableName := "suppliers"
+		if sum.AccountType == "Customer" {
+			sum.PayableAmount = (-1) * sum.PayableAmount
+			tableName = "customers"
+		}
+		stmt := `
+			UPDATE public.` + tableName + `
+			SET due_amount = due_amount + $1, updated_at = $2
+			WHERE id = $3
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.AccountID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+		}
+		//convert receivedDate into go supported date
+		txDate, err := time.Parse("01/02/2006", sum.Date)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable parse time in go supported format: %w", err)
+		}
+		//insert to financial transactions
+		stmt = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Amount Payable', 'Account', 0, $1, $2, $3, $4, $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.PayableAmount, txDate, sum.VoucherNo, sum.Description)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to commit: %w", err)
+	}
+	return nil
+}
+
+func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.AmountReceivableSummary) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//Begin transaction
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to begin transaction: %w", err)
+	}
+
+	for _, sum := range summary {
+		tableName := "customers"
+		if sum.AccountType == "Supplier" {
+			sum.ReceivableAmount = (-1) * sum.ReceivableAmount
+			tableName = "suppliers"
+		}
+		stmt := `
+			UPDATE public.` + tableName + `
+			SET due_amount = due_amount + $1, updated_at = $2
+			WHERE id = $3
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.AccountID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update due_amount in suppliers table: %w", err)
+		}
+		//convert receivedDate into go supported date
+		txDate, err := time.Parse("01/02/2006", sum.Date)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable parse time in go supported format: %w", err)
+		}
+		//insert to financial transactions
+		stmt = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Amount Receivable', $1, $2, 'Account', 0, $3, $4, $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.ReceivableAmount, txDate, sum.VoucherNo, sum.Description)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to commit: %w", err)
 	}
 	return nil
 }
