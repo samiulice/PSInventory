@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>PSINVENTORY</title>
+  <title>Expenses</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -173,16 +173,12 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>RECEIVE & COLLECTION</label></h2>
+        <h2 class="text-center text-warning fa-2x"><label>EXPENSES</label></h2>
         <!-- Page content here -->
-        <!-- ReceiveCollection Details Section  -->
+        <!-- expenses Details Section  -->
         <div class="x_panel bg-gw">
           <div class="x_title">
-            <div class="col-md-4 col-sm-4 col-xs-4">
-              <h2>Due History</h2>
-            </div>
-            <div style="color: rgb(255, 0, 0); float: right;">Due: &nbsp;&#2547; <label id="due_amount">0</b></label>
-            </div>
+            <h2>Expenses Form</h2>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -191,21 +187,21 @@
               <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="destination">Cash/Bank *: </label>
+                    <label for="destination">Paid To *: </label>
                     <select class="form-control  has-feedback-left" id="destination" required>
-                      <option value="" selected disabled>Select Account</option>
+                      <option value="" selected disabled>Select Supplier Account</option>
                     </select>
-                    <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
+                    <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
+                      aria-hidden="true"></i>
                   </div>
                 </div>
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="source">Received From *: </label>
+                    <label for="source">Cash/Bank *: </label>
                     <select class="form-control  has-feedback-left" id="source" required>
-                      <option value="" selected disabled>Select Customer Account</option>
+                      <option value="" selected disabled>Select Account</option>
                     </select>
-                    <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
-                      aria-hidden="true"></i>
+                    <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
                   </div>
                 </div>
               </div>
@@ -223,8 +219,8 @@
                 </div>
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="received-amount">Received Amount *:</label>
-                    <input type="number" id="received-amount" class="form-control has-feedback-left"
+                    <label for="paid-amount">Paid Amount *:</label>
+                    <input type="number" id="paid-amount" class="form-control has-feedback-left"
                       placeholder="Enter amount" required>
                     <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left "
                       aria-hidden="true"></i>
@@ -268,9 +264,10 @@
                 id="add-transaction-info" onclick="addToSummary()"><i class="fa fa-arrow-down"></i> Add
               </button>
             </div>
+
           </div>
         </div>
-        <form action="#" id="receiveCollectionForm">
+        <form action="#" id="paymentForm">
           <!-- /page content -->
           <!-- Received section -->
           <!-- Table row -->
@@ -280,13 +277,13 @@
               <tr>
                 <th>Voucher No.</th>
                 <th>Cash/Bank</th>
-                <th>Paid By</th>
-                <th>Received Amount</th>
-                <th>Total Receivable Amount</th>
+                <th>Paid To</th>
+                <th>Paid Amount</th>
+                <th>Total Payable Amount</th>
                 <th>Receipt No</th>
                 <th>Carrier</th>
                 <th>Description</th>
-                <th>Received Date</th>
+                <th>Payment Date</th>
                 <th>Remove</th>
               </tr>
             </thead>
@@ -352,28 +349,28 @@
     <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
     <script>
-      let accounts, customers, payableAmount, reception_summary = [];
+      let accounts, suppliers, payableAmount, payment_summary = [];
       window.addEventListener("DOMContentLoaded", () => {
-        // fetch-1: On load window Get accounts for destination and customers who have due amount
+        // fetch-1: On load window Get accounts for destination and suppliers who have due amount
         const requestOptions = {
           method: 'post'
         }
-        fetch('http://localhost:4321/api/accounts/receive-collection/get-page-details', requestOptions)
+        fetch('http://localhost:4321/api/accounts/payment/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
               accounts = data.head_accounts;
-              customers = data.customers;
+              suppliers = data.suppliers;
               updatePage();
             }
           })
       })
 
       function updatePage() {
-        let accountsDiv = document.getElementById("destination");
-        let customerDiv = document.getElementById("source");
+        let accountsDiv = document.getElementById("source");
+        let supplierDiv = document.getElementById("destination");
         accountsDiv.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
         if (accounts) {
           accounts.forEach((ac, i) => {
@@ -383,27 +380,27 @@
           accountsDiv.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
           accountsDiv.ariaDisabled = true;
         }
-        customerDiv.innerHTML = `<option value="" selected disabled>Select Customer Account</option>`;
-        if (customers) {
-          customers.forEach((c, i) => {
-            customerDiv.innerHTML += `<option value="${i}">${c.account_name}[${c.account_code}]</option>`;
+        supplierDiv.innerHTML = `<option value="" selected disabled>Select Supplier Account</option>`;
+        if (suppliers) {
+          suppliers.forEach((c, i) => {
+            supplierDiv.innerHTML += `<option value="${i}">${c.account_name}[${c.account_code}]</option>`;
           });
         } else {
-          customerDiv.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-          customerDiv.ariaDisabled = true;
+          supplierDiv.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
+          supplierDiv.ariaDisabled = true;
         }
       }
 
       //change due_amount section on changing customer selection
-      document.getElementById("source").addEventListener("change", () => {
-        payableAmount = customers[parseInt(document.getElementById("source").value)].due_amount
+      document.getElementById("destination").addEventListener("change", () => {
+        payableAmount = suppliers[parseInt(document.getElementById("destination").value)].due_amount
         document.getElementById("due_amount").innerText = payableAmount;
-        document.getElementById("received-amount").max = payableAmount;
+        document.getElementById("paid-amount").max = payableAmount;
       })
 
       function addToSummary() {
         let paymentDate = document.getElementById("single_cal4").value;
-        let receivedAmount = document.getElementById("received-amount");
+        let paidAmount = document.getElementById("paid-amount");
         let destination = document.getElementById("destination");
         let source = document.getElementById("source");
         let chqNo = document.getElementById("chq-no");
@@ -412,16 +409,16 @@
         let voucherNo = `V-RC-${generateRandomAlphanumericCode(6)}`
         let ps = {
           voucher_no: voucherNo,
-          received_date: paymentDate,
-          received_amount: parseInt(receivedAmount.value),
-          source_account: customers[parseInt(source.value)],
-          destination_account: accounts[parseInt(destination.value)],
+          payment_date: paymentDate,
+          paid_amount: parseInt(paidAmount.value),
+          source_account: accounts[parseInt(source.value)],
+          destination_account: suppliers[parseInt(destination.value)],
           cheque_no: chqNo.value,
           carrier_info: carrier.value,
           description: description.value,
         }
         //push data to the array
-        reception_summary.push(ps);
+        payment_summary.push(ps);
         //push to table
         if (paymentDate == "") {
           Swal.fire({
@@ -431,27 +428,27 @@
           return
         } else if (source.value === "") {
           Swal.fire({
-            title: "Select Customer Account",
+            title: "Select Cash-bank Account",
             icon: "error"
           });
           return
         }
         else if (destination.value === "") {
           Swal.fire({
-            title: "Select Cash-bank Account",
+            title: "Select Supplier Account",
             icon: "error"
           });
           return
         }
-        else if (receivedAmount.value === '') {
+        else if (paidAmount.value === '') {
           Swal.fire({
-            title: "Received Amount must be greater than 0",
+            title: "Paid Amount must be greater than 0",
             icon: "error"
           });
           return
-        } else if (receivedAmount.value > payableAmount) {
+        } else if (paidAmount.value > payableAmount) {
           Swal.fire({
-            title: `Received Amount exceeds max limit(&#2547; ${payableAmount})`,
+            title: `Paid Amount exceeds max limit(&#2547; ${payableAmount})`,
             icon: "error"
           });
           return
@@ -459,9 +456,9 @@
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
-            <td>${accounts[parseInt(destination.value)].account_name}</td>
-            <td>${customers[parseInt(source.value)].account_name}</td> 
-            <td>${receivedAmount.value}</td>
+            <td>${accounts[parseInt(source.value)].account_name}</td>
+            <td>${suppliers[parseInt(destination.value)].account_name}</td> 
+            <td>${paidAmount.value}</td>
             <td>${payableAmount}</td>
             <td>${chqNo.value}</td>
             <td>${carrier.value}</td>
@@ -474,7 +471,7 @@
         voucherNo = "";
         source.value = "";
         destination.value = "";
-        receivedAmount.value = "";
+        paidAmount.value = "";
         chqNo.value = "";
         carrier.value = "";
         description.value = "";
@@ -486,12 +483,12 @@
         if (r) {
           r.remove()//removing row
         }
-        //remove entry from the reception_summary
-        reception_summary = reception_summary.filter(item => item.voucher_no !== vcr_no)
+        //remove entry from the payment_summary
+        payment_summary = payment_summary.filter(item => item.voucher_no !== vcr_no)
       }
 
       //submit the form
-      document.getElementById("receiveCollectionForm").addEventListener("submit", event => {
+      document.getElementById("paymentForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
         document.getElementById("submitBtn").classList.add("d-none");
@@ -502,10 +499,10 @@
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(reception_summary),
+          body: JSON.stringify(payment_summary),
         }
-        console.log(reception_summary)
-        fetch('http://localhost:4321/api/accounts/receive-collection/complete-submission', requestOptions)
+        console.log(payment_summary)
+        fetch('http://localhost:4321/api/accounts/payment/complete-submission', requestOptions)
           .then(response => response.json())
           .then(data => {
             console.log("resp : ", data)
@@ -522,20 +519,20 @@
 
       //renderPrintWindow renders printing window 
       function renderPrintWindow() {
-        let n = reception_summary.length;
+        let n = payment_summary.length;
         let tBody = '';
 
         if (n > 0) {
           for (let i = 0; i < n; i++) {
-            const ps = reception_summary[i];
+            const ps = payment_summary[i];
             tBody += `
             <tr>
               <td>${ps.voucher_no || "-"}</td>
-              <td>${ps.destination_account.account_name || "-"}</td>
               <td>${ps.source_account.account_name || "-"}</td>
-              <td>${ps.received_amount || "-"}</td>
-              <td>${ps.source_account.due_amount || "-"}</td>
-              <td>${ps.received_date ? formatDate(ps.received_date, "date", "-") : "-"}</td>
+              <td>${ps.destination_account.account_name || "-"}</td>
+              <td>${ps.paid_amount || "-"}</td>
+              <td>${ps.destination_account.due_amount || "-"}</td>
+              <td>${ps.payment_date ? formatDate(ps.payment_date, "date", "-") : "-"}</td>
               <td>${ps.cheque_no || "-"}</td>
               <td>${ps.carrier_info || "-"}</td>
               <td>${ps.description || "-"}</td>
@@ -641,11 +638,11 @@
         <body>
           <!-- Header Section -->
           <div class="header">
-            ${reception_summary.company ? `
-              <h1>${reception_summary.company.name || ""}</h1>
-              <h2>${reception_summary.company.slogan || ""}</h2>
-              <p>${reception_summary.company.address || ""}</p>
-              <p>Mobile: ${reception_summary.company.mobile || ""} | Email: ${reception_summary.company.email || ""}</p>
+            ${payment_summary.company ? `
+              <h1>${payment_summary.company.name || ""}</h1>
+              <h2>${payment_summary.company.slogan || ""}</h2>
+              <p>${payment_summary.company.address || ""}</p>
+              <p>Mobile: ${payment_summary.company.mobile || ""} | Email: ${payment_summary.company.email || ""}</p>
             ` : `
               <h1>ProjuktiSheba Inventory</h1>
               <h2>Track Smarter, Stock Better</h2>
@@ -655,7 +652,7 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Collection Summary</div>
+              <div class="caption">Payment Summary</div>
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>
@@ -666,10 +663,10 @@
               <tr>
                 <th>Voucher No#</th>
                 <th>Cash/Bank</th>
-                <th>Paid By</th>
-                <th>Received Amount</th>
-                <th>Total Receivable Amount</th>
-                <th>Received Date</th>
+                <th>Paid To</th>
+                <th>Paid Amount</th>
+                <th>Total Payable Amount</th>
+                <th>Payment Date</th>
                 <th>Receipt No.</th>
                 <th>Carrier</th>
                 <th>Description</th>
