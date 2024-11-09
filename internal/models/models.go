@@ -305,8 +305,8 @@ type Service struct {
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
-// ReceptionSummary is the definition for Receive & Collection info
-type ReceptionSummary struct {
+// Reception is the definition for Receive & Collection info
+type Reception struct {
 	VoucherNo          string       `json:"voucher_no"`
 	ReceivedDate       string       `json:"received_date"`
 	ReceivedAmount     int          `json:"received_amount"`
@@ -317,8 +317,8 @@ type ReceptionSummary struct {
 	Description        string       `json:"description"`
 }
 
-// PaymentSummary is the definition for payment info
-type PaymentSummary struct {
+// Payment is the definition for payment info
+type Payment struct {
 	VoucherNo          string       `json:"voucher_no"`
 	PaymentDate        string       `json:"payment_date"`
 	PaidAmount         int          `json:"paid_amount"`
@@ -329,8 +329,8 @@ type PaymentSummary struct {
 	Description        string       `json:"description"`
 }
 
-// AmountTransferSummary is the definition for amount transfer info
-type AmountTransferSummary struct {
+// AmountTransfer is the definition for amount transfer info
+type AmountTransfer struct {
 	VoucherNo          string       `json:"voucher_no"`
 	TransactionDate    string       `json:"transaction_date"`
 	TransferAmount     int          `json:"transfer_amount"`
@@ -341,8 +341,8 @@ type AmountTransferSummary struct {
 	Description        string       `json:"description"`
 }
 
-// AmountPayableSummary is the definition for amount payable info
-type AmountPayableSummary struct {
+// AmountPayable is the definition for amount payable info
+type AmountPayable struct {
 	VoucherNo     string `json:"voucher_no"`
 	Date          string `json:"date"`
 	PayableAmount int    `json:"payable_amount"`
@@ -354,16 +354,29 @@ type AmountPayableSummary struct {
 	Carrier       string `json:"carrier_info"`
 	Description   string `json:"description"`
 }
-// AmountReceivableSummary is the definition for amount receivable info
-type AmountReceivableSummary struct {
-	VoucherNo     string `json:"voucher_no"`
-	Date          string `json:"date"`
+
+// AmountReceivable is the definition for amount receivable info
+type AmountReceivable struct {
+	VoucherNo        string `json:"voucher_no"`
+	Date             string `json:"date"`
 	ReceivableAmount int    `json:"receivable_amount"`
-	Reason        string `json:"reason"`
-	AccountType   string `json:"account_type"`
-	AccountID     int    `json:"account_id"`
-	AccountName   string `json:"account_name"`
-	ChequeNo      string `json:"cheque_no"`
-	Carrier       string `json:"carrier_info"`
-	Description   string `json:"description"`
+	Reason           string `json:"reason"`
+	AccountType      string `json:"account_type"`
+	AccountID        int    `json:"account_id"`
+	AccountName      string `json:"account_name"`
+	ChequeNo         string `json:"cheque_no"`
+	Carrier          string `json:"carrier_info"`
+	Description      string `json:"description"`
+}
+
+// Expense is the definition for expense info
+type Expense struct {
+	VoucherNo          string       `json:"voucher_no"`
+	ExpenseDate        string       `json:"expense_date"`
+	PaidAmount         int          `json:"paid_amount"`
+	SourceAccount      *HeadAccount `json:"source_account"`
+	DestinationAccount *Supplier    `json:"destination_account"`
+	ChequeNo           string       `json:"cheque_no"`
+	Carrier            string       `json:"carrier_info"`
+	Description        string       `json:"description"`
 }

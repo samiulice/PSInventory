@@ -116,7 +116,7 @@
                         <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
-                        <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
+                        <li class="sub_menu"><a href="customer-due-report.html">Customer Due Report</a></li>
                         <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
                         <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
                         <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
@@ -189,7 +189,7 @@
                   <div class="col-md-12 col-sm-12 col-xs-12">
                     <label for="destination">Paid To *: </label>
                     <select class="form-control  has-feedback-left" id="destination" required>
-                      <option value="" selected disabled>Select Supplier Account</option>
+                      <option value="" selected disabled>Select Account</option>
                     </select>
                     <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
                       aria-hidden="true"></i>
@@ -210,7 +210,7 @@
               <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label id="date" for="single_cal4">Date *:</label>
+                    <label for="single_cal4">Date *:</label>
                     <input type="text" id="single_cal4" class="form-control has-feedback-left" placeholder="Select Date"
                       aria-describedby="inputSuccess2Status4" required>
                     <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left "
@@ -260,8 +260,8 @@
               </div>
             </div>
             <div class="row text-center">
-              <button type="button" class="btn btn-primary"
-                id="add-transaction-info" onclick="addToSummary()"><i class="fa fa-arrow-down"></i> Add
+              <button type="button" class="btn btn-primary" id="add-transaction-info" onclick="addToSummary()"><i
+                  class="fa fa-arrow-down"></i> Add
               </button>
             </div>
 
@@ -279,12 +279,11 @@
                 <th>Cash/Bank</th>
                 <th>Paid To</th>
                 <th>Paid Amount</th>
-                <th>Total Payable Amount</th>
                 <th>Receipt No</th>
                 <th>Carrier</th>
                 <th>Description</th>
                 <th>Payment Date</th>
-                <th>Remove</th>
+                <th class="remove-item-btn">Remove</th>
               </tr>
             </thead>
             <tbody id="tBody">
@@ -349,13 +348,13 @@
     <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
     <script>
-      let accounts, suppliers, payableAmount, payment_summary = [];
+      let accounts, suppliers, payment_summary = [];
       window.addEventListener("DOMContentLoaded", () => {
         // fetch-1: On load window Get accounts for destination and suppliers who have due amount
         const requestOptions = {
           method: 'post'
         }
-        fetch('http://localhost:4321/api/accounts/payment/get-page-details', requestOptions)
+        fetch('http://localhost:4321/api/accounts/expenses/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
             if (data.error === true) {
@@ -391,25 +390,18 @@
         }
       }
 
-      //change due_amount section on changing customer selection
-      document.getElementById("destination").addEventListener("change", () => {
-        payableAmount = suppliers[parseInt(document.getElementById("destination").value)].due_amount
-        document.getElementById("due_amount").innerText = payableAmount;
-        document.getElementById("paid-amount").max = payableAmount;
-      })
-
       function addToSummary() {
-        let paymentDate = document.getElementById("single_cal4").value;
+        let expenseDate = document.getElementById("single_cal4").value;
         let paidAmount = document.getElementById("paid-amount");
         let destination = document.getElementById("destination");
         let source = document.getElementById("source");
         let chqNo = document.getElementById("chq-no");
         let carrier = document.getElementById("carrier");
         let description = document.getElementById("description");
-        let voucherNo = `V-RC-${generateRandomAlphanumericCode(6)}`
+        let voucherNo = `V-EXP-${generateRandomAlphanumericCode(6)}`
         let ps = {
           voucher_no: voucherNo,
-          payment_date: paymentDate,
+          expense_date: expenseDate,
           paid_amount: parseInt(paidAmount.value),
           source_account: accounts[parseInt(source.value)],
           destination_account: suppliers[parseInt(destination.value)],
@@ -417,11 +409,11 @@
           carrier_info: carrier.value,
           description: description.value,
         }
-        
+
         //push to table
-        if (paymentDate == "") {
+        if (expenseDate == "") {
           Swal.fire({
-            title: "Select payment date",
+            title: "Select expense date",
             icon: "error"
           });
           return
@@ -445,12 +437,6 @@
             icon: "error"
           });
           return
-        } else if (paidAmount.value > payableAmount) {
-          Swal.fire({
-            title: `Paid Amount exceeds max limit(&#2547; ${payableAmount})`,
-            icon: "error"
-          });
-          return
         }
         //push data to the array
         payment_summary.push(ps);
@@ -460,12 +446,11 @@
             <td>${accounts[parseInt(source.value)].account_name}</td>
             <td>${suppliers[parseInt(destination.value)].account_name}</td> 
             <td>${paidAmount.value}</td>
-            <td>${payableAmount}</td>
             <td>${chqNo.value}</td>
             <td>${carrier.value}</td>
             <td>${description.value}</td>
-            <td>${paymentDate}</td>
-            <td><button class="btn btn-xs btn-dark" onclick="removeFromSummary('${voucherNo}')">Remove</button></td>
+            <td>${expenseDate}</td>
+            <td class="remove-item-btn"><button class="btn btn-xs btn-dark" onclick="removeFromSummary('${voucherNo}')">Remove</button></td>
           </tr>
         `;
         //clear the input field values
@@ -492,7 +477,7 @@
       document.getElementById("paymentForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
-        if(payment_summary.length === 0){
+        if (payment_summary.length === 0) {
           Swal.fire({
             title: "Empty Transaction list",
             icon: "error"
@@ -510,7 +495,7 @@
           body: JSON.stringify(payment_summary),
         }
         console.log(payment_summary)
-        fetch('http://localhost:4321/api/accounts/payment/complete-submission', requestOptions)
+        fetch('http://localhost:4321/api/accounts/expenses/complete-submission', requestOptions)
           .then(response => response.json())
           .then(data => {
             console.log("resp : ", data)
@@ -520,6 +505,12 @@
               showSuccessMessage(data.message);
               //hide form fields
               document.getElementById("form-content").style.display = 'none'
+              let elements = document.querySelectorAll('.remove-item-btn');
+              if (elements.length !== 0) {
+                elements.forEach(element => {
+                  element.remove(); // This won't execute since the list is empty
+                });
+              }
               //show print button
               document.getElementById('printInvoice').classList.remove('d-none')
             }
@@ -541,8 +532,7 @@
               <td>${ps.source_account.account_name || "-"}</td>
               <td>${ps.destination_account.account_name || "-"}</td>
               <td>${ps.paid_amount || "-"}</td>
-              <td>${ps.destination_account.due_amount || "-"}</td>
-              <td>${ps.payment_date ? formatDate(ps.payment_date, "date", "-") : "-"}</td>
+              <td>${ps.expense_date ? formatDate(ps.expense_date, "date", "-") : "-"}</td>
               <td>${ps.cheque_no || "-"}</td>
               <td>${ps.carrier_info || "-"}</td>
               <td>${ps.description || "-"}</td>
@@ -662,7 +652,7 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Payment Summary</div>
+              <div class="caption">Expense Summary</div>
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>
@@ -675,8 +665,7 @@
                 <th>Cash/Bank</th>
                 <th>Paid To</th>
                 <th>Paid Amount</th>
-                <th>Total Payable Amount</th>
-                <th>Payment Date</th>
+                <th>Expense Date</th>
                 <th>Receipt No.</th>
                 <th>Carrier</th>
                 <th>Description</th>

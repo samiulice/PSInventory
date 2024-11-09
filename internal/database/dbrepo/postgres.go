@@ -2888,7 +2888,7 @@ func (p *postgresDBRepo) DeliveryWarrantyProduct(warrantyHistoryID, productSeria
 }
 
 // .......................Accounts.......................
-func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models.ReceptionSummary) error {
+func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models.Reception) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -2950,7 +2950,7 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 	}
 	return nil
 }
-func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.PaymentSummary) error {
+func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -3018,7 +3018,7 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.PaymentSu
 	return nil
 }
 
-func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.AmountTransferSummary) error {
+func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.AmountTransfer) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -3080,7 +3080,7 @@ func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.Am
 	}
 	return nil
 }
-func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.AmountPayableSummary) error {
+func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.AmountPayable) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -3133,7 +3133,7 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 	return nil
 }
 
-func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.AmountReceivableSummary) error {
+func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.AmountReceivable) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -3182,6 +3182,70 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to commit: %w", err)
+	}
+	return nil
+}
+
+func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//Begin transaction
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to begin transaction: %w", err)
+	}
+
+	for _, sum := range summary {
+		//update Cash-Bank account
+		//set current_balance += received_amount
+		stmt := `
+			UPDATE public.head_accounts
+			SET current_balance = current_balance - $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.SourceAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update current_balance in head_accounts table: %w", err)
+		}
+
+		//convert expenseDate into go supported date
+		txDate, err := time.Parse("01/02/2006", strings.TrimSpace(sum.ExpenseDate))
+		fmt.Println("Exp Date: ", strings.TrimSpace(sum.ExpenseDate))
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable parse time in go supported format: %w", err)
+		}
+		//insert to financial transactions
+		stmt = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Payment', 'Account', $1, 'Supplier', $2, $3, $4, $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable Insert into financial_transaction table: %w", err)
+		}
+		//update customer account
+		//set due_mount -= received_amount
+		stmt = `
+			UPDATE public.suppliers
+			SET total_amount = total_amount + $1, updated_at = $2
+			WHERE id = $3`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.DestinationAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update due_amount in suppliers table: %w", err)
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to commit: %w", err)
 	}
 	return nil
 }
@@ -3348,6 +3412,28 @@ func (p *postgresDBRepo) GetServiceListReport() ([]*models.Service, error) {
 		service = append(service, &p)
 	}
 	return service, nil
+}
+
+func(p *postgresDBRepo)GetCustomerDueHistory()([]*models.Sale, error){
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var sales []*models.Sale
+	query := `
+		SELECT sl.sale_date, sl.customer_id, sl.memo_no, sl.bill_amount, sl.total_amount, sl.paid_amount, c.id, c.account_code, c.account_name, c.due_amount, c.mobile
+		FROM public.sales_history
+		INNER JOIN public.customers ON (sl.customer_id = c.id)
+		WHERE sl.total_amount > sl.paid_amount
+	`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return sales, fmt.Errorf("DBERROR: GetCustomerDueHistory => %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next(){
+		var sales
+	}
+	return sales, nil
 }
 
 // Helper functions

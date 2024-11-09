@@ -81,15 +81,17 @@ type DatabaseRepo interface {
 
 	//accounts
 	//Receive & Collection
-	CompleteReceiveCollectionTransactions(summary []*models.ReceptionSummary) error
+	CompleteReceiveCollectionTransactions(summary []*models.Reception) error
 	//Payment
-	CompletePaymentTransactions(summary []*models.PaymentSummary) error
+	CompletePaymentTransactions(summary []*models.Payment) error
 	//Amount Transfer
-	CompleteAmountTransferTransactions(summary []*models.AmountTransferSummary) error
+	CompleteAmountTransferTransactions(summary []*models.AmountTransfer) error
 	//Amount Payable
-	CompleteAmountPayableTransactions(summary []*models.AmountPayableSummary) error
+	CompleteAmountPayableTransactions(summary []*models.AmountPayable) error
 	//Amount Receivable
-	CompleteAmountReceivableTransactions(summary []*models.AmountReceivableSummary) error
+	CompleteAmountReceivableTransactions(summary []*models.AmountReceivable) error
+	//Amount Receivable
+	CompleteExpensesTransactions(summary []*models.Expense) error
 	//Inventory Reports
 	GetAllEmployeesList() ([]*models.Employee, error)
 	GetAllSuppliersList() ([]*models.Supplier, error)
@@ -99,6 +101,8 @@ type DatabaseRepo interface {
 	GetProductListReport() ([]*models.Product, error)
 	GetServiceListReport() ([]*models.Service, error)
 
+	//Accounts report
+	GetCustomerDueHistory()([]*models.Sale, error)
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)

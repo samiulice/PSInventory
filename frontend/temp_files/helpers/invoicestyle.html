@@ -2,20 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generate PDF</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
-<body>
-    <button id="generate-pdf">Generate PDF</button>
-
-    <script>
-        document.getElementById('generate-pdf').addEventListener('click', () => {
-            // Your HTML5 structured string
-            let htmlString = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
     <title>Sales Invoice</title>
     <style>
         /* General Styling */
@@ -256,35 +242,5 @@
             Thank you for your business! Please make payments by the due date to avoid late fees. Reference Invoice #98765 when submitting payment.
         </div>
     </div>
-</body>
-</html>
-
-`
-            // Create a temporary element to hold the HTML
-            const tempElement = document.createElement('div');
-            tempElement.innerHTML = htmlString;
-
-            // Use html2pdf to convert the HTML to PDF
-            html2pdf()
-                .from(tempElement)
-                .set({
-                    margin: 0,
-                    filename: 'document.pdf',
-                    html2canvas: { scale: 5 },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                })
-                .toPdf()
-                .get('pdf')
-                .then(function (pdf) {
-                    // Open the PDF in the print dialog
-                    pdf.autoPrint();
-                    window.open(pdf.output('bloburl'), '_blank');
-                })
-                .finally(() => {
-                    // Clean up the temporary element
-                    tempElement.remove();
-                });
-        });
-    </script>
 </body>
 </html>
