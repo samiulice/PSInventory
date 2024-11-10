@@ -2203,7 +2203,20 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		return errors.New("SQLErrorRestockProduct(Update suppliers):" + err.Error())
 	}
 
-	//Tx-3: Insert data to purchase history table
+	//Tx-3 :Update company info :: current_balance,  total_supplier_due
+	var current_balance int
+	query = `
+		UPDATE Public.company_info
+		SET current_balance = current_balance - $1, total_supplier_due =  total_supplier_due + $2
+		WHERE id = 1
+	`
+	err = tx.QueryRowContext(ctx, query, purchase.PaidAmount, purchase.TotalAmount-purchase.PaidAmount).Scan(&current_balance)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Update company_info):" + err.Error())
+	}
+
+	//Tx-4: Insert data to purchase history table
 	//.........insert the following data into purchase_history table.........
 	// PurchaseDate     string
 	// SupplierID       int
@@ -2240,20 +2253,22 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		return errors.New("SQLErrorRestockProduct(Insert purchase_history):" + err.Error())
 	}
 
-	//Tx-4: store financial_transactions
+	//Tx-5: store financial_transactions
 	var financial_transactions_id int
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
-	VALUES ('Payment','Account',$1, 'Supplier', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,created_at,updated_at)
+	VALUES ('Purchase','Account',$1, 'Supplier', $2, $3, $4, $5, $6, $7, $8) RETURNING transaction_id
 	`
 	purchaseDate, err := time.Parse("01/02/2006", purchase.PurchaseDate)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(unable to parse time from string):" + err.Error())
 	}
+	current_balance += purchase.PaidAmount
 	purchaseDescription := "cash payment / Bank Transfer"
 	row = tx.QueryRowContext(ctx, query,
 		&purchase.HeadAccount.ID,
 		&purchase.Supplier.ID,
+		&current_balance,
 		&purchase.PaidAmount,
 		&purchaseDate,
 		&purchaseDescription,
@@ -2402,8 +2417,8 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 
 	//Tx-4: store financial_transactions
 	var financial_transactions_id int
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
-	VALUES ('Receive & Collection','Customer',$1, 'Account', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,voucher_no,created_at,updated_at)
+	VALUES ('Sale','Customer',$1, 'Account', $2, $3, $4, $5, $6, $7, $8) RETURNING transaction_id
 	`
 	saleDate, err := time.Parse("01/02/2006", sale.SaleDate)
 	if err != nil {
@@ -2417,6 +2432,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		&sale.PaidAmount,
 		&saleDate,
 		&description,
+		&sale.MemoNo,
 		time.Now(),
 		time.Now(),
 	)
@@ -2478,7 +2494,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	//Insert Financial transaction
 	var financial_transactions_id int
 	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
-	VALUES ('Cash Transfer','Supplier',$1, 'Account', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	VALUES ('Purchase Return','Supplier',$1, 'Account', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
 	`
 	description := "cash return due to returning product to the supplier"
 	err = tx.QueryRowContext(ctx, query,
@@ -2606,7 +2622,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	//Insert Financial transaction
 	var financial_transactions_id int
 	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
-	VALUES ('Cash Transfer','Account',$1, 'Customer', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	VALUES ('Sale Return','Account',$1, 'Customer', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
 	`
 	description := "cash return due to returning product from the customer"
 	err = tx.QueryRowContext(ctx, query,
