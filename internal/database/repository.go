@@ -102,7 +102,8 @@ type DatabaseRepo interface {
 	GetServiceListReport() ([]*models.Service, error)
 
 	//Accounts report
-	GetCustomerDueHistory()([]*models.Sale, error)
+	GetCustomerDueHistoryReport()([]*models.Sale, error)
+	GetTransactionsHistoryReport()([]*models.Transaction, error)
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)

@@ -3414,26 +3414,80 @@ func (p *postgresDBRepo) GetServiceListReport() ([]*models.Service, error) {
 	return service, nil
 }
 
-func(p *postgresDBRepo)GetCustomerDueHistory()([]*models.Sale, error){
+func (p *postgresDBRepo) GetCustomerDueHistoryReport() ([]*models.Sale, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	var sales []*models.Sale
+
 	query := `
 		SELECT sl.sale_date, sl.customer_id, sl.memo_no, sl.bill_amount, sl.total_amount, sl.paid_amount, c.id, c.account_code, c.account_name, c.due_amount, c.mobile
-		FROM public.sales_history
-		INNER JOIN public.customers ON (sl.customer_id = c.id)
+		FROM public.sales_history as sl
+		INNER JOIN public.customers as c ON (sl.customer_id = c.id)
 		WHERE sl.total_amount > sl.paid_amount
 	`
 	rows, err := p.DB.QueryContext(ctx, query)
 	if err != nil {
-		return sales, fmt.Errorf("DBERROR: GetCustomerDueHistory => %w", err)
+		return sales, fmt.Errorf("DBERROR: GetCustomerDueHistoryReport => %w", err)
 	}
 	defer rows.Close()
 
-	for rows.Next(){
-		var sales
+	for rows.Next() {
+		var sale models.Sale
+		err = rows.Scan(
+			&sale.SaleDate,
+			&sale.CustomerID,
+			&sale.MemoNo,
+			&sale.BillAmount,
+			&sale.TotalAmount,
+			&sale.PaidAmount,
+			&sale.Customer.ID,
+			&sale.Customer.AccountCode,
+			&sale.Customer.AccountName,
+			&sale.Customer.DueAmount,
+			&sale.Customer.Mobile,
+		)
+		if err != nil {
+			return sales, fmt.Errorf("DBERROR: GetCustomerDueHistoryReport => %w", err)
+		}
+		sales = append(sales, &sale)
 	}
 	return sales, nil
+}
+func (p *postgresDBRepo) GetTransactionsHistoryReport()([]*models.Transaction, error){
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var transactions []*models.Transaction
+	
+	query := `
+		SELECT transaction_id, voucher_no, transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, description
+		FROM public.financial_transactions
+	`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return transactions , fmt.Errorf("DBERROR: GetTransactionsHistoryReport => %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var trx models.Transaction
+		err = rows.Scan(
+			&trx.ID,
+			&trx.VoucherNo,
+			&trx.TransactionType,
+			&trx.SourceType,
+			&trx.SourceID,
+			&trx.DestinationType,
+			&trx.DestinationID,
+			&trx.Amount,
+			&trx.TransactionDate,
+			&trx.Description,
+		)
+		if err != nil {
+			return transactions, fmt.Errorf("DBERROR: GetTransactionsHistoryReport => %w", err)
+		}
+		transactions = append(transactions, &trx)
+	}
+	return transactions, nil
 }
 
 // Helper functions

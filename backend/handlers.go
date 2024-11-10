@@ -1349,10 +1349,10 @@ func (app *application) CompleteAmountReceivableProcess(w http.ResponseWriter, r
 // GetExpensesPageDetails scarp data for expenses page
 func (app *application) GetExpensesPageDetails(w http.ResponseWriter, r *http.Request) {
 	var resp struct {
-		Error     bool               `json:"error,omitempty"`
-		Message   string             `json:"message,omitempty"`
-		Suppliers []*models.Supplier `json:"suppliers,omitempty"`
-		Accounts []*models.HeadAccount `json:"head_accounts,omitempty"`
+		Error     bool                  `json:"error,omitempty"`
+		Message   string                `json:"message,omitempty"`
+		Suppliers []*models.Supplier    `json:"suppliers,omitempty"`
+		Accounts  []*models.HeadAccount `json:"head_accounts,omitempty"`
 	}
 
 	accounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
@@ -1635,6 +1635,47 @@ func (app *application) GetServiceListReport(w http.ResponseWriter, r *http.Requ
 	resp.Error = false
 	resp.Message = "Data fetched successfully"
 	resp.Services = services
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// .....................Accounts Handlers......................
+func (app *application) GetCustomerDueReport(w http.ResponseWriter, r *http.Request) {
+	sales, err := app.DB.GetCustomerDueHistoryReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetCustomerDueReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error   bool           `json:"error"`
+		Message string         `json:"message"`
+		Report  []*models.Sale `json:"report"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = sales
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+func (app *application) GetTransactionsReport(w http.ResponseWriter, r *http.Request) {
+	transactions, err := app.DB.GetTransactionsHistoryReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetCustomerDueReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error   bool                  `json:"error"`
+		Message string                `json:"message"`
+		Report  []*models.Transaction `json:"report"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = transactions
 
 	app.writeJSON(w, http.StatusOK, resp)
 }

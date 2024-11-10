@@ -343,8 +343,8 @@
               { data: "account_name", title: "Account Name", className: "account-name" },
               { data: "mobile", title: "Mobile", className: "contact-number" },
               { data: "account_status", title: "Account Status", className: "account-status" },
-              { data: "due_amount", title: "Balance", className: "opening-balance" },
-              { data: "date", title: "Date", className: "date" },
+              { data: "opening_balance", title: "Balance", className: "opening-balance" },
+              { data: "joining_date", title: "Joining Date", className: "joining-date" },
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -367,7 +367,7 @@
               const requestOptions = {
                 method: 'post'
               }
-              fetch('http://localhost:4321/api/mis/view-all-customer', requestOptions)
+              fetch('http://localhost:4321/api/reports/accounts/transactions-report', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
                   console.log(responseData)

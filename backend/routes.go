@@ -108,6 +108,10 @@ func (app *application) routes() http.Handler {
 		// Sales History
 		// Service History
 
+		//.......................Accounts Reports.......................
+		mux.Post("/reports/accounts/transactions-report", app.GetTransactionsReport)
+		mux.Post("/reports/accounts/customer-due-report", app.GetCustomerDueReport)
+
 	})
 	return mux
 }

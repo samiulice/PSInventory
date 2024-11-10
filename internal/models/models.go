@@ -265,6 +265,7 @@ type Sale struct {
 	PaidAmount       int              `json:"paid_amount"`
 	CreatedAt        time.Time        `json:"created_at"`
 	UpdatedAt        time.Time        `json:"updated_at"`
+	Customer         Customer         `json:"customer_info"`
 }
 
 type Warranty struct {
@@ -315,6 +316,8 @@ type Reception struct {
 	ChequeNo           string       `json:"cheque_no"`
 	Carrier            string       `json:"carrier_info"`
 	Description        string       `json:"description"`
+	CreatedAt          time.Time    `json:"created_at"`
+	UpdatedAt          time.Time    `json:"updated_at"`
 }
 
 // Payment is the definition for payment info
@@ -327,6 +330,8 @@ type Payment struct {
 	ChequeNo           string       `json:"cheque_no"`
 	Carrier            string       `json:"carrier_info"`
 	Description        string       `json:"description"`
+	CreatedAt          time.Time    `json:"created_at"`
+	UpdatedAt          time.Time    `json:"updated_at"`
 }
 
 // AmountTransfer is the definition for amount transfer info
@@ -339,34 +344,40 @@ type AmountTransfer struct {
 	ChequeNo           string       `json:"cheque_no"`
 	Carrier            string       `json:"carrier_info"`
 	Description        string       `json:"description"`
+	CreatedAt          time.Time    `json:"created_at"`
+	UpdatedAt          time.Time    `json:"updated_at"`
 }
 
 // AmountPayable is the definition for amount payable info
 type AmountPayable struct {
-	VoucherNo     string `json:"voucher_no"`
-	Date          string `json:"date"`
-	PayableAmount int    `json:"payable_amount"`
-	Reason        string `json:"reason"`
-	AccountType   string `json:"account_type"`
-	AccountID     int    `json:"account_id"`
-	AccountName   string `json:"account_name"`
-	ChequeNo      string `json:"cheque_no"`
-	Carrier       string `json:"carrier_info"`
-	Description   string `json:"description"`
+	VoucherNo     string    `json:"voucher_no"`
+	Date          string    `json:"date"`
+	PayableAmount int       `json:"payable_amount"`
+	Reason        string    `json:"reason"`
+	AccountType   string    `json:"account_type"`
+	AccountID     int       `json:"account_id"`
+	AccountName   string    `json:"account_name"`
+	ChequeNo      string    `json:"cheque_no"`
+	Carrier       string    `json:"carrier_info"`
+	Description   string    `json:"description"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // AmountReceivable is the definition for amount receivable info
 type AmountReceivable struct {
-	VoucherNo        string `json:"voucher_no"`
-	Date             string `json:"date"`
-	ReceivableAmount int    `json:"receivable_amount"`
-	Reason           string `json:"reason"`
-	AccountType      string `json:"account_type"`
-	AccountID        int    `json:"account_id"`
-	AccountName      string `json:"account_name"`
-	ChequeNo         string `json:"cheque_no"`
-	Carrier          string `json:"carrier_info"`
-	Description      string `json:"description"`
+	VoucherNo        string    `json:"voucher_no"`
+	Date             string    `json:"date"`
+	ReceivableAmount int       `json:"receivable_amount"`
+	Reason           string    `json:"reason"`
+	AccountType      string    `json:"account_type"`
+	AccountID        int       `json:"account_id"`
+	AccountName      string    `json:"account_name"`
+	ChequeNo         string    `json:"cheque_no"`
+	Carrier          string    `json:"carrier_info"`
+	Description      string    `json:"description"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 // Expense is the definition for expense info
@@ -379,4 +390,23 @@ type Expense struct {
 	ChequeNo           string       `json:"cheque_no"`
 	Carrier            string       `json:"carrier_info"`
 	Description        string       `json:"description"`
+	CreatedAt          time.Time    `json:"created_at"`
+	UpdatedAt          time.Time    `json:"updated_at"`
+}
+
+//Transaction is the definition for the financial transaction
+
+type Transaction struct {
+	ID              int       `json:"id"`
+	VoucherNo       string    `json:"voucher_no"`
+	TransactionType string    `json:"transaction_type"`
+	SourceType      string    `json:"source_type"`
+	SourceID        int       `json:"source_id"`
+	DestinationType string    `json:"destination_type"`
+	DestinationID   int       `json:"destination_id"`
+	Amount          int       `json:"amount"`
+	TransactionDate time.Time `json:"transaction_date"`
+	Description     string    `json:"description"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
