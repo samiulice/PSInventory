@@ -400,9 +400,11 @@ type Transaction struct {
 	ID              int       `json:"id"`
 	VoucherNo       string    `json:"voucher_no"`
 	TransactionType string    `json:"transaction_type"`
+	SourceAccountName string    `json:"source_account_name"`
 	SourceType      string    `json:"source_type"`
 	SourceID        int       `json:"source_id"`
 	DestinationType string    `json:"destination_type"`
+	DestinationAccountName string    `json:"destination_account_name"`
 	DestinationID   int       `json:"destination_id"`
 	Amount          int       `json:"amount"`
 	TransactionDate time.Time `json:"transaction_date"`

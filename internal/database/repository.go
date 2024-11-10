@@ -12,7 +12,6 @@ type DatabaseRepo interface {
 	UpdateHeadAccountBalance(int, int) error
 	// HR Management
 	AddEmployee(employee models.Employee) (int, error)
-	GetEmployeeByID(id int) (models.Employee, error)
 	GetEmployeeListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Employee, int, error)
 
 	//MIS--customer

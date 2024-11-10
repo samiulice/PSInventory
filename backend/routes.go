@@ -22,7 +22,6 @@ func (app *application) routes() http.Handler {
 		// mux.Use(app.AuthAdmin)
 
 		//HR Management
-		mux.Post("/hr/view-employee/{type}", app.GetEmployees)
 		mux.Post("/hr/view-all-employee", app.GetAllEmployees)
 		mux.Post("/hr/add-employee", app.AddEmployee)
 		//MIS

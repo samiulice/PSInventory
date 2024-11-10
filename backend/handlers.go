@@ -24,52 +24,6 @@ func (app *application) PathNotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 // .....................HR Management Panel Handlers......................
-// GetEmployeeList return list of employees to the corresponded category in JSON format
-func (app *application) GetEmployees(w http.ResponseWriter, r *http.Request) {
-	accountType := path.Base(r.URL.Path)
-
-	id, err := strconv.Atoi(accountType)
-	if err == nil {
-		employee, err := app.DB.GetEmployeeByID(id)
-		if err != nil {
-			app.errorLog.Println(err)
-			app.badRequest(w, err)
-			return
-		}
-		app.writeJSON(w, http.StatusOK, employee)
-	} else {
-		var payload struct {
-			PageSize         int `json:"page_size"`
-			CurrentPageIndex int `json:"current_page_index"`
-		}
-		err := app.readJSON(w, r, &payload)
-		if err != nil {
-			app.badRequest(w, fmt.Errorf("ERROR Unable to read JSON: %w", err))
-			return
-		}
-		employees, totalRecords, err := app.DB.GetEmployeeListPaginated(accountType, payload.PageSize, payload.CurrentPageIndex)
-
-		if err != nil {
-			app.badRequest(w, fmt.Errorf("DBERROR: %w", err))
-			return
-		}
-		var Resp struct {
-			Error            bool               `json:"error,omitempty"`
-			Message          string             `json:"message,omitempty"`
-			PageSize         int                `json:"page_size,omitempty"`
-			CurrentPageIndex int                `json:"current_page_index,omitempty"`
-			TotalRecords     int                `json:"total_records,omitempty"`
-			Employees        []*models.Employee `json:"employees,omitempty"`
-		}
-		Resp.Error = false
-		Resp.Message = "Data successfully fetched"
-		Resp.PageSize = payload.PageSize
-		Resp.CurrentPageIndex = payload.CurrentPageIndex
-		Resp.TotalRecords = totalRecords
-		Resp.Employees = employees
-		app.writeJSON(w, http.StatusOK, Resp)
-	}
-}
 
 // GetAllEmployees returns list of all employees info from the database
 func (app *application) GetAllEmployees(w http.ResponseWriter, r *http.Request) {
@@ -1661,9 +1615,9 @@ func (app *application) GetCustomerDueReport(w http.ResponseWriter, r *http.Requ
 }
 
 func (app *application) GetTransactionsReport(w http.ResponseWriter, r *http.Request) {
-	transactions, err := app.DB.GetTransactionsHistoryReport()
+	trx, err := app.DB.GetTransactionsHistoryReport()
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR:GetCustomerDueReport: %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR:GetTransactionsReport: %w", err))
 		return
 	}
 
@@ -1675,7 +1629,8 @@ func (app *application) GetTransactionsReport(w http.ResponseWriter, r *http.Req
 
 	resp.Error = false
 	resp.Message = "Data fetched successfully"
-	resp.Report = transactions
+	resp.Report = trx
 
+	fmt.Println(resp)
 	app.writeJSON(w, http.StatusOK, resp)
 }
