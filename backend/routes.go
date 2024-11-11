@@ -22,14 +22,14 @@ func (app *application) routes() http.Handler {
 		// mux.Use(app.AuthAdmin)
 
 		//HR Management
-		mux.Post("/hr/view-all-employee", app.GetAllEmployees)
+		mux.Post("/hr/view-all-employees", app.GetAllEmployees)
 		mux.Post("/hr/add-employee", app.AddEmployee)
 		//MIS
 		mux.Post("/mis/view-customer/{type}", app.GetCustomers)
-		mux.Post("/mis/view-all-customer", app.GetAllCustomers)
+		mux.Post("/mis/view-all-customers", app.GetAllCustomers)
 		mux.Post("/mis/add-customer", app.AddCustomer)
 		mux.Post("/mis/view-supplier/{type}", app.GetSuppliers)
-		mux.Post("/mis/view-all-supplier", app.GetAllSuppliers)
+		mux.Post("/mis/view-all-suppliers", app.GetAllSuppliers)
 		mux.Post("/mis/get-supplier-id-name-list", app.GetActiveSuppliersIDAndName)
 		mux.Post("/mis/get-customer-id-name-list", app.GetActiveCustomersIDAndName)
 		mux.Post("/mis/add-supplier", app.AddSupplier)

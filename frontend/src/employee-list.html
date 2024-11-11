@@ -371,7 +371,7 @@
               const requestOptions = {
                 method: 'post',
               }
-              fetch('http://localhost:4321/api/hr/view-all-employee', requestOptions)
+              fetch('http://localhost:4321/api/hr/view-all-employees', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
                   reportData = responseData.employees;

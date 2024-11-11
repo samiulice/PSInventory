@@ -2478,7 +2478,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		SET current_balance = current_balance + $1, amount_receivable =  amount_receivable + $2, offered_discount = offered_discount + $3
 		WHERE id = $4 returning current_balance
 	`
-	err = tx.QueryRowContext(ctx, query, totalPrice, totalPrice-sale.PaidAmount, sale.BillAmount-sale.TotalAmount, sale.HeadAccountInfo.ID).Scan(&current_balance)
+	err = tx.QueryRowContext(ctx, query, sale.TotalAmount, sale.TotalAmount-sale.PaidAmount, sale.BillAmount-sale.TotalAmount, sale.HeadAccountInfo.ID).Scan(&current_balance)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProducts(Update head_accounts info):" + err.Error())
@@ -3270,10 +3270,9 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable Insert into financial_transaction table: %w", err)
 		}
-		//update customer account
-		//set due_mount -= received_amount
+		//update account
 		stmt = `
-			UPDATE public.`+sum.AccountType+`
+			UPDATE public.` + sum.AccountType + `
 			SET total_amount = total_amount + $1, updated_at = $2
 			WHERE id = $3`
 
@@ -3502,8 +3501,8 @@ func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, 
 	var transactions []*models.Transaction
 
 	query := `
-		SELECT DISTINCT ON (voucher_no) transaction_id, voucher_no, transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, description
-		FROM public.financial_transactions
+		SELECT transaction_id, voucher_no, transaction_type, source_type, source_id, destination_type, destination_id, amount, current_balance, transaction_date, description
+		FROM public.financial_transactions ORDER BY transaction_date DESC
 	`
 	rows, err := p.DB.QueryContext(ctx, query)
 	if err != nil {
@@ -3522,6 +3521,7 @@ func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, 
 			&trx.DestinationType,
 			&trx.DestinationID,
 			&trx.Amount,
+			&trx.CurrentBalance,
 			&trx.TransactionDate,
 			&trx.Description,
 		)
@@ -3531,14 +3531,14 @@ func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, 
 		//retrieve source account name
 		var account_name string
 		query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.SourceType)
-		err = p.DB.QueryRowContext(ctx, query).Scan(&account_name)
+		err = p.DB.QueryRowContext(ctx, query, trx.SourceID).Scan(&account_name)
 		if err != nil {
 			return transactions, fmt.Errorf("DBERROR: GetTransactionsHistoryReport (Unable to retrieve %s account name)=> %w", trx.SourceType, err)
 		}
 		trx.SourceAccountName = account_name
 		//retrieve source account name
 		query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
-		err = p.DB.QueryRowContext(ctx, query).Scan(&account_name)
+		err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
 		if err != nil {
 			return transactions, fmt.Errorf("DBERROR: GetTransactionsHistoryReport (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
 		}

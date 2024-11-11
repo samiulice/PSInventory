@@ -384,18 +384,19 @@ type AmountReceivable struct {
 
 // Expense is the definition for expense info
 type Expense struct {
-	VoucherNo          string       `json:"voucher_no"`
-	ExpenseDate        string       `json:"expense_date"`
-	PaidAmount         int          `json:"paid_amount"`
-	SourceAccount      *HeadAccount `json:"source_account"`
-	AccountType      string      `json:"account_type"`
-	AccountID        int         `json:"account_id"`
-	AccountName      string      `json:"account_name"`
-	ChequeNo           string       `json:"cheque_no"`
-	Carrier            string       `json:"carrier_info"`
-	Description        string       `json:"description"`
-	CreatedAt          time.Time    `json:"created_at"`
-	UpdatedAt          time.Time    `json:"updated_at"`
+	VoucherNo     string       `json:"voucher_no"`
+	ExpenseDate   string       `json:"expense_date"`
+	PaidAmount    int          `json:"paid_amount"`
+	SourceAccount *HeadAccount `json:"source_account"`
+	AccountType   string       `json:"account_type"`
+	AccountCode   string       `json:"account_code"`
+	AccountID     int          `json:"account_id"`
+	AccountName   string       `json:"account_name"`
+	ChequeNo      string       `json:"cheque_no"`
+	Carrier       string       `json:"carrier_info"`
+	Description   string       `json:"description"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
 }
 
 //Transaction is the definition for the financial transaction
@@ -411,8 +412,10 @@ type Transaction struct {
 	DestinationAccountName string    `json:"destination_account_name"`
 	DestinationID          int       `json:"destination_id"`
 	Amount                 int       `json:"amount"`
+	CurrentBalance         int       `json:"current_balance"`
 	TransactionDate        time.Time `json:"transaction_date"`
 	Description            string    `json:"description"`
+	ChequeNo      string       `json:"cheque_no"`
 	CreatedAt              time.Time `json:"created_at"`
 	UpdatedAt              time.Time `json:"updated_at"`
 }

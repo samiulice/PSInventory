@@ -285,7 +285,7 @@
 
           </div>
         </div>
-        <form action="#" id="paymentForm">
+        <form action="#" id="expenseForm">
           <!-- /page content -->
           <!-- Received section -->
           <!-- Table row -->
@@ -368,7 +368,7 @@
     <script>
       let accounts, suppliers, payment_summary = [];
       window.addEventListener("DOMContentLoaded", () => {
-        // fetch-1: On load window Get accounts for destination and suppliers who have due amount
+        // fetch-1: On load window Get head_accounts for destination and suppliers who have due amount
         const requestOptions = {
           method: 'post'
         }
@@ -378,25 +378,32 @@
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
-              accounts = data.head_accounts;
+              head_accounts = data.head_accounts;
               updatePage();
             }
           })
         document.getElementById("destination_account_type").addEventListener("change", e => {
-          // fetch-1: On changes account type fetch accounts details list
-          const requestOptions = {
-            method: 'post',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            body:JSON.stringify({account_type:document.getElementById("destination_account_type").value})
+          let ac = document.getElementById("destination_account_type").value
+          let link = "";
+          if (ac === "customers" || ac === "suppliers") {
+            link = "http://localhost:4321/api/mis/view-all-" + ac;
+          } else if (ac === "employees") {
+            link = "http://localhost:4321/api/hr/view-all-" + ac;
           }
-          fetch('http://localhost:4321/api/accounts/expenses/get-account-details', requestOptions)
+          // fetch-1: On changes account type fetch head_accounts details list 
+          fetch(link, requestOptions)
             .then(response => response.json())
             .then(data => {
               if (data.error === true) {
                 showErrorMessage(data.message)
               } else {
-                accounts = data.head_accounts;
+                if (ac === "customers") {
+                  accounts = data.customers
+                } else if (ac === "suppliers") {
+                  accounts = data.suppliers
+                } else if (ac === "employees") {
+                  accounts = data.employees
+                }
                 updateAccountSection();
               }
             })
@@ -406,8 +413,8 @@
       function updatePage() {
         let accountsDiv = document.getElementById("source");
         accountsDiv.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
-        if (accounts) {
-          accounts.forEach((ac, i) => {
+        if (head_accounts) {
+          head_accounts.forEach((ac, i) => {
             accountsDiv.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
           });
         } else {
@@ -416,15 +423,15 @@
         }
       }
       function updateAccountSection() {
-        let supplierDiv = document.getElementById("destination");
-        supplierDiv.innerHTML = `<option value="" selected disabled>Select Supplier Account</option>`;
-        if (suppliers) {
-          suppliers.forEach((c, i) => {
-            supplierDiv.innerHTML += `<option value="${i}">${c.account_name}[${c.account_code}]</option>`;
+        let div = document.getElementById("destination");
+        div.innerHTML = `<option value="" selected disabled>Select Supplier Account</option>`;
+        if (accounts) {
+          accounts.forEach((c, i) => {
+            div.innerHTML += `<option value="${i}">${c.account_name}[${c.account_code}]</option>`;
           });
         } else {
-          supplierDiv.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-          supplierDiv.ariaDisabled = true;
+          div.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
+          div.ariaDisabled = true;
         }
       }
 
@@ -437,15 +444,16 @@
         let carrier = document.getElementById("carrier");
         let description = document.getElementById("description");
         let voucherNo = `V-EXP-${generateRandomAlphanumericCode(6)}`
-        let destination_account = suppliers[parseInt(destination.value)]
+        let destination_account = accounts[parseInt(destination.value)]
         let ps = {
           voucher_no: voucherNo,
           expense_date: expenseDate,
           paid_amount: parseInt(paidAmount.value),
-          source_account: accounts[parseInt(source.value)],
+          source_account: head_accounts[parseInt(source.value)],
           account_type: document.getElementById("destination_account_type").value,
-          account_name: destination_account.id,
-          account_id: destination_account.account_name,
+          account_id: destination_account.id,
+          account_code: destination_account.account_code,
+          account_name: destination_account.account_name,
           cheque_no: chqNo.value,
           carrier_info: carrier.value,
           description: description.value,
@@ -484,8 +492,8 @@
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
-            <td>${accounts[parseInt(source.value)].account_name}</td>
-            <td>${suppliers[parseInt(destination.value)].account_name}</td> 
+            <td>${head_accounts[parseInt(source.value)].account_name}</td>
+            <td>${accounts[parseInt(destination.value)].account_code}-${accounts[parseInt(destination.value)].account_name}</td> 
             <td>${paidAmount.value}</td>
             <td>${chqNo.value}</td>
             <td>${carrier.value}</td>
@@ -515,7 +523,7 @@
       }
 
       //submit the form
-      document.getElementById("paymentForm").addEventListener("submit", event => {
+      document.getElementById("expenseForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
         if (payment_summary.length === 0) {
@@ -570,8 +578,8 @@
             tBody += `
             <tr>
               <td>${ps.voucher_no || "-"}</td>
-              <td>${ps.source_account.account_name || "-"}</td>
-              <td>${ps.destination_account.account_name || "-"}</td>
+              <td>${ps.source_account.account_name || "-"}<br><span style="font-size:10px;">[${ps.source_account.account_code || "-"}]</span></td>
+              <td>${ps.account_name || "-"}<br><span style="font-size:10px;">[${ps.account_code || "-"}]</span></td>
               <td>${ps.paid_amount || "-"}</td>
               <td>${ps.expense_date ? formatDate(ps.expense_date, "date", "-") : "-"}</td>
               <td>${ps.cheque_no || "-"}</td>

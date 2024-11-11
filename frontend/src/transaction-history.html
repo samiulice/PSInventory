@@ -340,11 +340,58 @@
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
               { data: "transaction_date", title: "Date", className: "date" },
-              // { data: "account_name", title: "From", className: "account-name" },
-              // { data: "mobile", title: "Mobile", className: "contact-number" },
-              // { data: "account_status", title: "Account Status", className: "account-status" },
-              // { data: "opening_balance", title: "Balance", className: "opening-balance" },
-              // { data: "joining_date", title: "Joining Date", className: "joining-date" },
+              {
+                title: "Description",
+                className: "description",
+                render: function (data, type, row) {
+                  let current_data = ""
+                  if (row.transaction_type) {
+                    current_data += row.transaction_type
+                  }
+                  if (row.source_type === "head_accounts") {
+                    current_data += ` [${row.destination_account_name}]`;
+                  } else {
+                    current_data += ` [${row.source_account_name}]`;
+                  }
+                  return current_data
+                }
+              },
+              { data: "voucher_no", title: "Invoice #", className: "invoice" },
+              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no" },
+              {
+                title: "Received",
+                className: "received-amount",
+                render: function (data, type, row) {
+                  if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
+                    return row.amount;
+                  } else {
+                    return "-";
+                  }
+                }
+              },
+              {
+                title: "Paid",
+                className: "paid-amount",
+                render: function (data, type, row) {
+                  if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
+                    return row.amount;
+                  } else {
+                    return "-";
+                  }
+                }
+              },
+              { data: "current_balance", title: "Balance", className: "chq-no" },
+              {
+                title: "Account",
+                className: "account",
+                render: function (data, type, row) {
+                  if (row.source_type === "head_accounts") {
+                    return row.source_account_name;
+                  }
+                  return row.destination_account_name;
+                }
+              },
+
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -373,10 +420,10 @@
                   console.log(responseData)
                   reportData = responseData.report;
                   //Format date in the received data
-                  responseData.report.forEach(rp => {
-                    if(rp.destination_type)
-                    rp.description = formatDate(rp.created_at, "date", "-");
-                    rp.created_at = formatDate(rp.created_at, "date", "-");
+                  reportData.forEach(rp => {
+                    if (rp.transaction_date) {
+                      rp.transaction_date = formatDate(rp.transaction_date, "date", "-");
+                    }
                   });
                   // Wrap the data in the expected format
                   const returnData = {
@@ -413,14 +460,48 @@
       if (n > 0) {
         for (let i = 0; i < n; i++) {
           const c = reportData[i];
+          //description
+          let description = ""
+          if (c.transaction_type) {
+            description += c.transaction_type
+          }
+          if (c.source_type === "head_accounts") {
+            description += ` [${c.destination_account_name}]`;
+          } else {
+            description += ` [${c.source_account_name}]`;
+          }
+
+          //received
+          let received = 0;
+          if (c.transaction_type === "Purchase Return" || c.transaction_type === "Sale" || c.transaction_type === "Receive & Collection") {
+            received = c.amount;
+          } else {
+            received = "";
+          }
+          //paid
+          let paid = 0;
+          if (c.transaction_type === "Purchase" || c.transaction_type === "Sale Return" || c.transaction_type === "Payment" || c.transaction_type === "Expense") {
+            paid = c.amount;
+          } else {
+            paid = "";
+          }
+          //account 
+          let account = ""
+          if (c.source_type === "head_accounts") {
+            account = c.source_account_name;
+          }
+          account = c.destination_account_name;
+
           tBody += `
             <tr>
-              <td>${c.account_code}</td>
-              <td>${c.account_name}</td>
-              <td>${c.mobile}</td>
-              <td>${c.account_status}</td>
-              <td>${c.due_amount || "0"}</td>
-              <td>${formatDate(c.joining_date, "date", "-")}</td>
+              <td>${formatDate(c.transaction_date, "date", "-")}</td>
+              <td>${description}</td>
+              <td>${c.voucher_no || "-"}</td>
+              <td>${c.cheque_no || "-"}</td>
+              <td>${received || ""}</td>
+              <td>${paid || ""}</td>
+              <td>${c.current_balance || ""}</td>
+              <td>${account}</td>
             </tr>`;
         }
       } else {
@@ -536,12 +617,14 @@
           <table>
             <thead>
               <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Mobile</th>
-                <th>Status</th>
-                <th>Due Amount</th>
-                <th>Joining Date</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Invoice #</th>
+                <th>Chq/Rec. No.</th>
+                <th>Received</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Account</th>
               </tr>
             </thead>
             <tbody>
