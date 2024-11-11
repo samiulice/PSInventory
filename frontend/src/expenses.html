@@ -184,12 +184,15 @@
           <div class="x_content">
             <div class="row">
               <!-- first col -->
-              <div class="col-md-4 col-sm-6 col-xs-12">
+              <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="destination">Paid To *: </label>
-                    <select class="form-control  has-feedback-left" id="destination" required>
-                      <option value="" selected disabled>Select Account</option>
+                    <label for="destination_account_type">Paid To *: </label>
+                    <select class="form-control  has-feedback-left" id="destination_account_type" required>
+                      <option value="" selected disabled>Select Account Type</option>
+                      <option value="employees">Employee</option>
+                      <option value="suppliers">Supplier</option>
+                      <option value="customers">Customer</option>
                     </select>
                     <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
                       aria-hidden="true"></i>
@@ -197,24 +200,25 @@
                 </div>
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="source">Cash/Bank *: </label>
-                    <select class="form-control  has-feedback-left" id="source" required>
+                    <label for="destination">Account Holder *: </label>
+                    <select class="form-control  has-feedback-left" id="destination" required>
                       <option value="" selected disabled>Select Account</option>
                     </select>
-                    <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
+                    <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
+                      aria-hidden="true"></i>
                   </div>
                 </div>
               </div>
               <!-- /first col -->
               <!-- second col -->
-              <div class="col-md-4 col-sm-6 col-xs-12">
+              <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="single_cal4">Date *:</label>
-                    <input type="text" id="single_cal4" class="form-control has-feedback-left" placeholder="Select Date"
-                      aria-describedby="inputSuccess2Status4" required>
-                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left "
-                      aria-hidden="true"></i>
+                    <label for="source">Cash/Bank *: </label>
+                    <select class="form-control  has-feedback-left" id="source" required>
+                      <option value="" selected disabled>Select Account</option>
+                    </select>
+                    <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
                   </div>
                 </div>
                 <div class="row form-group has-feedback">
@@ -229,7 +233,16 @@
               </div>
               <!-- /second col -->
               <!-- third col -->
-              <div class="col-md-4 col-sm-12 col-xs-12">
+              <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="row form-group has-feedback">
+                  <div class="col-md-12 col-sm-12 col-xs-12">
+                    <label for="single_cal4">Date *:</label>
+                    <input type="text" id="single_cal4" class="form-control has-feedback-left" placeholder="Select Date"
+                      aria-describedby="inputSuccess2Status4" required>
+                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left "
+                      aria-hidden="true"></i>
+                  </div>
+                </div>
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
                     <label for="chq-no">Receipt No:</label>
@@ -239,6 +252,10 @@
                       aria-hidden="true"></i>
                   </div>
                 </div>
+              </div>
+              <!-- /third col -->
+              <!-- fourth col -->
+              <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
                     <label for="carrier">Carrier:</label>
@@ -248,16 +265,17 @@
                       aria-hidden="true"></i>
                   </div>
                 </div>
+                <div class="row form-group has-feedback">
+                  <div class="col-md-12 col-sm-12 col-xs-12">
+                    <label for="description">Description :</label>
+                    <input type="text" name="description" id="description" class="form-control has-feedback-left"
+                      placeholder="Enter payment details(optional)">
+                    <i style="color:rgba(0, 0, 0, 1);" class="fa fa-bars form-control-feedback left"
+                      aria-hidden="true"></i>
+                  </div>
+                </div>
               </div>
-              <!-- /third col -->
-            </div>
-            <div class="row form-group has-feedback">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <label for="description">Description :</label>
-                <input type="text" name="description" id="description" class="form-control has-feedback-left"
-                  placeholder="Enter payment details(optional)">
-                <i style="color:rgba(0, 0, 0, 1);" class="fa fa-bars form-control-feedback left" aria-hidden="true"></i>
-              </div>
+              <!-- /fourth col -->
             </div>
             <div class="row text-center">
               <button type="button" class="btn btn-primary" id="add-transaction-info" onclick="addToSummary()"><i
@@ -361,15 +379,32 @@
               showErrorMessage(data.message)
             } else {
               accounts = data.head_accounts;
-              suppliers = data.suppliers;
               updatePage();
             }
           })
+        document.getElementById("destination_account_type").addEventListener("change", e => {
+          // fetch-1: On changes account type fetch accounts details list
+          const requestOptions = {
+            method: 'post',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            body:JSON.stringify({account_type:document.getElementById("destination_account_type").value})
+          }
+          fetch('http://localhost:4321/api/accounts/expenses/get-account-details', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              if (data.error === true) {
+                showErrorMessage(data.message)
+              } else {
+                accounts = data.head_accounts;
+                updateAccountSection();
+              }
+            })
+        })
       })
 
       function updatePage() {
         let accountsDiv = document.getElementById("source");
-        let supplierDiv = document.getElementById("destination");
         accountsDiv.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
         if (accounts) {
           accounts.forEach((ac, i) => {
@@ -379,6 +414,9 @@
           accountsDiv.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
           accountsDiv.ariaDisabled = true;
         }
+      }
+      function updateAccountSection() {
+        let supplierDiv = document.getElementById("destination");
         supplierDiv.innerHTML = `<option value="" selected disabled>Select Supplier Account</option>`;
         if (suppliers) {
           suppliers.forEach((c, i) => {
@@ -399,12 +437,15 @@
         let carrier = document.getElementById("carrier");
         let description = document.getElementById("description");
         let voucherNo = `V-EXP-${generateRandomAlphanumericCode(6)}`
+        let destination_account = suppliers[parseInt(destination.value)]
         let ps = {
           voucher_no: voucherNo,
           expense_date: expenseDate,
           paid_amount: parseInt(paidAmount.value),
           source_account: accounts[parseInt(source.value)],
-          destination_account: suppliers[parseInt(destination.value)],
+          account_type: document.getElementById("destination_account_type").value,
+          account_name: destination_account.id,
+          account_id: destination_account.account_name,
           cheque_no: chqNo.value,
           carrier_info: carrier.value,
           description: description.value,
