@@ -3131,6 +3131,31 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
 		}
+		//update Destination account
+		//set current_balance -= received_amount
+		if sum.AccountType == "Customer" {
+			stmt = `
+			UPDATE public.head_accounts
+			SET amount_receivable = amount_receivable + $1, updated_at = $2
+			WHERE id = $3`
+
+			_, err = tx.ExecContext(ctx, stmt, (-1)*sum.PayableAmount, time.Now(), sum.AccountID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			}
+		} else {
+			stmt = `
+			UPDATE public.head_accounts
+			SET amount_payable = amount_payable + $1, updated_at = $2
+			WHERE id = $3`
+
+			_, err = tx.ExecContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.AccountID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			}
+		}
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.Date)
 		if err != nil {
@@ -3139,8 +3164,8 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
-			VALUES('Amount Payable', 'head_accounts', 0, $1, $2, $3, $4, $5, $6)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, current_balance, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Amount Payable', 'head_accounts', 0, 0, $1, $2, $3, $4, $5, $6)
 		`
 		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.PayableAmount, txDate, sum.VoucherNo, sum.Description)
 		if err != nil {
@@ -3183,6 +3208,31 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update due_amount in suppliers table: %w", err)
+		}
+		//update Destination account
+		//set current_balance -= received_amount
+		if sum.AccountType == "Supplier" {
+			stmt = `
+			UPDATE public.head_accounts
+			SET amount_receivable = amount_receivable + $1, updated_at = $2
+			WHERE id = $3`
+
+			_, err = tx.ExecContext(ctx, stmt, (-1)*sum.ReceivableAmount, time.Now(), sum.AccountID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			}
+		} else {
+			stmt = `
+			UPDATE public.head_accounts
+			SET amount_payable = amount_payable + $1, updated_at = $2
+			WHERE id = $3`
+
+			_, err = tx.ExecContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.AccountID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			}
 		}
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.Date)
