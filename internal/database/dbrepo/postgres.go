@@ -2144,7 +2144,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	//Tx-2: Update total_amount, due_amount(if available) in suppliers table
 	query = `
 		UPDATE Public.suppliers
-		SET total_amount = total_amount + $1, due_amount = due_amount + $2
+		SET total_amount = total_amount + $1, due_amount = due_amount - $2
 		WHERE id = $3
 	`
 	_, err = tx.ExecContext(ctx, query, purchase.TotalAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.Supplier.ID)
@@ -2311,7 +2311,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	//Update total_amount, due_amount(if available) in suppliers table
 	query := `
 		UPDATE Public.suppliers
-		SET total_amount = total_amount - $1, due_amount = due_amount - $2, 
+		SET total_amount = total_amount - $1, due_amount = due_amount + $2, 
 		WHERE id = $3
 	`
 	_, err = tx.ExecContext(ctx, query, TotalPrices, due, PurchaseHistory.Supplier.ID)
@@ -3020,11 +3020,11 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable Insert into financial_transaction table: %w", err)
 		}
-		//update customer account
+		//update suppliers account
 		//set due_mount -= received_amount
 		stmt = `
 			UPDATE public.suppliers
-			SET due_amount = due_amount - $1, updated_at = $2
+			SET due_amount = due_amount + $1, updated_at = $2
 			WHERE id = $3`
 
 		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.DestinationAccount.ID)
@@ -3105,6 +3105,7 @@ func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.Am
 	}
 	return nil
 }
+
 func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.AmountPayable) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -3116,45 +3117,28 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 	}
 
 	for _, sum := range summary {
-		tableName := "suppliers"
-		if sum.AccountType == "Customer" {
-			sum.PayableAmount = (-1) * sum.PayableAmount
-			tableName = "customers"
-		}
+		//update customers/suppliers/employees accounts
+		//update head_accounts
 		stmt := `
-			UPDATE public.` + tableName + `
-			SET due_amount = due_amount + $1, updated_at = $2
+			UPDATE public.` + sum.AccountType + `
+			SET due_amount = due_amount - $1, updated_at = $2
 			WHERE id = $3
 		`
 		_, err = tx.ExecContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.AccountID)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in %s table: %w", sum.AccountType, err)
 		}
-		//update Destination account
-		//set current_balance -= received_amount
-		if sum.AccountType == "Customer" {
-			stmt = `
-			UPDATE public.head_accounts
-			SET amount_receivable = amount_receivable + $1, updated_at = $2
-			WHERE id = $3`
-
-			_, err = tx.ExecContext(ctx, stmt, (-1)*sum.PayableAmount, time.Now(), sum.AccountID)
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
-			}
-		} else {
-			stmt = `
+		var current_balance int
+		stmt = `
 			UPDATE public.head_accounts
 			SET amount_payable = amount_payable + $1, updated_at = $2
-			WHERE id = $3`
+			WHERE id = $3 RETURNING current_balance`
 
-			_, err = tx.ExecContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.AccountID)
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
-			}
+		err = tx.QueryRowContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.HeadAccount.ID).Scan(&current_balance)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
 		}
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.Date)
@@ -3164,10 +3148,10 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, current_balance, destination_type, destination_id, amount, transaction_date, voucher_no, description)
-			VALUES('Amount Payable', 'head_accounts', 0, 0, $1, $2, $3, $4, $5, $6)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, $5, $6, $7, $8)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.PayableAmount, txDate, sum.VoucherNo, sum.Description)
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.PayableAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
@@ -3194,45 +3178,28 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 	}
 
 	for _, sum := range summary {
-		tableName := "customers"
-		if sum.AccountType == "Supplier" {
-			sum.ReceivableAmount = (-1) * sum.ReceivableAmount
-			tableName = "suppliers"
-		}
+		//update customers/suppliers/employees accounts
+		//update head_accounts
 		stmt := `
-			UPDATE public.` + tableName + `
+			UPDATE public.` + sum.AccountType + `
 			SET due_amount = due_amount + $1, updated_at = $2
 			WHERE id = $3
 		`
 		_, err = tx.ExecContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.AccountID)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update due_amount in %s table: %w", sum.AccountType, err)
 		}
-		//update Destination account
-		//set current_balance -= received_amount
-		if sum.AccountType == "Supplier" {
-			stmt = `
+		var current_balance int
+		stmt = `
 			UPDATE public.head_accounts
 			SET amount_receivable = amount_receivable + $1, updated_at = $2
-			WHERE id = $3`
+			WHERE id = $3 RETURNING current_balance`
 
-			_, err = tx.ExecContext(ctx, stmt, (-1)*sum.ReceivableAmount, time.Now(), sum.AccountID)
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
-			}
-		} else {
-			stmt = `
-			UPDATE public.head_accounts
-			SET amount_payable = amount_payable + $1, updated_at = $2
-			WHERE id = $3`
-
-			_, err = tx.ExecContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.AccountID)
-			if err != nil {
-				tx.Rollback()
-				return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
-			}
+		err = tx.QueryRowContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.HeadAccount.ID).Scan(&current_balance)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
 		}
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.Date)
@@ -3242,10 +3209,10 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
-			VALUES('Amount Receivable', $1, $2, 'head_accounts', 0, $3, $4, $5, $6)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, $5, $6, $7, $8)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.ReceivableAmount, txDate, sum.VoucherNo, sum.Description)
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.ReceivableAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
@@ -3274,12 +3241,13 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 	for _, sum := range summary {
 		//update Cash-Bank account
 		//set current_balance += received_amount
+		var current_balance int
 		stmt := `
 			UPDATE public.head_accounts
 			SET current_balance = current_balance - $1, updated_at = $2
-			WHERE id = $3`
+			WHERE id = $3 RETURNING current_balance`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.SourceAccount.ID)
+		err = tx.QueryRowContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.SourceAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update current_balance in head_accounts table: %w", err)
@@ -3294,10 +3262,10 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
-			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, $4, $5, $6)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			VALUES('Expense', 'head_accounts', $1, $2, $3, $4, $5, $6, $7, $8)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.AccountType, sum.AccountID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3305,14 +3273,14 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 		//update customer account
 		//set due_mount -= received_amount
 		stmt = `
-			UPDATE public.suppliers
+			UPDATE public.`+sum.AccountType+`
 			SET total_amount = total_amount + $1, updated_at = $2
 			WHERE id = $3`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.DestinationAccount.ID)
+		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.AccountID)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update due_amount in suppliers table: %w", err)
+			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update due_amount in %s table: %w", sum.AccountType, err)
 		}
 	}
 
@@ -3320,7 +3288,7 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 	err = tx.Commit()
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to commit: %w", err)
+		return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to commit: %w", err)
 	}
 	return nil
 }
