@@ -2478,7 +2478,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		SET current_balance = current_balance + $1, amount_receivable =  amount_receivable + $2, offered_discount = offered_discount + $3
 		WHERE id = $4 returning current_balance
 	`
-	err = tx.QueryRowContext(ctx, query, sale.TotalAmount, sale.TotalAmount-sale.PaidAmount, sale.BillAmount-sale.TotalAmount, sale.HeadAccountInfo.ID).Scan(&current_balance)
+	err = tx.QueryRowContext(ctx, query, sale.PaidAmount, sale.TotalAmount-sale.PaidAmount, sale.BillAmount-sale.TotalAmount, sale.HeadAccountInfo.ID).Scan(&current_balance)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProducts(Update head_accounts info):" + err.Error())
@@ -2995,10 +2995,11 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 		//set current_balance += received_amount
 		stmt := `
 			UPDATE Public.head_accounts
-			SET current_balance = current_balance - $1, amount_receivable =  amount_receivable - $2, updated_at = $3
+			SET current_balance = current_balance - $1, amount_payable =  amount_payable - $2, updated_at = $3
 			WHERE id = $4 returning current_balance`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, sum.PaidAmount, time.Now(), sum.SourceAccount.ID)
+		var current_balance int
+		err = tx.QueryRowContext(ctx, stmt, sum.PaidAmount, sum.PaidAmount, time.Now(), sum.SourceAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to update current_balance in head_accounts table: %w", err)
@@ -3012,10 +3013,10 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
-			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, $4, $5, $6)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, $4, $5, $6, $7)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3195,11 +3196,13 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 			UPDATE public.head_accounts
 			SET amount_receivable = amount_receivable + $1, updated_at = $2
 			WHERE id = $3 RETURNING current_balance`
-
+		if sum.HeadAccount.ID == 0 {
+			sum.HeadAccount.ID = 1
+		}
 		err = tx.QueryRowContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.HeadAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update head_accounts table: %w", err)
 		}
 		//convert receivedDate into go supported date
 		txDate, err := time.Parse("01/02/2006", sum.Date)
@@ -3502,7 +3505,7 @@ func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, 
 
 	query := `
 		SELECT transaction_id, voucher_no, transaction_type, source_type, source_id, destination_type, destination_id, amount, current_balance, transaction_date, description
-		FROM public.financial_transactions ORDER BY transaction_date DESC
+		FROM public.financial_transactions ORDER BY transaction_date DESC, created_at DESC
 	`
 	rows, err := p.DB.QueryContext(ctx, query)
 	if err != nil {

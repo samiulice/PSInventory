@@ -408,11 +408,11 @@
         let dInfo = destination.split("-");
         let accountID, accountName, accountType;
         if (dInfo[0] === "c") {
-          accountType = "Customer";
+          accountType = "customers";
           accountID = customers[parseInt(dInfo[1])].id;
           accountName = customers[parseInt(dInfo[1])].account_name;
         } else {
-          accountType = "Supplier"
+          accountType = "suppliers"
           accountID = suppliers[parseInt(dInfo[1])].id;
           accountName = suppliers[parseInt(dInfo[1])].account_name;
         }

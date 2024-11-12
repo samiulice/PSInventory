@@ -1626,7 +1626,6 @@ func (app *application) GetTransactionsReport(w http.ResponseWriter, r *http.Req
 		Message string                `json:"message"`
 		Report  []*models.Transaction `json:"report"`
 	}
-
 	resp.Error = false
 	resp.Message = "Data fetched successfully"
 	resp.Report = trx

@@ -69,6 +69,7 @@
 
     .datatable-buttons th,
     .datatable-buttons td {
+      overflow:auto;
       white-space: nowrap;
       /* Prevent text from wrapping */
       /* overflow: hidden; */
@@ -339,10 +340,21 @@
             pageLength: 10, // Default page size
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
-              { data: "transaction_date", title: "Date", className: "date" },
+              {
+                title: "S/N",
+                className: "id",
+                width:"2%",
+                render: function (data, type, row, meta) {
+                  // Access row index from the meta object
+                  let rowIndex = meta.row;
+                  return rowIndex + 1;
+                }
+              },
+              { data: "transaction_date", title: "Date", className: "date",width:"5%"},
               {
                 title: "Description",
                 className: "description",
+                width:"30%",
                 render: function (data, type, row) {
                   let current_data = ""
                   if (row.transaction_type) {
@@ -356,11 +368,12 @@
                   return current_data
                 }
               },
-              { data: "voucher_no", title: "Invoice #", className: "invoice" },
-              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no" },
+              { data: "voucher_no", title: "Invoice #", className: "invoice", width:"10%"},
+              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no"},
               {
                 title: "Received",
                 className: "received-amount",
+                width:"10%",
                 render: function (data, type, row) {
                   if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
                     return row.amount;
@@ -372,6 +385,7 @@
               {
                 title: "Paid",
                 className: "paid-amount",
+                width:"10%",
                 render: function (data, type, row) {
                   if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
                     return row.amount;
@@ -380,10 +394,11 @@
                   }
                 }
               },
-              { data: "current_balance", title: "Balance", className: "chq-no" },
+              { data: "current_balance", title: "Balance", className: "chq-no", width:"10%",},
               {
                 title: "Account",
                 className: "account",
+                width:"10%",
                 render: function (data, type, row) {
                   if (row.source_type === "head_accounts") {
                     return row.source_account_name;
@@ -409,6 +424,9 @@
             // autoWidth: true, // Automatically adjust column width to container
             scrollX: false,   // Disable horizontal scroll
             order: [[0, 'asc']],
+            language: {
+              "emptyTable": "No data available" // Custom message when there is no data
+            },
             ajax: function (data, callback, settings) {
               // Fetch all data once and let DataTables handle searching/pagination on client side
               const requestOptions = {
@@ -419,12 +437,14 @@
                 .then(function (responseData) {
                   console.log(responseData)
                   reportData = responseData.report;
-                  //Format date in the received data
-                  reportData.forEach(rp => {
-                    if (rp.transaction_date) {
-                      rp.transaction_date = formatDate(rp.transaction_date, "date", "-");
-                    }
-                  });
+                  if (reportData) {
+                    //Format date in the received data
+                    reportData.forEach(rp => {
+                      if (rp.transaction_date) {
+                        rp.transaction_date = formatDate(rp.transaction_date, "date", "-");
+                      }
+                    });
+                  }
                   // Wrap the data in the expected format
                   const returnData = {
                     data: reportData // Wrap data in { data: ... } for DataTables
