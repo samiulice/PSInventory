@@ -161,7 +161,7 @@
                       <a>Account Reports<span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
                         <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
-                        <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
+                        <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
                         <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
@@ -370,6 +370,9 @@
             // autoWidth: true, // Automatically adjust column width to container
             scrollX: false,   // Disable horizontal scroll
             order: [[0, 'asc']],
+            language: {
+              "emptyTable": "No data available" // Custom message when there is no data
+            },
             ajax: function (data, callback, settings) {
               // Fetch all data once and let DataTables handle searching/pagination on client side
               const requestOptions = {
@@ -378,18 +381,16 @@
               fetch('http://localhost:4321/api/reports/inventory/category-list', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
-                  reportData = responseData.categories;
-                  //Format date in the received data
-                  responseData.categories.forEach(cat => {
-                    cat.status = cat.status=='true' ? "Active":"Inactive"
-                    cat.created_at = formatDate(cat.created_at, "date", "-");
-                    cat.updated_at = formatDate(cat.updated_at, "date", "-");
-                  });
-                  // Wrap the data in the expected format
-                  const returnData = {
-                    data: responseData.categories // Wrap data in { data: ... } for DataTables
-                  };
-                  callback(returnData);
+                  reportData = responseData.categories || [];
+                  if (reportData.length > 0) {
+                    //Format date in the received data
+                    reportData.forEach(cat => {
+                      cat.status = cat.status == 'true' ? "Active" : "Inactive"
+                      cat.created_at = formatDate(cat.created_at, "date", "-");
+                      cat.updated_at = formatDate(cat.updated_at, "date", "-");
+                    });
+                  }
+                  callback({data: reportData})
                 })
                 .catch(function (error) {
                   console.error('Error fetching data:', error);
@@ -474,7 +475,7 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              font-size: 14px;
+              font-size: 18px;
               color: #444;
               padding-top: 10px;
             }

@@ -161,7 +161,7 @@
                       <a>Account Reports<span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
                         <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
-                        <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
+                        <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
                         <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
@@ -383,22 +383,19 @@
                 .then(response => response.json())
                 .then(function (responseData) {
                   console.log(responseData)
-                  reportData = responseData.products;
-                  //Format date in the received data
-                  responseData.products.forEach(pr => {
-                    pr.category_id = pr.category.name;
-                    pr.brand_id = pr.brand.name;
-                    pr.quantity_in_stock = pr.quantity_purchased-pr.quantity_sold;
-                    pr.product_status = pr.product_status==true ? "Active":"Inactive" ;
-                    pr.created_at = formatDate(pr.created_at, "date", "-");
-                    pr.updated_at = formatDate(pr.updated_at, "date", "-");
-                  });
-                  console.log(reportData);
-                  // Wrap the data in the expected format
-                  const returnData = {
-                    data: responseData.products // Wrap data in { data: ... } for DataTables
-                  };
-                  callback(returnData);
+                  reportData = responseData.products || [];
+                  if (reportData.length > 0) {
+                    //Format date in the received data
+                    reportData.forEach(pr => {
+                      pr.category_id = pr.category.name;
+                      pr.brand_id = pr.brand.name;
+                      pr.quantity_in_stock = pr.quantity_purchased - pr.quantity_sold;
+                      pr.product_status = pr.product_status == true ? "Active" : "Inactive";
+                      pr.created_at = formatDate(pr.created_at, "date", "-");
+                      pr.updated_at = formatDate(pr.updated_at, "date", "-");
+                    });
+                  }
+                  callback({data:reportData})
                 })
                 .catch(function (error) {
                   console.error('Error fetching data:', error);
@@ -428,13 +425,13 @@
       if (n > 0) {
         for (let i = 0; i < n; i++) {
           const p = reportData[i];
-          let purchase_rate = "-",sale_rate = "-"; 
-          if (p.quantity_purchased != 0){
-            let prate = p.purchase_cost/p.quantity_purchased;
+          let purchase_rate = "-", sale_rate = "-";
+          if (p.quantity_purchased != 0) {
+            let prate = p.purchase_cost / p.quantity_purchased;
             purchase_rate = `${prate.toFixed(2)}`
           }
           if (p.quantity_sold != 0) {
-            let srate = p.sold_price/p.quantity_sold;
+            let srate = p.sold_price / p.quantity_sold;
             sale_rate = `${srate.toFixed(2)}`
           }
           tBody += `
@@ -453,7 +450,7 @@
         }
       } else {
         tBody = `
-          <tr><td colspan="6" style="text-align:center;">No data available</td></tr>`;
+          <tr><td colspan="9" style="text-align:center;">No data available</td></tr>`;
       }
 
       const content = `
@@ -496,7 +493,7 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              font-size: 14px;
+              font-size: 18px;
               color: #444;
               padding-top: 10px;
             }

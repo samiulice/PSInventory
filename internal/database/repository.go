@@ -99,10 +99,13 @@ type DatabaseRepo interface {
 	GetBrandListReport() ([]*models.Brand, error)
 	GetProductListReport() ([]*models.Product, error)
 	GetServiceListReport() ([]*models.Service, error)
+	GetPurchaseHistoryReport() ([]*models.Purchase, error)
+	GetSalesHistoryReport() ([]*models.Sale, error)
 
 	//Accounts report
-	GetCustomerDueHistoryReport()([]*models.Sale, error)
-	GetTransactionsHistoryReport()([]*models.Transaction, error)
+	GetCustomerDueHistoryReport() ([]*models.Sale, error)
+	GetTransactionsHistoryReport() ([]*models.Transaction, error)
+	GetCashBankStatement() ([]*models.Transaction, error)
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)

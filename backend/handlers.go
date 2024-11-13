@@ -1097,7 +1097,7 @@ func (app *application) GetPaymentPageDetails(w http.ResponseWriter, r *http.Req
 	}
 
 	//retrieve suppliers from the database
-	suppliers, err := app.DB.GetDebitSuppliersDetails()
+	suppliers, err := app.DB.GetCreditSuppliersDetails()
 	if err == sql.ErrNoRows {
 		resp.Message += "||No Supplier Available||"
 	} else if err != nil {
@@ -1593,6 +1593,45 @@ func (app *application) GetServiceListReport(w http.ResponseWriter, r *http.Requ
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// GetPurchaseHistoryReport retrieves the purchase history
+func (app *application) GetPurchaseHistoryReport(w http.ResponseWriter, r *http.Request) {
+	purchase, err := app.DB.GetPurchaseHistoryReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetPurchaseHistoryReport => %w", err))
+		return
+	}
+	var resp struct {
+		Error    bool               `json:"error"`
+		Message  string             `json:"message"`
+		Purchase []*models.Purchase `json:"purchase_history"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Purchase = purchase
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+// // GetSalesHistoryReport retrieves the sales history
+func (app *application) GetSalesHistoryReport(w http.ResponseWriter, r *http.Request) {
+	sale, err := app.DB.GetSalesHistoryReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetPurchaseHistoryReport => %w", err))
+		return
+	}
+	var resp struct {
+		Error    bool               `json:"error"`
+		Message  string             `json:"message"`
+		Purchase []*models.Sale `json:"sales_history"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Purchase = sale
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // .....................Accounts Handlers......................
 func (app *application) GetCustomerDueReport(w http.ResponseWriter, r *http.Request) {
 	sales, err := app.DB.GetCustomerDueHistoryReport()
@@ -1618,6 +1657,25 @@ func (app *application) GetTransactionsReport(w http.ResponseWriter, r *http.Req
 	trx, err := app.DB.GetTransactionsHistoryReport()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR:GetTransactionsReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error   bool                  `json:"error"`
+		Message string                `json:"message"`
+		Report  []*models.Transaction `json:"report"`
+	}
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = trx
+
+	fmt.Println(resp)
+	app.writeJSON(w, http.StatusOK, resp)
+}
+func (app *application) GetCashBankStatement(w http.ResponseWriter, r *http.Request) {
+	trx, err := app.DB.GetCashBankStatement()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetCashBankStatement: %w", err))
 		return
 	}
 

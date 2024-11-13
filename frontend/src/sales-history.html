@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>PSINVENTORY</title>
+  <title>Purchase History</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,11 +25,61 @@
   <link href="assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
   <!-- bootstrap-daterangepicker -->
   <link href="assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
+  <!-- iCheck -->
+  <link href="assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+  <!-- Datatables -->
+  <link href="assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
   <!-- Custom Theme Style -->
   <link href="assets/css/custom.min.css" rel="stylesheet">
   <!-- sweetalert2 style -->
   <link rel="stylesheet" href="assets/sweetalert2/sweetalert2.min.css">
+
+  <style>
+    * {
+      overflow-x: hidden;
+    }
+
+    h2 {
+      overflow: hidden;
+    }
+
+    /* Force the table to fit within its container */
+    .datatable-buttons {
+      width: 100% !important;
+      table-layout: fixed;
+      /* Fix column width to prevent overflow */
+    }
+
+    .datatable-buttons tbody tr:nth-child(even) {
+      background-color: rgba(0, 128, 128, 0.1);
+      /* Light teal for even rows */
+    }
+
+    .datatable-buttons tbody tr:nth-child(odd) {
+      background-color: #ffffff;
+      /* White for odd rows */
+    }
+
+    .datatable-buttons th {
+      background-color: #008080;
+      /* Teal header */
+      color: white;
+      font-weight: 400;
+    }
+
+    .datatable-buttons th,
+    .datatable-buttons td {
+      white-space: nowrap;
+      /* Prevent text from wrapping */
+      /* overflow: hidden; */
+      text-overflow: ellipsis;
+      /* Ellipsis for overflowed text */
+    }
+  </style>
 </head>
 
 <body class="nav-md">
@@ -107,42 +157,43 @@
                 </li>
                 <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                      <li>
-                        <a>Account Reports<span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                          <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
-                          <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
-                          <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                          <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
-                          <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
-                          <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
-                          <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
-                          <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
-                          <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
-                          <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
-                          <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
-                          <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
-                        <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                          <li class="sub_menu"><a href="category-list.html">Category List</a></li>
-                          <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
-                          <li class="sub_menu"><a href="product-list.html">Product List</a></li>
-                          <li class="sub_menu"><a href="service-list.html">Service List</a></li>
-                          <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
-                          <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
-                          <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
-                          <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
-                          <li class="sub_menu"><a href="service-history.html">Service History</a></li>
-                          </li>
-                        </ul>
-                      </li>
-                      </li>
+                    <li>
+                      <a>Account Reports<span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
+                        <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
+                        <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
+                        <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
+                        <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
+                        <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
+                        <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
+                        <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
+                        <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
+                        <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
+                        <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
+                        <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
+                    </li>
                   </ul>
-                </li> 
+                </li>
+                <li>
+                  <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li class="sub_menu"><a href="category-list.html">Category List</a></li>
+                    <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
+                    <li class="sub_menu"><a href="product-list.html">Product List</a></li>
+
+                    <li class="sub_menu"><a href="service-list.html">Service List</a></li>
+                    <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                    <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
+                    <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
+                    <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
+                    <li class="sub_menu"><a href="service-history.html">Service History</a></li>
+                </li>
+              </ul>
+              </li>
+              </li>
+              </ul>
+              </li>
               </ul>
             </div>
 
@@ -169,63 +220,22 @@
         </div>
       </div>
 
-      
+
 
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>Sales History List</label></h2>
+        <h2 class="text-center text-warning fa-2x text-bold">Sales History</h2>
         <!-- Page content here -->
         <div class="x_panel bg-gw">
           <div class="x_content">
-            <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-              <div class="row">
-                <div class="col-4">
-                  <div class="dataTables_length" id="datatable_length">
-                    <label>Show
-                      <select id="page_length_selector" name="datatable_length" aria-controls="datatable"
-                        class="form-control input-sm">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                      </select> entries
-                    </label>
-                  </div>
-                </div>
-                </div>
-              </div>
+            <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
               <!-- start project list -->
-              <div class="row bg-white">
-                <div class="col">
-                  <table class="table table-striped table-bordered dataTable no-footer" role="grid"
-                    aria-describedby="datatable_info">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Sale Date</th>
-                        <th>Salesman ID</th>
-                        <th>Customer ID</th>
-                        <th>Product ID</th>
-                        <th>Account ID</th>
-                        <th>Chalan No</th>
-                        <th>Memo No</th>
-                        <th>Note</th>
-                        <th>Bill Amount</th>
-                        <th>Discount</th>
-                        <th>Total Amount</th>
-                        <th>Paid Amount</th>
-                        <th>Updated at</th>
-                        <th>Created at</th>
-                    </tr>
-                    </thead>
-                    <tbody id="sales-history_list">
-                      <!-- tbody is deployed by javascript -->
-                    </tbody>
-                  </table>
-                  <!-- end project list -->
-                </div>
+              <div class="bg-white">
+                <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+                  cellspacing="0" width="100%">
+                  <!-- Will be updated by JS DOM -->
+                </table>
               </div>
               <div class="row">
                 <div class="col-3">
@@ -290,93 +300,314 @@
   <script src="assets/vendors/moment/min/moment.min.js"></script>
   <script src="assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
+  <!-- iCheck -->
+  <script src="assets/vendors/iCheck/icheck.min.js"></script>
+  <!-- Datatables -->
+  <script src="assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+  <script src="assets/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+  <script src="assets/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+  <script src="assets/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+  <script src="assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+  <script src="assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  <script src="assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+  <script src="assets/vendors/jszip/dist/jszip.min.js"></script>
+  <script src="assets/vendors/pdfmake/build/pdfmake.min.js"></script>
+  <script src="assets/vendors/pdfmake/build/vfs_fonts.js"></script>
+
   <!-- Custom Theme Scripts -->
   <script src="assets/js/custom.js"></script>
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/invoice.js"></script>
+  <!-- HTML to PDF generator -->
+  <script src="assets/vendors/html2pdf/html2pdf.bundle.min.js"></script>
+
 
   <!-- sweetalert2 script -->
   <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
   <!-- fetching data from backend and populate frontend table -->
   <script>
-    let currentPageIndex = 1;
-    let pageSize = parseInt(document.getElementById('page_length_selector').value); // Set initial page size
+    let reportData;
+    function init_DataTables() {
 
-    window.addEventListener('DOMContentLoaded', (event) => {
-      updatePage(pageSize, currentPageIndex);
-    });
+      console.log('run_datatables');
 
-    function updatePage(pSize, cpIndex) {
-      let tbody = document.getElementById("sales-history_list");
-      tbody.innerHTML = '';
+      if (typeof ($.fn.DataTable) === 'undefined') { return; }
+      console.log('init_DataTables');
 
-      let payload = {
-        page_size: pSize,
-        current_page_index: cpIndex,
-      }
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      }
+      var handleDataTableButtons = function () {
+        if ($(".datatable-buttons").length) {
+          var table = $(".datatable-buttons").DataTable({
+            dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
+            // processing: true, // Show processing indicator
+            serverSide: false, // Disable server-side processing for client-side only
+            pageLength: 10, // Default page size
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
+            columns: [
+              { data: "sale_date",title: "Date", className: "date"},
+              { data: "memo_no", title: "Memo No.", className: "memo-no" },
+              { title: "Discount", 
+                className: "discount",
+                render: function (data, type, row, meta) {
+                  return Math.round(row.total_amount * row.discount/100) || "0";
+                }
+              },
+              { data: "total_amount", title: "Sub Total", className: "total-amount" },
+              { data: "paid_amount", title: "Paid Amount", className: "paid-amount" },
+            ],
+            buttons: [
+              { extend: "copy", className: "btn-sm" },
+              { extend: "csv", className: "btn-sm" },
+              {
+                extend: "print",
+                className: "btn-sm",
+                text: "Print", // Change button text
+                action: function (e, dt, node, config) {
+                  customPrintFunction(reportData); // Call custom function with returnedData
+                }
+              }
+            ],
+            responsive: true,
+            // autoWidth: true, // Automatically adjust column width to container
+            scrollX: false,   // Disable horizontal scroll
+            order: [[0, 'asc']],
+            language: {
+              "emptyTable": "No data available" // Custom message when there is no data
+            },
+            ajax: function (data, callback, settings) {
+              // Fetch all data once and let DataTables handle searching/pagination on client side
+              const requestOptions = {
+                method: 'post',
+              }
+              fetch('http://localhost:4321/api/reports/inventory/sales-history', requestOptions)
+                .then(response => response.json())
+                .then(function (responseData) {
+                  console.log(responseData)
+                  reportData = responseData.sales_history || [];
+                  if (reportData.length > 0) {
+                    //Format date in the received data
+                    reportData.forEach(s => {
+                      s.sale_date = formatDate(s.sale_date, "date", "-");
+                      s.created_at = formatDate(s.created_at, "date", "-");
+                      s.updated_at = formatDate(s.updated_at, "date", "-");
+                    });
+                  }
+                  callback({ data: reportData })
+                })
+                .catch(function (error) {
+                  console.error('Error fetching data:', error);
+                });
+            },
+            order: [[0, 'asc']], // Default sorting on the first column
+          });
+        }
+      };
 
-      fetch('http://localhost:4321/api/reports/view-sales-history/all', requestOptions)
-        .then(response => response.json())
-        .then(function (data) {
-          if (data) {
-            if (data.error === true) {
-              tbody.innerHTML += `<tr><td colspan="7" class="text-center text-warning"><b>${data.message}}</b></td><tr>`
-              return;
-            }
-            console.log(data)
-            if (data.categories) {
-              data.categories.forEach(function (i) {
-                // <th>ID</th>
-                // <th>Name</th>
-                // <th>Status</th>
-                // <th>Last Update</th>
-                // <th>First Release</th>
-                let newRow = `
-                <tr>
-                  <td>${i.id}</td>
-                  <td>${i.name}</td>
-                  <td>${i.status === true ? `<label class="bg-dark">Active</label>` : `<label class="bg-danger">Inactive</label>`}</td>
-                  <td>${formatDate(i.created_at, "date", "-")}</td>
-                  <td>${formatDate(i.updated_at, "date", "-")}</td>
-                </tr>`
-                // http://localhost:4321/api/mis/view-sales-history/view/${i.id}
-                // http://localhost:4321/api/mis/view-sales-history/edit/${i.id}
-
-                tbody.innerHTML += newRow
-              });
-
-              //Reset Paginator
-              paginator(data.current_page_index, data.page_size, data.total_records);
-            } else {
-              tbody.innerHTML += `<tr><td colspan="5" class="text-center text-info"><b>No data available</b></td><tr>`
-            }
-
-          } else {
-            tbody.innerHTML += `<tr><td colspan="5" class="text-center text-danger"><b>Internal Server Error</b></td><tr>`
+      
+      TableManageButtons = function () {
+        "use strict";
+        return {
+          init: function () {
+            handleDataTableButtons();
           }
-        })
-        .catch(error => {
-          console.error('There was a problem with the fetch operation:', error);
-        });
+        };
+      }();
+
+      TableManageButtons.init();
+
+    };
+    function customPrintFunction() {
+      let n = reportData.length;
+      let total_amount = 0, total_discount = 0, total_paid_amount = 0;
+      let tBody = '';
+      if (n > 0) {
+        for (let i = 0; i < n; i++) {
+          const p = reportData[i];
+          total_amount += p.total_amount;
+          total_discount += Math.round(p.total_amount * p.discount/100);
+          total_paid_amount += p.paid_amount;
+          tBody += `
+            <tr>
+              <td>${p.sale_date || "-"}</td>
+              <td><b>${p.customer_info.account_name || ""}</b><br><span style="font-size:10px">[Code: ${p.customer_info.account_code || ""}]</span></td>
+              <td>${p.memo_no || "-"}</td>
+              <td>${Math.round(p.total_amount * p.discount/100) || "0"}</td>
+              <td>${p.total_amount || "-"}</td>
+              <td>${p.paid_amount || "-"}</td>
+            </tr>
+          `;
+        }
+        tBody += `
+            <tr>
+              <th colspan=3 style="background-color: #1b3453;color: white;">Total</td>
+              <th style="background-color: #1b3453;color: white;">${total_discount || "0"}</td>
+              <th style="background-color: #1b3453;color: white;">${total_amount || "0"}</td>
+              <th style="background-color: #1b3453;color: white;">${total_paid_amount || "0"}</td>
+            </tr>
+          `;
+      } else {
+        tBody = `
+          <tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
+      }
+
+      const content = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Company Report</title>
+          <link rel="stylesheet" type="text/css" href="styles.css">
+          <style>
+              /* Header styling */
+            .header {
+              text-align: center;
+              margin-bottom: 20px;
+              padding: 10px;
+              border-bottom: 2px solid #008080;
+            }
+            .header h1 {
+              font-size: 28px;
+              color: #008080;
+              font-weight: bold;
+              margin: 0;
+              text-transform: uppercase;
+            }
+            .header h2 {
+              font-size: 16px;
+              color: #444;
+              margin: 5px 0 15px 0;
+              font-style: italic;
+              font-weight: normal;
+            }
+            .header p {
+              margin: 3px 0;
+              font-size: 14px;
+              color: #666;
+            }
+            
+            /* table caption and printing date section */
+            .caption-section {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 18px;
+              color: #444;
+              padding-top: 10px;
+            }
+            .caption-section .caption {
+              font-weight: bold;
+              color: #008080;
+            }
+            .caption-section .print-date {
+              font-style: italic;
+              color: #666;
+            }
+
+            /* Table styling */
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-family: Arial, sans-serif;
+            }
+            th, td {
+              padding: 8px;
+              font-size: 12px;
+              text-align: left;
+              border: 0.1em solid #000;
+            }
+            th {
+              background-color: #008080;
+              color: white;
+            }
+            tr:nth-child(even) {
+              background-color: rgba(0, 128, 128, 0.1);
+            }
+            tr:nth-child(odd) {
+              background-color: #ffffff;
+            }
+
+            /* Footer styling */
+            .footer {
+              position: fixed;
+              bottom: 0;
+              width: 100%;
+              text-align: center;
+              font-size: 12px;
+              color: #666;
+              padding: 10px 0;
+            }
+            .footer .page-number:after {
+              content: counter(page);
+            }
+          </style>
+        </head>
+        <body>
+          <!-- Header Section -->
+          <div class="header">
+            ${reportData.company ? `
+              <h1>${reportData.company.name || ""}</h1>
+              <h2>${reportData.company.slogan || ""}</h2>
+              <p>${reportData.company.address || ""}</p>
+              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
+            ` : `
+              <h1>ProjuktiSheba Inventory</h1>
+              <h2>Track Smarter, Stock Better</h2>
+              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
+              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
+            `}
+            
+            <!-- Line with Caption and Print Date -->
+            <div class="caption-section">
+              <div class="caption">Sales History</div>
+              <div class="print-date">Printed on: ${getShortDate()}</div>
+            </div>
+          </div>
+
+          <!-- Table Section -->
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Memo_no</th>
+                <th>Discount</th>
+                <th>Total Amount</th>
+                <th>Paid Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tBody}
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      // Create an iframe to load the content
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframe.style.display = 'none';
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(content);
+      doc.close();
+
+      // Wait for content to load and then print
+      iframe.onload = () => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      };
     }
 
-    document.getElementById('page_length_selector').addEventListener('change', function () {
-      pageSize = parseInt(this.value);
-      currentPageIndex = 1; // Reset to first page whenever page size changes
-      updatePage(pageSize, currentPageIndex);
-    });
-    document.getElementById('add-sales-history-btn').addEventListener('click', function () {
-        addNewSalesHistory("", null)
-    });   
   </script>
+
+
+
 </body>
 
 </html>

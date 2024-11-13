@@ -40,7 +40,7 @@
 
   <style>
     .page-content {
-      overflow-x:hidden;
+      overflow-x: hidden;
     }
 
     h2 {
@@ -161,7 +161,7 @@
                       <a>Account Reports<span class="fa fa-chevron-down"></span></a>
                       <ul class="nav child_menu">
                         <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
-                        <li class="sub_menu"><a href="#cash-bank-statement.html">Cash & Bank Statement</a></li>
+                        <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
                         <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
@@ -380,17 +380,16 @@
                 .then(response => response.json())
                 .then(function (responseData) {
                   console.log(responseData)
-                  //Format date in the received data
-                  responseData.services.forEach(sr => {
-                    sr.created_at = formatDate(sr.created_at, "date", "-");
-                    sr.updated_at = formatDate(sr.updated_at, "date", "-");
-                  });
-                  reportData = responseData.services;
-                  // Wrap the data in the expected format
-                  const returnData = {
-                    data: responseData.services // Wrap data in { data: ... } for DataTables
-                  };
-                  callback(returnData);
+                  reportData = responseData.services || [];
+                  if (reportData.length > 0) {
+                    //Format date in the received data
+                    reportData.forEach(sr => {
+                      sr.created_at = formatDate(sr.created_at, "date", "-");
+                      sr.updated_at = formatDate(sr.updated_at, "date", "-");
+                    });
+                  }
+
+                  callback({ data: reportData })
                 })
                 .catch(function (error) {
                   console.error('Error fetching data:', error);
@@ -435,7 +434,7 @@
         }
       } else {
         tBody = `
-          <tr><td colspan="6" style="text-align:center;">No data available</td></tr>`;
+          <tr><td colspan="8" style="text-align:center;">No data available</td></tr>`;
       }
 
       const content = `
@@ -478,7 +477,7 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              font-size: 14px;
+              font-size: 18px;
               color: #444;
               padding-top: 10px;
             }

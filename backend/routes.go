@@ -98,6 +98,8 @@ func (app *application) routes() http.Handler {
 		mux.Post("/reports/inventory/product-list", app.GetProductListReport)
 		mux.Post("/reports/inventory/service-list", app.GetServiceListReport)
 		mux.Post("/reports/inventory/stock-report", app.GetProductListReport)
+		mux.Post("/reports/inventory/purchase-history", app.GetPurchaseHistoryReport)
+		mux.Post("/reports/inventory/sales-history", app.GetSalesHistoryReport)
 		// Category List
 		// Product List
 		// Service List
@@ -109,6 +111,7 @@ func (app *application) routes() http.Handler {
 
 		//.......................Accounts Reports.......................
 		mux.Post("/reports/accounts/transactions-report", app.GetTransactionsReport)
+		mux.Post("/reports/accounts/cash-bank-statement", app.GetCashBankStatement)
 		mux.Post("/reports/accounts/customer-due-report", app.GetCustomerDueReport)
 
 	})

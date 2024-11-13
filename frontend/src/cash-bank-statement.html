@@ -221,7 +221,7 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">Transaction Report</h2>
+        <h2 class="text-center text-warning fa-2x text-bold">Cash & Bank Statement</h2>
         <!-- Page content here -->
         <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
           <!-- start project list -->
@@ -422,7 +422,7 @@
               const requestOptions = {
                 method: 'post'
               };
-              fetch('http://localhost:4321/api/reports/accounts/transactions-report', requestOptions)
+              fetch('http://localhost:4321/api/reports/accounts/cash-bank-statement', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
                   console.log(responseData);
@@ -621,7 +621,7 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Transaction Report</div>
+              <div class="caption">Cash & Bank Statement</div>
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>
