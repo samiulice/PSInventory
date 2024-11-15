@@ -106,6 +106,7 @@ type DatabaseRepo interface {
 	GetCustomerDueHistoryReport() ([]*models.Sale, error)
 	GetTransactionsHistoryReport() ([]*models.Transaction, error)
 	GetCashBankStatement() ([]*models.Transaction, error)
+	GetExpensesHistoryReport() ([]*models.Transaction, error)
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)

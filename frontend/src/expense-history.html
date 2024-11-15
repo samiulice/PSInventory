@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Expense History</title>
+
+    <!-- Bootstrap -->
+    <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="assets/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+    <!-- bootstrap-progressbar -->
+    <link href="assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+    <!-- bootstrap-daterangepicker -->
+    <link href="assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <!-- Datatables -->
+    <link href="assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="assets/css/custom.min.css" rel="stylesheet">
+    <!-- sweetalert2 style -->
+    <link rel="stylesheet" href="assets/sweetalert2/sweetalert2.min.css">
+    <style>
+        h2 {
+            overflow: hidden;
+        }
+
+        /* Force the table to fit within its container */
+        .datatable-buttons {
+            width: 100% !important;
+            table-layout: fixed;
+            /* Fix column width to prevent overflow */
+        }
+
+        .datatable-buttons tbody tr:nth-child(even) {
+            background-color: rgba(0, 128, 128, 0.1);
+            /* Light teal for even rows */
+        }
+
+        .datatable-buttons tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+            /* White for odd rows */
+        }
+
+        .datatable-buttons th {
+            background-color: #008080;
+            /* Teal header */
+            color: white;
+            font-weight: 400;
+        }
+
+        .datatable-buttons th,
+        .datatable-buttons td {
+            overflow: auto;
+            white-space: nowrap;
+            /* Prevent text from wrapping */
+            /* overflow: hidden; */
+            text-overflow: ellipsis;
+            /* Ellipsis for overflowed text */
+        }
+    </style>
+</head>
+
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col menu_fixed">
+                <div class="left_col">
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>PSINVENTORY</span></a>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <!-- menu profile quick info -->
+                    <div class="profile clearfix">
+                        <div class="profile_pic">
+                            <img src="assets/images/samiul-photo.jpg" alt="..." class="img-circle profile_img">
+                        </div>
+                        <div class="profile_info">
+                            <span>Welcome,</span>
+                            <h2>Admin</h2>
+                        </div>
+                    </div>
+                    <!-- /menu profile quick info -->
+
+                    <br />
+
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                        <div class="menu_section">
+                            <ul class="nav side-menu">
+                                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="index.html">Dashboard</a></li>
+                                        <li><a href="open.html">Open</a></li>
+                                        <li><a href="#company-profile.html">Company Profile</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-group"></i>HR Management<span
+                                            class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="employee-list.html">Employee List</a></li>
+                                        <li><a href="#manage-employee.html">Manage Employee</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="customer-list.html">Customer List</a></li>
+                                        <li><a href="supplier-list.html">Supplier List</a></li>
+                                        <li><a href="#customer_supplier-list.html">Customer & Supplier List</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-table"></i> Inventory <span
+                                            class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="sale.html">Sale</a></li>
+                                        <li><a href="sale-return.html">Sale Return</a></li>
+                                        <li><a href="purchase.html">Purchase</a></li>
+                                        <li><a href="purchase-return.html">Purchase Return</a></li>
+                                        <li><a href="warranty.html">Warranty</a></li>
+                                        <li><a href="#repair.html">Repair</a></li>
+                                        <li><a href="#delivery.html">Delivery</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-bar-chart-o"></i> Accounts <span
+                                            class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="receive-collection.html">Receive & Collection</a></li>
+                                        <li><a href="payment.html">Payment</a></li>
+                                        <li><a href="amount-transfer.html">Amount Transfer</a></li>
+                                        <li><a href="amount-receivable.html">Amount Receivable</a></li>
+                                        <li><a href="amount-payable.html">Amount Payable</a></li>
+                                        <li><a href="expenses.html">Expenses</a></li>
+                                        <li><a href="#adjustment.html">Adjustment</a></li>
+                                        <li><a href="#bank-reconciliation.html">Bank Reconciliation</a></li>
+                                        <li><a href="#transaction-posting.html">Transaction Posting</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-file-text"></i>Reports <span
+                                            class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li>
+                                            <a>Account Reports<span class="fa fa-chevron-down"></span></a>
+                                            <ul class="nav child_menu">
+                                                <li class="sub_menu"><a href="transaction-history.html">Transaction
+                                                        History</a></li>
+                                                <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank
+                                                        Statement</a></li>
+                                                <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger
+                                                        Book(SUMMARY)</a></li>
+                                                <li class="sub_menu"><a href="#ladger-book-details.html">Ledger
+                                                        Book(DETAILS)</a></li>
+                                                <li class="sub_menu"><a href="expense-history.html">Expenses History</a>
+                                                </li>
+                                                <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit
+                                                        Report</a></li>
+                                                <li class="sub_menu"><a href="#income-statement.html">Income
+                                                        Statement</a></li>
+                                                <li class="sub_menu"><a href="#customer-due-report.html">Customer Due
+                                                        Report</a></li>
+                                                <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due
+                                                        Report</a></li>
+                                                <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
+                                                <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a>
+                                                </li>
+                                                <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a>
+                                                </li>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li class="sub_menu"><a href="category-list.html">Category List</a></li>
+                                        <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
+                                        <li class="sub_menu"><a href="product-list.html">Product List</a></li>
+                                        <li class="sub_menu"><a href="service-list.html">Service List</a></li>
+                                        <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                                        <li class="sub_menu"><a href="item-history-report.html">Item History Report</a>
+                                        </li>
+                                        <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
+                                        <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
+                                        <li class="sub_menu"><a href="service-history.html">Service History</a></li>
+                                </li>
+                            </ul>
+                            </li>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    <!-- /sidebar menu -->
+
+
+                    <!-- /menu footer buttons -->
+                    <div class="sidebar-footer hidden-small">
+                        <a data-toggle="tooltip" data-placement="top" title="Settings">
+                            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                        </a>
+                        <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                            <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                        </a>
+                        <a data-toggle="tooltip" data-placement="top" title="Lock">
+                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                        </a>
+                        <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+                            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                    <!-- /menu footer buttons -->
+                </div>
+            </div>
+
+
+
+            <!-- page content -->
+            <div id="page-content" class="right_col" role="main">
+                <!-- Content Title -->
+                <h2 class="text-center text-warning fa-2x text-bold">Expense History</h2>
+                <!-- Page content here -->
+
+                <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                    <!-- start project list -->
+                    <div class="bg-white">
+                        <table id="expense-history-table"
+                            class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+                            cellspacing="0" width="100%">
+                            <!-- Will be updated by JS DOM -->
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <div id="paginator_info" class="dataTables_info" id="datatable_info" role="status"
+                                aria-live="polite">
+                                <!-- will be updated using js DOM -->
+                            </div>
+                        </div>
+                        <div class="col-9">
+                            <nav aria-label="Page navigation example">
+                                <ul id="paginate_nav" class="pagination">
+                                    <!-- will be populated by Javascript DOM -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /page content -->
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="assets/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="assets/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="assets/vendors/nprogress/nprogress.js"></script>
+    <!-- Chart.js -->
+    <script src="assets/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="assets/vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="assets/vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="assets/vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="assets/vendors/Flot/jquery.flot.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="assets/vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="assets/vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="assets/vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="assets/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <!-- Validator JS  -->
+    <script src="assets/vendors/validator/validator.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="assets/vendors/moment/min/moment.min.js"></script>
+    <script src="assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <!-- iCheck -->
+    <script src="assets/vendors/iCheck/icheck.min.js"></script>
+    <!-- Datatables -->
+    <script src="assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="assets/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="assets/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="assets/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+    <script src="assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+    <script src="assets/vendors/jszip/dist/jszip.min.js"></script>
+    <script src="assets/vendors/pdfmake/build/pdfmake.min.js"></script>
+    <script src="assets/vendors/pdfmake/build/vfs_fonts.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="assets/js/custom.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/invoice.js"></script>
+    <!-- sweetalert2 script -->
+    <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+
+    <!-- fetching data from backend and populate frontend table -->
+    <script>
+        let reportData;
+        window.addEventListener("DOMContentLoaded", () => {
+            init_DataTables_custom('http://localhost:4321/api/reports/accounts/expenses-report');
+        })
+        function init_DataTables_custom(dataUrl) {
+            console.log('run_datatables');
+
+            if (typeof ($.fn.DataTable) === 'undefined') {
+                return;
+            }
+            console.log('init_DataTables');
+
+            var handleDataTableButtons = function () {
+                if ($("#expense-history-table").length) {
+                    // Destroy DataTable if it already exists to reinitialize it
+                    if ($.fn.DataTable.isDataTable("#expense-history-table")) {
+                        $("#expense-history-table").DataTable().clear().destroy();
+                    }
+
+                    var table = $("#expense-history-table").DataTable({
+                        dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"col-md-6"i><"col-md-6"p>',
+                        serverSide: false,
+                        pageLength: 10,
+                        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                        columns: [
+                            {
+                                title: "S/N",
+                                className: "id",
+                                width: "10%",
+                                render: function (data, type, row, meta) {
+                                    return meta.row + 1; // Row index for S/N
+                                }
+                            },
+                            { data: "transaction_date", title: "Date", className: "date", width: "7%" },
+                            {
+                                title: "Description",
+                                className: "description",
+                                width: "25%",
+                                render: function (data, type, row) {
+                                    return `To: <b>${row.destination_account_name}-${row.destination_type.substring(0, 3)}[${row.destination_id}] </b><br>
+                                    <span style="font-size:12px;">${row.description || ""}</span>`
+
+
+                                }
+                            },
+                            { data: "amount", title: "Paid", className: "paid-amount", width: "10%", },
+                            { data: "current_balance", title: "Balance", className: "current_balance", width: "10%" },
+                            {
+                                title: "Account",
+                                className: "account",
+                                width: "10%",
+                                render: function (data, type, row) {
+                                    return row.source_type === "head_accounts" ? row.source_account_name : row.destination_account_name;
+                                }
+                            },
+                            { data: "voucher_no", title: "Invoice #", className: "invoice", width: "10%" },
+                            { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no", width: "10%" }
+
+                        ],
+                        buttons: [
+                            { extend: "copy", className: "btn-sm" },
+                            { extend: "csv", className: "btn-sm" },
+                            {
+                                extend: "print",
+                                className: "btn-sm",
+                                text: "Print",
+                                action: function (e, dt, node, config) {
+                                    showDateRangePickerPopup();
+                                }
+                            }
+                        ],
+                        responsive: true,
+                        scrollX: false,
+                        order: [[0, 'asc']],
+                        language: {
+                            "emptyTable": "No data available"
+                        },
+                        ajax: function (data, callback, settings) {
+                            const requestOptions = { method: 'POST' };
+                            fetch(dataUrl, requestOptions)
+                                .then(response => response.json())
+                                .then(responseData => {
+                                    reportData = responseData.report || [];
+                                    callback({ data: reportData });
+                                })
+                                .catch(error => console.error('Error fetching data:', error));
+                        }
+                    });
+                }
+            };
+
+            // Initialize DataTable buttons
+            handleDataTableButtons();
+        }
+
+        // Function to initialize the SweetAlert2 form with date range picker
+        function showDateRangePickerPopup() {
+            Swal.fire({
+                title: 'Select Date Range',
+                html: '<div id="daterange-container" style="cursor: pointer; padding: 5px; border: 1px solid #ccc; width: 100%;">' +
+                    '<span>Click to select date range</span> <i class="fa fa-calendar"></i></div>',
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                preConfirm: () => {
+                    const daterangepicker = $('#daterange-container').data('daterangepicker');
+                    const startDate = daterangepicker.startDate.format('MM/DD/YYYY');
+                    const endDate = daterangepicker.endDate.format('MM/DD/YYYY');
+                    return { startDate, endDate };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { startDate, endDate } = result.value;
+                    showFilteredReport(startDate, endDate);
+                }
+            });
+
+            // Initialize the date range picker in the SweetAlert popup
+            init_daterangepicker_cal('daterange-container');
+        }
+
+        function showFilteredReport(startDateStr, endDateStr) {
+            let n = reportData.length;
+            let tBody = '';
+            let counter = 0;
+
+            if (n > 0) {
+                for (let i = 0; i < n; i++) {
+                    const c = reportData[i];
+
+                    // Convert string dates to Date objects
+                    const startDate = parseDate(startDateStr, "/");
+                    const endDate = parseDate(endDateStr, "/");
+                    const targetDate = parseDate(changeISODateToMMDDYYYY(c.transaction_date), "/");
+                    console.log(i, ":", startDate, endDate, targetDate)
+                    // Check if targetDate is within the range (inclusive)
+                    if (targetDate >= startDate && targetDate <= endDate) {
+                        counter += 1;
+                        tBody += `
+                            <tr>
+                                <td>${formatDate(c.transaction_date, "date", "-")}</td>
+                                <td>
+                                    To: <b>${c.destination_account_name}-${c.destination_type.substring(0, 3)}[${c.destination_id}] </b><br>
+                                    <span style="font-size:12px;">${c.description || ""}</span>
+                                </td>
+                                <td>${c.voucher_no || "-"}</td>
+                                <td>${c.cheque_no || "-"}</td>
+                                <td>${c.amount || ""}</td>
+                                <td>${c.current_balance || ""}</td>
+                                <td>${c.source_account_name}</td>
+                            </tr>
+                        `;
+                    }
+                }
+            }
+            if (counter === 0) {
+                tBody = `
+                    <tr><td colspan=7 style="text-align:center;">No data available</td></tr>`;
+            }
+
+            const currentDate = new Date().toLocaleDateString();
+            const content = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Company Report</title>
+          <link rel="stylesheet" type="text/css" href="styles.css">
+          <style>
+            /* Header styling */
+            .header {
+              text-align: center;
+              margin-bottom: 10px;
+              padding: 10px;
+              border-bottom: 2px solid #008080;
+            }
+            .header .current-date{
+              text-align: left;
+              font-size:10px;
+              font-weight:600;
+              color:#2F4F4F;
+            }
+            .header h1 {
+              font-size: 28px;
+              color: #008080;
+              font-weight: bold;
+              margin: 0;
+              text-transform: uppercase;
+            }
+            .header h2 {
+              font-size: 16px;
+              color: #444;
+              margin: 5px 0 15px 0;
+              font-style: italic;
+              font-weight: normal;
+            }
+            .header p {
+              margin: 3px 0;
+              font-size: 14px;
+              color: #666;
+            }
+            /* table caption and printing date section */
+            .caption-section {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 14px;
+              color: #444;
+              padding-top: 10px;
+              padding-bottom:0px;
+            }
+            .caption-section .caption {
+                font-size: 18px;
+              font-weight: bold;
+              color: #008080;
+            }
+            .caption-section .print-date {
+              font-style: italic;
+              color: #666;
+            }
+            /* Table styling */
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-family: Arial, sans-serif;
+            }
+            th, td {
+              padding: 8px;
+              font-size: 12px;
+              text-align: left;
+              border: 0.1em solid #000;
+            }
+            th {
+              background-color: #008080;
+              color: white;
+            }
+            tr:nth-child(even) {
+              background-color: rgba(0, 128, 128, 0.1);
+            }
+            tr:nth-child(odd) {
+              background-color: #ffffff;
+            }
+          </style>
+        </head>
+        <body>
+          <!-- Header Section -->
+          <div class="header">
+            ${reportData.company ? `
+              <h1>${reportData.company.name || ""}</h1>
+              <h2>${reportData.company.slogan || ""}</h2>
+              <p>${reportData.company.address || ""}</p>
+              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
+            ` : `
+              <h1>ProjuktiSheba Inventory</h1>
+              <h2>Track Smarter, Stock Better</h2>
+              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
+              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
+            `}
+            
+            <!-- Line with Caption and Print Date -->
+            <div class="caption-section">
+              <div class="caption">Expense History</div>
+              <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:left;text-decoration-line: underline;">${moment(startDateStr).format('MMMM D, YYYY')} - ${moment(endDateStr).format('MMMM D, YYYY')}</div>
+            
+              <div class="print-date">Printed on: ${getShortDate()}</div>
+            </div>
+          </div>
+          <!-- Table Section -->
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Invoice #</th>
+                <th>Chq/Rec. No.</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Account</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tBody}
+            </tbody>
+          </table>
+        </body>
+        </html>`;
+
+            // Create an iframe to load the content
+            const iframe = document.createElement('iframe');
+            document.body.appendChild(iframe);
+            iframe.style.display = 'none';
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write(content);
+            doc.close();
+
+            // Wait for content to load and then print
+            iframe.onload = () => {
+                iframe.contentWindow.print();
+                document.body.removeChild(iframe);
+            };
+        }
+
+    </script>
+
+
+</body>
+
+</html>

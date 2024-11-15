@@ -161,7 +161,7 @@
                         <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
                         <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
-                        <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
+                        <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
@@ -347,10 +347,11 @@
                   return rowIndex + 1;
                 }
               },
-              { data: "transaction_date", title: "Date", className: "date" },
+              { data: "transaction_date", title: "Date", className: "date", width:"7%"},
               {
                 title: "Description",
                 className: "description",
+                width:"25%",
                 render: function (data, type, row) {
                   let current_data = "";
                   if (row.transaction_type) {
@@ -364,11 +365,10 @@
                   return current_data;
                 }
               },
-              { data: "voucher_no", title: "Invoice #", className: "invoice" },
-              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no" },
               {
                 title: "Received",
                 className: "received-amount",
+                width:"10%",
                 render: function (data, type, row) {
                   if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
                     return row.amount;
@@ -380,6 +380,7 @@
               {
                 title: "Paid",
                 className: "paid-amount",
+                width:"10%",
                 render: function (data, type, row) {
                   if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
                     return row.amount;
@@ -388,17 +389,21 @@
                   }
                 }
               },
-              { data: "current_balance", title: "Balance", className: "chq-no" },
+              { data: "current_balance", title: "Balance", className: "chq-no",width:"10%"},
               {
                 title: "Account",
                 className: "account",
+                width:"10%",
                 render: function (data, type, row) {
                   if (row.source_type === "head_accounts") {
                     return row.source_account_name;
                   }
                   return row.destination_account_name;
                 }
-              }
+              },
+              { data: "voucher_no", title: "Invoice #", className: "invoice", width:"10%"},
+              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no", width:"10%" }
+              
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },

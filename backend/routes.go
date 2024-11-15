@@ -112,6 +112,7 @@ func (app *application) routes() http.Handler {
 		//.......................Accounts Reports.......................
 		mux.Post("/reports/accounts/transactions-report", app.GetTransactionsReport)
 		mux.Post("/reports/accounts/cash-bank-statement", app.GetCashBankStatement)
+		mux.Post("/reports/accounts/expenses-report", app.GetExpensesReport)
 		mux.Post("/reports/accounts/customer-due-report", app.GetCustomerDueReport)
 
 	})

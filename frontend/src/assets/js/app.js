@@ -9,7 +9,7 @@ function toTitleCase(str) {
   return str
     .toLowerCase() // Convert the entire string to lowercase for uniformity.
     .split(' ') // Split the string into an array of words using spaces as delimiters.
-    .map(word => 
+    .map(word =>
       word.charAt(0).toUpperCase() + word.slice(1) // Capitalize the first letter of each word and append the rest of the word.
     )
     .join(' '); // Join the array of words back into a single string with spaces between them.
@@ -39,12 +39,12 @@ function numberToWords(num) {
 
   // Arrays for words of numbers below 20 and multiples of ten
   const belowTwenty = [
-      "", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", 
-      "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", 
-      "sixteen", "seventeen", "eighteen", "nineteen"
+    "", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+    "sixteen", "seventeen", "eighteen", "nineteen"
   ];
   const tens = [
-      "", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
+    "", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
   ];
 
   // Array for place values in the Indian numbering system (thousand, lakh, crore)
@@ -52,12 +52,12 @@ function numberToWords(num) {
 
   // Helper function to convert numbers below 1000 to words
   function helper(n) {
-      if (n < 20) 
-          return belowTwenty[n]; // For numbers 0-19, directly return from `belowTwenty` array
-      else if (n < 100) 
-          return tens[Math.floor(n / 10)] + (n % 10 ? " " + belowTwenty[n % 10] : ""); // For numbers 20-99
-      else 
-          return belowTwenty[Math.floor(n / 100)] + " hundred" + (n % 100 ? " " + helper(n % 100) : ""); // For numbers 100-999
+    if (n < 20)
+      return belowTwenty[n]; // For numbers 0-19, directly return from `belowTwenty` array
+    else if (n < 100)
+      return tens[Math.floor(n / 10)] + (n % 10 ? " " + belowTwenty[n % 10] : ""); // For numbers 20-99
+    else
+      return belowTwenty[Math.floor(n / 100)] + " hundred" + (n % 100 ? " " + helper(n % 100) : ""); // For numbers 100-999
   }
 
   let word = "";       // Variable to store the final word result
@@ -65,20 +65,20 @@ function numberToWords(num) {
 
   // Loop through the number in chunks based on Indian numbering system
   while (num > 0) {
-      // Extract current chunk: hundreds for thousand's place, thousands for lakh and crore
-      let chunk = num % 100;
-      if (unitIndex === 1) chunk = num % 1000; // Special handling for thousand's place (3 digits)
+    // Extract current chunk: hundreds for thousand's place, thousands for lakh and crore
+    let chunk = num % 100;
+    if (unitIndex === 1) chunk = num % 1000; // Special handling for thousand's place (3 digits)
 
-      // If the chunk is not zero, convert it to words and add place value
-      if (chunk > 0) {
-          word = helper(chunk) + (units[unitIndex] ? " " + units[unitIndex] : "") + (word ? " " + word : "");
-      }
+    // If the chunk is not zero, convert it to words and add place value
+    if (chunk > 0) {
+      word = helper(chunk) + (units[unitIndex] ? " " + units[unitIndex] : "") + (word ? " " + word : "");
+    }
 
-      // Remove the processed chunk from `num`
-      num = Math.floor(num / (unitIndex === 1 ? 1000 : 100));
+    // Remove the processed chunk from `num`
+    num = Math.floor(num / (unitIndex === 1 ? 1000 : 100));
 
-      // Move to the next place value (thousand, lakh, crore)
-      unitIndex++;
+    // Move to the next place value (thousand, lakh, crore)
+    unitIndex++;
   }
 
   return word.trim(); // Return the final word result, trimmed of any extra spaces
@@ -102,8 +102,8 @@ function generateRandomAlphanumericCode(length) {
   let randomCode = '';
 
   for (let i = 0; i < length; i++) {
-      const index = Math.floor(Math.random() * charsetLength);
-      randomCode += charset[index];
+    const index = Math.floor(Math.random() * charsetLength);
+    randomCode += charset[index];
   }
 
   return randomCode;
@@ -139,6 +139,89 @@ function paginator(currPageIndex, pageSize, totalRecords) {
 
     pNav.innerHTML = htmlTmpl;
   }
+}
+// calenders
+function DateRangePicker_Cal(id, callback) {
+
+  if (typeof ($.fn.daterangepicker) === 'undefined') { return; }
+  console.log('dateRangePicker');
+
+  var cb = function (start, end, label) {
+    console.log(start.toISOString(), end.toISOString(), label);
+    $('#' + id + ' span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+  };
+
+  var optionSet1 = {
+    startDate: moment(),
+    endDate: moment(),
+    minDate: '01/01/2012',
+    maxDate: '12/31/2025',
+    dateLimit: {
+      days: 60
+    },
+    showDropdowns: true,
+    showWeekNumbers: true,
+    timePicker: false,
+    timePickerIncrement: 1,
+    timePicker12Hour: true,
+    ranges: {
+      'Today': [moment(), moment()],
+      'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+      'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+      'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+      'This Month': [moment().startOf('month'), moment().endOf('month')],
+      'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    },
+    opens: 'right',
+    buttonClasses: ['btn btn-default'],
+    applyClass: 'btn-small btn-primary',
+    cancelClass: 'btn-small',
+    format: 'MM/DD/YYYY',
+    separator: ' to ',
+    locale: {
+      applyLabel: 'Submit',
+      cancelLabel: 'Clear',
+      fromLabel: 'From',
+      toLabel: 'To',
+      customRangeLabel: 'Custom',
+      daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+      monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      firstDay: 1
+    }
+  };
+
+  $('#' + id + ' span').html('Click to select date range');
+
+  $('#' + id).daterangepicker(optionSet1, cb);
+
+  $('#' + id).on('show.daterangepicker', function () {
+    console.log("show event fired");
+  });
+  $('#' + id).on('hide.daterangepicker', function () {
+    console.log("hide event fired");
+  });
+  $('#' + id).on('apply.daterangepicker', function (ev, picker) {
+    // Resolve the promise with formatted dates
+    // document.getElementById("startDateField").innerText = picker.startDate.format('MMMM D, YYYY');
+    // document.getElementById("endDateField").innerText =picker.endDate.format('MMMM D, YYYY');
+    showFilteredReport(picker.startDate, picker.endDate)
+  });
+  $('#' + id).on('cancel.daterangepicker', function (ev, picker) {
+    console.log("cancel event fired");
+  });
+
+  $('#options1').click(function () {
+    $('#' + id).data('daterangepicker').setOptions(optionSet1, cb);
+  });
+
+  $('#options2').click(function () {
+    $('#' + id).data('daterangepicker').setOptions(optionSet2, cb);
+  });
+
+  $('#destroy').click(function () {
+    $('#' + id).data('daterangepicker').remove();
+  });
+
 }
 /* DATA TABLES */
 
@@ -229,6 +312,34 @@ function init_DataTables() {
 
 };
 
+function changeISODateToMMDDYYYY(isoDate) {
+  const date = new Date(isoDate);
+
+  // Get month, day, and year, adding leading zeros if necessary
+  const formattedDate = [
+    ('0' + (date.getMonth() + 1)).slice(-2), // Months are zero-based
+    ('0' + date.getDate()).slice(-2),
+    date.getFullYear()
+  ].join('/');
+
+  return formattedDate; // Output: 11/14/2024
+}
+
+/**
+ * Parses a date string in the "mm/dd/yyyy" format and returns a JavaScript Date object.
+ *
+ * @param {string} dateStr - The date string in "mm/dd/yyyy" format.
+ * @param {string} separator - specify the separator used in the string.
+ * @returns {Date} - A JavaScript Date object representing the parsed date.
+ */
+function parseDate(dateStr, separator) {
+  // Split the date string by "/" to get [month, day, year] as strings, then convert to numbers
+  const [month, day, year] = dateStr.split(separator).map(Number);
+
+  // Create a new Date object with the parsed values
+  // Note: In JavaScript Date, months are zero-indexed (0 = January, 11 = December)
+  return new Date(year, month - 1, day);
+}
 
 
 /*formatDate returns formattedDate for the given time, 
@@ -309,12 +420,12 @@ function getCurrentDate() {
 }
 
 //getShortDate returns current date in 25-Jun-2024 format
-function getShortDate(){
+function getShortDate() {
   const options = { day: '2-digit', month: 'short', year: 'numeric' };
   return new Date().toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
 //getLongDate returns current date in 25-June-2024 format
-function getLongDate(){
+function getLongDate() {
   const options = { day: '2-digit', month: 'long', year: 'numeric' };
   return new Date().toLocaleDateString('en-GB', options).replace(/ /g, '-');
 }
@@ -537,19 +648,19 @@ function generatePDF(id, dpi) {
 
   // Configure and generate the PDF with html2pdf
   html2pdf()
-      .from(element)
-      .set({
-          margin: [10,5,10,5],  // Adjust margin as needed (in mm)
-          filename: 'myContent.pdf',
-          html2canvas: { scale: dpi },
-          jsPDF: { format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'] }  // Page breaks managed by CSS rules
-      })
-      .outputPdf('bloburl')
-      .then((pdfUrl) => {
-          const pdfWindow = window.open(pdfUrl, '_blank');
-          pdfWindow.print();
-      });
+    .from(element)
+    .set({
+      margin: [10, 5, 10, 5],  // Adjust margin as needed (in mm)
+      filename: 'myContent.pdf',
+      html2canvas: { scale: dpi },
+      jsPDF: { format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }  // Page breaks managed by CSS rules
+    })
+    .outputPdf('bloburl')
+    .then((pdfUrl) => {
+      const pdfWindow = window.open(pdfUrl, '_blank');
+      pdfWindow.print();
+    });
 }
 
 

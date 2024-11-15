@@ -75,7 +75,7 @@
     .datatable-buttons td {
       white-space: nowrap;
       /* Prevent text from wrapping */
-      /* overflow: hidden; */
+      overflow: hidden;
       text-overflow: ellipsis;
       /* Ellipsis for overflowed text */
     }
@@ -164,7 +164,7 @@
                         <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
                         <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
-                        <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
+                        <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
@@ -348,7 +348,7 @@
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
               { data: "service_code", title: "ID", className: "service-code" },
-              { data: "service_name", title: "Name", className: "service-name" },
+              { data: "service_name", title: "Name", className: "service-name", width:"30%"},
               { data: "service_status", title: "Status", className: "service-status" },
               { data: "base_fee", title: "Base Fee", className: "base-fee" },
               { data: "discount", title: "Discount", className: "discount" },

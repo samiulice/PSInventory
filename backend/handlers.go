@@ -1691,3 +1691,22 @@ func (app *application) GetCashBankStatement(w http.ResponseWriter, r *http.Requ
 	fmt.Println(resp)
 	app.writeJSON(w, http.StatusOK, resp)
 }
+func (app *application) GetExpensesReport(w http.ResponseWriter, r *http.Request) {
+	exp, err := app.DB.GetExpensesHistoryReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetExpensesReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error   bool                  `json:"error"`
+		Message string                `json:"message"`
+		Report  []*models.Transaction `json:"report"`
+	}
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = exp
+
+	fmt.Println(resp)
+	app.writeJSON(w, http.StatusOK, resp)
+}

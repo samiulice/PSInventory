@@ -39,6 +39,12 @@
   <link rel="stylesheet" href="assets/sweetalert2/sweetalert2.min.css">
 
   <style>
+    .dataTables_wrapper {
+      padding: 0px;
+      /* border: 1px solid #008080; */
+      /* Adjust this value as needed */
+    }
+
     h2 {
       overflow: hidden;
     }
@@ -161,7 +167,7 @@
                         <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
                         <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
-                        <li class="sub_menu"><a href="#expense-history.html">Expenses History</a></li>
+                        <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
@@ -223,7 +229,8 @@
         <!-- Content Title -->
         <h2 class="text-center text-warning fa-2x text-bold">Cash & Bank Statement</h2>
         <!-- Page content here -->
-        <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+         
+        <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
           <!-- start project list -->
           <div class="bg-white">
             <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
@@ -324,81 +331,81 @@
   <!-- fetching data from backend and populate frontend table -->
   <script>
     let reportData;
-    function init_DataTables() {
-
+    window.addEventListener("DOMContentLoaded", () => {
+      init_DataTables('http://localhost:4321/api/reports/accounts/transactions-report');
+    })
+    function init_DataTables(dataUrl) {
       console.log('run_datatables');
 
-      if (typeof ($.fn.DataTable) === 'undefined') { return; }
+      if (typeof ($.fn.DataTable) === 'undefined') {
+        return;
+      }
       console.log('init_DataTables');
 
       var handleDataTableButtons = function () {
         if ($(".datatable-buttons").length) {
+          // Destroy DataTable if it already exists to reinitialize it
+          if ($.fn.DataTable.isDataTable(".datatable-buttons")) {
+            $(".datatable-buttons").DataTable().clear().destroy();
+          }
+
           var table = $(".datatable-buttons").DataTable({
-            dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
-            serverSide: false, // Disable server-side processing for client-side only
-            pageLength: 10, // Default page size
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
+            dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"col-md-6"i><"col-md-6"p>',
+            serverSide: false,
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             columns: [
               {
                 title: "S/N",
                 className: "id",
                 render: function (data, type, row, meta) {
-                  let rowIndex = meta.row;
-                  return rowIndex + 1;
+                  return meta.row + 1; // Row index for S/N
                 }
               },
-              { data: "transaction_date", title: "Date", className: "date" },
+              { data: "transaction_date", title: "Date", className: "date", width: "7%" },
               {
                 title: "Description",
                 className: "description",
+                width: "25%",
                 render: function (data, type, row) {
-                  let current_data = "";
-                  if (row.transaction_type) {
-                    current_data += row.transaction_type;
-                  }
-                  if (row.source_type === "head_accounts") {
-                    current_data += ` [${row.destination_account_name}]`;
-                  } else {
-                    current_data += ` [${row.source_account_name}]`;
-                  }
-                  return current_data;
+                  let description = row.transaction_type || "";
+                  description += row.source_type === "head_accounts" ? ` [${row.destination_account_name}]` : ` [${row.source_account_name}]`;
+                  return description;
                 }
               },
-              { data: "voucher_no", title: "Invoice #", className: "invoice" },
-              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no" },
               {
                 title: "Received",
                 className: "received-amount",
+                width: "10%",
                 render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
+                  if (["Purchase Return", "Sale", "Receive & Collection"].includes(row.transaction_type)) {
                     return row.amount;
-                  } else {
-                    return "-";
                   }
+                  return "-";
                 }
               },
               {
                 title: "Paid",
                 className: "paid-amount",
+                width: "10%",
                 render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
+                  if (["Purchase", "Sale Return", "Payment", "Expense"].includes(row.transaction_type)) {
                     return row.amount;
-                  } else {
-                    return "-";
                   }
+                  return "-";
                 }
               },
-              { data: "current_balance", title: "Balance", className: "chq-no" },
+              { data: "current_balance", title: "Balance", className: "chq-no", width: "10%" },
               {
                 title: "Account",
                 className: "account",
+                width: "10%",
                 render: function (data, type, row) {
-                  if (row.source_type === "head_accounts") {
-                    return row.source_account_name;
-                  }
-                  return row.destination_account_name;
+                  return row.source_type === "head_accounts" ? row.source_account_name : row.destination_account_name;
                 }
-              }
+              },
+              { data: "voucher_no", title: "Invoice #", className: "invoice", width: "10%" },
+              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no", width: "10%" }
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -406,64 +413,45 @@
               {
                 extend: "print",
                 className: "btn-sm",
-                text: "Print", // Change button text
+                text: "Print",
                 action: function (e, dt, node, config) {
-                  customPrintFunction(reportData); // Call custom function with returnedData
+                  customPrintFunction(reportData);
                 }
               }
             ],
             responsive: true,
-            scrollX: false, // Disable horizontal scroll
-            order: [[0, 'asc']], // Default sorting on the first column
+            scrollX: false,
+            order: [[0, 'asc']],
             language: {
-              "emptyTable": "No data available" // Custom message when there is no data
+              "emptyTable": "No data available"
             },
             ajax: function (data, callback, settings) {
-              const requestOptions = {
-                method: 'post'
-              };
-              fetch('http://localhost:4321/api/reports/accounts/cash-bank-statement', requestOptions)
+              const requestOptions = { method: 'POST' };
+              fetch(dataUrl, requestOptions)
                 .then(response => response.json())
-                .then(function (responseData) {
-                  console.log(responseData);
-                  reportData = responseData.report || []; // Ensure reportData is always an array
+                .then(responseData => {
+                  reportData = responseData.report || [];
 
-                  // If there is no data, ensure DataTable knows it's empty
                   if (reportData.length === 0) {
-                    callback({ data: [] }); // This will trigger the emptyTable message
+                    callback({ data: [] });
                   } else {
-                    // Format date in the received data
                     reportData.forEach(rp => {
                       if (rp.transaction_date) {
                         rp.transaction_date = formatDate(rp.transaction_date, "date", "-");
                       }
                     });
-                    // Return the fetched data
-                    callback({
-                      data: reportData // Wrap data in { data: ... } for DataTables
-                    });
+                    callback({ data: reportData });
                   }
                 })
-                .catch(function (error) {
-                  console.error('Error fetching data:', error);
-                });
+                .catch(error => console.error('Error fetching data:', error));
             }
           });
         }
       };
 
-      TableManageButtons = function () {
-        "use strict";
-        return {
-          init: function () {
-            handleDataTableButtons();
-          }
-        };
-      }();
-
-      TableManageButtons.init();
-
-    };
+      // Initialize DataTable buttons
+      handleDataTableButtons();
+    }
 
     function customPrintFunction() {
       let n = reportData.length;

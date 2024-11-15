@@ -3787,6 +3787,62 @@ func (p *postgresDBRepo) GetCashBankStatement() ([]*models.Transaction, error) {
 	return transactions, nil
 }
 
+func (p *postgresDBRepo) GetExpensesHistoryReport() ([]*models.Transaction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var transactions []*models.Transaction
+
+	query := `
+		SELECT transaction_id, voucher_no, transaction_type, source_type, source_id, destination_type, destination_id, amount, current_balance, transaction_date, description
+		FROM public.financial_transactions 
+		WHERE transaction_type = 'Expense'
+		ORDER BY transaction_id DESC
+	`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport => %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var trx models.Transaction
+		err = rows.Scan(
+			&trx.ID,
+			&trx.VoucherNo,
+			&trx.TransactionType,
+			&trx.SourceType,
+			&trx.SourceID,
+			&trx.DestinationType,
+			&trx.DestinationID,
+			&trx.Amount,
+			&trx.CurrentBalance,
+			&trx.TransactionDate,
+			&trx.Description,
+		)
+		if err != nil {
+			return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport => %w", err)
+		}
+		//retrieve source account name
+		var account_name string
+		query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.SourceType)
+		err = p.DB.QueryRowContext(ctx, query, trx.SourceID).Scan(&account_name)
+		if err != nil {
+			return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport (Unable to retrieve %s account name)=> %w", trx.SourceType, err)
+		}
+		trx.SourceAccountName = account_name
+		//retrieve source account name
+		query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
+		err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
+		if err != nil {
+			return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
+		}
+		trx.DestinationAccountName = account_name
+
+		transactions = append(transactions, &trx)
+	}
+	return transactions, nil
+}
+
 // Helper functions
 // CountTotalEntries counts total number of rows in given the table
 func (p *postgresDBRepo) CountRows(tableName string) (int, error) {
