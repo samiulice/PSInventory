@@ -2126,7 +2126,6 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	if err != nil {
 		return err
 	}
-	log.Println(purchase.Quantity)
 
 	//Tx-1: Update product quantity
 	//Set quantity += newQuantity
@@ -2134,12 +2133,6 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
           SET quantity_purchased = quantity_purchased + $1, purchase_cost = purchase_cost+$2 
           WHERE id = $3;`
 
-	// Execute the query with parameters
-	_, err = tx.ExecContext(ctx, query, purchase.QuantityPurchased, purchase.TotalAmount, purchase.Product.ID)
-	if err != nil {
-		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
-	}
 	// Execute the query with parameters
 	_, err = tx.ExecContext(ctx, query, purchase.QuantityPurchased, purchase.TotalAmount, purchase.Product.ID)
 	if err != nil {
@@ -3443,6 +3436,7 @@ func (p *postgresDBRepo) GetProductListReport() ([]*models.Product, error) {
 			public.products i
 			INNER JOIN brands b ON (b.id = i.brand_id) 
 			INNER JOIN categories c ON (c.id = i.category_id)
+		ORDER BY c.name ASC
 	`
 	var rows *sql.Rows
 	var err error
@@ -3731,6 +3725,7 @@ func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, 
 	}
 	return transactions, nil
 }
+
 func (p *postgresDBRepo) GetCashBankStatement() ([]*models.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -3795,7 +3790,7 @@ func (p *postgresDBRepo) GetExpensesHistoryReport() ([]*models.Transaction, erro
 	query := `
 		SELECT transaction_id, voucher_no, transaction_type, source_type, source_id, destination_type, destination_id, amount, current_balance, transaction_date, description
 		FROM public.financial_transactions 
-		WHERE transaction_type = 'Expense'
+		WHERE transaction_type NOT IN ('Amount Payable', 'Amount Receivable', 'Adjustment')
 		ORDER BY transaction_id DESC
 	`
 	rows, err := p.DB.QueryContext(ctx, query)
@@ -3870,4 +3865,33 @@ func (p *postgresDBRepo) LastIndex(tableName string) (int64, error) {
 		id = lastID.Int64
 	}
 	return id, err
+}
+
+func (p *postgresDBRepo) GetCompanyProfile() (models.CompanyInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var companyInfo models.CompanyInfo
+
+	query := "SELECT * FROM public.company_info WHERE id = 1"
+	err := p.DB.QueryRowContext(ctx, query).Scan(
+		&companyInfo.ID,
+		&companyInfo.Name,
+		&companyInfo.Description,
+		&companyInfo.Slogan,
+		&companyInfo.Mobile,
+		&companyInfo.WhatsappAccount,
+		&companyInfo.Telephone,
+		&companyInfo.Email,
+		&companyInfo.Division,
+		&companyInfo.District,
+		&companyInfo.Upazila,
+		&companyInfo.Area,
+		&companyInfo.PostalCode,
+		&companyInfo.LogoLink,
+		&companyInfo.OpeningDate,
+		&companyInfo.CreatedAt,
+		&companyInfo.UpdatedAt,
+	)
+	return companyInfo, err
 }

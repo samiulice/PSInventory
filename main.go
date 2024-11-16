@@ -7,6 +7,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 //go:embed all:frontend/src
@@ -35,16 +36,20 @@ func main() {
 	// Create application with options
 	err = wails.Run(&options.App{
 		Title: "PSInventory",
+		// Frameless: true, // Removes the default title bar
 		// WindowStartState:  options.Maximised, //maximum width
 		Width:  1366,
 		Height: 768,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		BackgroundColour: &options.RGBA{R: 127, G: 138, B: 54, A: 1},
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
+		},
+		Windows: &windows.Options{
+			DisableWindowIcon: true,
 		},
 	})
 

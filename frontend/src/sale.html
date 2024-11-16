@@ -84,7 +84,7 @@
                   <ul class="nav child_menu">
                     <li><a href="sale.html">Sale</a></li>
                     <li><a href="sale-return.html">Sale Return</a></li>
-                                        <li><a href="purchase.html">Purchase</a></li>
+                    <li><a href="purchase.html">Purchase</a></li>
                     <li><a href="purchase-return.html">Purchase Return</a></li>
                     <li><a href="warranty.html">Warranty</a></li>
                     <li><a href="#repair.html">Repair</a></li>
@@ -112,7 +112,7 @@
                         <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
                         <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                        <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
+                        <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
@@ -168,18 +168,13 @@
         </div>
       </div>
 
-      
+
 
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
         <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
-        <div class="row text-right">
-          <div class="col-md-12 col-sm-12 col-xs-12">
-            <a href="javascript:void(0);" id="invoiceBtn" style="width: 200px;"
-              onclick="generatePDF('sales-invoice-content', 3)" class="btn btn-danger d-none">Print Invoice</a>
-          </div>
-        </div>
+        <div class="x_title" class="pull-right"><button class="d-none" type="button" id="invoiceBtn" onclick="printSalesInvoice()">Print Invoice</button></div>
         <div id="sale-page-content">
           <!-- Page content here -->
           <form action="#" id="sale-form">
@@ -393,13 +388,10 @@
                           </div>
                         </div>
                       </div>
-                      <div class="row form-group text-center py-">
+                      <div class="row form-group text-center">
                         <div id="btns">
                           <br>
                           <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Save</button>
-                          <a href="javascript:void(0);" id="invoiceBtn" onclick="printInvoice()"
-                            class="btn btn-primary d-none">Generate
-                            Invoice</a>
                         </div>
                       </div>
                     </div>
@@ -637,15 +629,8 @@
                     showErrorMessage(data.message)
                   } else {
                     InvoiceData = data.sales_invoice_data;
-                    showSuccessMessage(data.message);
-                    //generate table
-                    renderSalesInvoicePage(InvoiceData)
-                    //show print button
-                    document.getElementById('invoiceBtn').classList.remove('d-none')
+                    document.getElementById("invoiceBtn").classList.remove("d-none");
                   }
-                  // setTimeout(() => {
-                  //   location.reload();
-                  // }, 5000);
                 });
             })
           }
@@ -665,6 +650,7 @@
         category.innerHTML = `<option value="" selected disabled>No Category Available. Create One</option>`;
       }
     }
+    
     //updateCustomerDiv updates customer selection options with the fetched data
     function updateCustomerDiv(customers) {
       if (customers) {
@@ -770,7 +756,6 @@
       `
 
     }
-
 
     // removeProduct removes a product by product_id
     function removeProduct(productIdToRemove) {
@@ -979,7 +964,7 @@
           serial_numbers: sn,
           mrp: parseInt(row.cells[6].innerText),
           warranty: parseInt(document.getElementById('product-warranty-' + row.cells[0].innerText).innerText),
-          sub_total: Math.round(parseInt(row.cells[7].innerText)*(1-parseInt(document.getElementById("discount").value)/100.00))
+          sub_total: Math.round(parseInt(row.cells[7].innerText) * (1 - parseInt(document.getElementById("discount").value) / 100.00))
         }
         selectedProducts.push(item)
       });
@@ -987,7 +972,341 @@
       // return the selected products list
       return selectedProducts;
     }
+
+    function printSalesInvoice() {
+      //product list table
+      let tBody = ""
+      let company_info = ""
+      let pLn = InvoiceData.selected_items.length
+      for (let i = 0; i < pLn; i++) {
+        const items = InvoiceData.selected_items[i]
+        let sn = ""
+        items.serial_numbers.forEach((s, j) => {
+          if (j % 2 === 1) {
+            sn += `#${s}<br>`
+            
+          } else {
+            sn += `#${s}&nbsp;&nbsp;&nbsp;&nbsp;`
+          }
+        })
+        tBody += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>
+              ${items.product_name}<br>
+              <span class="product-deatils">
+                <b>Category: </b>${items.category_name} &nbsp;&nbsp;
+                <b>Brand: </b>${items.brand_name} &nbsp;&nbsp;
+                <b> Warranty: </b> ${items.warranty} <br>
+                ${sn}
+              </span>
+          </td>
+          <td style="text-align:center">${items.quantity}</td>
+          <td style="text-align:right">${Math.round(items.sub_total / items.quantity)}</td>
+          <td style="text-align:right">${items.sub_total}</td>
+        </tr>`
+      }
+      //company_profile
+      if (InvoiceData.company_profile) {
+        let company_info = ` 
+          <div class="company-info">
+              <p class="company-name">${InvoiceData.company_profile.name}</p>
+              ${'<p class="company-slogan>' + InvoiceData.company_profile.slogan + '</p>' || ""}
+              <p>Mobile: ${InvoiceData.company_profile.mobile}<br>
+                  ${'Tel:' + InvoiceData.company_profile.tel + '<br>' || ""}
+                  ${'Email:' + InvoiceData.company_profile.email + '<br>' || ""}
+                  <span class="basic" style="float: inline-end; margin-top: 5px; font-weight: bold;">Date: ${getShortDate()}</span>
+              </p>
+          </div>`
+      }
+      const content = `
+        
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Sales Invoice</title>
+            <style>
+                /* General Styling */
+                * {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-family: IBMPlexSans-Regular;
+                }
+
+                body {
+                    font-family: Arial, sans-serif;
+                    color: #333;
+                    background-color: #ffffff;
+                    padding: 5px;
+                }
+
+                /* A4 Page Setup */
+                .invoice-container {
+                    margin: auto;
+                    padding: 10px;
+                    background-color: #fff;
+                }
+
+                /* Header Styling */
+                .header {
+                    background-color: #10455f;
+                    color: white;
+                    padding: 10px;
+                    /* Reduced padding */
+                    text-align: center;
+                    border-radius: 5px;
+                    margin-bottom: 5px;
+                    /* Reduced margin */
+                }
+
+                .header h1 {
+                    font-family: 'Georgia', serif;
+                    font-size: 24px;
+                    /* Reduced font size */
+                    font-weight: 700;
+                    margin: 0;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+
+                /* Info Section */
+                .info-section {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 0px;
+                    padding: 5px;
+                    background-color: #F7F9FB;
+                    border-bottom: 2px solid #1E3A5F;
+                }
+
+                .info-section div {
+                    width: 45%;
+                }
+
+                /* Customer Info and Company Info Styling */
+                .customer-info h2 {
+                    font-family: IBMPlexSans-Regular;
+                    font-size: 20px;
+                    color: #1E3A5F;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
+
+                .customer-info p {
+                    font-size: 14px;
+                    color: #000000;
+                    line-height: 2;
+                }
+
+                .basic {
+                    font-family: IBMPlexSans-Regular;
+                    letter-spacing: 0.5px;
+                    padding-left: 2px;
+                    padding-right: 2px;
+                    border-bottom: 1px dotted #000000;
+                }
+
+                .invoice {
+                    font-family: IBMPlexSans-Bold;
+                    float: left;
+                    letter-spacing: 0.5px;
+                }
+
+                .customer-info .date {
+                    font-family: IBMPlexSans-Bold;
+                    float: right;
+                    letter-spacing: 0.5px;
+                }
+
+                .company-info p {
+                    font-family: IBMPlexSans-Regular;
+                    font-size: 14px;
+                    color: #000000;
+                    line-height: 1.5;
+                }
+
+                .company-info {
+                    text-align: right;
+                }
+
+                /* Company Info Enhanced Styling */
+                .company-info .company-name {
+                    font-family: IBMPlexSans-Regular;
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #1E3A5F;
+                }
+
+                .company-info .company-slogan {
+                    font-style: italic;
+                    color: #092635;
+                    font-size: 12px;
+                }
+
+                /* Table Styling */
+                .items-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                    font-size: 12px;
+                    color: #000000;
+                }
+
+                .product-deatils {
+                    font-size: 10px;
+                    line-height: 1.25em;
+                }
+
+                .items-table th,
+                .items-table td {
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    text-align: left;
+                }
+
+                .items-table th {
+                    background-color: #10455f;
+                    color: white;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    word-spacing: 2px;
+                }
+
+                /* Totals and Payment Info */
+                .totals-section {
+                    font-family: IBMPlexSans-Regular;
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 10px;
+                    gap: 10px;
+                    font-size: 12px;
+                    color: #ffffff;
+                }
+
+                .totals,
+                .payment-info {
+                    flex: 1;
+                    padding: 10px;
+                    background-color: #ffffff;
+                    border-radius: 5px;
+                    border: 1px solid #ddd;
+                }
+
+                .totals .total-row,
+                .payment-info .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 5px 0;
+                    color: #444;
+                }
+
+                .totals .total-label,
+                .payment-info .info-label {
+                    color: #1f1f1f;
+                }
+
+                /* Remarks Section */
+                .remarks {
+                    font-size: 14px;
+                    color: #4b4949;
+                    background-color: #F7F9FB;
+                    padding: 10px;
+                    border-left: 3px solid #4C91B3;
+                    margin-top: 10px;
+                }
+            </style>
+        </head>
+
+        <body>
+          <div class="invoice-container" id="invoice-content">
+              <!-- Header Title with Solid Background Color and Updated Font Style -->
+              <div class="header">
+                  <h1>Sales Invoice</h1>
+              </div>
+
+              <!-- Info Section with Customer and Company Info Side by Side -->
+              <div class="info-section">
+                  <!-- Customer Info -->
+                  <div class="customer-info">
+                      <h2>Bill To</h2>
+                      <p>Name: <span class="basic" style="margin-left: 20px;">${InvoiceData.customer_info.account_name}</span><br>
+                          Mobile: <span class="basic" style="margin-left: 18px;">${InvoiceData.customer_info.mobile}<br></span>
+                          Address: <span class="basic" style="margin-left: 8px;">${InvoiceData.customer_info.upazila + ", " || ""}${InvoiceData.customer_info.district || ""}<br></span>
+                          Invoice: <span class="basic" style="margin-left: 15px; font-weight: bold;">${InvoiceData.memo_no}</span>
+                      </p>
+                  </div>
+
+                  <!-- Company Info -->
+                  ${company_info}
+              </div>
+
+              <!-- Items Table -->
+              <table class="items-table">
+                  <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>Description</th>
+                          <th>Quantity</th>
+                          <th>Unit Price</th>
+                          <th>Total Price</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    ${tBody}
+                      <!-- rows will be add using JS DOM -->
+                  </tbody>
+              </table>
+
+              <!-- Totals and Payment Info Section with Consistent Spacing -->
+              <div class="totals-section">
+
+                  <!-- Payment Info Section -->
+                  <div class="payment-info">
+                      <div class="info-row"><span class="info-label">Payment Method</span><span>${InvoiceData.chalan_no === "" ? "Cash Received" : "Bank Payment"}</span></div>
+                      <div class="info-row"><span class="info-label">Cheque No.</span><span>${InvoiceData.chalan_no || ""}</span></div>
+                      <div class="info-row"><span class="info-label">Due</span><span>${InvoiceData.total_amount - InvoiceData.paid_amount}</span></div>
+                  </div>
+                  <!-- Totals Section -->
+                  <div class="totals">
+                      <div class="total-row"><span class="total-label">Subtotal</span><span>${InvoiceData.bill_amount}</span></div>
+                      <div class="total-row"><span class="total-label">Discount</span><span>${InvoiceData.bill_amount - InvoiceData.total_amount}</span></div>
+                      <div class="total-row"><strong>Total Amount</strong><span><strong>${InvoiceData.total_amount}</strong></span></div>
+                  </div>
+              </div>
+
+              <!-- Remarks Section -->
+              <div class="remarks">
+                  <p>
+                    <strong>Remarks:</strong><br>
+                    ${InvoiceData.total_amount - InvoiceData.paid_amount > 0 ? "Please make the due payment within 30 days to avoid late fees." : ""}<br>
+                    Warranty excludes damage misuse, removing or scarting products stickers, consumables and unauthorized handling</li>
+                    <ul>
+                  </p>
+              </div>
+          </div>
+        </body>
+        </html>`;
+
+      // Create an iframe to load the content
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframe.style.display = 'none';
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(content);
+      doc.close();
+
+      // Wait for content to load and then print
+      iframe.onload = () => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      };
+    }
   </script>
+
 
 </body>
 

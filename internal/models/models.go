@@ -415,7 +415,27 @@ type Transaction struct {
 	CurrentBalance         int       `json:"current_balance"`
 	TransactionDate        time.Time `json:"transaction_date"`
 	Description            string    `json:"description"`
-	ChequeNo      string       `json:"cheque_no"`
+	ChequeNo               string    `json:"cheque_no"`
 	CreatedAt              time.Time `json:"created_at"`
 	UpdatedAt              time.Time `json:"updated_at"`
+}
+
+type CompanyInfo struct {
+	ID          int    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Slogan      string    `json:"slogan"`
+	Mobile      string    `json:"mobile"`
+	WhatsappAccount      string    `json:"whatsapp"`
+	Telephone   string    `json:"tel"`
+	Email       string    `json:"email"`
+	Division    string    `json:"division"`
+	District    string    `json:"district"`
+	Upazila     string    `json:"upazila"`
+	Area        string    `json:"area"`
+	PostalCode  string    `json:"postal_code"`
+	LogoLink  string    `json:"logo_link"`
+	OpeningDate time.Time `json:"opening_date"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }

@@ -163,7 +163,7 @@
                         <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
                         <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                        <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
+                        <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
@@ -321,6 +321,7 @@
 
   <!-- Custom Theme Scripts -->
   <script src="assets/js/custom.js"></script>
+  <script src="assets/js/swal-popup-form.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/invoice.js"></script>
   <!-- HTML to PDF generator -->
@@ -368,7 +369,7 @@
                 className: "btn-sm",
                 text: "Print", // Change button text
                 action: function (e, dt, node, config) {
-                  customPrintFunction(reportData); // Call custom function with returnedData
+                  showDateRangePickerPopup(); //show popup daterange selector
                 }
               }
             ],
@@ -389,14 +390,6 @@
                 .then(function (responseData) {
                   console.log(responseData)
                   reportData = responseData.sales_history || [];
-                  if (reportData.length > 0) {
-                    //Format date in the received data
-                    reportData.forEach(s => {
-                      s.sale_date = formatDate(s.sale_date, "date", "-");
-                      s.created_at = formatDate(s.created_at, "date", "-");
-                      s.updated_at = formatDate(s.updated_at, "date", "-");
-                    });
-                  }
                   callback({ data: reportData })
                 })
                 .catch(function (error) {
@@ -421,33 +414,43 @@
       TableManageButtons.init();
 
     };
-    function customPrintFunction() {
+    function showFilteredReport(startDateStr, endDateStr) {
       let n = reportData.length;
       let total_amount = 0, total_discount = 0, total_paid_amount = 0;
       let tBody = '';
+      let counter = 0;
       if (n > 0) {
         for (let i = 0; i < n; i++) {
           const p = reportData[i];
-          total_amount += p.total_amount;
-          total_discount += Math.round(p.total_amount * p.discount/100);
-          total_paid_amount += p.paid_amount;
-          tBody += `
-            <tr>
-              <td>${p.sale_date || "-"}</td>
-              <td><b>${p.customer_info.account_name || ""}</b><br><span style="font-size:10px">[Code: ${p.customer_info.account_code || ""}]</span></td>
-              <td>${p.memo_no || "-"}</td>
-              <td>${Math.round(p.total_amount * p.discount/100) || "0"}</td>
-              <td>${p.total_amount || "-"}</td>
-              <td>${p.paid_amount || "-"}</td>
-            </tr>
-          `;
+
+          // Convert string dates to Date objects
+          const startDate = parseDate(startDateStr, "/");
+          const endDate = parseDate(endDateStr, "/");
+          const targetDate = parseDate(changeISODateToMMDDYYYY(p.sale_date), "/");
+          // Check if targetDate is within the range (inclusive)
+          if (targetDate >= startDate && targetDate <= endDate) {
+            counter += 1;
+            total_amount += p.total_amount;
+            total_discount += Math.round(p.total_amount * p.discount/100);
+            total_paid_amount += p.paid_amount;
+            tBody += `
+              <tr>
+                <td>${formatDate(p.sale_date, "date", "-") || "-"}</td>
+                <td><b>${p.customer_info.account_name || ""}</b><br><span style="font-size:10px">[Code: ${p.customer_info.account_code || ""}]</span></td>
+                <td>${p.memo_no || "-"}</td>
+                <td style="text-align:right">${Math.round(p.total_amount * p.discount/100) || "0"}</td>
+                <td style="text-align:right">${p.total_amount || "-"}</td>
+                <td style="text-align:right">${p.paid_amount || "-"}</td>
+              </tr>
+            `;
+          }
         }
         tBody += `
             <tr>
               <th colspan=3 style="background-color: #1b3453;color: white;">Total</td>
-              <th style="background-color: #1b3453;color: white;">${total_discount || "0"}</td>
-              <th style="background-color: #1b3453;color: white;">${total_amount || "0"}</td>
-              <th style="background-color: #1b3453;color: white;">${total_paid_amount || "0"}</td>
+              <th style="text-align:right; background-color: #1b3453;color: white;">${total_discount || "0"}</td>
+              <th style="text-align:right; background-color: #1b3453;color: white;">${total_amount || "0"}</td>
+              <th style="text-align:right; background-color: #1b3453;color: white;">${total_paid_amount || "0"}</td>
             </tr>
           `;
       } else {
@@ -515,10 +518,10 @@
               font-family: Arial, sans-serif;
             }
             th, td {
-              padding: 8px;
+              padding: 5px;
               font-size: 12px;
               text-align: left;
-              border: 0.1em solid #000;
+              border: 0.1em solid rgba(0, 0, 0, 0.25);
             }
             th {
               background-color: #008080;

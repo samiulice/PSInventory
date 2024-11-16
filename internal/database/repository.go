@@ -110,4 +110,5 @@ type DatabaseRepo interface {
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)
+	GetCompanyProfile() (models.CompanyInfo, error)
 }

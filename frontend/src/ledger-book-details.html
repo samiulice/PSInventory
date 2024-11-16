@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>PSINVENTORY</title>
+  <title>Ledger Book Details</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -39,10 +39,6 @@
   <link rel="stylesheet" href="assets/sweetalert2/sweetalert2.min.css">
 
   <style>
-    * {
-      overflow-x: hidden;
-    }
-
     h2 {
       overflow: hidden;
     }
@@ -73,6 +69,7 @@
 
     .datatable-buttons th,
     .datatable-buttons td {
+      overflow: auto;
       white-space: nowrap;
       /* Prevent text from wrapping */
       /* overflow: hidden; */
@@ -224,32 +221,54 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">List of Suppliers</h2>
-        <!-- Page content here -->
-        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-          <!-- start project list -->
-          <div class="bg-white">
-            <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
-              cellspacing="0" width="100%">
-              <!-- Will be updated by JS DOM -->
-            </table>
+        <div class="row text-center">
+
+          <div class="col-md-3 col-sm-6 col-xs-6 form-group has-feedback">
+            <select class="form-control has-feedback-left" id="account_type" required>
+              <option value="suppliers" selected>Supplier</option>
+              <option value="customers">Customer</option>
+              <option value="employees">Employee</option>
+            </select>
+            <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left" aria-hidden="true"></i>
           </div>
-          <div class="row">
-            <div class="col-3">
-              <div id="paginator_info" class="dataTables_info" id="datatable_info" role="status" aria-live="polite">
-                <!-- will be updated using js DOM -->
-              </div>
+          <div class="col-md-3 col-sm-6 col-xs-6 form-group has-feedback">
+            <select class="form-control has-feedback-left" id="account_holder" required>
+              <!-- Will be updated by JS DOM -->
+            </select>
+            <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left" aria-hidden="true"></i>
+          </div>
+          <div class="col-md-3 col-sm-12 col-xs-12">
+            <button class="btn btn-dark">Submit</button>
+          </div>
+        </div>
+        <!-- Page content here -->
+        <div class="x_panel">
+          <div id="datatable_wrapper" class="row dataTables_wrapper form-inline dt-bootstrap no-footer">
+            <!-- start project list -->
+            <div class="bg-white">
+              <table id="ledger-book-datatable"
+                class="table table-striped table-bordered dt-responsive nowrap datatable-buttons" cellspacing="0"
+                width="100%">
+                <!-- Will be updated by JS DOM -->
+              </table>
             </div>
-            <div class="col-9">
-              <nav aria-label="Page navigation example">
-                <ul id="paginate_nav" class="pagination">
-                  <!-- will be populated by Javascript DOM -->
-                </ul>
-              </nav>
+            <div class="row">
+              <div class="col-3">
+                <div id="paginator_info" class="dataTables_info" id="datatable_info" role="status" aria-live="polite">
+                  <!-- will be updated using js DOM -->
+                </div>
+              </div>
+              <div class="col-9">
+                <nav aria-label="Page navigation example">
+                  <ul id="paginate_nav" class="pagination">
+                    <!-- will be populated by Javascript DOM -->
+                  </ul>
+                </nav>
+              </div>
             </div>
           </div>
         </div>
-        <!-- /top tiles -->
+
       </div>
       <!-- /page content -->
     </div>
@@ -316,6 +335,7 @@
 
   <!-- Custom Theme Scripts -->
   <script src="assets/js/custom.js"></script>
+  <script src="assets/js/swal-popup-form.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/invoice.js"></script>
   <!-- HTML to PDF generator -->
@@ -327,8 +347,56 @@
 
   <!-- fetching data from backend and populate frontend table -->
   <script>
-    let reportData;
-    function init_DataTables() {
+    let reportData, accounts;
+    window.addEventListener("DOMContentLoaded", () => {
+      updateAccountHolderSection();
+      document.getElementById("account_type").addEventListener("change", () => {
+        updateAccountHolderSection();
+      })
+      document.getElementById("account_holder").addEventListener("change", () => {
+        //init data table
+        InitDataTable(document.getElementById("account_type").value, parseInt(document.getElementById("account_holder").value))
+      })
+    })
+
+    function updateAccountHolderSection() {
+      let ac = document.getElementById("account_type").value
+      //update account_holder table
+      let link = "";
+      if (ac === "customers" || ac === "suppliers") {
+        link = "http://localhost:4321/api/mis/view-all-" + ac;
+      } else if (ac === "employees") {
+        link = "http://localhost:4321/api/hr/view-all-" + ac;
+      }
+      // fetch-1: On changes account type fetch head_accounts details list 
+      fetch(link, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error === true) {
+            showErrorMessage(data.message)
+          } else {
+            if (ac === "customers") {
+              accounts = data.customers
+            } else if (ac === "suppliers") {
+              accounts = data.suppliers
+            } else if (ac === "employees") {
+              accounts = data.employees
+            }
+            let div = document.getElementById("account_holder");
+            div.innerHTML = `<option value="" selected disabled>Select Account</option>`;
+            if (accounts) {
+              accounts.forEach((a, i) => {
+                div.innerHTML += `<option value="${i}">${a.account_name}[${a.account_code}]</option>`;
+              });
+            } else {
+              div.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
+              div.ariaDisabled = true;
+            }
+          }
+        })
+    }
+
+    function InitDataTable(account_type, account_id) {
 
       console.log('run_datatables');
 
@@ -336,20 +404,89 @@
       console.log('init_DataTables');
 
       var handleDataTableButtons = function () {
-        if ($(".datatable-buttons").length) {
-          var table = $(".datatable-buttons").DataTable({
+        if ($("#ledger-book-datatable").length) {
+          // Destroy DataTable if it already exists to reinitialize it
+          if ($.fn.DataTable.isDataTable("#ledger-book-datatable")) {
+            $("#ledger-book-datatable").DataTable().clear().destroy();
+          }
+          var table = $("#ledger-book-datatable").DataTable({
             dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
-            // processing: true, // Show processing indicator
             serverSide: false, // Disable server-side processing for client-side only
-            pageLength: 10, // Default page size
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
+            pageLength: -1, // Default page size
+            lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
-              { data: "account_code", title: "Account Code", className: "account-code" },
-              { data: "account_name", title: "Account Name", className: "account-name" },
-              { data: "mobile", title: "Mobile", className: "contact-number" },
-              { data: "account_status", title: "Account Status", className: "account-status" },
-              { data: "due_amount", title: "Due Amount", className: "due-amount" },
-              { data: "joining_date", title: "Joining Date", className: "joining-date" },
+              {
+                title: "S/N",
+                className: "id",
+                render: function (data, type, row, meta) {
+                  let rowIndex = meta.row;
+                  return rowIndex + 1;
+                }
+              },
+              {
+                title: "Date",
+                className: "date",
+                width: "7%",
+                render: function (data, type, row) {
+                  return formatDate(row.transaction_date, "date", "-")
+                }
+              },
+              {
+                title: "Description",
+                className: "description",
+                width: "25%",
+                render: function (data, type, row) {
+                  let current_data = "";
+                  if (row.transaction_type) {
+                    current_data += row.transaction_type;
+                  }
+                  if (row.source_type === "head_accounts") {
+                    current_data += ` [${row.destination_account_name}]`;
+                  } else {
+                    current_data += ` [${row.source_account_name}]`;
+                  }
+                  return current_data;
+                }
+              },
+              {
+                title: "Received",
+                className: "received-amount",
+                width: "10%",
+                render: function (data, type, row) {
+                  if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
+                    return row.amount;
+                  } else {
+                    return "-";
+                  }
+                }
+              },
+              {
+                title: "Paid",
+                className: "paid-amount",
+                width: "10%",
+                render: function (data, type, row) {
+                  if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
+                    return row.amount;
+                  } else {
+                    return "-";
+                  }
+                }
+              },
+              { data: "current_balance", title: "Balance", className: "chq-no", width: "10%" },
+              {
+                title: "Account",
+                className: "account",
+                width: "10%",
+                render: function (data, type, row) {
+                  if (row.source_type === "head_accounts") {
+                    return row.source_account_name;
+                  }
+                  return row.destination_account_name;
+                }
+              },
+              { data: "voucher_no", title: "Invoice #", className: "invoice", width: "10%" },
+              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no", width: "10%" }
+
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -357,42 +494,33 @@
               {
                 extend: "print",
                 className: "btn-sm",
-                text: "Print", // Change button text
+                text: "Print",
                 action: function (e, dt, node, config) {
-                  customPrintFunction(); // Call custom function with returnedData
+                  showDateRangePickerPopup(); //show popup daterange selector
                 }
               }
             ],
             responsive: true,
-            // autoWidth: true, // Automatically adjust column width to container
-            scrollX: false,   // Disable horizontal scroll
-            order: [[0, 'asc']],
+            scrollX: false, // Disable horizontal scroll
+            order: [[0, 'asc']], // Default sorting on the first column
+            language: {
+              "emptyTable": "No data available" // Custom message when there is no data
+            },
             ajax: function (data, callback, settings) {
-              // Fetch all data once and let DataTables handle searching/pagination on client side
               const requestOptions = {
                 method: 'post'
-              }
-              fetch('http://localhost:4321/api/mis/view-all-suppliers', requestOptions)
+              };
+              fetch('http://localhost:4321/api/reports/accounts/transactions-report', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
-                  console.log(responseData)
-                  reportData = responseData.suppliers;
-                  //Format date in the received data
-                  responseData.suppliers.forEach(sup => {
-                    sup.account_status = (sup.account_status == 1) ? `<b style="text-align:center;">Active</b>` : "Inactive";
-                    sup.joining_date = formatDate(sup.joining_date, "date", "-");
-                  });
-                  // Wrap the data in the expected format
-                  const returnData = {
-                    data: responseData.suppliers // Wrap data in { data: ... } for DataTables
-                  };
-                  callback(returnData);
+                  console.log(responseData);
+                  reportData = responseData.report || [];
+                  callback({ data: reportData });
                 })
                 .catch(function (error) {
                   console.error('Error fetching data:', error);
                 });
-            },
-            order: [[0, 'asc']], // Default sorting on the first column
+            }
           });
         }
       };
@@ -410,29 +538,71 @@
 
     };
 
-    function customPrintFunction() {
+    function showFilteredReport(startDateStr, endDateStr) {
       let n = reportData.length;
       let tBody = '';
-
+      let counter = 0;
       if (n > 0) {
         for (let i = 0; i < n; i++) {
-          const s = reportData[i];
-          tBody += `
-            <tr>
-              <td>${s.account_code}</td>
-              <td>${s.account_name}</td>
-              <td>${s.mobile}</td>
-              <td>${s.account_status}</td>
-              <td>${s.due_amount || "0"}</td>
-              <td>${formatDate(s.joining_date, "date", "-")}</td>
-            </tr>`;
-        }
-      } else {
-        tBody = `
-          <tr><td colspan=6 style="text-align:center; color:#DC143C">No data available</td></tr>`;
-      }
+          const c = reportData[i];
 
-      const currentDate = new Date().toLocaleDateString();
+          // Convert string dates to Date objects
+          const startDate = parseDate(startDateStr, "/");
+          const endDate = parseDate(endDateStr, "/");
+          const targetDate = parseDate(changeISODateToMMDDYYYY(c.transaction_date), "/");
+          // Check if targetDate is within the range (inclusive)
+          if (targetDate >= startDate && targetDate <= endDate) {
+            counter += 1;
+            //description
+            let description = ""
+            if (c.transaction_type) {
+              description += c.transaction_type
+            }
+            if (c.source_type === "head_accounts") {
+              description += ` [${c.destination_account_name}]`;
+            } else {
+              description += ` [${c.source_account_name}]`;
+            }
+
+            //received
+            let received = 0;
+            if (c.transaction_type === "Purchase Return" || c.transaction_type === "Sale" || c.transaction_type === "Receive & Collection") {
+              received = c.amount;
+            } else {
+              received = "";
+            }
+            //paid
+            let paid = 0;
+            if (c.transaction_type === "Purchase" || c.transaction_type === "Sale Return" || c.transaction_type === "Payment" || c.transaction_type === "Expense") {
+              paid = c.amount;
+            } else {
+              paid = "";
+            }
+            //account 
+            let account = ""
+            if (c.source_type === "head_accounts") {
+              account = c.source_account_name;
+            }
+            account = c.destination_account_name;
+
+            tBody += `
+            <tr>
+              <td>${formatDate(c.transaction_date, "date", "-")}</td>
+              <td>${description}</td>
+              <td>${c.voucher_no || "-"}</td>
+              <td>${c.cheque_no || "-"}</td>
+              <td>${received || ""}</td>
+              <td>${paid || ""}</td>
+              <td>${c.current_balance || ""}</td>
+              <td>${account}</td>
+            </tr>`;
+          }
+        }
+      }
+      if (counter === 0) {
+        tBody = `
+          <tr><td colspan=8 style="text-align:center;">No data available</td></tr>`;
+      }
       const content = `
         <!DOCTYPE html>
         <html lang="en">
@@ -441,21 +611,10 @@
           <title>Company Report</title>
           <link rel="stylesheet" type="text/css" href="styles.css">
           <style>
-            /* General print styling */
-            @media print {
-              body {
-                margin: 0;
-                padding: 10px;
-                box-sizing: border-box;
-              }
-              table {
-                width: 100%;
-              }
-            }
             /* Header styling */
             .header {
               text-align: center;
-              margin-bottom: 20px;
+              margin-bottom: 10px;
               padding: 10px;
               border-bottom: 2px solid #008080;
             }
@@ -492,9 +651,10 @@
               font-size: 14px;
               color: #444;
               padding-top: 10px;
-              padding-bottom:0px
+              padding-bottom:0px;
             }
             .caption-section .caption {
+                font-size: 18px;
               font-weight: bold;
               color: #008080;
             }
@@ -543,21 +703,24 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">List of Suppliers</div>
+              <div class="caption">Transaction Report</div>
+              <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:left;text-decoration-line: underline;">${moment(startDateStr).format('MMMM D, YYYY')} - ${moment(endDateStr).format('MMMM D, YYYY')}</div>
+            
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>
-
           <!-- Table Section -->
           <table>
             <thead>
               <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Mobile</th>
-                <th>Status</th>
-                <th>Due</th>
-                <th>Joining Date</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Invoice #</th>
+                <th>Chq/Rec. No.</th>
+                <th>Received</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Account</th>
               </tr>
             </thead>
             <tbody>
@@ -584,7 +747,6 @@
     }
 
   </script>
-
 
 
 </body>

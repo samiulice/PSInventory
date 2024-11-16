@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Sales Invoice</title>
-</head>
-
-<body>
-    <div><button type="button" id="clickBtn">Print</button></div>
-    <script>
-        window.addEventListener("DOMContentLoaded", ()=>{
-            document.getElementById('clickBtn').addEventListener("click", e =>{
-                customPrintFunction()
-            })
-        })
-        function customPrintFunction() {
-            const content = `
             <!DOCTYPE html>
             <html lang="en">
 
@@ -322,24 +305,3 @@
             </body>
             </html>
             `;
-
-            // Create an iframe to load the content
-            const iframe = document.createElement('iframe');
-            document.body.appendChild(iframe);
-            iframe.style.display = 'none';
-            const doc = iframe.contentDocument || iframe.contentWindow.document;
-            doc.open();
-            doc.write(content);
-            doc.close();
-
-            // Wait for content to load and then print
-            iframe.onload = () => {
-                iframe.contentWindow.print();
-                document.body.removeChild(iframe);
-            };
-        }
-
-    </script>
-</body>
-
-</html>

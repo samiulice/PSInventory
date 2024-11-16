@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Range Picker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff; /* Light background */
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .date-range-container {
+            background-color: #ffffff; /* White card background */
+            padding: 15px;
+            border-radius: 8px;
+            width: 250px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-range-container h3 {
+            margin: 0 0 15px;
+            font-size: 16px;
+            text-align: center;
+            color: #333333; /* Dark heading */
+        }
+
+        .button-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .button-list button {
+            padding: 10px 15px;
+            font-size: 14px;
+            color: #536A7F; /* Neutral text color */
+            background-color: #F5F5F5; /* Light gray background for buttons */
+            border: none; /* No border */
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .button-list button:hover {
+            background-color: #265166; /* Dark blue hover */
+            color: #ffffff; /* White text on hover */
+        }
+
+        .button-list button.active {
+            background-color: #265166; /* Dark blue active button */
+            color: #ffffff; /* White text */
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .action-buttons button:first-child {
+            background-color: #265166; /* Dark blue for "Submit" */
+            color: #ffffff;
+            border: none; /* No border */
+            margin-right: 8px;
+        }
+
+        .action-buttons button:first-child:hover {
+            background-color: #1d3e4e; /* Darker blue on hover */
+        }
+
+        .action-buttons button:last-child {
+            background-color: #ffffff; /* White for "Clear" */
+            color: #495057;
+            border: none; /* No border */
+            box-shadow: inset 0 0 0 1px #ced4da; /* Thin border effect via shadow */
+        }
+
+        .action-buttons button:last-child:hover {
+            background-color: #f8f9fa; /* Slightly lighter gray on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="date-range-container">
+        <h3>Select Date Range</h3>
+        <div class="button-list">
+            <button>Till Date</button>
+            <button class="active">Today</button>
+            <button>Yesterday</button>
+            <button>Last 7 Days</button>
+            <button>Last 30 Days</button>
+            <button>This Month</button>
+            <button>Last Month</button>
+            <button>Custom</button>
+        </div>
+        <div class="action-buttons">
+            <button>Submit</button>
+            <button>Clear</button>
+        </div>
+    </div>
+</body>
+</html>

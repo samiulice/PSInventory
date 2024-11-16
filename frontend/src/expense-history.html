@@ -166,7 +166,7 @@
                                                         Statement</a></li>
                                                 <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger
                                                         Book(SUMMARY)</a></li>
-                                                <li class="sub_menu"><a href="#ladger-book-details.html">Ledger
+                                                <li class="sub_menu"><a href="ledger-book-details.html">Ledger
                                                         Book(DETAILS)</a></li>
                                                 <li class="sub_menu"><a href="expense-history.html">Expenses History</a>
                                                 </li>
@@ -330,6 +330,7 @@
 
     <!-- Custom Theme Scripts -->
     <script src="assets/js/custom.js"></script>
+    <script src="assets/js/swal-popup-form.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/invoice.js"></script>
     <!-- sweetalert2 script -->
@@ -337,7 +338,7 @@
 
     <!-- fetching data from backend and populate frontend table -->
     <script>
-        let reportData;
+        let reportData, total_exp = 0, total_paid = 0;
         window.addEventListener("DOMContentLoaded", () => {
             init_DataTables_custom('http://localhost:4321/api/reports/accounts/expenses-report');
         })
@@ -370,13 +371,21 @@
                                     return meta.row + 1; // Row index for S/N
                                 }
                             },
-                            { data: "transaction_date", title: "Date", className: "date", width: "7%" },
+                            {   title: "Date", 
+                                className: "date",
+                                width: "7%",
+                                render: function (data, type, row) {
+                                    return formatDate(row.transaction_date, "date", "-")
+
+
+                                }
+                            },
                             {
                                 title: "Description",
                                 className: "description",
                                 width: "25%",
                                 render: function (data, type, row) {
-                                    return `To: <b>${row.destination_account_name}-${row.destination_type.substring(0, 3)}[${row.destination_id}] </b><br>
+                                    return `To: <b>${row.destination_account_name}-${row.destination_type.substring(0, 4)}[${row.destination_id}] </b><br>
                                     <span style="font-size:12px;">${row.description || ""}</span>`
 
 
@@ -427,40 +436,16 @@
                     });
                 }
             };
-
             // Initialize DataTable buttons
             handleDataTableButtons();
         }
 
-        // Function to initialize the SweetAlert2 form with date range picker
-        function showDateRangePickerPopup() {
-            Swal.fire({
-                title: 'Select Date Range',
-                html: '<div id="daterange-container" style="cursor: pointer; padding: 5px; border: 1px solid #ccc; width: 100%;">' +
-                    '<span>Click to select date range</span> <i class="fa fa-calendar"></i></div>',
-                showCancelButton: true,
-                confirmButtonText: 'Submit',
-                preConfirm: () => {
-                    const daterangepicker = $('#daterange-container').data('daterangepicker');
-                    const startDate = daterangepicker.startDate.format('MM/DD/YYYY');
-                    const endDate = daterangepicker.endDate.format('MM/DD/YYYY');
-                    return { startDate, endDate };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const { startDate, endDate } = result.value;
-                    showFilteredReport(startDate, endDate);
-                }
-            });
-
-            // Initialize the date range picker in the SweetAlert popup
-            init_daterangepicker_cal('daterange-container');
-        }
-
         function showFilteredReport(startDateStr, endDateStr) {
             let n = reportData.length;
+            console.log(reportData)
             let tBody = '';
             let counter = 0;
+            total_exp = 0;
 
             if (n > 0) {
                 for (let i = 0; i < n; i++) {
@@ -470,10 +455,10 @@
                     const startDate = parseDate(startDateStr, "/");
                     const endDate = parseDate(endDateStr, "/");
                     const targetDate = parseDate(changeISODateToMMDDYYYY(c.transaction_date), "/");
-                    console.log(i, ":", startDate, endDate, targetDate)
                     // Check if targetDate is within the range (inclusive)
                     if (targetDate >= startDate && targetDate <= endDate) {
                         counter += 1;
+                        total_exp +=c.amount
                         tBody += `
                             <tr>
                                 <td>${formatDate(c.transaction_date, "date", "-")}</td>
@@ -492,136 +477,138 @@
                 }
             }
             if (counter === 0) {
-                tBody = `
-                    <tr><td colspan=7 style="text-align:center;">No data available</td></tr>`;
+                tBody = `<tr><td colspan=7 style="text-align:center;">No data available</td></tr>`;
             }
-
             const currentDate = new Date().toLocaleDateString();
             const content = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <title>Company Report</title>
-          <link rel="stylesheet" type="text/css" href="styles.css">
-          <style>
-            /* Header styling */
-            .header {
-              text-align: center;
-              margin-bottom: 10px;
-              padding: 10px;
-              border-bottom: 2px solid #008080;
-            }
-            .header .current-date{
-              text-align: left;
-              font-size:10px;
-              font-weight:600;
-              color:#2F4F4F;
-            }
-            .header h1 {
-              font-size: 28px;
-              color: #008080;
-              font-weight: bold;
-              margin: 0;
-              text-transform: uppercase;
-            }
-            .header h2 {
-              font-size: 16px;
-              color: #444;
-              margin: 5px 0 15px 0;
-              font-style: italic;
-              font-weight: normal;
-            }
-            .header p {
-              margin: 3px 0;
-              font-size: 14px;
-              color: #666;
-            }
-            /* table caption and printing date section */
-            .caption-section {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              font-size: 14px;
-              color: #444;
-              padding-top: 10px;
-              padding-bottom:0px;
-            }
-            .caption-section .caption {
-                font-size: 18px;
-              font-weight: bold;
-              color: #008080;
-            }
-            .caption-section .print-date {
-              font-style: italic;
-              color: #666;
-            }
-            /* Table styling */
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              font-family: Arial, sans-serif;
-            }
-            th, td {
-              padding: 8px;
-              font-size: 12px;
-              text-align: left;
-              border: 0.1em solid #000;
-            }
-            th {
-              background-color: #008080;
-              color: white;
-            }
-            tr:nth-child(even) {
-              background-color: rgba(0, 128, 128, 0.1);
-            }
-            tr:nth-child(odd) {
-              background-color: #ffffff;
-            }
-          </style>
-        </head>
-        <body>
-          <!-- Header Section -->
-          <div class="header">
-            ${reportData.company ? `
-              <h1>${reportData.company.name || ""}</h1>
-              <h2>${reportData.company.slogan || ""}</h2>
-              <p>${reportData.company.address || ""}</p>
-              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
-            ` : `
-              <h1>ProjuktiSheba Inventory</h1>
-              <h2>Track Smarter, Stock Better</h2>
-              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
-              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
-            `}
-            
-            <!-- Line with Caption and Print Date -->
-            <div class="caption-section">
-              <div class="caption">Expense History</div>
-              <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:left;text-decoration-line: underline;">${moment(startDateStr).format('MMMM D, YYYY')} - ${moment(endDateStr).format('MMMM D, YYYY')}</div>
-            
-              <div class="print-date">Printed on: ${getShortDate()}</div>
-            </div>
-          </div>
-          <!-- Table Section -->
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Invoice #</th>
-                <th>Chq/Rec. No.</th>
-                <th>Paid</th>
-                <th>Balance</th>
-                <th>Account</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${tBody}
-            </tbody>
-          </table>
-        </body>
-        </html>`;
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                <meta charset="UTF-8">
+                <title>Company Report</title>
+                <style>
+                    /* Header styling */
+                    .header {
+                    text-align: center;
+                    margin-bottom: 10px;
+                    padding: 10px;
+                    border-bottom: 2px solid #008080;
+                    }
+                    .header .current-date{
+                    text-align: left;
+                    font-size:10px;
+                    font-weight:600;
+                    color:#2F4F4F;
+                    }
+                    .header h1 {
+                    font-size: 28px;
+                    color: #008080;
+                    font-weight: bold;
+                    margin: 0;
+                    text-transform: uppercase;
+                    }
+                    .header h2 {
+                    font-size: 16px;
+                    color: #444;
+                    margin: 5px 0 15px 0;
+                    font-style: italic;
+                    font-weight: normal;
+                    }
+                    .header p {
+                    margin: 3px 0;
+                    font-size: 14px;
+                    color: #666;
+                    }
+                    /* table caption and printing date section */
+                    .caption-section {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: 14px;
+                    color: #444;
+                    padding-top: 10px;
+                    padding-bottom:0px;
+                    }
+                    .caption-section .caption {
+                        font-size: 18px;
+                    font-weight: bold;
+                    color: #008080;
+                    }
+                    .caption-section .print-date {
+                    font-style: italic;
+                    color: #666;
+                    }
+                    /* Table styling */
+                    table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-family: Arial, sans-serif;
+                    }
+                    th, td {
+                    padding: 8px;
+                    font-size: 12px;
+                    text-align: left;
+                    border: 0.1em solid #000;
+                    }
+                    th {
+                    background-color: #008080;
+                    color: white;
+                    }
+                    tr:nth-child(even) {
+                    background-color: rgba(0, 128, 128, 0.1);
+                    }
+                    tr:nth-child(odd) {
+                    background-color: #ffffff;
+                    }
+                </style>
+                </head>
+                <body>
+                <!-- Header Section -->
+                <div class="header">
+                    ${reportData.company ? `
+                    <h1>${reportData.company.name || ""}</h1>
+                    <h2>${reportData.company.slogan || ""}</h2>
+                    <p>${reportData.company.address || ""}</p>
+                    <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
+                    ` : `
+                    <h1>ProjuktiSheba Inventory</h1>
+                    <h2>Track Smarter, Stock Better</h2>
+                    <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
+                    <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
+                    `}
+                    
+                    <!-- Line with Caption and Print Date -->
+                    <div class="caption-section">
+                        <div class="caption">Expense History</div>
+                        <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:left;text-decoration-line: underline;">${moment(startDateStr).format('MMMM D, YYYY')} - ${moment(endDateStr).format('MMMM D, YYYY')}</div>
+                        
+                        <div class="print-date">Printed on: ${getShortDate()}</div>
+                    </div>
+                </div>
+                <!-- Table Section -->
+                <table>
+                    <div class="caption-section">
+                        <span style="text-align:left;">Total Entry: ${counter}</span>
+                        <span style="text-align:right;">Total Paid:${total_exp}</span>
+                        <span style="text-align:center;">Total Paid:${total_paid}</span>
+                    </div>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Invoice #</th>
+                        <th>Chq/Rec. No.</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
+                        <th>Account</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    ${tBody}
+                    </tbody>
+                </table>
+                </body>
+                </html>`;
 
             // Create an iframe to load the content
             const iframe = document.createElement('iframe');

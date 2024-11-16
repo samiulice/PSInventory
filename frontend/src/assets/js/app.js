@@ -141,7 +141,7 @@ function paginator(currPageIndex, pageSize, totalRecords) {
   }
 }
 // calenders
-function DateRangePicker_Cal(id, callback) {
+function DateRangePicker_Cal(id) {
 
   if (typeof ($.fn.daterangepicker) === 'undefined') { return; }
   console.log('dateRangePicker');
@@ -155,7 +155,7 @@ function DateRangePicker_Cal(id, callback) {
     startDate: moment(),
     endDate: moment(),
     minDate: '01/01/2012',
-    maxDate: '12/31/2025',
+    maxDate: moment(),
     dateLimit: {
       days: 60
     },
@@ -165,6 +165,7 @@ function DateRangePicker_Cal(id, callback) {
     timePickerIncrement: 1,
     timePicker12Hour: true,
     ranges: {
+      'Till Date': [moment('01/01/2012', 'MM/DD/YYYY'), moment()], // Added Till Date option
       'Today': [moment(), moment()],
       'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
       'Last 7 Days': [moment().subtract(6, 'days'), moment()],
@@ -189,8 +190,7 @@ function DateRangePicker_Cal(id, callback) {
       firstDay: 1
     }
   };
-
-  $('#' + id + ' span').html('Click to select date range');
+  $('#' + id + ' span').html(moment().format('MMM D, YYYY') + ' - ' + moment().format('MMM D, YYYY'));
 
   $('#' + id).daterangepicker(optionSet1, cb);
 
@@ -204,7 +204,7 @@ function DateRangePicker_Cal(id, callback) {
     // Resolve the promise with formatted dates
     // document.getElementById("startDateField").innerText = picker.startDate.format('MMMM D, YYYY');
     // document.getElementById("endDateField").innerText =picker.endDate.format('MMMM D, YYYY');
-    showFilteredReport(picker.startDate, picker.endDate)
+    // showFilteredReport(picker.startDate, picker.endDate)
   });
   $('#' + id).on('cancel.daterangepicker', function (ev, picker) {
     console.log("cancel event fired");

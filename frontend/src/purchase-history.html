@@ -163,7 +163,7 @@
                         <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
                         <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                        <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
+                        <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
@@ -321,6 +321,7 @@
 
   <!-- Custom Theme Scripts -->
   <script src="assets/js/custom.js"></script>
+  <script src="assets/js/swal-popup-form.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/invoice.js"></script>
   <!-- HTML to PDF generator -->
@@ -349,38 +350,42 @@
             pageLength: 10, // Default page size
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
-              { title: "Date", 
+              {
+                title: "Date",
                 className: "date",
-                width:"8%",
+                width: "8%",
                 render: function (data, type, row, meta) {
-                  return row.purchase_date;
-                } 
-              },
-              { title: "Product", 
-                className: "item",
-                width:"15%",
-                render: function (data, type, row, meta) {
-                  return `<b>${row.product_info.brand.name+" " || ""}${row.product_info.product_name || ""}</b><br><span style="font-size:12px">[Code: ${row.product_info.product_code || ""}]</span>`;
-                } 
-              },
-              { title: "Supplier", 
-                className: "supplier",
-                width:"15%",
-                render: function (data, type, row, meta) {
-                  return `<b>${row.supplier_info.account_name || ""}</b><br><span style="font-size:12px">[Code: ${row.supplier_info.account_code || ""}]</span>`;
-                } 
-              },
-              { data: "memo_no", title: "Memo No.", className: "memo-no", width: "15%"},
-              { data: "quantity_purchased", title: "Quantity", className: "quantity-purchased" , width: "7%"},
-              { title: "Discount", 
-                className: "discount",
-                width: "10%",
-                render: function (data, type, row, meta) {
-                  return Math.round(row.total_amount * row.discount/100) || "00000000";
+                  return formatDate(row.purchase_date, "date", "-");
                 }
               },
-              { data: "total_amount", title: "Total Amount", className: "total-amount", width:"15%" },
-              { data: "paid_amount", title: "Paid Amount", className: "paid-amount", width: "15%" },
+              {
+                title: "Product",
+                className: "item",
+                width: "15%",
+                render: function (data, type, row, meta) {
+                  return `<b>${row.product_info.brand.name + " " || ""}${row.product_info.product_name || ""}</b><br><span style="font-size:12px">[Code: ${row.product_info.product_code || ""}]</span>`;
+                }
+              },
+              {
+                title: "Supplier",
+                className: "supplier",
+                width: "15%",
+                render: function (data, type, row, meta) {
+                  return `<b>${row.supplier_info.account_name || ""}</b><br><span style="font-size:12px">[Code: ${row.supplier_info.account_code || ""}]</span>`;
+                }
+              },
+              { data: "memo_no", title: "Memo No.", className: "memo-no", width: "15%" },
+              { data: "quantity_purchased", title: "Quantity", className: "quantity-purchased text-right", width: "7%" },
+              {
+                title: "Discount",
+                className: "discount text-right",
+                width: "10%",
+                render: function (data, type, row, meta) {
+                  return Math.round(row.total_amount * row.discount / 100) || "00000000";
+                }
+              },
+              { data: "total_amount", title: "Total Amount", className: "total-amount text-right"},
+              { data: "paid_amount", title: "Paid Amount", className: "paid-amount text-right"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -390,7 +395,7 @@
                 className: "btn-sm",
                 text: "Print", // Change button text
                 action: function (e, dt, node, config) {
-                  customPrintFunction(reportData); // Call custom function with returnedData
+                  showDateRangePickerPopup(); //show popup daterange selector
                 }
               }
             ],
@@ -410,14 +415,6 @@
                 .then(function (responseData) {
                   console.log(responseData)
                   reportData = responseData.purchase_history || [];
-                  if (reportData.length > 0) {
-                    //Format date in the received data
-                    reportData.forEach(ph => {
-                      ph.purchase_date = formatDate(ph.purchase_date, "date", "-");
-                      ph.created_at = formatDate(ph.created_at, "date", "-");
-                      ph.updated_at = formatDate(ph.updated_at, "date", "-");
-                    });
-                  }
                   callback({ data: reportData })
                 })
                 .catch(function (error) {
@@ -441,40 +438,53 @@
       TableManageButtons.init();
 
     };
-    function customPrintFunction() {
+    function showFilteredReport(startDateStr, endDateStr) {
       let n = reportData.length;
-      let total_amount = 0, total_discount = 0, total_paid_amount = 0;
+      let total_quantity = 0, total_amount = 0, total_discount = 0, total_paid_amount = 0;
       let tBody = '';
+      let counter = 0;
       if (n > 0) {
         for (let i = 0; i < n; i++) {
           const p = reportData[i];
-          total_amount += p.total_amount;
-          total_discount += Math.round(p.total_amount * p.discount/100);
-          total_paid_amount += p.paid_amount;
-          tBody += `
-            <tr>
-              <td>${p.purchase_date || "-"}</td>
-              <td><b>${p.product_info.product_name || ""}</b><br><span style="font-size:10px">[Code: ${p.product_info.product_code || ""}]</span></td>
-              <td><b>${p.supplier_info.account_name || ""}</b><br><span style="font-size:10px">[Code: ${p.supplier_info.account_code || ""}]</span></td>
-              <td>${p.memo_no || "-"}</td>
-              <td>${p.quantity_purchased || "-"}</td>
-              <td>${Math.round(p.total_amount * p.discount/100) || "0"}</td>
-              <td>${p.total_amount || "-"}</td>
-              <td>${p.paid_amount || "-"}</td>
-            </tr>
-          `;
+
+          // Convert string dates to Date objects
+          const startDate = parseDate(startDateStr, "/");
+          const endDate = parseDate(endDateStr, "/");
+          const targetDate = parseDate(changeISODateToMMDDYYYY(p.purchase_date), "/");
+          // Check if targetDate is within the range (inclusive)
+          if (targetDate >= startDate && targetDate <= endDate) {
+            counter += 1;
+            total_quantity += p.quantity_purchased;
+            total_amount += p.total_amount;
+            total_discount += Math.round(p.total_amount * p.discount / 100);
+            total_paid_amount += p.paid_amount;
+            tBody += `
+              <tr>
+                <td>${formatDate(p.purchase_date, "date", "-") || "-"}</td>
+                <td><b>${p.product_info.product_name || ""}</b><br><span style="font-size:10px">[Code: ${p.product_info.product_code || ""}]</span></td>
+                <td><b>${p.supplier_info.account_name || ""}</b><br><span style="font-size:10px">[Code: ${p.supplier_info.account_code || ""}]</span></td>
+                <td>${p.memo_no || "-"}</td>
+                <td style="text-align:right">${p.quantity_purchased || "-"}</td>
+                <td style="text-align:right">${Math.round(p.total_amount * p.discount / 100) || "0"}</td>
+                <td style="text-align:right">${p.total_amount || "-"}</td>
+                <td style="text-align:right">${p.paid_amount || "-"}</td>
+              </tr>
+            `;
+          }
         }
         tBody += `
             <tr>
-              <th colspan=5 style="background-color: #1b3453;color: white;">Total</td>
-              <th style="background-color: #1b3453;color: white;">${total_discount || "0"}</td>
-              <th style="background-color: #1b3453;color: white;">${total_amount || "0"}</td>
-              <th style="background-color: #1b3453;color: white;">${total_paid_amount || "0"}</td>
+              <th colspan=4 style="background-color: #1b3223;color: white;">Total</td>
+              <th style="text-align:right; background-color: #1b3223;color: white;">${total_quantity || "0"}</td>
+              <th style="text-align:right; background-color: #1b3223;color: white;">${total_discount || "0"}</td>
+              <th style="text-align:right; background-color: #1b3223;color: white;">${total_amount || "0"}</td>
+              <th style="text-align:right; background-color: #1b3223;color: white;">${total_paid_amount || "0"}</td>
             </tr>
           `;
-      } else {
+      }
+      if (counter === 0) {
         tBody = `
-          <tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
+          <tr><td colspan="8" style="text-align:center;">No data available</td></tr>`;
       }
 
       const content = `
@@ -537,10 +547,10 @@
               font-family: Arial, sans-serif;
             }
             th, td {
-              padding: 8px;
+              padding: 5px;
               font-size: 12px;
               text-align: left;
-              border: 0.1em solid #000;
+              border: 0.1em solid rgba(0, 0, 0, 0.25);
             }
             th {
               background-color: #008080;

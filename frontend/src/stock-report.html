@@ -163,7 +163,7 @@
                         <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
                         <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
                         <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                        <li class="sub_menu"><a href="#ladger-book-details.html">Ledger Book(DETAILS)</a></li>
+                        <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
@@ -395,13 +395,13 @@
                       pr.updated_at = formatDate(pr.updated_at, "date", "-");
                     });
                   }
-                  callback({data:reportData})
+                  callback({ data: reportData })
                 })
                 .catch(function (error) {
                   console.error('Error fetching data:', error);
                 });
             },
-            order: [[0, 'asc']], // Default sorting on the first column
+            order: [[4, 'asc']], // Default sorting on the first column
           });
         }
       };
@@ -421,9 +421,48 @@
     function customPrintFunction() {
       let n = reportData.length;
       let tBody = '';
+      total_stock_qty = 0;
+      total_purchase_qty = 0;
+      total_purchase_price = 0;
+      total_sale_qty = 0;
+      total_sale_price = 0;
 
       if (n > 0) {
-        for (let i = 0; i < n; i++) {
+        const p = reportData[0];
+        let purchase_rate = "-", sale_rate = "-";
+        if (p.quantity_purchased != 0) {
+          let prate = p.purchase_cost / p.quantity_purchased;
+          purchase_rate = `${prate.toFixed(2)}`
+        }
+        if (p.quantity_sold != 0) {
+          let rate = p.sold_price / p.quantity_sold;
+          sale_rate = `${rate.toFixed(2)}`
+        }
+        total_stock_qty += p.quantity_in_stock;
+        total_purchase_qty += p.quantity_purchased;
+        total_purchase_price += p.purchase_cost;
+        total_sale_qty += p.quantity_sold;
+        total_sale_price += p.sold_price;
+        tBody += `
+          <tr>
+            <th colspan=9 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${p.category_id}</th>
+          </tr>
+          <tr>
+            <td>${p.product_code || "-"}</td>
+            <td style="text-align: left;">${p.product_name || "-"}</td>
+            <td>${p.quantity_in_stock}</td>
+            <td>${p.quantity_purchased}</td>
+            <td>${purchase_rate}</td>
+            <td>${p.purchase_cost}</td>
+            <td>${p.quantity_sold}</td>
+            <td>${sale_rate}</td>
+            <td>${p.sold_price}</td>
+          </tr>
+          `
+        for (let i = 1; i < n; i++) {
+          if (reportData[i - 1].category_id !== reportData[i].category_id) {
+            tBody += `<tr><th colspan=9 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${reportData[i].category_id}</th></tr>`
+          }
           const p = reportData[i];
           let purchase_rate = "-", sale_rate = "-";
           if (p.quantity_purchased != 0) {
@@ -431,13 +470,18 @@
             purchase_rate = `${prate.toFixed(2)}`
           }
           if (p.quantity_sold != 0) {
-            let srate = p.sold_price / p.quantity_sold;
-            sale_rate = `${srate.toFixed(2)}`
+            let rate = p.sold_price / p.quantity_sold;
+            sale_rate = `${rate.toFixed(2)}`
           }
+          total_stock_qty += p.quantity_in_stock;
+          total_purchase_qty += p.quantity_purchased;
+          total_purchase_price += p.purchase_cost;
+          total_sale_qty += p.quantity_sold;
+          total_sale_price += p.sold_price;
           tBody += `
             <tr>
               <td>${p.product_code || "-"}</td>
-              <td>${p.product_name || "-"}</td>
+              <td style="text-align: left;">${p.product_name || "-"}</td>
               <td>${p.quantity_in_stock}</td>
               <td>${p.quantity_purchased}</td>
               <td>${purchase_rate}</td>
@@ -448,6 +492,16 @@
             </tr>
           `;
         }
+        tBody += `
+          <tr>
+            <th style="text-align:left" colspan=2>Total</th>
+            <th style="text-align:right">${total_stock_qty}</th>
+            <th style="text-align:right">${total_purchase_qty}</th>
+            <th colspan=2>${total_purchase_price}</th>
+            <th style="text-align:right">${total_sale_qty}</th>
+            <th style="text-align:right" colspan=2>${total_sale_price}</th>
+          </tr>
+          `
       } else {
         tBody = `
           <tr><td colspan="9" style="text-align:center;">No data available</td></tr>`;
@@ -513,21 +567,16 @@
               font-family: Arial, sans-serif;
             }
             th, td {
-              padding: 8px;
-              font-size: 12px;
-              text-align: left;
-              border: 0.1em solid #000;
+              padding: 5px;
+              font-size: 10px;
+              text-align: right;
+              border: 0.1em solid rgba(0, 0, 0, 0.25);
             }
             th {
               background-color: #008080;
               color: white;
-            }
-            tr:nth-child(even) {
-              background-color: rgba(0, 128, 128, 0.1);
-            }
-            tr:nth-child(odd) {
-              background-color: #ffffff;
-            }
+              text-align: center;
+            }            
 
             /* Footer styling */
             .footer {

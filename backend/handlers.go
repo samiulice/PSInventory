@@ -95,15 +95,13 @@ func (app *application) AddCustomer(w http.ResponseWriter, r *http.Request) {
 		app.badRequest(w, err)
 		return
 	}
-	//Sanitize blank info
-	if customer.AccountCode == "" {
-		n, err := app.DB.CountRows("customers")
-		if err == nil {
-			customer.AccountCode = "em-" + fmt.Sprintf("%06d", n+1)
-		}
+
+	n, err := app.DB.LastIndex("customers")
+	if err == nil {
+		customer.AccountCode = "cus-" + fmt.Sprintf("%06d", n+1)
 	}
 	customer.AccountStatus = true
-	_, err = app.DB.AddCustomer(customer)
+	id, err := app.DB.AddCustomer(customer)
 
 	if err != nil {
 		resp = JSONResponse{
@@ -114,6 +112,7 @@ func (app *application) AddCustomer(w http.ResponseWriter, r *http.Request) {
 		app.writeJSON(w, http.StatusInternalServerError, resp)
 		return
 	}
+	customer.ID = id
 	resp = JSONResponse{
 		Error:   false,
 		Message: "Customer added successfully",
@@ -427,7 +426,11 @@ func (app *application) AddProduct(w http.ResponseWriter, r *http.Request) {
 		app.badRequest(w, err)
 		return
 	}
-	product.ID = id
+	product ,err = app.DB.GetProductByID(id)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
 	var resp = JSONResponse{
 		Error:   false,
 		Message: "Product Added Successfully",
@@ -813,23 +816,30 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 
 	err = app.readJSON(w, r, &salesInfo)
 	if err != nil {
-		app.badRequest(w, err)
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts:Unable to read JSON => %w",err))
 		return
 	}
 	err = app.DB.SaleProducts(&salesInfo)
 	if err != nil {
-		app.badRequest(w, err)
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w",err))
+		return
+	}
+	cp, err := app.DB.GetCompanyProfile()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w",err))
 		return
 	}
 	var resp struct {
 		Error            bool                 `json:"error"`
 		Message          string               `json:"message"`
 		SalesInvoiceData *models.SalesInvoice `json:"sales_invoice_data"`
+		CompanyProfile *models.CompanyInfo `json:"company_profile"`
 	}
 
 	resp.Error = false
 	resp.Message = "product checked out successfully"
 	resp.SalesInvoiceData = &salesInfo
+	resp.CompanyProfile = &cp
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
@@ -1612,6 +1622,7 @@ func (app *application) GetPurchaseHistoryReport(w http.ResponseWriter, r *http.
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
 // // GetSalesHistoryReport retrieves the sales history
 func (app *application) GetSalesHistoryReport(w http.ResponseWriter, r *http.Request) {
 	sale, err := app.DB.GetSalesHistoryReport()
@@ -1620,8 +1631,8 @@ func (app *application) GetSalesHistoryReport(w http.ResponseWriter, r *http.Req
 		return
 	}
 	var resp struct {
-		Error    bool               `json:"error"`
-		Message  string             `json:"message"`
+		Error    bool           `json:"error"`
+		Message  string         `json:"message"`
 		Purchase []*models.Sale `json:"sales_history"`
 	}
 

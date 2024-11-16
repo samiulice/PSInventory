@@ -200,7 +200,7 @@ function renderSalesInvoicePage(invoiceData) {
  * 
  * Dependency: htmlStringToPDF function
  */
-function renderPurchaseInvoice(invoiceData, dip) {
+function renderPurchaseInvoice(invoiceData, dpi) {
     let tableBody = `
         <tr>
             <td>1</td>
@@ -208,7 +208,7 @@ function renderPurchaseInvoice(invoiceData, dip) {
                 </br>Category: ${invoiceData.product_info.category.name}} &nbsp;&nbsp;&nbsp;&nbsp; ${invoiceData.product_info.brand.name}
                 </br>Category: ${invoiceData.warranty}
             </td>
-            <td>${invoiceData.quantity}</td>
+            <td>${invoiceData.quantity_purchased}</td>
             <td>${invoiceData.max_retail_price}</td>
             <td>${invoiceData.total_amount}</td>
         </tr>
