@@ -118,7 +118,8 @@
                                             class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
                                         <li><a href="employee-list.html">Employee List</a></li>
-                                        <li><a href="#manage-employee.html">Manage Employee</a></li>
+                                        <li><a href="add-employee.html">Add Employee</a></li>
+                    <li><a href="edit-employee.html">Edit Employee</a></li>
                                     </ul>
                                 </li>
                                 <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
@@ -194,6 +195,7 @@
                                         <li class="sub_menu"><a href="product-list.html">Product List</a></li>
                                         <li class="sub_menu"><a href="service-list.html">Service List</a></li>
                                         <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                    <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
                                         <li class="sub_menu"><a href="item-history-report.html">Item History Report</a>
                                         </li>
                                         <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
@@ -340,9 +342,9 @@
     <script>
         let reportData, total_exp = 0, total_paid = 0;
         window.addEventListener("DOMContentLoaded", () => {
-            init_DataTables_custom('http://localhost:4321/api/reports/accounts/expenses-report');
+            init_DataTables_custom();
         })
-        function init_DataTables_custom(dataUrl) {
+        function init_DataTables_custom() {
             console.log('run_datatables');
 
             if (typeof ($.fn.DataTable) === 'undefined') {
@@ -371,7 +373,8 @@
                                     return meta.row + 1; // Row index for S/N
                                 }
                             },
-                            {   title: "Date", 
+                            {
+                                title: "Date",
                                 className: "date",
                                 width: "7%",
                                 render: function (data, type, row) {
@@ -407,7 +410,16 @@
                         ],
                         buttons: [
                             { extend: "copy", className: "btn-sm" },
-                            { extend: "csv", className: "btn-sm" },
+                            {
+                                extend: "csv",
+                                className: "btn-sm",
+                                filename: function () {
+                                    // Generate a custom file name dynamically
+                                    const today = new Date();
+                                    const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
+                                    return `Expense_History_${formattedDate}`;
+                                },
+                            },
                             {
                                 extend: "print",
                                 className: "btn-sm",
@@ -425,7 +437,7 @@
                         },
                         ajax: function (data, callback, settings) {
                             const requestOptions = { method: 'POST' };
-                            fetch(dataUrl, requestOptions)
+                            fetch('http://localhost:4321/api/reports/accounts/expenses-report', requestOptions)
                                 .then(response => response.json())
                                 .then(responseData => {
                                     reportData = responseData.report || [];
@@ -458,7 +470,7 @@
                     // Check if targetDate is within the range (inclusive)
                     if (targetDate >= startDate && targetDate <= endDate) {
                         counter += 1;
-                        total_exp +=c.amount
+                        total_exp += c.amount
                         tBody += `
                             <tr>
                                 <td>${formatDate(c.transaction_date, "date", "-")}</td>

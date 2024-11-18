@@ -22,6 +22,23 @@ func (app *application) PathNotFound(w http.ResponseWriter, r *http.Request) {
 	// Serve the custom 404 HTML page
 	http.ServeFile(w, r, "frontend/src/404.html")
 }
+func (app *application) FetchCompanyProfile(w http.ResponseWriter, r *http.Request) {
+
+	cp, err := app.DB.GetCompanyProfile()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: FetchCompanyProfile => Unable to retrieve Company Details:  %w", err))
+		return
+	}
+	var resp struct {
+		Error          bool                  `json:"error"`
+		Message        string                `json:"message"`
+		CompanyProfile models.CompanyProfile `json:"company_profile"`
+	}
+	resp.Message = "Company data fetched successfully"
+	resp.CompanyProfile = cp
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
 
 // .....................HR Management Panel Handlers......................
 
@@ -203,12 +220,12 @@ func (app *application) AddSupplier(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Sanitize blank info
-	if supplier.AccountCode == "" {
-		n, err := app.DB.CountRows("suppliers")
-		if err == nil {
-			supplier.AccountCode = "sup-" + fmt.Sprintf("%06d", n+1)
-		}
+	n, err := app.DB.LastIndex("suppliers")
+	if err != nil {
+		app.badRequest(w, err)
+		return
 	}
+	supplier.AccountCode = "S-" + fmt.Sprintf("%06d", n+1)
 	supplier.AccountStatus = true
 	id, err := app.DB.AddSupplier(supplier)
 
@@ -426,7 +443,7 @@ func (app *application) AddProduct(w http.ResponseWriter, r *http.Request) {
 		app.badRequest(w, err)
 		return
 	}
-	product ,err = app.DB.GetProductByID(id)
+	product, err = app.DB.GetProductByID(id)
 	if err != nil {
 		app.badRequest(w, err)
 		return
@@ -816,24 +833,24 @@ func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
 
 	err = app.readJSON(w, r, &salesInfo)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts:Unable to read JSON => %w",err))
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts:Unable to read JSON => %w", err))
 		return
 	}
 	err = app.DB.SaleProducts(&salesInfo)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w",err))
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w", err))
 		return
 	}
 	cp, err := app.DB.GetCompanyProfile()
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w",err))
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w", err))
 		return
 	}
 	var resp struct {
-		Error            bool                 `json:"error"`
-		Message          string               `json:"message"`
-		SalesInvoiceData *models.SalesInvoice `json:"sales_invoice_data"`
-		CompanyProfile *models.CompanyInfo `json:"company_profile"`
+		Error            bool                   `json:"error"`
+		Message          string                 `json:"message"`
+		SalesInvoiceData *models.SalesInvoice   `json:"sales_invoice_data"`
+		CompanyProfile   *models.CompanyProfile `json:"company_profile"`
 	}
 
 	resp.Error = false
@@ -1026,7 +1043,7 @@ func (app *application) GetSalePageDetails(w http.ResponseWriter, r *http.Reques
 
 // GetReceiveCollectionPageDetails scrape data from the database to initialize receive-collection page
 func (app *application) GetReceiveCollectionPageDetails(w http.ResponseWriter, r *http.Request) {
-	app.infoLog.Println("Hit receive-collection handler")
+
 	var resp struct {
 		Error        bool                  `json:"error,omitempty"`
 		Message      string                `json:"message,omitempty"`
@@ -1098,7 +1115,7 @@ func (app *application) CompleteReceiveCollectionProcess(w http.ResponseWriter, 
 
 // GetPaymentPageDetails scrape data from the database to initialize payment page
 func (app *application) GetPaymentPageDetails(w http.ResponseWriter, r *http.Request) {
-	app.infoLog.Println("Hit receive-collection handler")
+
 	var resp struct {
 		Error        bool                  `json:"error,omitempty"`
 		Message      string                `json:"message,omitempty"`
@@ -1126,7 +1143,7 @@ func (app *application) GetPaymentPageDetails(w http.ResponseWriter, r *http.Req
 
 	//TODO: Retrieve accounts and send to frontend
 	resp.Error = false
-	resp.Message += "||data Succesfully fetched||"
+	resp.Message += "||data Successfully fetched||"
 	resp.Suppliers = suppliers
 	resp.HeadAccounts = headAccounts
 
@@ -1581,6 +1598,26 @@ func (app *application) GetProductListReport(w http.ResponseWriter, r *http.Requ
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+// GetLowStockProductReport retrieves the product list that marked as low stock
+func (app *application) GetLowStockProductReport(w http.ResponseWriter, r *http.Request) {
+	products, err := app.DB.GetLowStockProductReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetLowStockProductReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error    bool              `json:"error"`
+		Message  string            `json:"message"`
+		Products []*models.Product `json:"products"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Products = products
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
 
 // GetServiceListReport retrieves the services list
 func (app *application) GetServiceListReport(w http.ResponseWriter, r *http.Request) {
@@ -1698,6 +1735,41 @@ func (app *application) GetCashBankStatement(w http.ResponseWriter, r *http.Requ
 	resp.Error = false
 	resp.Message = "Data fetched successfully"
 	resp.Report = trx
+
+	fmt.Println(resp)
+	app.writeJSON(w, http.StatusOK, resp)
+}
+func (app *application) GetLedgerBookDetails(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		AccountType string `json:"account_type"`
+		AccountID   int    `json:"account_id"`
+	}
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetLedgerBookDetails: %w", err))
+		return
+	}
+	trx, err := app.DB.GetLedgerBookDetails(payload.AccountType, payload.AccountID)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetLedgerBookDetails: %w", err))
+		return
+	}
+	cp, err := app.DB.GetCompanyProfile()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetLedgerBookDetails: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error          bool                   `json:"error"`
+		Message        string                 `json:"message"`
+		Report         []*models.Transaction  `json:"report"`
+		CompanyProfile *models.CompanyProfile `json:"company_profile"`
+	}
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = trx
+	resp.CompanyProfile = &cp
 
 	fmt.Println(resp)
 	app.writeJSON(w, http.StatusOK, resp)

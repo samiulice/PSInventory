@@ -117,7 +117,7 @@ function addNewBrand(page, brand) {
     }
   });
 }
-//addNewProduct show a popup form and then make an api call to insert iten data to the database table
+//addNewProduct show a popup form and then make an api call to insert item data to the database table
 function addNewProduct(page, brands, categories, products) {
   let brandList = '';
   let categoryList = '';
@@ -162,8 +162,8 @@ function addNewProduct(page, brands, categories, products) {
                     </div>
                     <!-- Sale Discount -->
                     <div class="col-4 form-group has-feedback">
-                        <input type="number" class="form-control has-feedback-left" id="discount" name="discount"
-                            placeholder="discount(%)" min="0" max="100" autocomplete="off">
+                        <input type="number" class="form-control has-feedback-left" id="stock_alert_level" name="stock_alert_level"
+                            placeholder="Stock Alert Level" min="0" max="100" autocomplete="off">
                         <div class="invalid-feedback d-none text-danger">Enter value between 0 to 100.</div>
                         <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-gift" aria-hidden="true"></span>
                     </div>
@@ -214,7 +214,7 @@ function addNewProduct(page, brands, categories, products) {
             brand_id: form.brand.value,
             category_id: form.category.value,
             category_name: form.category.options[form.category.selectedIndex].text,
-            discount: form.discount.value,
+            stock_alert_level: form.stock_alert_level.value,
           });
         } else {
           Swal.showValidationMessage('Please correct the errors in the form.');
@@ -255,7 +255,7 @@ function addNewProduct(page, brands, categories, products) {
         product_description: data.description,
         brand_id: parseInt(data.brand_id),
         category_id: parseInt(data.category_id),
-        discount: parseInt(data.discount),
+        stock_alert_level: parseInt(data.stock_alert_level),
       }
       const requestOptions = {
         method: 'post',

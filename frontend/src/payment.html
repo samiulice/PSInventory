@@ -70,7 +70,8 @@
                 <li><a><i class="fa fa-group"></i>HR Management<span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li><a href="employee-list.html">Employee List</a></li>
-                    <li><a href="#manage-employee.html">Manage Employee</a></li>
+                    <li><a href="add-employee.html">Add Employee</a></li>
+                    <li><a href="edit-employee.html">Edit Employee</a></li>
                   </ul>
                 </li>
                 <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
@@ -132,6 +133,7 @@
                     <li class="sub_menu"><a href="product-list.html">Product List</a></li>
                     <li class="sub_menu"><a href="service-list.html">Service List</a></li>
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                    <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
                     <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
                     <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
                     <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
@@ -363,6 +365,7 @@
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
+              console.log(data)
               accounts = data.head_accounts;
               suppliers = data.suppliers;
               updatePage();
@@ -371,6 +374,8 @@
       })
 
       function updatePage() {
+        console.log("HeadAccounts :", accounts);
+        console.log("Suppliers :", suppliers);
         let accountsDiv = document.getElementById("source");
         let supplierDiv = document.getElementById("destination");
         accountsDiv.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
@@ -396,6 +401,7 @@
       //change due_amount section on changing customer selection
       document.getElementById("destination").addEventListener("change", () => {
         payableAmount = suppliers[parseInt(document.getElementById("destination").value)].due_amount
+        payableAmount = Math.abs(payableAmount);
         document.getElementById("due_amount").innerText = payableAmount;
         document.getElementById("paid-amount").max = payableAmount;
       })

@@ -98,6 +98,7 @@ type DatabaseRepo interface {
 	GetCategoryListReport() ([]*models.Category, error)
 	GetBrandListReport() ([]*models.Brand, error)
 	GetProductListReport() ([]*models.Product, error)
+	GetLowStockProductReport() ([]*models.Product, error)
 	GetServiceListReport() ([]*models.Service, error)
 	GetPurchaseHistoryReport() ([]*models.Purchase, error)
 	GetSalesHistoryReport() ([]*models.Sale, error)
@@ -106,9 +107,10 @@ type DatabaseRepo interface {
 	GetCustomerDueHistoryReport() ([]*models.Sale, error)
 	GetTransactionsHistoryReport() ([]*models.Transaction, error)
 	GetCashBankStatement() ([]*models.Transaction, error)
+	GetLedgerBookDetails(account_type string, account_id int) ([]*models.Transaction, error)
 	GetExpensesHistoryReport() ([]*models.Transaction, error)
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)
-	GetCompanyProfile() (models.CompanyInfo, error)
+	GetCompanyProfile() (models.CompanyProfile, error)
 }

@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>PSINVENTORY</title>
+  <title>Stock Alert Report</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -182,7 +182,6 @@
                     <li class="sub_menu"><a href="category-list.html">Category List</a></li>
                     <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
                     <li class="sub_menu"><a href="product-list.html">Product List</a></li>
-
                     <li class="sub_menu"><a href="service-list.html">Service List</a></li>
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
                     <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
@@ -227,19 +226,19 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">Stock Report</h2>
+        <h2 class="text-center text-warning fa-2x text-bold">Stock Alert Report</h2>
         <!-- Page content here -->
         <div class="x_panel bg-gw">
           <div class="x_content">
-            <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+            <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
               <!-- start project list -->
               <div class="bg-white">
-                <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+                <table id="stock-alert-report" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
                   cellspacing="0" width="100%">
                   <!-- Will be updated by JS DOM -->
                 </table>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -330,8 +329,8 @@
       console.log('init_DataTables');
 
       var handleDataTableButtons = function () {
-        if ($(".datatable-buttons").length) {
-          var table = $(".datatable-buttons").DataTable({
+        if ($("#stock-alert-report").length) {
+          var table = $("#stock-alert-report").DataTable({
             dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
             // processing: true, // Show processing indicator
             serverSide: false, // Disable server-side processing for client-side only
@@ -340,25 +339,39 @@
             columns: [
               { data: "product_code", title: "ID", className: "product-code" },
               { data: "product_name", title: "Name", className: "product-name" },
-              { data: "product_status", title: "Status", className: "product-status" },
-              { data: "quantity_in_stock", title: "Available Quantity", className: "available-quantity" },
-              { data: "category_id", title: "Category", className: "category-name" },
-              { data: "brand_id", title: "Brand", className: "brand-name" },
-              { data: "created_at", title: "First Release", className: "created-at" },
+              { data: "stock_alert_level", title: "Stock Alert Level", className: "stock-alert-level" },
+              {
+                title: "Available Quantity", className: "available-quantity",
+                render: (_, __, row) => {
+                  return row.quantity_purchased - row.quantity_sold;
+                }
+              },
+              {
+                title: "Category", className: "category-name",
+                render: (_, __, row) => {
+                  return row.category.name || "";
+                }
+              },
+              {
+                title: "Brand", className: "brand-name",
+                render: (_, __, row) => {
+                  return row.brand.name || "";
+                }
+              },
               { data: "updated_at", title: "Last Update", className: "updated-at" },
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
               {
-              extend: "csv",
-              className: "btn-sm",
-              filename: function () {
-                // Generate a custom file name dynamically
-                const today = new Date();
-                const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
-                return `Stock_Report_${formattedDate}`;
+                extend: "csv",
+                className: "btn-sm",
+                filename: function () {
+                  // Generate a custom file name dynamically
+                  const today = new Date();
+                  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
+                  return `Stock_Report_${formattedDate}`;
+                },
               },
-            },
               {
                 extend: "print",
                 className: "btn-sm",
@@ -377,18 +390,14 @@
               const requestOptions = {
                 method: 'post',
               }
-              fetch('http://localhost:4321/api/reports/inventory/product-list', requestOptions)
+              fetch('http://localhost:4321/api/reports/inventory/stock-alert-report', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
                   console.log(responseData)
                   reportData = responseData.products || [];
                   if (reportData.length > 0) {
                     //Format date in the received data
-                    reportData.forEach(pr => {
-                      pr.category_id = pr.category.name;
-                      pr.brand_id = pr.brand.name;
-                      pr.quantity_in_stock = pr.quantity_purchased - pr.quantity_sold;
-                      pr.product_status = pr.product_status == true ? "Active" : "Inactive";
+                    reportData.forEach(pr => { 
                       pr.created_at = formatDate(pr.created_at, "date", "-");
                       pr.updated_at = formatDate(pr.updated_at, "date", "-");
                     });
@@ -443,12 +452,13 @@
         total_sale_price += p.sold_price;
         tBody += `
           <tr>
-            <th colspan=9 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${p.category_id}</th>
+            <th colspan=10 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${p.category.name}</th>
           </tr>
           <tr>
             <td>${p.product_code || "-"}</td>
             <td style="text-align: left;">${p.product_name || "-"}</td>
             <td>${p.quantity_in_stock}</td>
+            <td>${p.stock_alert_level}</td>
             <td>${p.quantity_purchased}</td>
             <td>${purchase_rate}</td>
             <td>${p.purchase_cost}</td>
@@ -459,7 +469,7 @@
           `
         for (let i = 1; i < n; i++) {
           if (reportData[i - 1].category_id !== reportData[i].category_id) {
-            tBody += `<tr><th colspan=9 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${reportData[i].category_id}</th></tr>`
+            tBody += `<tr><th colspan=10 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${reportData[i].category.name}</th></tr>`
           }
           const p = reportData[i];
           let purchase_rate = "-", sale_rate = "-";
@@ -481,6 +491,7 @@
               <td>${p.product_code || "-"}</td>
               <td style="text-align: left;">${p.product_name || "-"}</td>
               <td>${p.quantity_in_stock}</td>
+              <td>${p.stock_alert_level}</td>
               <td>${p.quantity_purchased}</td>
               <td>${purchase_rate}</td>
               <td>${p.purchase_cost}</td>
@@ -493,7 +504,7 @@
         tBody += `
           <tr>
             <th style="text-align:left" colspan=2>Total</th>
-            <th style="text-align:right">${total_stock_qty}</th>
+            <th colspan=2 style="text-align:right">${total_stock_qty}</th>
             <th style="text-align:right">${total_purchase_qty}</th>
             <th colspan=2>${total_purchase_price}</th>
             <th style="text-align:right">${total_sale_qty}</th>
@@ -502,7 +513,7 @@
           `
       } else {
         tBody = `
-          <tr><td colspan="9" style="text-align:center;">No data available</td></tr>`;
+          <tr><td colspan="10" style="text-align:center;">No data available</td></tr>`;
       }
 
       const content = `
@@ -620,6 +631,7 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>Stock</th>
+                <th>Stock Alert Level</th>
                 <th>Purchase Qty</th>
                 <th>Purchase Rate</th>
                 <th>Total Purchase Cost</th>

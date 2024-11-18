@@ -70,7 +70,8 @@
                 <li><a><i class="fa fa-group"></i>HR Management<span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li><a href="employee-list.html">Employee List</a></li>
-                    <li><a href="#manage-employee.html">Manage Employee</a></li>
+                    <li><a href="add-employee.html">Add Employee</a></li>
+                    <li><a href="edit-employee.html">Edit Employee</a></li>
                   </ul>
                 </li>
                 <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
@@ -132,6 +133,7 @@
                     <li class="sub_menu"><a href="product-list.html">Product List</a></li>
                     <li class="sub_menu"><a href="service-list.html">Service List</a></li>
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                    <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
                     <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
                     <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
                     <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
@@ -174,7 +176,9 @@
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
         <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
-        <div class="x_title" class="pull-right"><button class="d-none" type="button" id="invoiceBtn" onclick="printSalesInvoice()">Print Invoice</button></div>
+        <div class="text-right">
+          <button class="d-none btn btn-warning" type="button" id="invoiceBtn" onclick="printSalesInvoice()">Print Invoice</button>
+        </div>
         <div id="sale-page-content">
           <!-- Page content here -->
           <form action="#" id="sale-form">
@@ -509,7 +513,7 @@
 
   <script>
 
-    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, InvoiceData, selected_products = [];
+    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, InvoiceData, company, selected_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -629,6 +633,7 @@
                     showErrorMessage(data.message)
                   } else {
                     InvoiceData = data.sales_invoice_data;
+                    company = data.company_profile;
                     document.getElementById("invoiceBtn").classList.remove("d-none");
                   }
                 });
@@ -1006,19 +1011,19 @@
           <td style="text-align:right">${items.sub_total}</td>
         </tr>`
       }
-      //company_profile
-      if (InvoiceData.company_profile) {
-        let company_info = ` 
+      //company
+      console.log(company)
+
+      let address = ""
+        company_info = ` 
           <div class="company-info">
-              <p class="company-name">${InvoiceData.company_profile.name}</p>
-              ${'<p class="company-slogan>' + InvoiceData.company_profile.slogan + '</p>' || ""}
-              <p>Mobile: ${InvoiceData.company_profile.mobile}<br>
-                  ${'Tel:' + InvoiceData.company_profile.tel + '<br>' || ""}
-                  ${'Email:' + InvoiceData.company_profile.email + '<br>' || ""}
+              <p class="company-name">${company.name}</p>
+              <p class="company-slogan>${company.slogan} </p>
+              <p>Mobile: ${company.mobile}<br>
                   <span class="basic" style="float: inline-end; margin-top: 5px; font-weight: bold;">Date: ${getShortDate()}</span>
               </p>
           </div>`
-      }
+      
       const content = `
         
         <!DOCTYPE html>

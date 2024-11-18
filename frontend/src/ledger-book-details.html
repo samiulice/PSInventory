@@ -118,7 +118,8 @@
                 <li><a><i class="fa fa-group"></i>HR Management<span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li><a href="employee-list.html">Employee List</a></li>
-                    <li><a href="#manage-employee.html">Manage Employee</a></li>
+                    <li><a href="add-employee.html">Add Employee</a></li>
+                    <li><a href="edit-employee.html">Edit Employee</a></li>
                   </ul>
                 </li>
                 <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
@@ -180,6 +181,7 @@
                     <li class="sub_menu"><a href="product-list.html">Product List</a></li>
                     <li class="sub_menu"><a href="service-list.html">Service List</a></li>
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                    <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
                     <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
                     <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
                     <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
@@ -221,9 +223,9 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <div class="row text-center">
 
-          <div class="col-md-3 col-sm-6 col-xs-6 form-group has-feedback">
+        <div class="row text-center">
+          <div class="col-md-3 col-sm-4 col-xs-12 form-group has-feedback">
             <select class="form-control has-feedback-left" id="account_type" required>
               <option value="suppliers" selected>Supplier</option>
               <option value="customers">Customer</option>
@@ -231,18 +233,27 @@
             </select>
             <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left" aria-hidden="true"></i>
           </div>
-          <div class="col-md-3 col-sm-6 col-xs-6 form-group has-feedback">
+          <div class="col-md-4 col-sm-5 col-xs-8 form-group has-feedback">
             <select class="form-control has-feedback-left" id="account_holder" required>
               <!-- Will be updated by JS DOM -->
             </select>
             <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left" aria-hidden="true"></i>
           </div>
-          <div class="col-md-3 col-sm-12 col-xs-12">
-            <button class="btn btn-dark">Submit</button>
+          <div class="col-md-2 col-sm-3 col-xs-4">
+            <button type="button" class=" btn btn-success btn-sm" onclick="reset()"><span
+                class="glyphicon glyphicon-refresh" aria-hidden="true"></span></button>
           </div>
         </div>
         <!-- Page content here -->
         <div class="x_panel">
+          <div class="x_title text-center" id="ledger-book-title">
+            <label style="color:#e0230a; font-size: 15px;">
+              Select Account Holder Name
+              <!-- Will be updated by JS DOM -->
+            </label>
+            <div class="clearfix"></div>
+
+          </div>
           <div id="datatable_wrapper" class="row dataTables_wrapper form-inline dt-bootstrap no-footer">
             <!-- start project list -->
             <div class="bg-white">
@@ -251,20 +262,7 @@
                 width="100%">
                 <!-- Will be updated by JS DOM -->
               </table>
-            </div>
-            <div class="row">
-              <div class="col-3">
-                <div id="paginator_info" class="dataTables_info" id="datatable_info" role="status" aria-live="polite">
-                  <!-- will be updated using js DOM -->
-                </div>
-              </div>
-              <div class="col-9">
-                <nav aria-label="Page navigation example">
-                  <ul id="paginate_nav" class="pagination">
-                    <!-- will be populated by Javascript DOM -->
-                  </ul>
-                </nav>
-              </div>
+              <tfoot></tfoot> <!-- Footer where the custom row is added -->
             </div>
           </div>
         </div>
@@ -347,13 +345,14 @@
 
   <!-- fetching data from backend and populate frontend table -->
   <script>
-    let reportData, accounts;
+    let reportData = [], accounts, company, accountName;
     window.addEventListener("DOMContentLoaded", () => {
       updateAccountHolderSection();
+      fetchCompanyProfile();
       document.getElementById("account_type").addEventListener("change", () => {
         updateAccountHolderSection();
       })
-      document.getElementById("account_holder").addEventListener("change", () => {
+      document.getElementById("account_holder").addEventListener('change', function (event) {
         //init data table
         InitDataTable(document.getElementById("account_type").value, parseInt(document.getElementById("account_holder").value))
       })
@@ -396,156 +395,179 @@
         })
     }
 
-    function InitDataTable(account_type, account_id) {
+    function fetchCompanyProfile() {
+      fetch('http://localhost:4321/api/company-profile', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error === false) {
+            //assign to company var
+            company = data.company_profile
+          } else {
+            Swal.fire({
+              title: "Error fetch company profile",
+              text: data.message,
+              icon: "error"
+            });
+          }
+        })
+        .catch(error => {
+          Swal.fire({
+            title: "Error fetch company profile",
+            text: error,
+            icon: "error"
+          });
+        })
+    }
+    function InitDataTable(acc_type, acc_id) {
+      let balance = 0, debit = 0, credit = 0; // Ensure balance resets on each initialization
 
-      console.log('run_datatables');
+      // Disable input fields to prevent unintentional changes
+      document.getElementById('account_type').disabled = true;
+      document.getElementById('account_holder').disabled = true;
+
+      console.log('Initializing DataTable...');
 
       if (typeof ($.fn.DataTable) === 'undefined') { return; }
-      console.log('init_DataTables');
 
       var handleDataTableButtons = function () {
-        if ($("#ledger-book-datatable").length) {
-          // Destroy DataTable if it already exists to reinitialize it
-          if ($.fn.DataTable.isDataTable("#ledger-book-datatable")) {
-            $("#ledger-book-datatable").DataTable().clear().destroy();
-          }
-          var table = $("#ledger-book-datatable").DataTable({
-            dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
-            serverSide: false, // Disable server-side processing for client-side only
-            pageLength: -1, // Default page size
-            lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]], // Add -1 for 'All' option
-            columns: [
-              {
-                title: "S/N",
-                className: "id",
-                render: function (data, type, row, meta) {
-                  let rowIndex = meta.row;
-                  return rowIndex + 1;
-                }
-              },
-              {
-                title: "Date",
-                className: "date",
-                width: "7%",
-                render: function (data, type, row) {
-                  return formatDate(row.transaction_date, "date", "-")
-                }
-              },
-              {
-                title: "Description",
-                className: "description",
-                width: "25%",
-                render: function (data, type, row) {
-                  let current_data = "";
-                  if (row.transaction_type) {
-                    current_data += row.transaction_type;
-                  }
-                  if (row.source_type === "head_accounts") {
-                    current_data += ` [${row.destination_account_name}]`;
-                  } else {
-                    current_data += ` [${row.source_account_name}]`;
-                  }
-                  return current_data;
-                }
-              },
-              {
-                title: "Received",
-                className: "received-amount",
-                width: "10%",
-                render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
-                    return row.amount;
-                  } else {
-                    return "-";
-                  }
-                }
-              },
-              {
-                title: "Paid",
-                className: "paid-amount",
-                width: "10%",
-                render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
-                    return row.amount;
-                  } else {
-                    return "-";
-                  }
-                }
-              },
-              { data: "current_balance", title: "Balance", className: "chq-no", width: "10%" },
-              {
-                title: "Account",
-                className: "account",
-                width: "10%",
-                render: function (data, type, row) {
-                  if (row.source_type === "head_accounts") {
-                    return row.source_account_name;
-                  }
-                  return row.destination_account_name;
-                }
-              },
-              { data: "voucher_no", title: "Invoice #", className: "invoice", width: "10%" },
-              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no", width: "10%" }
+        const tableId = "#ledger-book-datatable";
 
-            ],
-            buttons: [
-              { extend: "copy", className: "btn-sm" },
-              { extend: "csv", className: "btn-sm" },
-              {
-                extend: "print",
-                className: "btn-sm",
-                text: "Print",
-                action: function (e, dt, node, config) {
-                  showDateRangePickerPopup(); //show popup daterange selector
-                }
-              }
-            ],
-            responsive: true,
-            scrollX: false, // Disable horizontal scroll
-            order: [[0, 'asc']], // Default sorting on the first column
-            language: {
-              "emptyTable": "No data available" // Custom message when there is no data
-            },
-            ajax: function (data, callback, settings) {
-              const requestOptions = {
-                method: 'post'
-              };
-              fetch('http://localhost:4321/api/reports/accounts/transactions-report', requestOptions)
-                .then(response => response.json())
-                .then(function (responseData) {
-                  console.log(responseData);
-                  reportData = responseData.report || [];
-                  callback({ data: reportData });
-                })
-                .catch(function (error) {
-                  console.error('Error fetching data:', error);
-                });
-            }
-          });
+        // Destroy DataTable if it already exists
+        if ($.fn.DataTable.isDataTable(tableId)) {
+          $(tableId).DataTable().clear().destroy();
         }
+
+        // Initialize DataTable
+        const table = $(tableId).DataTable({
+          dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
+          serverSide: false,
+          pageLength: -1,
+          lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]],
+          columns: [
+            {
+              title: "S/N",
+              className: "id",
+              render: (_, __, ___, meta) => meta.row + 1
+            },
+            {
+              title: "Date",
+              className: "date",
+              width: "7%",
+              render: (data, type, row) => formatDate(row.transaction_date, "date", "-")
+            },
+            { data: "transaction_type", title: "Description", className: "description", width: "20%" },
+            { data: "voucher_no", title: "Invoice #", className: "invoice", width: "15%" },
+            {
+              title: "Debit(+)",
+              className: "debit-amount text-right",
+              width: "10%",
+              render: (_, __, row) => {
+                if (["Purchase", "Receive & Collection", "Refund", "Sale Return"].includes(row.transaction_type)) {
+                  balance += row.amount;
+                  return row.amount;
+                }
+                return "";
+              }
+            },
+            {
+              title: "Credit(-)",
+              className: "credit-amount text-right",
+              width: "10%",
+              render: (_, __, row) => {
+                if (["Payment", "Sale", "Purchase Return", "Repayment", "Expense"].includes(row.transaction_type)) {
+                  balance -= row.amount;
+                  return row.amount;
+                }
+                return "";
+              }
+            },
+            {
+              title: "Balance",
+              className: "balance text-right",
+              width: "10%",
+              render: () => balance
+            }
+          ],
+          buttons: [
+            { extend: "copy", className: "btn-sm" },
+            {
+              extend: "csv",
+              className: "btn-sm",
+              filename: function () {
+                // Generate a custom file name dynamically
+                const today = new Date();
+                const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
+                return `Ledger_Report_${accounts[acc_id].account_name}_${formattedDate}`;
+              },
+            },
+            {
+              extend: "print",
+              className: "btn-sm",
+              text: "Print",
+              action: () => showDateRangePickerPopup()
+            }
+          ],
+          responsive: true,
+          scrollX: false,
+          order: [[0, 'asc']],
+          language: {
+            "emptyTable": "No data available"
+          },
+          ajax: function (data, callback) {
+            const requestOptions = {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                account_type: acc_type,
+                account_id: accounts[acc_id].id
+              })
+            };
+
+            fetch('http://localhost:4321/api/reports/accounts/ledger-book-details', requestOptions)
+              .then(response => response.json())
+              .then(responseData => {
+                console.log("Data fetched successfully:", responseData);
+
+                reportData = responseData.report || [];
+                callback({ data: reportData });
+                if (reportData) {
+                  accountName = accounts[acc_id].account_name;
+                  accountCode = accounts[acc_id].account_code;
+                  // Update the Ledger Book title
+                  document.getElementById("ledger-book-title").innerHTML = `
+                            <label style="color:#008080; font-size: 18px;">
+                                Ledger Book of ${accountName}-${accountCode}
+                            </label>`;
+                }
+              })
+              .catch(error => {
+                console.error('Error fetching data:', error);
+                alert("Failed to fetch ledger book data. Please try again later.");
+              });
+          },
+        });
       };
 
-      TableManageButtons = function () {
-        "use strict";
-        return {
-          init: function () {
-            handleDataTableButtons();
-          }
-        };
-      }();
+      // Initialize table management buttons
+      const TableManageButtons = {
+        init: () => handleDataTableButtons()
+      };
 
       TableManageButtons.init();
-
-    };
+    }
 
     function showFilteredReport(startDateStr, endDateStr) {
       let n = reportData.length;
       let tBody = '';
       let counter = 0;
+      let balance = 0;
+      console.log("dates: ", startDateStr, endDateStr)
       if (n > 0) {
         for (let i = 0; i < n; i++) {
           const c = reportData[i];
-
           // Convert string dates to Date objects
           const startDate = parseDate(startDateStr, "/");
           const endDate = parseDate(endDateStr, "/");
@@ -553,48 +575,31 @@
           // Check if targetDate is within the range (inclusive)
           if (targetDate >= startDate && targetDate <= endDate) {
             counter += 1;
-            //description
-            let description = ""
-            if (c.transaction_type) {
-              description += c.transaction_type
-            }
-            if (c.source_type === "head_accounts") {
-              description += ` [${c.destination_account_name}]`;
-            } else {
-              description += ` [${c.source_account_name}]`;
-            }
-
+            
             //received
             let received = 0;
-            if (c.transaction_type === "Purchase Return" || c.transaction_type === "Sale" || c.transaction_type === "Receive & Collection") {
+            if (["Purchase", "Receive & Collection", "Refund", "Sale Return"].includes(c.transaction_type)) {
               received = c.amount;
+              balance += c.amount
             } else {
               received = "";
             }
             //paid
             let paid = 0;
-            if (c.transaction_type === "Purchase" || c.transaction_type === "Sale Return" || c.transaction_type === "Payment" || c.transaction_type === "Expense") {
+            if (["Payment", "Sale", "Purchase Return", "Repayment", "Expense"].includes(c.transaction_type)) {
               paid = c.amount;
+              balance -= c.amount
             } else {
               paid = "";
             }
-            //account 
-            let account = ""
-            if (c.source_type === "head_accounts") {
-              account = c.source_account_name;
-            }
-            account = c.destination_account_name;
-
+            
             tBody += `
-            <tr>
               <td>${formatDate(c.transaction_date, "date", "-")}</td>
-              <td>${description}</td>
+              <td>${c.transaction_type}</td>
               <td>${c.voucher_no || "-"}</td>
-              <td>${c.cheque_no || "-"}</td>
               <td>${received || ""}</td>
               <td>${paid || ""}</td>
-              <td>${c.current_balance || ""}</td>
-              <td>${account}</td>
+              <td>${balance || ""}</td>
             </tr>`;
           }
         }
@@ -654,7 +659,7 @@
               padding-bottom:0px;
             }
             .caption-section .caption {
-                font-size: 18px;
+                font-size: 15px;
               font-weight: bold;
               color: #008080;
             }
@@ -689,22 +694,15 @@
         <body>
           <!-- Header Section -->
           <div class="header">
-            ${reportData.company ? `
-              <h1>${reportData.company.name || ""}</h1>
-              <h2>${reportData.company.slogan || ""}</h2>
-              <p>${reportData.company.address || ""}</p>
-              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
-            ` : `
-              <h1>ProjuktiSheba Inventory</h1>
-              <h2>Track Smarter, Stock Better</h2>
-              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
-              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
-            `}
-            
+              <h1>${company.name || ""}</h1>
+              <h2>${company.slogan || ""}</h2>
+              <p>${company.area + "," || ""}${company.upazila + "," || ""}${company.district + "," || ""}</p>
+              <p>Mobile: ${company.mobile || ""} | Email: ${company.email || ""}</p>
+
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Transaction Report</div>
-              <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:left;text-decoration-line: underline;">${moment(startDateStr).format('MMMM D, YYYY')} - ${moment(endDateStr).format('MMMM D, YYYY')}</div>
+              <div class="caption">Ledger Book: <span style="color:#0f0f0f;"> ${accountName}-${accountCode}</span></div>
+              <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:center;text-decoration-line: underline;">${moment(startDateStr).format('MMM D, YYYY')} - ${moment(endDateStr).format('MMM D, YYYY')}</div>
             
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
@@ -716,11 +714,9 @@
                 <th>Date</th>
                 <th>Description</th>
                 <th>Invoice #</th>
-                <th>Chq/Rec. No.</th>
-                <th>Received</th>
-                <th>Paid</th>
+                <th>Debit</th>
+                <th>Credit</th>
                 <th>Balance</th>
-                <th>Account</th>
               </tr>
             </thead>
             <tbody>
@@ -745,7 +741,20 @@
         document.body.removeChild(iframe);
       };
     }
-
+    function reset() {
+      //Enable input field
+      document.getElementById('account_type').disabled = false;
+      document.getElementById('account_holder').disabled = false;
+      //reset title
+      document.getElementById("ledger-book-title").innerHTML = `
+        <label style="color:#e0230a; font-size: 15px;">Select Account Holder Name</label>
+            <div class="clearfix"></div>`
+      //Destroy datatable
+      // Destroy DataTable if it already exists to reinitialize it
+      if ($.fn.DataTable.isDataTable("#ledger-book-datatable")) {
+        $("#ledger-book-datatable").DataTable().clear().destroy();
+      }
+    }
   </script>
 
 
