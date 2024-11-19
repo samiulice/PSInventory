@@ -513,7 +513,7 @@
 
   <script>
 
-    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, InvoiceData, company, selected_products = [];
+    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, revenue = 0, InvoiceData, company, selected_products = [], sold_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -691,6 +691,7 @@
     }
 
     function updateViewItemsInfoContainer(items, status) {
+      console.log("New Product: ", items)
       let productMetadata = items.product_metadata;
       let qty = 0;
 
@@ -724,7 +725,7 @@
           `<tr style="transform:translate(0,5px);">
           <td class="text-primary"><b>Add Item:</b></td>
           <td class="text-primary"><b>${products.product_metadata[0].serial_number}</b></td>
-          <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markItemsAsSelected(${items.id})">Add Item</a></td>
+          <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markSingleItemAsSelected(${items.id})">Add Item</a></td>
         </tr>`
       }
 
@@ -824,6 +825,7 @@
       for (let i = 0; i < quantity; i++) {
         //insert serial number
         insertSerialNumber(id, products.product_metadata[i].serial_number)
+        revenue += products.product_metadata[i].max_retail_price - products.product_metadata[i].purchase_rate
         // const element = products.product_metadata[i].serial_number;  
         serial += `<span class="serial-number">${products.product_metadata[i].serial_number}</span></br>`;
       }
