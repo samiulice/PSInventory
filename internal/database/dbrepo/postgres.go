@@ -721,7 +721,7 @@ func (p *postgresDBRepo) GetAllCustomersList() ([]*models.Customer, error) {
 
 	query := `
 		SELECT 
-			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, discount, opening_balance, joining_date, created_at, updated_at
+			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, discount, due_amount, opening_balance, joining_date, created_at, updated_at
 		FROM
 			customers
 		ORDER BY
@@ -747,6 +747,7 @@ func (p *postgresDBRepo) GetAllCustomersList() ([]*models.Customer, error) {
 			&c.Email,
 			&c.AccountStatus,
 			&c.Discount,
+			&c.DueAmount,
 			&c.OpeningBalance,
 			&c.JoiningDate,
 			&c.CreatedAt,
@@ -920,7 +921,7 @@ func (p *postgresDBRepo) GetAllSuppliersList() ([]*models.Supplier, error) {
 
 	query := `
 		SELECT 
-			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, discount, joining_date, created_at, updated_at
+			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, discount, due_amount, joining_date, created_at, updated_at
 		FROM
 			suppliers
 		`
@@ -947,6 +948,7 @@ func (p *postgresDBRepo) GetAllSuppliersList() ([]*models.Supplier, error) {
 			&s.Email,
 			&s.AccountStatus,
 			&s.Discount,
+			&s.DueAmount,
 			&s.JoiningDate,
 			&s.CreatedAt,
 			&s.UpdatedAt,

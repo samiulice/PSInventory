@@ -1012,13 +1012,16 @@
         </tr>`
       }
       //company
-      console.log(company)
-
-      let address = ""
+      console.log("Company:",company)
+      let addr = ""
+      if(company.area !=""){
+        addr += company.area + ","
+      }
         company_info = ` 
           <div class="company-info">
               <p class="company-name">${company.name}</p>
-              <p class="company-slogan>${company.slogan} </p>
+              <p class="company-slogan">${company.slogan} </p>
+              <p>Address: ${addr + company.upazila + ", " + company.district}<br>
               <p>Mobile: ${company.mobile}<br>
                   <span class="basic" style="float: inline-end; margin-top: 5px; font-weight: bold;">Date: ${getShortDate()}</span>
               </p>

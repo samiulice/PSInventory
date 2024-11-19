@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Company Profile</title>
+
+  <!-- Bootstrap -->
+  <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <!-- NProgress -->
+  <link href="assets/vendors/nprogress/nprogress.css" rel="stylesheet">
+  <!-- iCheck -->
+  <link href="assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+
+  <!-- bootstrap-progressbar -->
+  <link href="assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+  <!-- JQVMap -->
+  <link href="assets/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+  <!-- bootstrap-daterangepicker -->
+  <link href="assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+
+  <!-- Custom Theme Style -->
+  <link href="assets/css/custom.min.css" rel="stylesheet">
+
+  <!-- sweetalert2 style -->
+  <link rel="stylesheet" href="assets/sweetalert2/sweetalert2.min.css">
+  <!-- <script src="main.js"></script> -->
+</head>
+
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col menu_fixed">
+        <div class="left_col">
+          <div class="navbar nav_title" style="border: 0;">
+            <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>PSINVENTORY</span></a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- menu profile quick info -->
+          <div class="profile clearfix">
+            <div class="profile_pic">
+              <img src="assets/images/samiul-photo.jpg" alt="..." class="img-circle profile_img">
+            </div>
+            <div class="profile_info">
+              <span>Welcome,</span>
+              <h2>Samiul Bashir</h2>
+            </div>
+          </div>
+          <!-- /menu profile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+              <ul class="nav side-menu">
+                <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="open.html">Open</a></li>
+                    <li><a href="company-profile.html">Company Profile</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-group"></i>HR Management<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="employee-list.html">Employee List</a></li>
+                    <li><a href="#manage-employee.html">Manage Employee</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-cogs"></i> MIS <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="customer-list.html">Customer List</a></li>
+                    <li><a href="supplier-list.html">Supplier List</a></li>
+                    <li><a href="#customer_supplier-list.html">Customer & Supplier List</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-table"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="sale.html">Sale</a></li>
+                    <li><a href="sale-return.html">Sale Return</a></li>
+                    <li><a href="purchase.html">Purchase</a></li>
+                    <li><a href="purchase-return.html">Purchase Return</a></li>
+                    <li><a href="warranty.html">Warranty</a></li>
+                    <li><a href="repair.html">Repair</a></li>
+                    <li><a href="#delivery.html">Delivery</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-bar-chart-o"></i> Accounts <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="receive-collection.html">Receive & Collection</a></li>
+                    <li><a href="payment.html">Payment</a></li>
+                    <li><a href="amount-transfer.html">Amount Transfer</a></li>
+                    <li><a href="amount-receivable.html">Amount Receivable</a></li>
+                    <li><a href="amount-payable.html">Amount Payable</a></li>
+                    <li><a href="expenses.html">Expenses</a></li>
+                    <li><a href="#adjustment.html">Adjustment</a></li>
+                    <li><a href="#bank-reconciliation.html">Bank Reconciliation</a></li>
+                    <li><a href="#transaction-posting.html">Transaction Posting</a></li>
+                  </ul>
+                </li>
+                <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                      <li>
+                        <a>Account Reports<span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                          <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
+                          <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
+                          <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
+                          <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
+                          <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
+                          <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
+                          <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
+                          <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
+                          <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
+                          <li class="sub_menu"><a href="#top-sheet.html">TOP Sheet</a></li>
+                          <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
+                          <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
+                          </li>
+                        </ul>
+                      </li>
+                      <li>
+                        <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                          <li class="sub_menu"><a href="category-list.html">Category List</a></li>
+                          <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
+                          <li class="sub_menu"><a href="product-list.html">Product List</a></li>
+                          <li class="sub_menu"><a href="service-list.html">Service List</a></li>
+                          <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
+                          <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
+                          <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
+                          <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
+                          <li class="sub_menu"><a href="service-history.html">Service History</a></li>
+                          </li>
+                        </ul>
+                      </li>
+                      </li>
+                  </ul>
+                </li> 
+              </ul>
+            </div>
+
+          </div>
+          <!-- /sidebar menu -->
+
+
+          <!-- /menu footer buttons -->
+          <div class="sidebar-footer hidden-small">
+            <a data-toggle="tooltip" data-placement="top" title="Settings">
+              <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+              <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Lock">
+              <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+            </a>
+          </div>
+          <!-- /menu footer buttons -->
+        </div>
+      </div>
+
+      
+
+      <!-- page content -->
+      <div id="page-content" class="right_col" role="main">
+        <div class="x_panel">
+            <div class="x_title">
+                <div class="text-center text-warning fa-2x text-bold">Company Details</div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                
+            </div>
+        </div>
+      </div>
+        
+    </div>
+    <!-- /page content -->
+  </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="assets/vendors/jquery/dist/jquery.min.js"></script>
+  <!-- Bootstrap -->
+  <script src="assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+  <!-- FastClick -->
+  <script src="assets/vendors/fastclick/lib/fastclick.js"></script>
+  <!-- NProgress -->
+  <script src="assets/vendors/nprogress/nprogress.js"></script>
+  <!-- Chart.js -->
+  <script src="assets/vendors/Chart.js/dist/Chart.min.js"></script>
+  <!-- gauge.js -->
+  <script src="assets/vendors/gauge.js/dist/gauge.min.js"></script>
+  <!-- bootstrap-progressbar -->
+  <script src="assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+  <!-- iCheck -->
+  <script src="assets/vendors/iCheck/icheck.min.js"></script>
+  <!-- Skycons -->
+  <script src="assets/vendors/skycons/skycons.js"></script>
+  <!-- Flot -->
+  <script src="assets/vendors/Flot/jquery.flot.js"></script>
+  <script src="assets/vendors/Flot/jquery.flot.pie.js"></script>
+  <script src="assets/vendors/Flot/jquery.flot.time.js"></script>
+  <script src="assets/vendors/Flot/jquery.flot.stack.js"></script>
+  <script src="assets/vendors/Flot/jquery.flot.resize.js"></script>
+  <!-- Flot plugins -->
+  <script src="assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+  <script src="assets/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+  <script src="assets/vendors/flot.curvedlines/curvedLines.js"></script>
+  <!-- DateJS -->
+  <script src="assets/vendors/DateJS/build/date.js"></script>
+  <!-- JQVMap -->
+  <script src="assets/vendors/jqvmap/dist/jquery.vmap.js"></script>
+  <script src="assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+  <script src="assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+  <!-- bootstrap-daterangepicker -->
+  <script src="assets/vendors/moment/min/moment.min.js"></script>
+  <script src="assets/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+  <!-- Custom Theme Scripts -->
+  <script src="assets/js/custom.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <!-- sweetalert2 script -->
+  <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
+  <script>
+
+  </script>
+
+</body>
+
+</html>

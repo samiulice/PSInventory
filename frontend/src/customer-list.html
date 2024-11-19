@@ -341,12 +341,12 @@
             pageLength: 10, // Default page size
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
-              { data: "account_code", title: "Account Code", className: "account-code" },
-              { data: "account_name", title: "Account Name", className: "account-name" },
-              { data: "mobile", title: "Mobile", className: "contact-number" },
-              { data: "account_status", title: "Account Status", className: "account-status" },
-              { data: "opening_balance", title: "Balance", className: "opening-balance" },
-              { data: "joining_date", title: "Joining Date", className: "joining-date" },
+              { data: "account_code", title: "Account Code", className: "account-code", width:"10%"},
+              { data: "account_name", title: "Account Name", className: "account-name", width:"20%"},
+              { data: "mobile", title: "Mobile", className: "contact-number", width:"10%"},
+              { data: "account_status", title: "Status", className: "account-status", width:"5%"},
+              { data: "due_amount", title: "Due Amount", className: "due-amount", width:"10%"},
+              { data: "joining_date", title: "Joining Date", className: "joining-date", width:"10%"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -373,6 +373,7 @@
             // autoWidth: true, // Automatically adjust column width to container
             scrollX: false,   // Disable horizontal scroll
             order: [[0, 'asc']],
+            autoWidth:false,
             ajax: function (data, callback, settings) {
               // Fetch all data once and let DataTables handle searching/pagination on client side
               const requestOptions = {

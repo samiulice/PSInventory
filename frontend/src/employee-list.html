@@ -227,7 +227,7 @@
         <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
           <!-- start project list -->
           <div class="bg-white">
-            <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+            <table id="employee-datatable" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
               cellspacing="0" width="100%">
               <!-- Will be updated by JS DOM -->
             </table>
@@ -333,33 +333,33 @@
       console.log('init_DataTables');
 
       var handleDataTableButtons = function () {
-        if ($(".datatable-buttons").length) {
-          var table = $(".datatable-buttons").DataTable({
+        if ($("#employee-datatable").length) {
+          var table = $("#employee-datatable").DataTable({
             dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
             // processing: true, // Show processing indicator
             serverSide: false, // Disable server-side processing for client-side only
             pageLength: 10, // Default page size
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
-              { data: "account_code", title: "Account Code", className: "account-code" },
-              { data: "account_name", title: "Account Name", className: "account-name" },
-              { data: "mobile", title: "Mobile", className: "contact-number" },
-              { data: "account_status", title: "Account Status", className: "account-status" },
-              { data: "monthly_salary", title: "Monthly Salary", className: "monthly-salary" },
-              { data: "joining_date", title: "Joining Date", className: "joining-date" },
+              { data: "account_code", title: "Account Code", className: "account-code", width: "10%"},
+              { data: "account_name", title: "Account Name", className: "account-name", width: "20%"},
+              { data: "mobile", title: "Mobile", className: "contact-number", width: "10%"},
+              { data: "account_status", title: "Status", className: "account-status", width: "5%"},
+              { data: "due_amount", title: "Due Amount", className: "due-amount", width: "10%"},
+              { data: "joining_date", title: "Joining Date", className: "joining-date", width: "10%"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
               {
-              extend: "csv",
-              className: "btn-sm",
-              filename: function () {
-                // Generate a custom file name dynamically
-                const today = new Date();
-                const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
-                return `Employee_List_${formattedDate}`;
+                extend: "csv",
+                className: "btn-sm",
+                filename: function () {
+                  // Generate a custom file name dynamically
+                  const today = new Date();
+                  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
+                  return `Employee_List_${formattedDate}`;
+                },
               },
-            },
               {
                 extend: "print",
                 className: "btn-sm",
@@ -398,6 +398,7 @@
                 });
             },
             order: [[0, 'asc']], // Default sorting on the first column
+            autoWidth:false,
           });
         }
       };
