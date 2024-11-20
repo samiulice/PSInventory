@@ -109,6 +109,7 @@ type DatabaseRepo interface {
 	GetCashBankStatement() ([]*models.Transaction, error)
 	GetLedgerBookDetails(account_type string, account_id int) ([]*models.Transaction, error)
 	GetExpensesHistoryReport() ([]*models.Transaction, error)
+	GetTopSheetReport() ([]*models.TopSheet, error)
 	//Helper functions
 	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)

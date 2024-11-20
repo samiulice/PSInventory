@@ -345,7 +345,6 @@
               {
                 title: "S/N",
                 className: "id",
-                width: "8%",
                 render: function (data, type, row, meta) {
                   let rowIndex = meta.row;
                   return rowIndex + 1;
@@ -356,65 +355,16 @@
                 className: "date",
                 width: "7%",
                 render: function (data, type, row) {
-                  return formatDate(row.transaction_date, "date", "-")
+                  return formatDate(row.sheet_date, "date", "-")
                 }
               },
-              {
-                title: "Description",
-                className: "description",
-                width: "25%",
-                render: function (data, type, row) {
-                  let current_data = "";
-                  if (row.transaction_type) {
-                    current_data += row.transaction_type;
-                  }
-                  if (row.source_type === "head_accounts") {
-                    current_data += ` [${row.destination_account_name}]`;
-                  } else {
-                    current_data += ` [${row.source_account_name}]`;
-                  }
-                  return current_data;
-                }
-              },
-              {
-                title: "Received",
-                className: "received-amount",
-                width: "10%",
-                render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
-                    return row.amount;
-                  } else {
-                    return "-";
-                  }
-                }
-              },
-              {
-                title: "Paid",
-                className: "paid-amount",
-                width: "10%",
-                render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
-                    return row.amount;
-                  } else {
-                    return "-";
-                  }
-                }
-              },
-              { data: "current_balance", title: "Balance", className: "chq-no", width: "10%" },
-              {
-                title: "Account",
-                className: "account",
-                width: "10%",
-                render: function (data, type, row) {
-                  if (row.source_type === "head_accounts") {
-                    return row.source_account_name;
-                  }
-                  return row.destination_account_name;
-                }
-              },
-              { data: "voucher_no", title: "Invoice #", className: "invoice", width: "10%" },
-              { data: "cheque_no", title: "Chq/Rec. No.", className: "chq-no", width: "10%" }
-
+              {data: "total_purchases", title: "Purchase", className: "purchase"},
+              {data: "purchases_discount", title: "Purchase Discount", className: "purchase-discount"},
+              {data: "total_payments", title: "Payment", className: "payment"},
+              {data: "total_sales", title: "Sale", className: "purchase-discount"},
+              {data: "sales_discount", title: "Sale Discount", className: "sale-discount"},
+              {data: "total_received_payments", title: "Collection", className: "collection"},
+              {data: "other_expenses", title: "Other Expense", className: "other-expense"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -447,7 +397,7 @@
               const requestOptions = {
                 method: 'post'
               };
-              fetch('http://localhost:4321/api/reports/accounts/transactions-report', requestOptions)
+              fetch('http://localhost:4321/api/reports/accounts/top-sheet-report', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
                   console.log(responseData);

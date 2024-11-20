@@ -1793,3 +1793,22 @@ func (app *application) GetExpensesReport(w http.ResponseWriter, r *http.Request
 	fmt.Println(resp)
 	app.writeJSON(w, http.StatusOK, resp)
 }
+func (app *application) GetTopSheetReport(w http.ResponseWriter, r *http.Request) {
+	topSheetData, err := app.DB.GetTopSheetReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetTopSheetReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error   bool                  `json:"error"`
+		Message string                `json:"message"`
+		Report  []*models.TopSheet `json:"report"`
+	}
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = topSheetData
+
+	fmt.Println(resp)
+	app.writeJSON(w, http.StatusOK, resp)
+}

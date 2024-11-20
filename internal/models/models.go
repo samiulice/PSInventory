@@ -421,6 +421,21 @@ type Transaction struct {
 	UpdatedAt              time.Time `json:"updated_at"`
 }
 
+type TopSheet struct {
+	ID                    int       `json:"id"`
+	SheetDate             time.Time `json:"sheet_date"`
+	TotalPurchases        int       `json:"total_purchases"`
+	PurchasesDiscount     int       `json:"purchases_discount"`
+	TotalPayments         int       `json:"total_payments"`
+	TotalPurchaseReturns  int       `json:"total_purchase_returns"`
+	TotalSales            int       `json:"total_sales"`
+	SalesDiscount         int       `json:"sales_discount"`
+	TotalReceivedPayments int       `json:"total_received_payments"`
+	TotalSaleReturns      int       `json:"total_sale_returns"`
+	OtherExpenses         int       `json:"other_expenses"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
 type CompanyProfile struct {
 	ID              int       `json:"id"`
 	Name            string    `json:"name"`

@@ -2572,13 +2572,13 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 	}
 	//Tx-9: update top_sheet data if the sheet_date for sales date already exist,
 	//Otherwise insert a new row  in the top_sheet table
-	customer_discount := sale.BillAmount - sale.TotalAmount
+	sale_discount := sale.BillAmount - sale.TotalAmount
 	query = `
 		INSERT INTO public.top_sheet (
 			sheet_date, 
 			total_sales,
-			total_received_payment, 
-			customer_discount,
+			total_received_payments, 
+			sales_discount,
 			updated_at
 		) 
 		VALUES (
@@ -2587,15 +2587,15 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		ON CONFLICT (sheet_date) 
 		DO UPDATE SET 
 			total_sales = public.top_sheet.total_sales + EXCLUDED.total_sales,
-			total_received_payment = public.top_sheet.total_received_payment + EXCLUDED.total_received_payment,
-			customer_discount = public.top_sheet.customer_discount + EXCLUDED.customer_discount,
+			total_received_payments = public.top_sheet.total_received_payments + EXCLUDED.total_received_payments,
+			sales_discount = public.top_sheet.sales_discount + EXCLUDED.sales_discount,
 			updated_at = CURRENT_TIMESTAMP;
 	`
 	_, err = tx.ExecContext(ctx, query,
 		&saleDate,
 		&sale.TotalAmount,
 		&sale.PaidAmount,
-		&customer_discount,
+		&sale_discount,
 		time.Now(),
 	)
 	if err != nil {
@@ -3995,6 +3995,48 @@ func (p *postgresDBRepo) GetExpensesHistoryReport() ([]*models.Transaction, erro
 		transactions = append(transactions, &trx)
 	}
 	return transactions, nil
+}
+
+func (p *postgresDBRepo) GetTopSheetReport() ([]*models.TopSheet, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var top_sheet []*models.TopSheet
+
+	query := `
+		SELECT id, sheet_date, total_purchases, total_payments, total_sales, total_received_payments, total_purchase_returns, total_sale_returns, purchases_discount, sales_discount, other_expenses, created_at, updated_at
+		FROM public.top_sheet 
+		ORDER BY id ASC
+	`
+
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return top_sheet, fmt.Errorf("DBERROR: GetTopSheetReport => %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var ts models.TopSheet
+		err = rows.Scan(
+			&ts.ID,
+			&ts.SheetDate,
+			&ts.TotalPurchases,
+			&ts.TotalPayments,
+			&ts.TotalSales,
+			&ts.TotalReceivedPayments,
+			&ts.TotalPurchaseReturns,
+			&ts.TotalSaleReturns,
+			&ts.PurchasesDiscount,
+			&ts.SalesDiscount,
+			&ts.OtherExpenses,
+			&ts.CreatedAt,
+			&ts.UpdatedAt,
+		)
+		if err != nil {
+			return top_sheet, fmt.Errorf("DBERROR: GetTopSheetReport => %w", err)
+		}
+		top_sheet = append(top_sheet, &ts)
+	}
+	return top_sheet, nil
 }
 
 // Helper functions
