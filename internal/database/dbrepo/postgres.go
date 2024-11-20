@@ -2570,6 +2570,38 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProducts(Insert financial_transactions):" + err.Error())
 	}
+	//Tx-9: update top_sheet data if the sheet_date for sales date already exist,
+	//Otherwise insert a new row  in the top_sheet table
+	customer_discount := sale.BillAmount - sale.TotalAmount
+	query = `
+		INSERT INTO public.top_sheet (
+			sheet_date, 
+			total_sales,
+			total_received_payment, 
+			customer_discount,
+			updated_at
+		) 
+		VALUES (
+			$1, $2, $3, $4, $5
+		)
+		ON CONFLICT (sheet_date) 
+		DO UPDATE SET 
+			total_sales = public.top_sheet.total_sales + EXCLUDED.total_sales,
+			total_received_payment = public.top_sheet.total_received_payment + EXCLUDED.total_received_payment,
+			customer_discount = public.top_sheet.customer_discount + EXCLUDED.customer_discount,
+			updated_at = CURRENT_TIMESTAMP;
+	`
+	_, err = tx.ExecContext(ctx, query,
+		&saleDate,
+		&sale.TotalAmount,
+		&sale.PaidAmount,
+		&customer_discount,
+		time.Now(),
+	)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleProducts(Insert or Update top_sheet):" + err.Error())
+	}
 
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
