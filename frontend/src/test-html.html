@@ -1,280 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Sales Invoice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Statement</title>
     <style>
-        /* General Styling */
-        * {
-            box-sizing: border-box;
+        /* General reset and body styles */
+        body {
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
             color: #333;
+        }
+
+        /* Container styles */
+        .container {
+            width: 80%;
+            max-width: 700px;
+            margin: 20px auto;
             background-color: #ffffff;
-            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
         }
 
-        /* A4 Page Setup */
-        .invoice-container {
-            max-width: 210mm;
-            margin: auto;
-            padding: 10px;
-            background-color: #fff;
-        }
-
-        /* Header Styling */
+        /* Header styles */
         .header {
-            background-color: #1b3453;
-            color: white;
-            padding: 5px;
-            /* Reduced padding */
             text-align: center;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            /* Reduced margin */
+            margin-bottom: 15px;
         }
 
         .header h1 {
-            font-family: 'Georgia', serif;
-            font-size: 24px;
-            /* Reduced font size */
-            font-weight: 700;
+            font-size: 20px;
             margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Info Section */
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            padding: 5px;
-            background-color: #F7F9FB;
-            border-bottom: 2px solid #1E3A5F;
-        }
-
-        .info-section div {
-            width: 48%;
-        }
-
-        /* Customer Info and Company Info Styling */
-        .customer-info h2,
-        .company-info h2 {
-            font-family: 'Verdana', sans-serif;
-            font-size: 18px;
-            color: #1E3A5F;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .customer-info p,
-        .company-info p {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        /* Company Info Enhanced Styling */
-        .company-info .company-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1E3A5F;
-        }
-
-        .company-info .company-slogan {
-            font-style: italic;
-            color: #4C91B3;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        /* Table Styling */
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #333;
-        }
-
-        .items-table th,
-        .items-table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        .items-table th {
-            background-color: #1b3453;
-            color: white;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .items-table tr:nth-child(even) {
-            background-color: #F7F9FB;
-        }
-
-        .items-table tr:nth-child(odd) {
-            background-color: #ffffff;
-        }
-
-        /* Totals and Payment Info */
-        .totals-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            gap: 20px;
-            font-size: 12px;
-            color: #333;
-        }
-
-        .totals,
-        .payment-info {
-            flex: 1;
-            padding: 15px;
-            background-color: #F7F9FB;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .totals .total-row,
-        .payment-info .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
             color: #444;
         }
 
-        .totals .total-label,
-        .payment-info .info-label {
-            color: #1E3A5F;
+        .header .date {
+            font-size: 12px;
+            color: #777;
         }
 
-        /* Remarks Section */
-        .remarks {
-            font-size: 14px;
-            color: #666;
-            background-color: #F7F9FB;
-            padding: 15px;
-            border-left: 3px solid #4C91B3;
-            margin-top: 20px;
+        /* Statement title */
+        .statement-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #00796b;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 15px;
         }
 
-        /* Print Styling for A4 Portrait Mode */
-        @media print {
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
 
-            body,
-            .invoice-container {
-                width: 210mm;
-                height: 297mm;
-                margin: 0 auto;
-                padding: 20mm;
-                box-shadow: none;
-            }
+        th, td {
+            padding: 8px 10px;
+            text-align: right;
+        }
 
-            .header,
-            .info-section,
-            .totals-section,
-            .remarks {
-                margin-bottom: 10mm;
-            }
+        th {
+            background-color: #e0f2f1;
+            font-weight: bold;
+            color: #004d40;
+            text-align: left;
+        }
 
-            .items-table th,
-            .items-table td {
-                padding: 8px;
-                font-size: 0.9em;
-            }
+        td {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f1f1f1;
+        }
+
+        /* Section titles */
+        .section-title {
+            background-color: #004d40;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* Total rows */
+        .total {
+            background-color: #00796b;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* Footer styles */
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #777;
+            margin-top: 10px;
         }
     </style>
 </head>
-
 <body>
-    <div class="invoice-container">
-        <!-- Header Title with Solid Background Color and Updated Font Style -->
+    <div class="container">
         <div class="header">
-            <h1>Sales Invoice</h1>
+            <h1>Your Company Name</h1>
+            <div class="date">Date: 1 March 2023</div>
         </div>
 
-        <!-- Info Section with Customer and Company Info Side by Side -->
-        <div class="info-section">
-            <!-- Customer Info -->
-            <div class="customer-info">
-                <h2>Bill To</h2>
-                <p>Customer Name<br>
-                    Customer Address<br>
-                    Customer Phone</p>
-            </div>
+        <div class="statement-title">Income Statement</div>
 
-            <!-- Company Info -->
-            <div class="company-info" style="color: rgba(0, 128, 128, 0.5);">
-                <p class="company-name">Your Company Name</p>
-                <p class="company-slogan">Your Company Slogan</p>
-                <p>Main Street, City, State, ZIP<br>
-                    Phone: +123-456-7890<br>
-                    Email: contact@yourcompany.com</p>
-            </div>
-        </div>
-
-        <!-- Items Table -->
-        <table class="items-table">
+        <table>
             <thead>
                 <tr>
-                    <th style="background-color: #1b3453;">Product ID</th>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total Price</th>
+                    <th></th>
+                    <th>2023</th>
+                    <th>2022</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>101</td>
-                    <td>Product A</td>
-                    <td>2</td>
-                    <td>$50.00</td>
-                    <td>$100.00</td>
+                <!-- Revenue Section -->
+                <tr class="section-title">
+                    <td>Revenue</td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <td>102</td>
-                    <td>Product B</td>
-                    <td>3</td>
-                    <td>$30.00</td>
-                    <td>$90.00</td>
+                    <td>Sales Revenue</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
                 </tr>
-                <!-- More rows as needed -->
+                <tr>
+                    <td>Service Revenue</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Interest Revenue</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Gain on Sales of Assets</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr class="total">
+                    <td>Total Revenue & Gains</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+
+                <!-- Expenses Section -->
+                <tr class="section-title">
+                    <td>Expenses</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Advertising</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Delivery/Freight Expense</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Depreciation</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Insurance</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Interest</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Office Supplies</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Rent/Lease</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Maintenance and Repairs</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Travel</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Wages</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Utilities/Telephone Expenses</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Other Expenses</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr class="total">
+                    <td>Total Expenses</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+
+                <!-- Net Profit Section -->
+                <tr class="total">
+                    <td>Income Before Tax</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr>
+                    <td>Income Tax Expense</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
+                <tr class="total">
+                    <td>Net Profit (Loss)</td>
+                    <td>$0.00</td>
+                    <td>$0.00</td>
+                </tr>
             </tbody>
         </table>
 
-        <!-- Totals and Payment Info Section with Consistent Spacing -->
-        <div class="totals-section">
-            <!-- Totals Section -->
-            <div class="totals">
-                <div class="total-row"><span class="total-label">Subtotal</span><span>$190.00</span></div>
-                <div class="total-row"><span class="total-label">Discount</span><span>$10.00</span></div>
-                <div class="total-row"><span class="total-label">Tax (5%)</span><span>$9.50</span></div>
-                <div class="total-row"><strong>Total Amount Due</strong><span><strong>$189.50</strong></span></div>
-            </div>
-            <!-- Payment Info Section -->
-            <div class="payment-info">
-                <div class="info-row"><span class="info-label">Payment Method</span><span>Credit Card</span></div>
-                <div class="info-row"><span class="info-label">Due Date</span><span>YYYY-MM-DD</span></div>
-            </div>
-        </div>
-
-        <!-- Remarks Section -->
-        <div class="remarks">
-            <strong>Remarks / Payment Instructions:</strong><br>
-            Thank you for your business! Please make payments by the due date to avoid late fees. Reference Invoice
-            #98765 when submitting payment.
+        <div class="footer">
+            © 2024 Your Company Name. All Rights Reserved.
         </div>
     </div>
 </body>
-
 </html>

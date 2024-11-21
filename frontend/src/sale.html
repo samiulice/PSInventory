@@ -45,7 +45,7 @@
           <!-- menu profile quick info -->
           <div class="profile clearfix">
             <div class="profile_pic">
-              <img src="assets/images/samiul-photo.jpg" alt="..." class="img-circle profile_img">
+              <img src="assets/images/ps-logo-white.png" alt="..." class="img-circle profile_img">
             </div>
             <div class="profile_info">
               <span>Welcome,</span>
@@ -189,7 +189,7 @@
                   <div class="x_title">
                     
                     <div class="col-md-6 col-sm-6 col-xs-12"><h2>Search Product</h2></div>
-                    <div class="col-md-6 col-sm-6 col-xs-12 text-right"><h5 id="revenue-amount">0</h5></div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 text-right"><h5 id="gross_profit-amount">0</h5></div>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
@@ -515,7 +515,7 @@
 
   <script>
 
-    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, revenue = 0, InvoiceData, company, selected_products = [], sold_products = [];
+    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, gross_profit = 0, InvoiceData, company, selected_products = [], sold_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -616,7 +616,7 @@
                 discount: parseInt(document.getElementById("discount").value),
                 total_amount: parseInt(document.getElementById("total-amount").value),
                 paid_amount: parseInt(document.getElementById("paid-amount").value),
-                revenue: parseInt(document.getElementById("revenue-amount").value),
+                gross_profit: parseInt(document.getElementById("gross_profit-amount").innerText),
               }
               console.log("sale_details: ", sale_details);
               const requestOptions = {
@@ -810,7 +810,7 @@
       let item = document.getElementById("selected-product-" + id);
       if (parentDiv && item) {
         billAmount -= parseInt(document.getElementById('selected-product-price-' + id).innerText);
-        revenue -= parseInt(document.getElementById('selected-product-revenue-' + id).value);
+        gross_profit -= parseInt(document.getElementById('selected-product-gross_profit-' + id).value);
         updateBillAmount();
         parentDiv.removeChild(item);
         removeProduct(id)
@@ -826,11 +826,11 @@
       }
       pm = products.product_metadata[0];
       let serial = ""
-      let sub_total = 0, sub_revenue = 0;
+      let sub_total = 0, sub_gross_profit = 0;
       for (let i = 0; i < quantity; i++) {
         //insert serial number
         insertSerialNumber(id, products.product_metadata[i].serial_number)
-        sub_revenue += products.product_metadata[i].max_retail_price - products.product_metadata[i].purchase_rate
+        sub_gross_profit += products.product_metadata[i].max_retail_price - products.product_metadata[i].purchase_rate
         sub_total += products.product_metadata[i].max_retail_price;
         // const element = products.product_metadata[i].serial_number;  
         serial += `<span class="serial-number">${products.product_metadata[i].serial_number}</span></br>`;
@@ -845,13 +845,13 @@
         <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
         <th class="text-center">${pm.max_retail_price}</th>
         <th class="text-center" id="selected-product-price-${id}">${sub_total}</th>
-        <input type="hidden" id="selected-product-revenue-${id}" value="${sub_revenue}">
+        <input type="hidden" id="selected-product-gross_profit-${id}" value="${sub_gross_profit}">
         <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
       </tr>
     `;
       //increase bill amount
       billAmount += sub_total;
-      revenue += sub_revenue;
+      gross_profit += sub_gross_profit;
       updateBillAmount();
     }
 
@@ -863,14 +863,14 @@
         if (!elem.innerHTML.includes(`${products.product_metadata[0].serial_number}`)) {
           elem.innerHTML += `<span class="serial-number">${products.product_metadata[0].serial_number}</span> <br>`;
           document.getElementById("selected-product-price-" + id).innerText = parseInt(document.getElementById("selected-product-price-" + id).innerText) + products.product_metadata[0].max_retail_price;
-          document.getElementById("selected-product-revenue-" + id).value = parseInt(document.getElementById("selected-product-revenue-" + id).value) + products.product_metadata[0].max_retail_price - products.product_metadata[0].purchase_rate;
+          document.getElementById("selected-product-gross_profit-" + id).value = parseInt(document.getElementById("selected-product-gross_profit-" + id).value) + products.product_metadata[0].max_retail_price - products.product_metadata[0].purchase_rate;
           document.getElementById("selected-product-qty-" + id).innerText = parseInt(document.getElementById("selected-product-qty-" + id).innerText) + 1;
 
           //insert serial number
           insertSerialNumber(id, products.product_metadata[0].serial_number)
           //increase bill amount
           billAmount += products.product_metadata[0].max_retail_price;
-          revenue += products.product_metadata[0].max_retail_price - products.product_metadata[0].purchase_rate;
+          gross_profit += products.product_metadata[0].max_retail_price - products.product_metadata[0].purchase_rate;
           updateBillAmount();
         }
       } else {
@@ -880,7 +880,7 @@
 
     //updateBillAmount updates current bill amount
     function updateBillAmount() {
-      document.getElementById("revenue-amount").innerText = revenue;
+      document.getElementById("gross_profit-amount").innerText = gross_profit;
       document.getElementById("bill-amount").value = billAmount;
       document.getElementById("total-amount").value = billAmount - Math.round(billAmount * (parseFloat(document.getElementById("discount").value) / 100.0));
       totalAmount = parseInt(document.getElementById("total-amount").value);

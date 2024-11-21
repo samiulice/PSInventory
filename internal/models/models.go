@@ -197,7 +197,7 @@ type SalesInvoice struct {
 	Discount        int                 `json:"discount"`
 	TotalAmount     int                 `json:"total_amount"`
 	PaidAmount      int                 `json:"paid_amount"`
-	Revenue         int                 `json:"revenue"`
+	GrossProfit         int                 `json:"gross_profit"`
 }
 
 // ProductMetadata holds products meta data

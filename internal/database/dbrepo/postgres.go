@@ -1678,7 +1678,7 @@ func (p *postgresDBRepo) GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.P
 	//Get product ids for this memo with associated purchase_id for the given memo from purchase_history table
 	query := `
 		SELECT
-			ph.id, ph.purchase_date, ph.supplier_id, ph.product_id, ph.account_id, ph.chalan_no, ph.memo_no, ph.note, ph.bill_amount, ph.discount, ph.total_amount, ph.paid_amount, ph.created_at, ph.updated_at
+			ph.id, TO_CHAR(ph.purchase_date, 'MM/DD/YYYY') AS purchase_date_str, ph.supplier_id, ph.product_id, ph.account_id, ph.chalan_no, ph.memo_no, ph.note, ph.bill_amount, ph.discount, ph.total_amount, ph.paid_amount, ph.created_at, ph.updated_at
 		FROM
 			public.purchase_history ph
 		WHERE
@@ -2165,11 +2165,16 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	}
 	purchase.MemoNo += strconv.Itoa(int(lastIndex))
 	var purchase_id int
+	purchaseDate, err := time.Parse("01/02/2006", purchase.PurchaseDate)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(unable to parse time):" + err.Error())
+	}
 	query = `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id
 	`
 	row := tx.QueryRowContext(ctx, query,
-		purchase.PurchaseDate,
+		&purchaseDate,
 		purchase.Supplier.ID,
 		purchase.Product.ID,
 		purchase.HeadAccount.ID,
@@ -2203,11 +2208,6 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,voucher_no,created_at,updated_at)
 	VALUES ('Purchase','head_accounts',$1, 'suppliers', $2, $3, $4, $5, $6, $7, $8, $9) RETURNING transaction_id
 	`
-	purchaseDate, err := time.Parse("01/02/2006", purchase.PurchaseDate)
-	if err != nil {
-		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(unable to parse time from string):" + err.Error())
-	}
 	purchaseDescription := "cash payment / Bank Transfer"
 	row = tx.QueryRowContext(ctx, query,
 		&purchase.HeadAccount.ID,
@@ -2276,6 +2276,39 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Product Serial Number):" + err.Error())
 	}
+
+	//Tx-9: update top_sheet data if the sheet_date for sales date already exist,
+	//Otherwise insert a new row  in the top_sheet table
+	purchase_discount := purchase.BillAmount - purchase.TotalAmount
+	query = `
+		INSERT INTO public.top_sheet (
+			sheet_date, 
+			total_purchases,
+			total_payments, 
+			purchases_discount,
+			updated_at
+		) 
+		VALUES (
+			$1, $2, $3, $4, $5
+		)
+		ON CONFLICT (sheet_date) 
+		DO UPDATE SET 
+			total_purchases = public.top_sheet.total_purchases + EXCLUDED.total_purchases,
+			total_payments = public.top_sheet.total_payments + EXCLUDED.total_payments,
+			purchases_discount = public.top_sheet.purchases_discount + EXCLUDED.purchases_discount,
+			updated_at = CURRENT_TIMESTAMP;
+	`
+	_, err = tx.ExecContext(ctx, query,
+		&purchaseDate,
+		&purchase.TotalAmount,
+		&purchase.PaidAmount,
+		&purchase_discount,
+		time.Now(),
+	)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorRestockProduct(Insert or Update top_sheet):" + err.Error())
+	}
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
@@ -2314,6 +2347,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 		}
 	}
 
+	//TODO: Calculate discount from frontend
 	due := 0
 	discount := (PurchaseHistory.BillAmount - PurchaseHistory.TotalAmount) * TotalPrices / PurchaseHistory.TotalAmount
 	if TotalPrices >= PurchaseHistory.TotalAmount-PurchaseHistory.PaidAmount {
@@ -2432,8 +2466,8 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 	//Tx-1: Insert sales details to sales history table
 	var sale_id int
 	query := `
-		INSERT INTO public.sales_history (sale_date,customer_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
+		INSERT INTO public.sales_history (sale_date,customer_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,gross_profit,created_at,updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
 	`
 	row := tx.QueryRowContext(ctx, query,
 		sale.SaleDate,
@@ -2446,6 +2480,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		sale.Discount,
 		sale.TotalAmount,
 		sale.PaidAmount,
+		sale.GrossProfit,
 		time.Now(),
 		time.Now(),
 	)
@@ -2579,16 +2614,18 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 			total_sales,
 			total_received_payments, 
 			sales_discount,
+			gross_profit,
 			updated_at
 		) 
 		VALUES (
-			$1, $2, $3, $4, $5
+			$1, $2, $3, $4, $5, $6
 		)
 		ON CONFLICT (sheet_date) 
 		DO UPDATE SET 
 			total_sales = public.top_sheet.total_sales + EXCLUDED.total_sales,
 			total_received_payments = public.top_sheet.total_received_payments + EXCLUDED.total_received_payments,
 			sales_discount = public.top_sheet.sales_discount + EXCLUDED.sales_discount,
+			gross_profit = public.top_sheet.gross_profit + EXCLUDED.gross_profit,
 			updated_at = CURRENT_TIMESTAMP;
 	`
 	_, err = tx.ExecContext(ctx, query,
@@ -2596,6 +2633,7 @@ func (p *postgresDBRepo) SaleProducts(sale *models.SalesInvoice) error {
 		&sale.TotalAmount,
 		&sale.PaidAmount,
 		&sale_discount,
+		&sale.GrossProfit,
 		time.Now(),
 	)
 	if err != nil {
@@ -3025,7 +3063,9 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to begin transaction: %w", err)
 	}
 
+	total_received_payments := 0
 	for _, sum := range summary {
+		total_received_payments += sum.ReceivedAmount
 		//update Cash-Bank account
 		//set current_balance += received_amount
 		var current_balance int
@@ -3055,6 +3095,32 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable Insert into financial_transaction table: %w", err)
+		}
+
+		//Tx: update top_sheet data if the sheet_date for entry for current date already exist,
+		//Otherwise insert a new row  in the top_sheet table
+		query := `
+			INSERT INTO public.top_sheet (
+				sheet_date, 
+				total_received_payments,
+				updated_at
+			) 
+			VALUES (
+				TO_DATE($1, 'MM/DD/YYYY'), $2, $3
+			)
+			ON CONFLICT (sheet_date) 
+			DO UPDATE SET 
+				total_received_payments = public.top_sheet.total_received_payments + EXCLUDED.total_received_payments,
+				updated_at = CURRENT_TIMESTAMP;
+		`
+		_, err = tx.ExecContext(ctx, query,
+			&sum.ReceivedDate,
+			&sum.ReceivedAmount,
+			time.Now(),
+		)
+		if err != nil {
+			tx.Rollback()
+			return errors.New("CompleteReceiveCollection(Insert or Update top_sheet):" + err.Error())
 		}
 		//update customer account
 		//set due_amount -= received_amount
@@ -3123,6 +3189,33 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable Insert into financial_transaction table: %w", err)
+		}
+
+		//Tx: update top_sheet data if the sheet_date for entriy for current date already exist,
+		//Otherwise insert a new row  in the top_sheet table
+
+		query := `
+			INSERT INTO public.top_sheet (
+				sheet_date, 
+				total_payments,
+				updated_at
+			) 
+			VALUES (
+				TO_DATE($1, 'MM/DD/YYYY'), $2, $3
+			)
+			ON CONFLICT (sheet_date) 
+			DO UPDATE SET 
+				total_payments = public.top_sheet.total_payments + EXCLUDED.total_payments,
+				updated_at = CURRENT_TIMESTAMP;
+		`
+		_, err = tx.ExecContext(ctx, query,
+			&sum.PaymentDate,
+			&sum.PaidAmount,
+			time.Now(),
+		)
+		if err != nil {
+			tx.Rollback()
+			return errors.New("CompletePaymentTransactions(Insert or Update top_sheet):" + err.Error())
 		}
 		//update suppliers account
 		//set due_mount -= received_amount
@@ -3626,7 +3719,7 @@ func (p *postgresDBRepo) GetPurchaseHistoryReport() ([]*models.Purchase, error) 
 
 	query := `
 		SELECT
-			ph.id, ph.purchase_date, ph.supplier_id, ph.product_id, ph.account_id, ph.chalan_no, ph.memo_no, ph.note, ph.quantity_purchased, ph.bill_amount,
+			ph.id, TO_CHAR(ph.purchase_date, 'MM/DD/YYYY') AS purchase_date_str, ph.supplier_id, ph.product_id, ph.account_id, ph.chalan_no, ph.memo_no, ph.note, ph.quantity_purchased, ph.bill_amount,
 			ph.discount, ph.total_amount, ph.paid_amount, ph.created_at, ph.updated_at, s.account_name, s.account_code, 
 			p.product_code,p.product_name, p.category_id, p.brand_id, pc.name, pb.name
 		FROM

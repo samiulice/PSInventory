@@ -1598,6 +1598,7 @@ func (app *application) GetProductListReport(w http.ResponseWriter, r *http.Requ
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
 // GetLowStockProductReport retrieves the product list that marked as low stock
 func (app *application) GetLowStockProductReport(w http.ResponseWriter, r *http.Request) {
 	products, err := app.DB.GetLowStockProductReport()
@@ -1800,14 +1801,22 @@ func (app *application) GetTopSheetReport(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	cp, err := app.DB.GetCompanyProfile()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetCompanyProfile: %w", err))
+		return
+	}
+
 	var resp struct {
-		Error   bool                  `json:"error"`
-		Message string                `json:"message"`
-		Report  []*models.TopSheet `json:"report"`
+		Error          bool                     `json:"error"`
+		Message        string                   `json:"message"`
+		Report         []*models.TopSheet       `json:"report"`
+		CompanyProfile models.CompanyProfile `json:"company_profile"`
 	}
 	resp.Error = false
 	resp.Message = "Data fetched successfully"
 	resp.Report = topSheetData
+	resp.CompanyProfile = cp
 
 	fmt.Println(resp)
 	app.writeJSON(w, http.StatusOK, resp)

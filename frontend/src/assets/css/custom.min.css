@@ -309,7 +309,7 @@ a:hover {
 }
 
 .left_col {
-    background: rgb(16, 23, 31);
+    background: #10171f;
     /* overflow-y: scroll; */
     overflow-x: hidden;
 }
@@ -462,12 +462,12 @@ table.tile_info td p {
 
 .img-circle.profile_img {
     width: 70%;
-    background: #fff;
+    background: #10171f;
     margin-left: 15%;
     z-index: 1000;
     position: inherit;
     margin-top: 20px;
-    border: 1px solid rgba(52, 73, 94, .44);
+    border: 1px solid #0d2553;
     padding: 4px
 }
 

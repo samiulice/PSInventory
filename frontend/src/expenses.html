@@ -45,7 +45,7 @@
           <!-- menu profile quick info -->
           <div class="profile clearfix">
             <div class="profile_pic">
-              <img src="assets/images/samiul-photo.jpg" alt="..." class="img-circle profile_img">
+              <img src="assets/images/ps-logo-white.png" alt="..." class="img-circle profile_img">
             </div>
             <div class="profile_info">
               <span>Welcome,</span>
@@ -189,27 +189,36 @@
               <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="destination_account_type">Paid To *: </label>
-                    <select class="form-control  has-feedback-left" id="destination_account_type" required>
-                      <option value="" selected disabled>Select Account Type</option>
-                      <option value="employees">Employee</option>
-                      <option value="suppliers">Supplier</option>
-                      <option value="customers">Customer</option>
+                    <label for="destination_account_type">Expense Type*: </label>
+                    <select class="form-control  has-feedback-left" name="expense_type" id="expense_type" class="form-select">
+                      <option value="" disabled selected>Select Expense Type</option>
+                      <option value="rent">Rent/Lease</option>
+                      <option value="advertising">Advertising and Promotions</option>
+                      <option value="utilities">Utilities</option>
+                      <option value="salaries">Salaries/Wages</option>
+                      <option value="maintenance">Maintenance and Repairs</option>
+                      <option value="supplies">Office Supplies</option>
+                      <option value="insurance">Insurance</option>
+                      <option value="delivery">Delivery/Freight Charges</option>
+                      <option value="depreciation">Depreciation</option>
+                      <option value="taxes">Income Taxes and Licenses</option>
+                      <option value="inventory">Inventory Costs</option>
+                      <option value="office">Office Expenses</option>
+                      <option value="travel">Travel Expenses</option>
+                      <option value="training">Training and Development</option>
+                      <option value="bank">Bank Charges and Fees</option>
+                      <option value="interest">Interest on Loans</option>
+                      <option value="software">Software/Subscriptions</option>
+                      <option value="security">Security Costs</option>
+                      <option value="waste_disposal">Waste Disposal</option>
+                      <option value="miscellaneous">Miscellaneous Expenses</option>
                     </select>
+                    
                     <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
                       aria-hidden="true"></i>
                   </div>
                 </div>
-                <div class="row form-group has-feedback">
-                  <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="destination">Account Holder *: </label>
-                    <select class="form-control  has-feedback-left" id="destination" required>
-                      <option value="" selected disabled>Select Account</option>
-                    </select>
-                    <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
-                      aria-hidden="true"></i>
-                  </div>
-                </div>
+                
               </div>
               <!-- /first col -->
               <!-- second col -->

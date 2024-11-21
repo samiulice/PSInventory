@@ -93,7 +93,7 @@
           <!-- menu profile quick info -->
           <div class="profile clearfix">
             <div class="profile_pic">
-              <img src="assets/images/samiul-photo.jpg" alt="..." class="img-circle profile_img">
+              <img src="assets/images/ps-logo-white.png" alt="..." class="img-circle profile_img">
             </div>
             <div class="profile_info">
               <span>Welcome,</span>
@@ -223,7 +223,7 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">Transaction Report</h2>
+        <h2 class="text-center text-warning fa-2x text-bold">Top Sheet</h2>
         <!-- Page content here -->
         <div id="datatable_wrapper" class="row dataTables_wrapper form-inline dt-bootstrap no-footer">
           <!-- start project list -->
@@ -326,7 +326,7 @@
 
   <!-- fetching data from backend and populate frontend table -->
   <script>
-    let reportData;
+    let reportData, company;
     function init_DataTables() {
 
       console.log('run_datatables');
@@ -375,7 +375,7 @@
                 // Generate a custom file name dynamically
                 const today = new Date();
                 const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
-                return `Transaction_History_Report_${formattedDate}`;
+                return `top_sheet_report${formattedDate}`;
               },
             },
               {
@@ -402,6 +402,7 @@
                 .then(function (responseData) {
                   console.log(responseData);
                   reportData = responseData.report || [];
+                  company = responseData.company_profile;
                   callback({ data: reportData });
                 })
                 .catch(function (error) {
@@ -436,52 +437,20 @@
           // Convert string dates to Date objects
           const startDate = parseDate(startDateStr, "/");
           const endDate = parseDate(endDateStr, "/");
-          const targetDate = parseDate(changeISODateToMMDDYYYY(c.transaction_date), "/");
+          const targetDate = parseDate(changeISODateToMMDDYYYY(c.sheet_date), "/");
           // Check if targetDate is within the range (inclusive)
           if (targetDate >= startDate && targetDate <= endDate) {
             counter += 1;
-            //description
-            let description = ""
-            if (c.transaction_type) {
-              description += c.transaction_type
-            }
-            if (c.source_type === "head_accounts") {
-              description += ` [${c.destination_account_name}]`;
-            } else {
-              description += ` [${c.source_account_name}]`;
-            }
-
-            //received
-            let received = 0;
-            if (c.transaction_type === "Purchase Return" || c.transaction_type === "Sale" || c.transaction_type === "Receive & Collection") {
-              received = c.amount;
-            } else {
-              received = "";
-            }
-            //paid
-            let paid = 0;
-            if (c.transaction_type === "Purchase" || c.transaction_type === "Sale Return" || c.transaction_type === "Payment" || c.transaction_type === "Expense") {
-              paid = c.amount;
-            } else {
-              paid = "";
-            }
-            //account 
-            let account = ""
-            if (c.source_type === "head_accounts") {
-              account = c.source_account_name;
-            }
-            account = c.destination_account_name;
-
             tBody += `
             <tr>
-              <td>${formatDate(c.transaction_date, "date", "-")}</td>
-              <td>${description}</td>
-              <td>${c.voucher_no || "-"}</td>
-              <td>${c.cheque_no || "-"}</td>
-              <td>${received || ""}</td>
-              <td>${paid || ""}</td>
-              <td>${c.current_balance || ""}</td>
-              <td>${account}</td>
+              <td>${formatDate(c.sheet_date, "date", "-")}</td>
+              <td>${c.total_purchases}</td>
+              <td>${c.purchases_discount}</td>
+              <td>${c.total_payments}</td>
+              <td>${c.total_sales}</td>
+              <td>${c.sales_discount}</td>
+              <td>${c.total_received_payments}</td>
+              <td>${c.other_expenses}</td>
             </tr>`;
           }
         }
@@ -496,8 +465,8 @@
         <head>
           <meta charset="UTF-8">
           <title>Company Report</title>
-          <link rel="stylesheet" type="text/css" href="styles.css">
           <style>
+            
             /* Header styling */
             .header {
               text-align: center;
@@ -528,7 +497,7 @@
             .header p {
               margin: 3px 0;
               font-size: 14px;
-              color: #666;
+              color: #060606;
             }
             /* table caption and printing date section */
             .caption-section {
@@ -576,22 +545,17 @@
         <body>
           <!-- Header Section -->
           <div class="header">
-            ${reportData.company ? `
-              <h1>${reportData.company.name || ""}</h1>
-              <h2>${reportData.company.slogan || ""}</h2>
-              <p>${reportData.company.address || ""}</p>
-              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
-            ` : `
-              <h1>ProjuktiSheba Inventory</h1>
-              <h2>Track Smarter, Stock Better</h2>
-              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
-              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
-            `}
+            ${company ? `
+              <h1>${company.name || ""}</h1>
+              <h2>${company.slogan || ""}</h2>
+              <p>${company.area+"," || ""}${company.upazila+"," || ""}${company.district+"," || ""}</p>
+              <p>Mobile: ${company.mobile || ""} | Email: ${company.email || ""}</p>
+            ` : ""}
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Transaction Report</div>
-              <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:left;text-decoration-line: underline;">${moment(startDateStr).format('MMMM D, YYYY')} - ${moment(endDateStr).format('MMMM D, YYYY')}</div>
+              <div class="caption">Top Sheet</div>
+              <div style="color:#0f0f0f; font-size:12px; padding-bottom:10px; text-align:left;text-decoration-line: underline;">${moment(startDateStr).format('MMM D, YYYY')} - ${moment(endDateStr).format('MMM D, YYYY')}</div>
             
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
@@ -601,13 +565,13 @@
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Description</th>
-                <th>Invoice #</th>
-                <th>Chq/Rec. No.</th>
-                <th>Received</th>
-                <th>Paid</th>
-                <th>Balance</th>
-                <th>Account</th>
+                <th>Purchases</th>
+                <th>Pur. Discount</th>
+                <th>Payments</th>
+                <th>Sales</th>
+                <th>Sales Discount</th>
+                <th>Collections</th>
+                <th>Other Expenses</th>
               </tr>
             </thead>
             <tbody>
