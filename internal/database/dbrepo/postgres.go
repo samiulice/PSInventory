@@ -1981,6 +1981,31 @@ func (p *postgresDBRepo) GetProductItemsDetailsBySalesHistoryID(id int) ([]*mode
 	return products, nil
 }
 
+// GetExpenseList retrieves the types of expenses from the database
+func (p *postgresDBRepo) GetExpenseList() ([]*models.ExpenseType, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var expList []*models.ExpenseType
+
+	query := `
+		SELECT id, expense_name, total_expense, updated_at, created_at
+		FROM public.expense_list
+	`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return expList, fmt.Errorf("DBERROR: Unable to retrieve data: %w", err)
+	}
+	for rows.Next() {
+		var exp models.ExpenseType
+		err = rows.Scan(&exp.ID, &exp.ExpenseName, &exp.TotalExpense, &exp.UpdatedAt, &exp.CreatedAt)
+		if err != nil {
+			return expList, fmt.Errorf("DBERROR: Unable to scan row: %w", err)
+		}
+		expList = append(expList, &exp)
+	}
+	return expList, nil
+}
+
 // UpdateProductItemStatusByProductSerialNumber updates the status of the product unit in product_serial_numbers Table
 func (p *postgresDBRepo) UpdateProductItemStatusByProductUnitsID(productUnitsID, status int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -2751,8 +2776,8 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	}
 	//Insert Financial transaction for sale return amount
 	var financial_transactions_id int
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
-	VALUES ('Sale Return','head_accounts',$1, 'customers', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,current_balance,created_at,updated_at)
+	VALUES ('Sale Return','head_accounts',$1, 'customers', $2, $3, $4, $5, $6, $7, $8) RETURNING transaction_id
 	`
 	description := "sales return from customer"
 	err = tx.QueryRowContext(ctx, query,
@@ -2761,6 +2786,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		&ReturnAmount,
 		time.Now(),
 		&description,
+		&current_balance,
 		time.Now(),
 		time.Now(),
 	).Scan(&financial_transactions_id)
@@ -2770,7 +2796,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	}
 
 	//Insert Financial transaction for sale return Repayment
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,created_at,updated_at)
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,current_balance,created_at,updated_at)
 	VALUES ('Sale Return','head_accounts',$1, 'customers', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
 	`
 	description = "cash return to customer due to returning product"
@@ -2780,6 +2806,7 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		&ReturnAmount,
 		time.Now(),
 		&description,
+		&current_balance,
 		time.Now(),
 		time.Now(),
 	).Scan(&financial_transactions_id)
@@ -3088,10 +3115,10 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
 			VALUES('Receive & Collection', 'customers', $1, 'head_accounts', $2, $3, $4, $5, $6, $7)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.ReceivedAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.ReceivedAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3182,10 +3209,10 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
 			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, $4, $5, $6, $7)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3345,10 +3372,10 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
 			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, $5, $6, $7, $8)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.PayableAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.PayableAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
@@ -3408,10 +3435,10 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
 			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, $5, $6, $7, $8)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.ReceivableAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.ReceivableAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
@@ -3446,39 +3473,38 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 			SET current_balance = current_balance - $1, updated_at = $2
 			WHERE id = $3 RETURNING current_balance`
 
-		err = tx.QueryRowContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.SourceAccount.ID).Scan(&current_balance)
+		err = tx.QueryRowContext(ctx, stmt, sum.ExpenseAmount, time.Now(), sum.SourceAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update current_balance in head_accounts table: %w", err)
 		}
 
 		//convert expenseDate into go supported date
-		txDate, err := time.Parse("01/02/2006", strings.TrimSpace(sum.ExpenseDate))
-		fmt.Println("Exp Date: ", strings.TrimSpace(sum.ExpenseDate))
+		txDate, err := time.Parse("01/02/2006", sum.ExpenseDate)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable parse time in go supported format: %w", err)
 		}
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description, current_balance)
-			VALUES('Expense', 'head_accounts', $1, $2, $3, $4, $5, $6, $7, $8)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
+			VALUES('Expense', 'head_accounts', $1, 'expenses', 0, $2, $3, $4, $5, $6, $7, $8)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.AccountType, sum.AccountID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.ExpenseAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable Insert into financial_transaction table: %w", err)
 		}
-		//update account
-		stmt = `
-			UPDATE public.` + sum.AccountType + `
-			SET total_amount = total_amount + $1, updated_at = $2
-			WHERE id = $3`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.AccountID)
+		//insert to expense_history table
+		stmt = `
+			INSERT INTO public.expense_history(expense_type, voucher_no, account, expense_date, expense_amount, description, carrier, cheque_no)
+			VALUES($1, $2, $3, TO_DATE($4,'MM/DD/YYY'), $5, $6, $7, $8)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.ExpenseType.ID, sum.VoucherNo, sum.SourceAccount.ID, sum.ExpenseDate, sum.ExpenseAmount, sum.Description, sum.Carrier, sum.ChequeNo)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update due_amount in %s table: %w", sum.AccountType, err)
+			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable Insert into expense_history table: %w", err)
 		}
 	}
 
@@ -3907,13 +3933,17 @@ func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, 
 			return transactions, fmt.Errorf("DBERROR: GetTransactionsHistoryReport (Unable to retrieve %s account name)=> %w", trx.SourceType, err)
 		}
 		trx.SourceAccountName = account_name
-		//retrieve source account name
-		query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
-		err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
-		if err != nil {
-			return transactions, fmt.Errorf("DBERROR: GetTransactionsHistoryReport (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
+		if trx.DestinationType == "expenses" {
+			trx.DestinationAccountName = trx.DestinationType
+		} else {
+			//retrieve destination account name
+			query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
+			err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
+			if err != nil {
+				return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
+			}
+			trx.DestinationAccountName = account_name
 		}
-		trx.DestinationAccountName = account_name
 
 		transactions = append(transactions, &trx)
 	}
@@ -3963,13 +3993,17 @@ func (p *postgresDBRepo) GetCashBankStatement() ([]*models.Transaction, error) {
 			return transactions, fmt.Errorf("DBERROR: GetCashBankStatement (Unable to retrieve %s account name)=> %w", trx.SourceType, err)
 		}
 		trx.SourceAccountName = account_name
-		//retrieve source account name
-		query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
-		err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
-		if err != nil {
-			return transactions, fmt.Errorf("DBERROR: GetCashBankStatement (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
+		if trx.DestinationType == "expenses" {
+			trx.DestinationAccountName = trx.DestinationType
+		} else {
+			//retrieve destination account name
+			query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
+			err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
+			if err != nil {
+				return transactions, fmt.Errorf("DBERROR: GetTransactionHistoryReport (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
+			}
+			trx.DestinationAccountName = account_name
 		}
-		trx.DestinationAccountName = account_name
 
 		transactions = append(transactions, &trx)
 	}
@@ -4077,17 +4111,111 @@ func (p *postgresDBRepo) GetExpensesHistoryReport() ([]*models.Transaction, erro
 			return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport (Unable to retrieve %s account name)=> %w", trx.SourceType, err)
 		}
 		trx.SourceAccountName = account_name
-		//retrieve source account name
-		query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
-		err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
-		if err != nil {
-			return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
+		if trx.DestinationType == "expenses" {
+			trx.DestinationAccountName = trx.DestinationType
+		} else {
+			//retrieve destination account name
+			query = fmt.Sprintf("SELECT account_name FROM public.%s WHERE id = $1", trx.DestinationType)
+			err = p.DB.QueryRowContext(ctx, query, trx.DestinationID).Scan(&account_name)
+			if err != nil {
+				return transactions, fmt.Errorf("DBERROR: GetExpensesHistoryReport (Unable to retrieve %s account name)=> %w", trx.DestinationType, err)
+			}
+			trx.DestinationAccountName = account_name
 		}
-		trx.DestinationAccountName = account_name
 
 		transactions = append(transactions, &trx)
 	}
 	return transactions, nil
+}
+
+func (p *postgresDBRepo) GetIncomeStatementData(startDate, endDate string) (models.IncomeStatement, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var ins models.IncomeStatement
+
+	query := `
+		WITH aggregated AS (
+			SELECT 
+				SUM(COALESCE(total_purchases, 0)) AS sum_total_purchases,
+				SUM(COALESCE(total_sales, 0)) AS sum_total_sales,
+				SUM(COALESCE(total_purchase_returns, 0)) AS sum_total_purchase_returns,
+				SUM(COALESCE(total_sale_returns, 0)) AS sum_total_sale_returns,
+				SUM(COALESCE(purchases_discount, 0)) AS sum_purchases_discount,
+				SUM(COALESCE(sales_discount, 0)) AS sum_sales_discount,
+				SUM(COALESCE(miscellaneous, 0)) AS sum_miscellaneous,
+				SUM(COALESCE(rent, 0)) AS sum_rent,
+				SUM(COALESCE(utilities, 0)) AS sum_utilities,
+				SUM(COALESCE(salaries_and_wages, 0)) AS sum_salaries_and_wages,
+				SUM(COALESCE(advertising_and_promotions, 0)) AS sum_advertising_and_promotions,
+				SUM(COALESCE(maintenance_and_repairs, 0)) AS sum_maintenance_and_repairs,
+				SUM(COALESCE(office_supplies, 0)) AS sum_office_supplies,
+				SUM(COALESCE(insurance, 0)) AS sum_insurance,
+				SUM(COALESCE(delivery_and_freight_charges, 0)) AS sum_delivery_and_freight_charges,
+				SUM(COALESCE(depreciation, 0)) AS sum_depreciation,
+				SUM(COALESCE(taxes_and_licenses, 0)) AS sum_taxes_and_licenses,
+				SUM(COALESCE(inventory_costs, 0)) AS sum_inventory_costs,
+				SUM(COALESCE(office_expense, 0)) AS sum_office_expense,
+				SUM(COALESCE(travel_expense, 0)) AS sum_travel_expense,
+				SUM(COALESCE(training_and_development, 0)) AS sum_training_and_development,
+				SUM(COALESCE(bank_charges_and_fees, 0)) AS sum_bank_charges_and_fees,
+				SUM(COALESCE(interest_on_loans, 0)) AS sum_interest_on_loans,
+				SUM(COALESCE(software_and_subscriptions, 0)) AS sum_software_and_subscriptions,
+				SUM(COALESCE(security_costs, 0)) AS sum_security_costs,
+				SUM(COALESCE(waste_disposal, 0)) AS sum_waste_disposal,
+				SUM(COALESCE(non_operating_income, 0)) AS sum_non_operating_income,
+				SUM(COALESCE(non_operating_expense, 0)) AS sum_non_operating_expense
+			FROM public.top_sheet
+			WHERE sheet_date BETWEEN TO_DATE($1, 'MM/DD/YYYY') AND TO_DATE($2, 'MM/DD/YYYY')
+		),
+		last_value AS (
+			SELECT opening_stock AS last_opening_stock_value
+			FROM public.top_sheet
+			WHERE sheet_date BETWEEN TO_DATE($1, 'MM/DD/YYYY') AND TO_DATE($2, 'MM/DD/YYYY')
+			ORDER BY sheet_date DESC
+			LIMIT 1
+		)
+		SELECT 
+			aggregated.*,
+			last_value.last_opening_stock_value
+		FROM aggregated, last_value;
+`
+
+	err := p.DB.QueryRowContext(ctx, query, startDate, endDate).Scan(
+		&ins.GoodsPurchased,
+		&ins.GrossSales,
+		&ins.PurchaseReturn,
+		&ins.SalesReturn,
+		&ins.PurchaseDiscount,
+		&ins.SalesDiscount,
+		&ins.ExpenseSection.Miscellaneous,
+		&ins.ExpenseSection.Rent,
+		&ins.ExpenseSection.Utilities,
+		&ins.ExpenseSection.SalariesAndWages,
+		&ins.ExpenseSection.AdvertisingAndPromotions,
+		&ins.ExpenseSection.MaintenanceAndRepairs,
+		&ins.ExpenseSection.OfficeSupplies,
+		&ins.ExpenseSection.Insurance,
+		&ins.ExpenseSection.DeliveryAndFreightCharges,
+		&ins.ExpenseSection.Depreciation,
+		&ins.ExpenseSection.TaxesAndLicenses,
+		&ins.ExpenseSection.InventoryCosts,
+		&ins.ExpenseSection.OfficeExpense,
+		&ins.ExpenseSection.TravelExpense,
+		&ins.ExpenseSection.TrainingAndDevelopment,
+		&ins.ExpenseSection.BankChargesAndFees,
+		&ins.ExpenseSection.InterestOnLoans,
+		&ins.ExpenseSection.SoftwareAndSubscriptions,
+		&ins.ExpenseSection.SecurityCosts,
+		&ins.ExpenseSection.WasteDisposal,
+		&ins.NonOperatingIncome,
+		&ins.NonOperatingExpense,
+		&ins.TotalAvailableGoods,
+	)
+	if err != nil {
+		return ins, fmt.Errorf("DBERROR: GetIncomeStatementData => %w", err)
+	}
+
+	return ins, nil
 }
 
 func (p *postgresDBRepo) GetTopSheetReport() ([]*models.TopSheet, error) {
@@ -4096,7 +4224,7 @@ func (p *postgresDBRepo) GetTopSheetReport() ([]*models.TopSheet, error) {
 	var top_sheet []*models.TopSheet
 
 	query := `
-		SELECT id, sheet_date, total_purchases, total_payments, total_sales, total_received_payments, total_purchase_returns, total_sale_returns, purchases_discount, sales_discount, other_expenses, created_at, updated_at
+		SELECT id, sheet_date, total_purchases, total_payments, total_sales, total_received_payments, total_purchase_returns, total_sale_returns, purchases_discount, sales_discount, total_expenses, created_at, updated_at
 		FROM public.top_sheet 
 		ORDER BY id ASC
 	`
@@ -4120,7 +4248,7 @@ func (p *postgresDBRepo) GetTopSheetReport() ([]*models.TopSheet, error) {
 			&ts.TotalSaleReturns,
 			&ts.PurchasesDiscount,
 			&ts.SalesDiscount,
-			&ts.OtherExpenses,
+			&ts.TotalExpenses,
 			&ts.CreatedAt,
 			&ts.UpdatedAt,
 		)

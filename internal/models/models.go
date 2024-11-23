@@ -197,7 +197,7 @@ type SalesInvoice struct {
 	Discount        int                 `json:"discount"`
 	TotalAmount     int                 `json:"total_amount"`
 	PaidAmount      int                 `json:"paid_amount"`
-	GrossProfit         int                 `json:"gross_profit"`
+	GrossProfit     int                 `json:"gross_profit"`
 }
 
 // ProductMetadata holds products meta data
@@ -383,21 +383,68 @@ type AmountReceivable struct {
 	UpdatedAt        time.Time   `json:"updated_at"`
 }
 
+// ExpenseList is the definition for expense type list
+type ExpenseType struct {
+	ID           int       `json:"id"`
+	ExpenseName  string    `json:"expense_name"`
+	TotalExpense string    `json:"total_expense"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
 // Expense is the definition for expense info
 type Expense struct {
+	ID            int          `json:"id"`
 	VoucherNo     string       `json:"voucher_no"`
+	ExpenseType   ExpenseType  `json:"expense_type"`
 	ExpenseDate   string       `json:"expense_date"`
-	PaidAmount    int          `json:"paid_amount"`
+	ExpenseAmount int          `json:"expense_amount"`
 	SourceAccount *HeadAccount `json:"source_account"`
-	AccountType   string       `json:"account_type"`
-	AccountCode   string       `json:"account_code"`
-	AccountID     int          `json:"account_id"`
-	AccountName   string       `json:"account_name"`
 	ChequeNo      string       `json:"cheque_no"`
 	Carrier       string       `json:"carrier_info"`
 	Description   string       `json:"description"`
 	CreatedAt     time.Time    `json:"created_at"`
 	UpdatedAt     time.Time    `json:"updated_at"`
+}
+
+// IncomeStatement is the definition for income statement
+type IncomeStatement struct {
+	//Revenue Section
+	GrossSales    int `json:"gross_sales"`
+	SalesReturn   int `json:"sales_return"`
+	SalesDiscount int `json:"sales_discount"`
+	//Cost of Goods Sold
+	GoodsPurchased      int `json:"goods_purchased"`
+	PurchaseReturn      int `json:"purchase_return"`
+	PurchaseDiscount    int `json:"purchase_discount"`
+	TotalAvailableGoods int `json:"total_available_goods"`
+	//Non Operating Sources
+	NonOperatingIncome  int `json:"non_operating_income"`
+	NonOperatingExpense int `json:"non_operating_expense"`
+
+	//Expenses
+	ExpenseSection struct {
+		Rent                      int `json:"rent"`
+		Utilities                 int `json:"utilities"`
+		SalariesAndWages          int `json:"salaries_and_wages"`
+		AdvertisingAndPromotions  int `json:"advertising_and_promotions"`
+		MaintenanceAndRepairs     int `json:"maintenance_and_repairs"`
+		OfficeSupplies            int `json:"office_supplies"`
+		Insurance                 int `json:"insurance"`
+		DeliveryAndFreightCharges int `json:"delivery_and_freight_charges"`
+		Depreciation              int `json:"depreciation"`
+		TaxesAndLicenses          int `json:"taxes_and_licenses"`
+		InventoryCosts            int `json:"inventory_costs"`
+		OfficeExpense             int `json:"office_expense"`
+		TravelExpense             int `json:"travel_expense"`
+		TrainingAndDevelopment    int `json:"training_and_development"`
+		BankChargesAndFees        int `json:"bank_charges_and_fees"`
+		InterestOnLoans           int `json:"interest_on_loans"`
+		SoftwareAndSubscriptions  int `json:"software_and_subscriptions"`
+		SecurityCosts             int `json:"security_costs"`
+		WasteDisposal             int `json:"waste_disposal"`
+		Miscellaneous             int `json:"other"`
+	} `json:"expense_section"`
 }
 
 //Transaction is the definition for the financial transaction
@@ -432,9 +479,9 @@ type TopSheet struct {
 	SalesDiscount         int       `json:"sales_discount"`
 	TotalReceivedPayments int       `json:"total_received_payments"`
 	TotalSaleReturns      int       `json:"total_sale_returns"`
-	OtherExpenses         int       `json:"other_expenses"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	TotalExpenses         int       `json:"total_expenses"`
+	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
 }
 type CompanyProfile struct {
 	ID              int       `json:"id"`

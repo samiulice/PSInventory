@@ -45,6 +45,7 @@ type DatabaseRepo interface {
 	GetAvailableProductsByCategoryID(cat_id int) ([]*models.Product, error)
 	GetAllProductsByCategoryID(cat_id int) ([]*models.Product, error)
 	GetAvailableProductsDetails() ([]*models.Product, error)
+	GetExpenseList()([]*models.ExpenseType, error)
 
 	GetInStockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
 	GetSoldProductListBySalesIDAndProductID(SalesID, productID int) (*models.Product, error)
@@ -109,6 +110,7 @@ type DatabaseRepo interface {
 	GetCashBankStatement() ([]*models.Transaction, error)
 	GetLedgerBookDetails(account_type string, account_id int) ([]*models.Transaction, error)
 	GetExpensesHistoryReport() ([]*models.Transaction, error)
+	GetIncomeStatementData(startDate,endDate string) (models.IncomeStatement, error)
 	GetTopSheetReport() ([]*models.TopSheet, error)
 	//Helper functions
 	CountRows(tableName string) (int, error)

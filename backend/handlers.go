@@ -1330,10 +1330,10 @@ func (app *application) CompleteAmountReceivableProcess(w http.ResponseWriter, r
 // GetExpensesPageDetails scarp data for expenses page
 func (app *application) GetExpensesPageDetails(w http.ResponseWriter, r *http.Request) {
 	var resp struct {
-		Error     bool                  `json:"error,omitempty"`
-		Message   string                `json:"message,omitempty"`
-		Suppliers []*models.Supplier    `json:"suppliers,omitempty"`
-		Accounts  []*models.HeadAccount `json:"head_accounts,omitempty"`
+		Error       bool                  `json:"error"`
+		Message     string                `json:"message"`
+		ExpenseList []*models.ExpenseType `json:"expense_list"`
+		Accounts    []*models.HeadAccount `json:"head_accounts"`
 	}
 
 	accounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
@@ -1341,13 +1341,13 @@ func (app *application) GetExpensesPageDetails(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, fmt.Errorf("ERROR: GetExpensesPageDetails => %w", err))
 		return
 	}
-	suppliers, err := app.DB.GetActiveSuppliersIDAndName()
+	expList, err := app.DB.GetExpenseList()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR: GetExpensesPageDetails => %w", err))
 		return
 	}
 	resp.Message = "Data fetched successfully"
-	resp.Suppliers = suppliers
+	resp.ExpenseList = expList
 	resp.Accounts = accounts
 	app.writeJSON(w, http.StatusOK, resp)
 }
@@ -1794,6 +1794,43 @@ func (app *application) GetExpensesReport(w http.ResponseWriter, r *http.Request
 	fmt.Println(resp)
 	app.writeJSON(w, http.StatusOK, resp)
 }
+func (app *application) GetIncomeStatementReport(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		StartDate string `json:"start_date"`
+		EndDate   string `json:"end_date"`
+	}
+
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetIncomeStatementReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error          bool                   `json:"error"`
+		Message        string                 `json:"message"`
+		Report         models.IncomeStatement `json:"report"`
+		CompanyProfile models.CompanyProfile  `json:"company_profile"`
+	}
+
+	ins, err := app.DB.GetIncomeStatementData(payload.StartDate, payload.EndDate)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetIncomeStatementReport: %w", err))
+		return
+	}
+	cp, err := app.DB.GetCompanyProfile()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetIncomeStatementReport: %w", err))
+		return
+	}
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = ins
+	resp.CompanyProfile = cp
+
+	fmt.Println(resp)
+	app.writeJSON(w, http.StatusOK, resp)
+}
 func (app *application) GetTopSheetReport(w http.ResponseWriter, r *http.Request) {
 	topSheetData, err := app.DB.GetTopSheetReport()
 	if err != nil {
@@ -1808,9 +1845,9 @@ func (app *application) GetTopSheetReport(w http.ResponseWriter, r *http.Request
 	}
 
 	var resp struct {
-		Error          bool                     `json:"error"`
-		Message        string                   `json:"message"`
-		Report         []*models.TopSheet       `json:"report"`
+		Error          bool                  `json:"error"`
+		Message        string                `json:"message"`
+		Report         []*models.TopSheet    `json:"report"`
 		CompanyProfile models.CompanyProfile `json:"company_profile"`
 	}
 	resp.Error = false

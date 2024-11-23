@@ -164,7 +164,7 @@
                         <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
-                        <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
+                        <li class="sub_menu"><a href="income-statement.html">Income Statement</a></li>
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
                         <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
                         <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
@@ -364,7 +364,7 @@
               {data: "total_sales", title: "Sale", className: "purchase-discount"},
               {data: "sales_discount", title: "Sale Discount", className: "sale-discount"},
               {data: "total_received_payments", title: "Collection", className: "collection"},
-              {data: "other_expenses", title: "Other Expense", className: "other-expense"},
+              {data: "total_expenses", title: "Other Expense", className: "other-expense"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -450,7 +450,7 @@
               <td>${c.total_sales}</td>
               <td>${c.sales_discount}</td>
               <td>${c.total_received_payments}</td>
-              <td>${c.other_expenses}</td>
+              <td>${c.total_expenses}</td>
             </tr>`;
           }
         }

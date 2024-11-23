@@ -116,7 +116,7 @@
                         <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
                         <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
-                        <li class="sub_menu"><a href="#income-statement.html">Income Statement</a></li>
+                        <li class="sub_menu"><a href="income-statement.html">Income Statement</a></li>
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
                         <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
                         <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
@@ -186,50 +186,41 @@
           <div class="x_content">
             <div class="row">
               <!-- first col -->
-              <div class="col-md-3 col-sm-6 col-xs-12">
+              <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="destination_account_type">Expense Type*: </label>
-                    <select class="form-control  has-feedback-left" name="expense_type" id="expense_type" class="form-select">
+                    <label for="expense-type">Expense Type*: </label>
+                    <select class="form-control  has-feedback-left" name="expense-type" id="expense-type"
+                      class="form-select">
                       <option value="" disabled selected>Select Expense Type</option>
-                      <option value="rent">Rent/Lease</option>
-                      <option value="advertising">Advertising and Promotions</option>
-                      <option value="utilities">Utilities</option>
-                      <option value="salaries">Salaries/Wages</option>
-                      <option value="maintenance">Maintenance and Repairs</option>
-                      <option value="supplies">Office Supplies</option>
-                      <option value="insurance">Insurance</option>
-                      <option value="delivery">Delivery/Freight Charges</option>
-                      <option value="depreciation">Depreciation</option>
-                      <option value="taxes">Income Taxes and Licenses</option>
-                      <option value="inventory">Inventory Costs</option>
-                      <option value="office">Office Expenses</option>
-                      <option value="travel">Travel Expenses</option>
-                      <option value="training">Training and Development</option>
-                      <option value="bank">Bank Charges and Fees</option>
-                      <option value="interest">Interest on Loans</option>
-                      <option value="software">Software/Subscriptions</option>
-                      <option value="security">Security Costs</option>
-                      <option value="waste_disposal">Waste Disposal</option>
-                      <option value="miscellaneous">Miscellaneous Expenses</option>
+                      <!-- Will be updated using JS DOM -->
                     </select>
-                    
+
                     <i style="color: black;" class="form-control-feedback glyphicon glyphicon-user left"
                       aria-hidden="true"></i>
                   </div>
                 </div>
-                
-              </div>
-              <!-- /first col -->
-              <!-- second col -->
-              <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="source">Cash/Bank *: </label>
-                    <select class="form-control  has-feedback-left" id="source" required>
+                    <label for="account">Cash/Bank *: </label>
+                    <select class="form-control  has-feedback-left" id="account" required>
                       <option value="" selected disabled>Select Account</option>
                     </select>
                     <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
+                  </div>
+                </div>
+
+              </div>
+              <!-- /first col -->
+              <!-- second col -->
+              <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="row form-group has-feedback">
+                  <div class="col-md-12 col-sm-12 col-xs-12">
+                    <label for="single_cal4">Date *:</label>
+                    <input type="text" id="single_cal4" class="form-control has-feedback-left" placeholder="Select Date"
+                      aria-describedby="inputSuccess2Status4" required>
+                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left "
+                      aria-hidden="true"></i>
                   </div>
                 </div>
                 <div class="row form-group has-feedback">
@@ -244,13 +235,13 @@
               </div>
               <!-- /second col -->
               <!-- third col -->
-              <div class="col-md-3 col-sm-6 col-xs-12">
+              <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="single_cal4">Date *:</label>
-                    <input type="text" id="single_cal4" class="form-control has-feedback-left" placeholder="Select Date"
-                      aria-describedby="inputSuccess2Status4" required>
-                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-calendar form-control-feedback left "
+                    <label for="carrier">Carrier:</label>
+                    <input type="text" class="form-control form-select has-feedback-left" id="carrier"
+                      placeholder="Enter name(optional)">
+                    <i style="color:rgba(0, 0, 0, 1);" class="fa fa-user form-control-feedback left"
                       aria-hidden="true"></i>
                   </div>
                 </div>
@@ -265,17 +256,8 @@
                 </div>
               </div>
               <!-- /third col -->
-              <!-- fourth col -->
-              <div class="col-md-3 col-sm-6 col-xs-12">
-                <div class="row form-group has-feedback">
-                  <div class="col-md-12 col-sm-12 col-xs-12">
-                    <label for="carrier">Carrier:</label>
-                    <input type="text" class="form-control form-select has-feedback-left" id="carrier"
-                      placeholder="Enter name(optional)">
-                    <i style="color:rgba(0, 0, 0, 1);" class="fa fa-user form-control-feedback left"
-                      aria-hidden="true"></i>
-                  </div>
-                </div>
+              <!-- New Row -->
+              <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
                     <label for="description">Description :</label>
@@ -286,7 +268,7 @@
                   </div>
                 </div>
               </div>
-              <!-- /fourth col -->
+              <!-- /New Row -->
             </div>
             <div class="row text-center">
               <button type="button" class="btn btn-primary" id="add-transaction-info" onclick="addToSummary()"><i
@@ -305,8 +287,8 @@
             <thead style="background-color: rgba(4, 209, 209, 0.1);">
               <tr>
                 <th>Voucher No.</th>
+                <th>Expense Type</th>
                 <th>Cash/Bank</th>
-                <th>Paid To</th>
                 <th>Paid Amount</th>
                 <th>Receipt No</th>
                 <th>Carrier</th>
@@ -379,51 +361,28 @@
     <script>
       let accounts, suppliers, payment_summary = [];
       window.addEventListener("DOMContentLoaded", () => {
-        // fetch-1: On load window Get head_accounts for destination and suppliers who have due amount
+        // fetch-1: On load window Get head_accounts and update account dropdown
         const requestOptions = {
           method: 'post'
         }
         fetch('http://localhost:4321/api/accounts/expenses/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
+            console.log(data);
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
               head_accounts = data.head_accounts;
+              expense_types = data.expense_list;
               updatePage();
             }
           })
-        document.getElementById("destination_account_type").addEventListener("change", e => {
-          let ac = document.getElementById("destination_account_type").value
-          let link = "";
-          if (ac === "customers" || ac === "suppliers") {
-            link = "http://localhost:4321/api/mis/view-all-" + ac;
-          } else if (ac === "employees") {
-            link = "http://localhost:4321/api/hr/view-all-" + ac;
-          }
-          // fetch-1: On changes account type fetch head_accounts details list 
-          fetch(link, requestOptions)
-            .then(response => response.json())
-            .then(data => {
-              if (data.error === true) {
-                showErrorMessage(data.message)
-              } else {
-                if (ac === "customers") {
-                  accounts = data.customers
-                } else if (ac === "suppliers") {
-                  accounts = data.suppliers
-                } else if (ac === "employees") {
-                  accounts = data.employees
-                }
-                updateAccountSection();
-              }
-            })
-        })
       })
 
       function updatePage() {
-        let accountsDiv = document.getElementById("source");
-        accountsDiv.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
+        let accountsDiv = document.getElementById("account");
+        let expenseTypeDiv = document.getElementById("expense-type");
+        accountsDiv.innerHTML = `<option value="" selected disabled>Select Account</option>`;
         if (head_accounts) {
           head_accounts.forEach((ac, i) => {
             accountsDiv.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
@@ -432,39 +391,33 @@
           accountsDiv.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
           accountsDiv.ariaDisabled = true;
         }
-      }
-      function updateAccountSection() {
-        let div = document.getElementById("destination");
-        div.innerHTML = `<option value="" selected disabled>Select Supplier Account</option>`;
-        if (accounts) {
-          accounts.forEach((c, i) => {
-            div.innerHTML += `<option value="${i}">${c.account_name}[${c.account_code}]</option>`;
+
+        expenseTypeDiv.innerHTML = `<option value="" disabled selected>Select Expense Type</option>`
+        if (expense_types) {
+          expense_types.forEach((ac, i) => {
+            expenseTypeDiv.innerHTML += `<option value="${i}">${ac.expense_name}</option>`;
           });
         } else {
-          div.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
-          div.ariaDisabled = true;
+          expenseTypeDiv.innerHTML = `<option value="" selected disabled>No Type Available</option>`;
+          expenseTypeDiv.ariaDisabled = true;
         }
       }
-
+  
       function addToSummary() {
         let expenseDate = document.getElementById("single_cal4").value;
+        let expenseType = document.getElementById("expense-type");
         let paidAmount = document.getElementById("paid-amount");
-        let destination = document.getElementById("destination");
-        let source = document.getElementById("source");
+        let account = document.getElementById("account");
         let chqNo = document.getElementById("chq-no");
         let carrier = document.getElementById("carrier");
         let description = document.getElementById("description");
         let voucherNo = `V-EXP-${generateRandomAlphanumericCode(6)}`
-        let destination_account = accounts[parseInt(destination.value)]
         let ps = {
           voucher_no: voucherNo,
+          expense_type:expense_types[parseInt(expenseType.value)],
           expense_date: expenseDate,
-          paid_amount: parseInt(paidAmount.value),
-          source_account: head_accounts[parseInt(source.value)],
-          account_type: document.getElementById("destination_account_type").value,
-          account_id: destination_account.id,
-          account_code: destination_account.account_code,
-          account_name: destination_account.account_name,
+          expense_amount: parseInt(paidAmount.value),
+          source_account: head_accounts[parseInt(account.value)],
           cheque_no: chqNo.value,
           carrier_info: carrier.value,
           description: description.value,
@@ -477,21 +430,13 @@
             icon: "error"
           });
           return
-        } else if (source.value === "") {
+        } else if (account.value === "") {
           Swal.fire({
             title: "Select Cash-bank Account",
             icon: "error"
           });
           return
-        }
-        else if (destination.value === "") {
-          Swal.fire({
-            title: "Select Supplier Account",
-            icon: "error"
-          });
-          return
-        }
-        else if (paidAmount.value === '') {
+        } else if (paidAmount.value === '') {
           Swal.fire({
             title: "Paid Amount must be greater than 0",
             icon: "error"
@@ -500,11 +445,12 @@
         }
         //push data to the array
         payment_summary.push(ps);
+        
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
-            <td>${head_accounts[parseInt(source.value)].account_name}</td>
-            <td>${accounts[parseInt(destination.value)].account_code}-${accounts[parseInt(destination.value)].account_name}</td> 
+            <td>${expense_types[parseInt(expenseType.value)].expense_name}</td>
+            <td>${head_accounts[parseInt(account.value)].account_name}</td>
             <td>${paidAmount.value}</td>
             <td>${chqNo.value}</td>
             <td>${carrier.value}</td>
@@ -515,8 +461,7 @@
         `;
         //clear the input field values
         voucherNo = "";
-        source.value = "";
-        destination.value = "";
+        account.value = "";
         paidAmount.value = "";
         chqNo.value = "";
         carrier.value = "";
@@ -587,17 +532,16 @@
           for (let i = 0; i < n; i++) {
             const ps = payment_summary[i];
             tBody += `
-            <tr>
-              <td>${ps.voucher_no || "-"}</td>
-              <td>${ps.source_account.account_name || "-"}<br><span style="font-size:10px;">[${ps.source_account.account_code || "-"}]</span></td>
-              <td>${ps.account_name || "-"}<br><span style="font-size:10px;">[${ps.account_code || "-"}]</span></td>
-              <td>${ps.paid_amount || "-"}</td>
-              <td>${ps.expense_date ? formatDate(ps.expense_date, "date", "-") : "-"}</td>
-              <td>${ps.cheque_no || "-"}</td>
-              <td>${ps.carrier_info || "-"}</td>
-              <td>${ps.description || "-"}</td>
-            </tr>
-          `;
+            <tr id="${ps.voucher_no}">
+            <td>${ps.voucher_no}</td>
+            <td>${ps.expense_type.expense_name}</td>
+            <td>${ps.source_account.account_name}-${ps.source_account.account_code}</td>
+            <td>${ps.expense_amount}</td>
+            <td>${ps.cheque_no}</td>
+            <td>${ps.carrier_info}</td>
+            <td>${ps.description}</td>
+            <td>${moment(ps.expense_date).format('MMM D, YYYY')}</td>
+            `;
           }
         } else {
           tBody = `
@@ -722,13 +666,13 @@
             <thead>
               <tr>
                 <th>Voucher No#</th>
+                <th>Expense Type</th>
                 <th>Cash/Bank</th>
-                <th>Paid To</th>
                 <th>Paid Amount</th>
-                <th>Expense Date</th>
                 <th>Receipt No.</th>
                 <th>Carrier</th>
                 <th>Description</th>
+                <th>Expense Date</th>
               </tr>
             </thead>
             <tbody>

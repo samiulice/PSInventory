@@ -5,10 +5,10 @@
  * @param {string} str - The input string to be converted.
  * @returns {string} - The string in title case format.
  */
-function toTitleCase(str) {
+function toTitleCase(str, sep=' ') {
   return str
     .toLowerCase() // Convert the entire string to lowercase for uniformity.
-    .split(' ') // Split the string into an array of words using spaces as delimiters.
+    .split(sep) // Split the string into an array of words using spaces as delimiters.
     .map(word =>
       word.charAt(0).toUpperCase() + word.slice(1) // Capitalize the first letter of each word and append the rest of the word.
     )
@@ -157,7 +157,7 @@ function DateRangePicker_Cal(id) {
     minDate: '01/01/2012',
     maxDate: moment(),
     dateLimit: {
-      days: 60
+      days: 7300
     },
     showDropdowns: true,
     showWeekNumbers: true,
