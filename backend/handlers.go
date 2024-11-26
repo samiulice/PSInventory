@@ -40,6 +40,30 @@ func (app *application) FetchCompanyProfile(w http.ResponseWriter, r *http.Reque
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// .....................Administrative Panel Handlers......................
+func (app *application) AddNewStakeHolder(w http.ResponseWriter, r *http.Request) {
+	var payload models.StakeHolder
+
+	err := app.readJSON(w, r, &payload)
+
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: AddNewStakeHolder: Unable to read JSON %w", err))
+		return
+	}
+
+	//insert to company_proprietors
+
+	var resp struct {
+		Error          bool               `json:"error"`
+		Message        string             `json:"message"`
+		CompanyProfile models.StakeHolder `json:"company_proprietors"`
+	}
+	resp.Message = fmt.Sprintf("%s-%s Added Successfully", payload.ContactPerson, payload.AccountName)
+	resp.CompanyProfile = payload
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // .....................HR Management Panel Handlers......................
 
 // GetAllEmployees returns list of all employees info from the database
