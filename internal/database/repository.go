@@ -10,6 +10,9 @@ type DatabaseRepo interface {
 	GetAvailableHeadAccounts() ([]*models.HeadAccount, error)
 	GetAvailableHeadAccountsByType(accountType string) ([]*models.HeadAccount, error)
 	UpdateHeadAccountBalance(int, int) error
+
+	//Administrative panel
+	AddNewStakeHolder(models.StakeHolder)(int, error)
 	// HR Management
 	AddEmployee(employee models.Employee) (int, error)
 	GetEmployeeListPaginated(accountType string, pageSize, currentPageIndex int) ([]*models.Employee, int, error)

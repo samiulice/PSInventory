@@ -42,24 +42,28 @@ func (app *application) FetchCompanyProfile(w http.ResponseWriter, r *http.Reque
 
 // .....................Administrative Panel Handlers......................
 func (app *application) AddNewStakeHolder(w http.ResponseWriter, r *http.Request) {
-	var payload models.StakeHolder
+	var stk models.StakeHolder
 
-	err := app.readJSON(w, r, &payload)
+	err := app.readJSON(w, r, &stk)
 
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: AddNewStakeHolder: Unable to read JSON %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR: AddNewStakeHolder: Unable to read JSON => %w", err))
 		return
 	}
 
-	//insert to company_proprietors
-
-	var resp struct {
-		Error          bool               `json:"error"`
-		Message        string             `json:"message"`
-		CompanyProfile models.StakeHolder `json:"company_proprietors"`
+	//insert to company_stakeholders
+	_, err = app.DB.AddNewStakeHolder(stk)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: AddNewStakeHolder => %w", err))
+		return
 	}
-	resp.Message = fmt.Sprintf("%s-%s Added Successfully", payload.ContactPerson, payload.AccountName)
-	resp.CompanyProfile = payload
+	var resp struct {
+		Error              bool               `json:"error"`
+		Message            string             `json:"message"`
+		CompanyStakeholder models.StakeHolder `json:"company_stakeholder"`
+	}
+	resp.Message = fmt.Sprintf("%s-%s Added Successfully", stk.AccountType, stk.AccountName)
+	resp.CompanyStakeholder = stk
 
 	app.writeJSON(w, http.StatusOK, resp)
 }

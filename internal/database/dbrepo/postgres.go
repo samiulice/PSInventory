@@ -142,6 +142,41 @@ func (p *postgresDBRepo) UpdateHeadAccountBalance(id, balance int) error {
 	return nil
 }
 
+//.......................Administrative Panel.....................
+
+// AddNewStakeHolder inserts new stakeholder information to the database
+func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder)(int,error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var id int
+
+	stmt := `
+		INSERT INTO public.company_stakeholders (account_type,account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,joining_date,created_at,updated_at) 
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id
+	`
+	err := p.DB.QueryRowContext(ctx, stmt,
+		stk.AccountType,
+		stk.AccountCode,
+		stk.AccountName,
+		stk.ContactPerson,
+		stk.Division,
+		stk.District,
+		stk.Upazila,
+		stk.Area,
+		stk.Mobile,
+		stk.Email,
+		stk.AccountStatus,
+		time.Now(),
+		time.Now(),
+		time.Now(),
+	).Scan(&id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
 //.......................HR Management.......................
 
 // AddEmployee inserts new employee information to the database

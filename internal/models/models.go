@@ -96,6 +96,7 @@ type Employee struct {
 type StakeHolder struct {
 	ID            int    `json:"id"`
 	AccountType   string `json:"account_type"`
+	AccountCode   string `json:"account_code"`
 	AccountName   string `json:"account_name"`
 	ContactPerson string `json:"contact_person"`
 	// Gender                string         `json:"gender"`
