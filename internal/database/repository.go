@@ -64,7 +64,7 @@ type DatabaseRepo interface {
 	GetPurchaseHistoryByMemoNo(memo_no string) ([]*models.Purchase, error)
 	//sales
 	GetSalesHistoryByMemoNo(memo_no string) ([]*models.Sale, error)
-	SaleProducts(sale *models.SalesInvoice) error
+	SaleProductsToCustomer(sale *models.SalesInvoice) error
 	GetSalesHistoryByID(id int) (models.Sale, error)
 	//sale return
 	SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID []int, SaleReturnDate string, ReturnItemsCount int, ReturnAmount int, MemoNo string) error

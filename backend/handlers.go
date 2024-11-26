@@ -826,24 +826,24 @@ func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// SaleProducts sale products, update product items state from in stock to sold in the database
-func (app *application) SaleProducts(w http.ResponseWriter, r *http.Request) {
+// SaleProductsToCustomer sale products, update product items state from in stock to sold in the database
+func (app *application) SaleProductsToCustomer(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var salesInfo models.SalesInvoice
 
 	err = app.readJSON(w, r, &salesInfo)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts:Unable to read JSON => %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer:Unable to read JSON => %w", err))
 		return
 	}
-	err = app.DB.SaleProducts(&salesInfo)
+	err = app.DB.SaleProductsToCustomer(&salesInfo)
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
 		return
 	}
 	cp, err := app.DB.GetCompanyProfile()
 	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: SaleProducts => %w", err))
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
 		return
 	}
 	var resp struct {

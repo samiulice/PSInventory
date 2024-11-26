@@ -176,9 +176,6 @@
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
         <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
-        <div class="text-right">
-          <button class="d-none btn btn-warning" type="button" id="invoiceBtn" onclick="printSalesInvoice()">Print Invoice</button>
-        </div>
         <div id="sale-page-content">
           <!-- Page content here -->
           <form action="#" id="sale-form">
@@ -398,6 +395,7 @@
                         <div id="btns">
                           <br>
                           <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Save</button>
+                          <button class="d-none btn btn-warning" type="button" id="invoiceBtn" onclick="printSalesInvoice()">Print Invoice</button>
                         </div>
                       </div>
                     </div>
@@ -638,6 +636,7 @@
                     InvoiceData = data.sales_invoice_data;
                     company = data.company_profile;
                     document.getElementById("invoiceBtn").classList.remove("d-none");
+                    showSuccessMessage(data.message)
                   }
                 });
             })
