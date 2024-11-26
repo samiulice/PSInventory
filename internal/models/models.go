@@ -93,6 +93,32 @@ type Employee struct {
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }
+type StakeHolder struct {
+	ID            int    `json:"id"`
+	AccountType   string `json:"account_type"`
+	AccountName   string `json:"account_name"`
+	ContactPerson string `json:"contact_person"`
+	// Gender                string         `json:"gender"`
+	// DateOfBith            time.Time      `json:"date_of_birth"`
+	// Experties        string         `json:"exparties"`
+	Division        string    `json:"division"`
+	District        string    `json:"district"`
+	Upazila         string    `json:"upazila"`
+	Area            string    `json:"area"`
+	Mobile          string    `json:"mobile"`
+	DueAmount       int       `json:"due_amount"`
+	WhatsappAccount string    `json:"whatsapp_account"`
+	Email           string    `json:"email"`
+	ImageLink       string    `json:"image_link"`     //username_profile_id_yy-mm-dd_hh-mm-ss.jpg
+	AccountStatus   bool      `json:"account_status"` //Active = true, Inactive = false
+	MonthlySalary   int       `json:"monthly_salary"`
+	OpeningBalance  int       `json:"opening_balance"`
+	CVLink          string    `json:"cv_link"`
+	NIDLink         string    `json:"nid_link"`
+	JoiningDate     time.Time `json:"joining_date"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+}
 
 // Customer is the type for customers
 type Customer struct {

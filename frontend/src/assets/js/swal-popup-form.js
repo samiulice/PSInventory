@@ -1108,6 +1108,219 @@ function addNewSupplier(page, suppliers) {
     }
   });
 }
+
+//addNewStakeHolder show a popup form and then make an api call to insert stakeholder data to the database table
+function addNewStakeHolder() {
+  Swal.fire({
+    title: 'Add Stakeholder',
+    width: 400,
+    html: `
+      <div class="x_panel">
+          <div class="x_content">
+              <form id="add-stake-holder" class="needs-validation" novalidate>
+                  <!-- Account Type -->
+                  <div class="col-4 form-group has-feedback">
+                      <select id="account_type" class="form-control form-select has-feedback-left" required>
+                          <option value="" selected disabled>Select Type</option>
+                          <option value="Owner">Onwer</option>
+                          <option value="Investor">Investor</option>
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)"
+                        class="form-control-feedback left glyphicon glyphicon-home" aria-hidden="true"></span>
+                      <div class="invalid-feedback d-none text-danger">please select account type</div>
+                  </div>
+
+                  <!-- Account Name -->
+                  <div class="col-4 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" id="account_name" name="account_name"
+                          placeholder="Account Name" autocomplete="off" required>
+                      <div class="invalid-feedback d-none text-danger">Please enter the account name.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-user" aria-hidden="true"></span>
+                  </div>
+
+                  <!-- Contact Person Name -->
+                  <div class="col-4 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" id="contact_person" name="contact_person"
+                          placeholder="Contact Person Name" autocomplete="off" required>
+                      <div class="invalid-feedback d-none text-danger">Please enter the contact person name.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-user" aria-hidden="true"></span>
+                  </div>
+
+                  <!-- Mobile Number -->
+                  <div class="col-4 form-group has-feedback">
+                      <input type="tel" pattern="[0]{1}[1]{1}[3-9]{1}[0-9]{8}" class="form-control has-feedback-left" id="mobile" name="mobile"
+                          placeholder="Mobile Number" autocomplete="off" required>
+                      <div class="invalid-feedback d-none text-danger">Please enter a valid mobile number.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-phone" aria-hidden="true"></span>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="col-4 form-group has-feedback">
+                      <input type="email" class="form-control has-feedback-left" id="email" name="email"
+                          placeholder="Email" autocomplete="off">
+                      <div class="invalid-feedback d-none text-danger">Please enter a valid email address.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-envelope" aria-hidden="true"></span>
+                  </div>
+
+                  <!-- Division -->
+                  <div class="col-4 form-group has-feedback">
+                      <select id="division" class="form-control form-select has-feedback-left" 
+                        onchange="updateChildList('division','district', 'divisionToDistrict')" required>
+                          <option value="" selected disabled>Select Division</option>
+                          <option value="Barisal">Barisal</option>
+                          <option value="Chattogram">Chattogram</option>
+                          <option value="Dhaka">Dhaka</option>
+                          <option value="Khulna">Khulna</option>
+                          <option value="Mymensingh">Mymensingh</option>
+                          <option value="Rajshahi">Rajshahi</option>
+                          <option value="Rangpur">Rangpur</option>
+                          <option value="Sylhet">Sylhet</option>
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)"
+                        class="form-control-feedback left glyphicon glyphicon-home" aria-hidden="true"></span>
+                      <div class="invalid-feedback d-none text-danger">Please select a division.</div>
+                  </div>
+
+                  <!-- District -->
+                  <div class="col-4 form-group has-feedback">
+                      <select id="district" class="form-control form-select has-feedback-left"
+                        onchange="updateChildList('district', 'upazila', 'districtToUpazila')" required>
+                          <option value="" selected disabled>Select District</option>
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)"
+                        class="form-control-feedback left glyphicon glyphicon-home" aria-hidden="true"></span>
+                      <div class="invalid-feedback d-none text-danger">Please select a district.</div>
+                  </div>
+
+                  <!-- Upazila -->
+                  <div class="col-4 form-group has-feedback">
+                      <select id="upazila" class="form-control form-select has-feedback-left" required>
+                          <option value="" selected disabled>Select Upazila</option>
+                      </select>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)"
+                        class="form-control-feedback left glyphicon glyphicon-home" aria-hidden="true"></span>
+                      <div class="invalid-feedback d-none text-danger">Please select an upazila.</div>
+                  </div>
+                  <!-- Area -->
+                  <div class="col-4 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" id="area" name="area"
+                          placeholder="Road/House No.(Optional)" autocomplete="off">
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-home" aria-hidden="true"></span>
+                  </div>
+                  <div class="form-group">
+                    <div id="btns" class="col-4">
+                        <br>
+                        <button type="submit" class="btn btn-round btn-success">Submit</button>
+                    </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+    `,
+    showCloseButton: true,
+    showConfirmButton: false,
+    showCancelButton: false,
+    allowOutsideClick: false,
+    preConfirm: () => {
+      return new Promise((resolve) => {
+        const form = document.getElementById('add-stake-holder');
+        const formFields = form.querySelectorAll('.form-control, .form-select');
+        let isValid = true;
+
+        // Reset all feedback messages
+        form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+          feedback.classList.add('d-none');
+        });
+
+        // Check each field
+        formFields.forEach(field => {
+          if (!field.checkValidity()) {
+            isValid = false;
+            const feedback = field.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+              feedback.classList.remove('d-none');
+            }
+          }
+        });
+
+        if (isValid) {
+          resolve({
+            account_type: form.account_type.value,
+            account_name: form.account_name.value,
+            contact_person: form.contact_person.value,
+            mobile: form.mobile.value,
+            email: form.email.value,
+            division: form.division.value,
+            district: form.district.value,
+            upazila: form.upazila.value,
+            area: form.area.value
+          });
+        } else {
+          Swal.showValidationMessage('Please correct the errors in the form.');
+        }
+      });
+    },
+    willOpen: () => {
+      const form = document.getElementById('add-stake-holder');
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+          feedback.classList.add('d-none');
+        });
+        let isValid = true;
+        form.querySelectorAll('.form-control, .form-select').forEach(field => {
+          if (!field.checkValidity()) {
+            isValid = false;
+            const feedback = field.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+              feedback.classList.remove('d-none');
+            }
+          }
+        });
+        if (isValid) {
+          Swal.getConfirmButton().click();
+        } else {
+          Swal.showValidationMessage('Please correct the errors in the form.');
+        }
+      });
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const data = result.value;
+      dis = parseInt(data.discount, 10);
+      let proprietor = {
+        account_type: data.account_type,
+        account_name: data.account_name,
+        contact_person: data.contact_person,
+        mobile: data.mobile,
+        email: data.email,
+        division: data.division,
+        district: data.district,
+        upazila: data.upazila,
+        area: data.area
+      }
+      const requestOptions = {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(proprietor),
+      }
+
+      fetch('http://localhost:4321/api/admin/add-stake-holder', requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error === true) {
+            showErrorMessage(data.message)
+          } else {
+            showSuccessMessage(data.message);
+          }
+        });
+    }
+  });
+}
 //checkoutWarrantyProducts show a popup checkout warranty for and make an api call to update database table for checkout process
 function checkoutWarrantyProducts(warrantyHistoryID, productSerialNo, productSerialID) {
 
