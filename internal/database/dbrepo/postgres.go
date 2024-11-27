@@ -12,6 +12,39 @@ import (
 	"time"
 )
 
+// GetDashBoardData retrieves dashboard data
+func (p *postgresDBRepo) GetDashBoardData() (interface{}, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	//total sale
+	//total purchase
+	//total employee
+	//total customer
+	//total supplier
+	query := `
+		SELECT 
+    (SELECT COUNT(*) FROM public.employees) AS total_employee,
+    (SELECT COUNT(*) FROM public.suppliers) AS total_customer,
+    (SELECT COUNT(*) FROM public.customers) AS total_supplier,
+    (SELECT COALESCE(SUM(total_purchases - total_purchase_returns), 0) FROM public.top_sheet) AS total_purchase_value,
+    (SELECT COALESCE(SUM(total_sales - total_sale_returns), 0) FROM public.top_sheet) AS total_sale_value,
+	(SELECT COALESCE(SUM(total_expenses), 0) FROM public.top_sheet) AS total_expense
+`
+	var data struct {
+		TotalEmployee int `json:"total_employee"`
+		TotalCustomer int `json:"total_customer"`
+		TotalSupplier int `json:"total_supplier"`
+		TotalPurchase int `json:"total_purchase"`
+		TotalSale     int `json:"total_sale"`
+		TotalExpense     int `json:"total_expense"`
+	}
+	err := p.DB.QueryRowContext(ctx, query).Scan(&data.TotalEmployee, &data.TotalSupplier, &data.TotalCustomer, &data.TotalPurchase, &data.TotalSale, &data.TotalExpense)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 //.......................HR Management.......................
 
 // AddHeadAccount inserts new head account information to the database
@@ -2349,7 +2382,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	`
 	_, err = tx.ExecContext(ctx, query,
 		&purchase.PurchaseDate,
-		&purchase.TotalAmount,
+		&purchase.BillAmount,
 		&purchase.PaidAmount,
 		&purchase_discount,
 		&purchase.TotalAmount,
@@ -2685,7 +2718,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 
 	_, err = tx.ExecContext(ctx, query,
 		&sale.SaleDate,
-		&sale.TotalAmount,
+		&sale.BillAmount,
 		&sale.PaidAmount,
 		&sale_discount,
 		&sale.GrossProfit,
