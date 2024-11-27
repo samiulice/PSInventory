@@ -22,6 +22,25 @@ func (app *application) PathNotFound(w http.ResponseWriter, r *http.Request) {
 	// Serve the custom 404 HTML page
 	http.ServeFile(w, r, "frontend/src/404.html")
 }
+func (app *application) FetchDashBoardData(w http.ResponseWriter, r *http.Request) {
+	data, err := app.DB.GetDashBoardData()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:FetchDashBoardData: Unable to get data %w", err))
+		return
+	}
+
+	var resp struct {
+		Error   bool        `json:"error,omitempty"`
+		Message string      `json:"message,omitempty"`
+		Result  interface{} `json:"result,omitempty"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Result = data
+
+	app.writeJSON(w,http.StatusOK, resp)
+}
 func (app *application) FetchCompanyProfile(w http.ResponseWriter, r *http.Request) {
 
 	cp, err := app.DB.GetCompanyProfile()

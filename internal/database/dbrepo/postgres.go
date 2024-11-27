@@ -12,6 +12,33 @@ import (
 	"time"
 )
 
+// GetDashBoardData retrieves dashboard data
+func (p *postgresDBRepo) GetDashBoardData() (interface{}, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	//total sale
+	//total purchase
+	//total employee
+	//total customer
+	//total supplier
+	query := `
+		SELECT 
+			(SELECT COUNT(*) FROM public.employees) as total_employee,
+			(SELECT COUNT(*) FROM public.suppliers) as total_customer,
+			(SELECT COUNT(*) FROM public.customers) as total_supplier
+	`
+	var data struct {
+		TotalEmployee int `json:"total_employee"`
+		TotalCustomer int `json:"total_customer"`
+		TotalSupplier int `json:"total_supplier"`
+	}
+	err := p.DB.QueryRowContext(ctx, query).Scan(&data.TotalEmployee, &data.TotalSupplier, &data.TotalCustomer)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 //.......................HR Management.......................
 
 // AddHeadAccount inserts new head account information to the database
@@ -145,7 +172,7 @@ func (p *postgresDBRepo) UpdateHeadAccountBalance(id, balance int) error {
 //.......................Administrative Panel.....................
 
 // AddNewStakeHolder inserts new stakeholder information to the database
-func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder)(int,error) {
+func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var id int
@@ -177,6 +204,7 @@ func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder)(int,error) {
 
 	return id, nil
 }
+
 //.......................HR Management.......................
 
 // AddEmployee inserts new employee information to the database
@@ -2347,7 +2375,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	`
 	_, err = tx.ExecContext(ctx, query,
 		&purchase.PurchaseDate,
-		&purchase.TotalAmount,
+		&purchase.BillAmount,
 		&purchase.PaidAmount,
 		&purchase_discount,
 		&purchase.TotalAmount,
@@ -2683,7 +2711,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 
 	_, err = tx.ExecContext(ctx, query,
 		&sale.SaleDate,
-		&sale.TotalAmount,
+		&sale.BillAmount,
 		&sale.PaidAmount,
 		&sale_discount,
 		&sale.GrossProfit,

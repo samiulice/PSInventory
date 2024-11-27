@@ -5,6 +5,7 @@ import (
 )
 
 type DatabaseRepo interface {
+	GetDashBoardData()(interface{} , error)
 	//Head Accounts
 	AddHeadAccount(ha models.HeadAccount) (int, error)
 	GetAvailableHeadAccounts() ([]*models.HeadAccount, error)
