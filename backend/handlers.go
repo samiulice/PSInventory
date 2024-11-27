@@ -1287,17 +1287,13 @@ func (app *application) CompleteAmountPayableProcess(w http.ResponseWriter, r *h
 	}
 	err := app.readJSON(w, r, &amountPayableSummary)
 	if err != nil {
-		resp.Error = true
-		resp.Message = "Unable to read JSON: " + err.Error()
-		app.writeJSON(w, http.StatusAccepted, resp)
+		app.badRequest(w,fmt.Errorf("unable to read JSON: %w", err))
 		return
 	}
 
 	err = app.DB.CompleteAmountPayableTransactions(amountPayableSummary)
 	if err != nil {
-		resp.Error = true
-		resp.Message = "Unable to read JSON: " + err.Error()
-		app.writeJSON(w, http.StatusAccepted, resp)
+		app.badRequest(w,fmt.Errorf("unable to Insert data: %w", err))
 		return
 	}
 	resp.Message = "Success"
@@ -1347,7 +1343,7 @@ func (app *application) CompleteAmountReceivableProcess(w http.ResponseWriter, r
 	err = app.DB.CompleteAmountReceivableTransactions(amountReceivableSummary)
 	if err != nil {
 		resp.Error = true
-		resp.Message = "Unable to read JSON: " + err.Error()
+		resp.Message = err.Error()
 		app.writeJSON(w, http.StatusAccepted, resp)
 		return
 	}

@@ -145,7 +145,7 @@ func (p *postgresDBRepo) UpdateHeadAccountBalance(id, balance int) error {
 //.......................Administrative Panel.....................
 
 // AddNewStakeHolder inserts new stakeholder information to the database
-func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder)(int,error) {
+func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var id int
@@ -177,6 +177,7 @@ func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder)(int,error) {
 
 	return id, nil
 }
+
 //.......................HR Management.......................
 
 // AddEmployee inserts new employee information to the database
@@ -2025,6 +2026,7 @@ func (p *postgresDBRepo) GetExpenseList() ([]*models.ExpenseType, error) {
 	query := `
 		SELECT id, expense_name, total_expense, updated_at, created_at
 		FROM public.expense_list
+		ORDER BY id ASC
 	`
 	rows, err := p.DB.QueryContext(ctx, query)
 	if err != nil {
@@ -3129,26 +3131,20 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		stmt := `
 			UPDATE public.head_accounts
 			SET current_balance = current_balance + $1, amount_receivable = amount_receivable - $2, updated_at = $3
-			WHERE id = $4 RETURNING current_balance`
-
+			WHERE id = $4 RETURNING current_balance;
+		`
 		err = tx.QueryRowContext(ctx, stmt, sum.ReceivedAmount, sum.ReceivedAmount, time.Now(), sum.DestinationAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to update current_balance in head_accounts table: %w", err)
 		}
 
-		//convert receivedDate into go supported date
-		txDate, err := time.Parse("01/02/2006", sum.ReceivedDate)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable parse time in go supported format: %w", err)
-		}
 		//insert to financial transactions
 		stmt = `
 			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
-			VALUES('Receive & Collection', 'customers', $1, 'head_accounts', $2, $3, $4, $5, $6, $7)
+			VALUES('Receive & Collection', 'customers', $1, 'head_accounts', $2, $3, TO_DATE($4,'MM/DD/YYYY'), $5, $6, $7, $8, $9)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.ReceivedAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.ReceivedAmount, sum.ReceivedDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3157,23 +3153,22 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		//Tx: update top_sheet data if the sheet_date for entry for current date already exist,
 		//Otherwise insert a new row  in the top_sheet table
 		query := `
-			INSERT INTO public.top_sheet (
-				sheet_date, 
-				total_received_payments,
-				updated_at
-			) 
-			VALUES (
-				TO_DATE($1, 'MM/DD/YYYY'), $2, $3
-			)
-			ON CONFLICT (sheet_date) 
-			DO UPDATE SET 
-				total_received_payments = public.top_sheet.total_received_payments + EXCLUDED.total_received_payments,
-				updated_at = CURRENT_TIMESTAMP;
-		`
+		INSERT INTO public.top_sheet (
+			sheet_date, 
+			total_received_payments, 
+			initial_stock_value
+		) 
+		VALUES (
+			 TO_DATE($1, 'MM/DD/YYYY'), $2, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)
+		)
+		ON CONFLICT (sheet_date) 
+		DO UPDATE SET 
+			total_received_payments = public.top_sheet.total_received_payments + EXCLUDED.total_received_payments,
+			updated_at = CURRENT_TIMESTAMP;
+	`
 		_, err = tx.ExecContext(ctx, query,
 			&sum.ReceivedDate,
 			&sum.ReceivedAmount,
-			time.Now(),
 		)
 		if err != nil {
 			tx.Rollback()
@@ -3240,7 +3235,7 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 		//insert to financial transactions
 		stmt = `
 			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
-			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, $4, $5, $6, $7)
+			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, $4, $5, $6, $7, $8, $9)
 		`
 		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
@@ -3250,25 +3245,23 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 
 		//Tx: update top_sheet data if the sheet_date for entriy for current date already exist,
 		//Otherwise insert a new row  in the top_sheet table
-
 		query := `
-			INSERT INTO public.top_sheet (
-				sheet_date, 
-				total_payments,
-				updated_at
-			) 
-			VALUES (
-				TO_DATE($1, 'MM/DD/YYYY'), $2, $3
-			)
-			ON CONFLICT (sheet_date) 
-			DO UPDATE SET 
-				total_payments = public.top_sheet.total_payments + EXCLUDED.total_payments,
-				updated_at = CURRENT_TIMESTAMP;
+		INSERT INTO public.top_sheet (
+			sheet_date, 
+			total_payments, 
+			initial_stock_value
+		) 
+		VALUES (
+			 TO_DATE($1, 'MM/DD/YYYY'), $2, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)
+		)
+		ON CONFLICT (sheet_date) 
+		DO UPDATE SET 
+			total_payments = public.top_sheet.total_payments + EXCLUDED.total_payments,
+			updated_at = CURRENT_TIMESTAMP;
 		`
 		_, err = tx.ExecContext(ctx, query,
 			&sum.PaymentDate,
 			&sum.PaidAmount,
-			time.Now(),
 		)
 		if err != nil {
 			tx.Rollback()
@@ -3373,12 +3366,13 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 	for _, sum := range summary {
 		//update customers/suppliers/employees accounts
 		//update head_accounts
-		stmt := `
-			UPDATE public.` + sum.AccountType + `
-			SET due_amount = due_amount - $1, updated_at = $2
-			WHERE id = $3
-		`
-		_, err = tx.ExecContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.AccountID)
+		stmt := fmt.Sprintf(`
+			UPDATE public.%s
+			SET due_amount = due_amount - $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2
+		`, sum.AccountType)
+		fmt.Println("account id : ", sum.AccountID)
+		_, err = tx.ExecContext(ctx, stmt, sum.PayableAmount, sum.AccountID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in %s table: %w", sum.AccountType, err)
@@ -3389,23 +3383,21 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 			SET amount_payable = amount_payable + $1, updated_at = $2
 			WHERE id = $3 RETURNING current_balance`
 
+		if sum.HeadAccount.ID == 0 {
+			sum.HeadAccount.ID = 1
+		}
 		err = tx.QueryRowContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.HeadAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in suppliers table: %w", err)
+			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in head_accounts table: %w", err)
 		}
-		//convert receivedDate into go supported date
-		txDate, err := time.Parse("01/02/2006", sum.Date)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable parse time in go supported format: %w", err)
-		}
+
 		//insert to financial transactions
 		stmt = `
 			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
-			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, $5, $6, $7, $8)
+			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, TO_DATE($5, 'MM/DD/YYYY'), $6, $7, $8, $9,$10)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.PayableAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.PayableAmount, sum.Date, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
@@ -3457,18 +3449,12 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update head_accounts table: %w", err)
 		}
-		//convert receivedDate into go supported date
-		txDate, err := time.Parse("01/02/2006", sum.Date)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable parse time in go supported format: %w", err)
-		}
 		//insert to financial transactions
 		stmt = `
 			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
-			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, $5, $6, $7, $8)
+			VALUES('Amount Receivable', $1, $2, 'head_accounts', $3, $4, TO_DATE($5,'MM/DD/YYYY'), $6, $7, $8, $9,$10)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.ReceivableAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.AccountType, sum.AccountID, sum.HeadAccount.ID, sum.ReceivableAmount, sum.Date, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable Insert into financial_transaction table(type-2): %w", err)
@@ -3509,18 +3495,12 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update current_balance in head_accounts table: %w", err)
 		}
 
-		//convert expenseDate into go supported date
-		txDate, err := time.Parse("01/02/2006", sum.ExpenseDate)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable parse time in go supported format: %w", err)
-		}
 		//insert to financial transactions
 		stmt = `
 			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
-			VALUES('Expense', 'head_accounts', $1, 'expenses', 0, $2, $3, $4, $5, $6, $7, $8)
+			VALUES('Expense', 'head_accounts', $1, 'expenses', 0, $2, TO_DATE($3, 'MM/DD/YYYY'), $4, $5, $6, $7, $8)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.ExpenseAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.ExpenseAmount, sum.ExpenseDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3535,6 +3515,56 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable Insert into expense_history table: %w", err)
+		}
+
+		exp_type := []string{
+			"",
+			"miscellaneous",
+			"rent",
+			"utilities",
+			"salaries_and_wages",
+			"advertising_and_promotions",
+			"maintenance_and_repairs",
+			"office_supplies",
+			"insurance",
+			"delivery_and_freight_charges",
+			"depreciation",
+			"taxes_and_licenses",
+			"inventory_costs",
+			"office_expense",
+			"travel_expense",
+			"training_and_development",
+			"bank_charges_and_fees",
+			"interest_on_loans",
+			"software_and_subscriptions",
+			"security_costs",
+			"waste_disposal",
+			"non_operating_income",
+			"non_operating_expense",
+		}
+		expense_type := exp_type[sum.ExpenseType.ID]
+		//update top_sheet
+		stmt = fmt.Sprintf(`
+		INSERT INTO public.top_sheet (
+			sheet_date,
+			total_expenses,
+			%s,
+			initial_stock_value
+		)
+		VALUES (
+			 TO_DATE($1, 'MM/DD/YYYY'), $2, $3, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)
+		)
+		ON CONFLICT (sheet_date)
+		DO UPDATE SET
+			total_expenses = public.top_sheet.total_expenses + EXCLUDED.total_expenses,
+			%s = public.top_sheet.%s + EXCLUDED.%s,
+			updated_at = CURRENT_TIMESTAMP;
+		`, expense_type, expense_type, expense_type, expense_type)
+
+		_, err = tx.ExecContext(ctx, stmt, sum.ExpenseDate, sum.ExpenseAmount, sum.ExpenseAmount)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => failed to update or  Insert into top_sheet table: %w", err)
 		}
 	}
 
@@ -4198,7 +4228,7 @@ func (p *postgresDBRepo) GetIncomeStatementData(startDate, endDate string) (mode
 			WHERE sheet_date BETWEEN TO_DATE($1, 'MM/DD/YYYY') AND TO_DATE($2, 'MM/DD/YYYY')
 		),
 		last_value AS (
-			SELECT opening_stock AS last_opening_stock_value
+			SELECT initial_stock_value AS last_initial_stock_value
 			FROM public.top_sheet
 			WHERE sheet_date BETWEEN TO_DATE($1, 'MM/DD/YYYY') AND TO_DATE($2, 'MM/DD/YYYY')
 			ORDER BY sheet_date DESC
@@ -4206,7 +4236,7 @@ func (p *postgresDBRepo) GetIncomeStatementData(startDate, endDate string) (mode
 		)
 		SELECT 
 			aggregated.*,
-			last_value.last_opening_stock_value
+			last_value.last_initial_stock_value
 		FROM aggregated, last_value;
 `
 

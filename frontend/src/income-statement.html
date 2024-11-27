@@ -303,6 +303,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.error === true) {
+                        console.log(data)
                         if (data.message.includes("no row")) {
                             Swal.fire({
                                 title: "No data available",
@@ -321,7 +322,7 @@
                     }
                     ins = data.report;
                     company = data.company_profile;
-                    console.log(data)
+                    
                     updateIncomeStatement()
                     document.getElementById("printBtn").classList.remove('d-none');
 
