@@ -375,6 +375,19 @@ type AmountTransfer struct {
 	CreatedAt          time.Time    `json:"created_at"`
 	UpdatedAt          time.Time    `json:"updated_at"`
 }
+// Adjustment is the definition for cash adjustment info
+type Adjustment struct {
+	VoucherNo          string       `json:"voucher_no"`
+	TransactionDate    string       `json:"transaction_date"`
+	TransferAmount     int          `json:"transfer_amount"`
+	SourceAccount      *StakeHolder `json:"source_account"`
+	DestinationAccount *HeadAccount `json:"destination_account"`
+	ChequeNo           string       `json:"cheque_no"`
+	Carrier            string       `json:"carrier_info"`
+	Description        string       `json:"description"`
+	CreatedAt          time.Time    `json:"created_at"`
+	UpdatedAt          time.Time    `json:"updated_at"`
+}
 
 // AmountPayable is the definition for amount payable info
 type AmountPayable struct {

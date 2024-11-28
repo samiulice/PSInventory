@@ -39,7 +39,7 @@ func (app *application) FetchDashBoardData(w http.ResponseWriter, r *http.Reques
 	resp.Message = "Data fetched successfully"
 	resp.Result = data
 
-	app.writeJSON(w,http.StatusOK, resp)
+	app.writeJSON(w, http.StatusOK, resp)
 }
 func (app *application) FetchCompanyProfile(w http.ResponseWriter, r *http.Request) {
 
@@ -1306,13 +1306,13 @@ func (app *application) CompleteAmountPayableProcess(w http.ResponseWriter, r *h
 	}
 	err := app.readJSON(w, r, &amountPayableSummary)
 	if err != nil {
-		app.badRequest(w,fmt.Errorf("unable to read JSON: %w", err))
+		app.badRequest(w, fmt.Errorf("unable to read JSON: %w", err))
 		return
 	}
 
 	err = app.DB.CompleteAmountPayableTransactions(amountPayableSummary)
 	if err != nil {
-		app.badRequest(w,fmt.Errorf("unable to Insert data: %w", err))
+		app.badRequest(w, fmt.Errorf("unable to Insert data: %w", err))
 		return
 	}
 	resp.Message = "Success"
@@ -1425,17 +1425,24 @@ func (app *application) CompleteExpensesProcess(w http.ResponseWriter, r *http.R
 func (app *application) GetAdjustmentPageDetails(w http.ResponseWriter, r *http.Request) {
 
 	var resp struct {
-		Error       bool                  `json:"error"`
-		Message     string                `json:"message"`
+		Error        bool                  `json:"error"`
+		Message      string                `json:"message"`
 		StakeHolders []*models.StakeHolder `json:"stakeholders"`
-		Accounts    []*models.HeadAccount `json:"head_accounts"`
+		Accounts     []*models.HeadAccount `json:"head_accounts"`
 	}
 
-	accounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
+	acc, err := app.DB.GetAvailableHeadAccountsByType("CAPITAL ACCOUNTS")
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR: GetAdjustmentPageDetails => %w", err))
 		return
 	}
+	resp.Accounts = append(resp.Accounts, acc...)
+	acc, err = app.DB.GetAvailableHeadAccountsByType("LOAN ACCOUNTS")
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAdjustmentPageDetails => %w", err))
+		return
+	}
+	resp.Accounts = append(resp.Accounts, acc...)
 	stk, err := app.DB.GeActiveStakeHolderList()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR: GetAdjustmentPageDetails => %w", err))
@@ -1443,7 +1450,34 @@ func (app *application) GetAdjustmentPageDetails(w http.ResponseWriter, r *http.
 	}
 	resp.Message = "Data fetched successfully"
 	resp.StakeHolders = stk
-	resp.Accounts = accounts
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+func (app *application) CompleteAdjustmentProcess(w http.ResponseWriter, r *http.Request) {
+	var Summary []*models.Adjustment
+
+	var resp struct {
+		Error   bool   `json:"error,omitempty"`
+		Message string `json:"message,omitempty"`
+	}
+
+	err := app.readJSON(w, r, &Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to read JSON: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	err = app.DB.CompleteAdjustmentProcess(Summary)
+	if err != nil {
+		resp.Error = true
+		resp.Message = "Unable to complete amount transfer process: " + err.Error()
+		app.writeJSON(w, http.StatusAccepted, resp)
+		return
+	}
+	//complete the process
+	resp.Error = false
+	resp.Message = "Cash adjustment successful"
 	app.writeJSON(w, http.StatusOK, resp)
 }
 

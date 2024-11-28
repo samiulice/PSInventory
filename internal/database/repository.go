@@ -95,8 +95,10 @@ type DatabaseRepo interface {
 	CompleteAmountPayableTransactions(summary []*models.AmountPayable) error
 	//Amount Receivable
 	CompleteAmountReceivableTransactions(summary []*models.AmountReceivable) error
-	//Amount Receivable
+	//Expenses
 	CompleteExpensesTransactions(summary []*models.Expense) error
+	//Cash-Adjustment
+	CompleteAdjustmentProcess(summary []*models.Adjustment) error
 	//Inventory Reports
 	GetAllEmployeesList() ([]*models.Employee, error)
 	GetAllSuppliersList() ([]*models.Supplier, error)

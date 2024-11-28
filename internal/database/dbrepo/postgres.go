@@ -3640,6 +3640,63 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 	return nil
 }
 
+func (p *postgresDBRepo) CompleteAdjustmentProcess(summary []*models.Adjustment) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	//Begin transaction
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable to begin transaction: %w", err)
+	}
+
+	for _, sum := range summary {
+		//update Source account
+		//set current_balance -= received_amount
+		stmt := `
+			UPDATE public.company_stakeholders
+			SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, sum.SourceAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable to update current_balance in company_stakeholders table: %w", err)
+		}
+		//update Destination account
+		//set current_balance += received_amount
+		stmt = `
+			UPDATE public.head_accounts
+			SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2`
+
+		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, sum.DestinationAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable to update current_balance in head_accounts table: %w", err)
+		}
+
+		//insert to financial transactions
+		stmt = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
+			VALUES('Cash Adjustment', 'stakeholders', $1, 'head_accounts', $2, $3, TO_DATE($4,'MM/DD/YYYY'), $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.TransferAmount, sum.TransactionDate, sum.VoucherNo, sum.Description)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable Insert into financial_transaction table: %w", err)
+		}
+	}
+
+	//commit transaction
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable to commit: %w", err)
+	}
+	return nil
+}
+
 // .......................Inventory Reports.......................
 // GetCategoryListReport returns a list of all categories with detailed info from categories table
 func (p *postgresDBRepo) GetCategoryListReport() ([]*models.Category, error) {

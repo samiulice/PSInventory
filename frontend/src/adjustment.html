@@ -421,7 +421,7 @@
           return
         } else if (source.value === "") {
           Swal.fire({
-            title: "Select Cash-bank(From) Account",
+            title: "Select Stakeholder(From) Account",
             icon: "error"
           });
           return
@@ -499,7 +499,7 @@
           body: JSON.stringify(transaction_summary),
         }
         console.log(transaction_summary)
-        fetch('http://localhost:4321/api/accounts/amount-transfer/complete-submission', requestOptions)
+        fetch('http://localhost:4321/api/accounts/adjustment/complete-submission', requestOptions)
           .then(response => response.json())
           .then(data => {
             console.log("resp : ", data)
@@ -656,7 +656,7 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Payment Summary</div>
+              <div class="caption">Cash Adjustment</div>
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>
