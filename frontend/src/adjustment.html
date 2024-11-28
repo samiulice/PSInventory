@@ -175,14 +175,12 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>AMOUNT TRANSFER</label></h2>
+        <h2 class="text-center text-warning fa-2x"><label>Adjustment</label></h2>
         <!-- Page content here -->
         <!-- ReceiveCollection Details Section  -->
         <div class="x_panel bg-gw" id="form-content">
           <div class="x_title">
             <h2>Transfer Form</h2>
-            <div style="color: rgb(255, 0, 0); float: right;">Current Balance: &nbsp;&#2547; <label
-                id="current_balance">0</b></label></div>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -202,7 +200,7 @@
                 <div class="row form-group has-feedback">
                   <div class="col-md-12 col-sm-12 col-xs-12">
                     <label for="destination">To *: </label>
-                    <select class="form-control  has-feedback-left" id="destination" required disabled>
+                    <select class="form-control  has-feedback-left" id="destination" required>
                       <option value="" selected disabled>Select An Account</option>
                     </select>
                     <i style="color: black;" class="form-control-feedback fa fa-bank left" aria-hidden="true"></i>
@@ -271,7 +269,7 @@
 
           </div>
         </div>
-        <form action="#" id="amountTransferForm">
+        <form action="#" id="adjustmentForm">
           <!-- /page content -->
           <!-- Received section -->
           <!-- Table row -->
@@ -352,20 +350,21 @@
     <script src="assets/sweetalert2/sweetalert2.all.min.js"></script>
 
     <script>
-      let accounts, currentBalance, transaction_summary = [];
+      let accounts, stakeholders, transaction_summary = [];
       window.addEventListener("DOMContentLoaded", () => {
         // fetch-1: On load window Get accounts for destination and suppliers who have due amount
         const requestOptions = {
           method: 'post'
         }
-        fetch('http://localhost:4321/api/accounts/amount-transfer/get-page-details', requestOptions)
+        fetch('http://localhost:4321/api/accounts/adjustment/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
+            console.log(data)
             if (data.error === true) {
               showErrorMessage(data.message)
             } else {
               accounts = data.head_accounts;
-              console.log(data)
+              stakeholders = data.stakeholders;
               updatePage();
             }
           })
@@ -374,44 +373,25 @@
       function updatePage() {
         let source = document.getElementById("source");
         source.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
-        if (accounts) {
-          accounts.forEach((ac, i) => {
-            if (ac.current_balance > 0) {
-              source.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
-            }
+        if (stakeholders) {
+          stakeholders.forEach((ac, i) => {
+            source.innerHTML += `<option value="${i}">${ac.account_name}[${ac.account_code}]</option>`;
           });
         } else {
           source.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
           source.ariaDisabled = true;
         }
-      }
 
-      //change due_amount section on changing customer selection
-      document.getElementById("source").addEventListener("change", () => {
-        let source = document.getElementById("source");
-        let sourceValue = parseInt(source.value);
-        currentBalance = accounts[sourceValue].current_balance;
-        document.getElementById("current_balance").innerText = currentBalance;
-        document.getElementById("amount").max = currentBalance;
-
-        let destination = document.getElementById("destination");
-        let flag = false;
         destination.innerHTML = `<option value="" selected disabled>Select An Account</option>`;
         if (accounts) {
           accounts.forEach((ac, i) => {
-            if (ac.current_balance > 0 && sourceValue !== i) {
-              destination.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
-              flag = true
-            }
+            destination.innerHTML += `<option value="${i}">${ac.account_name}-${ac.account_type}</option>`;
           });
-        }
-        if (flag === true){
-          destination.disabled = false;
         } else {
           destination.innerHTML = `<option value="" selected disabled>No Account Available</option>`;
           destination.disabled =  true;
         }
-      })
+      }
 
       function addToSummary() {
         let transactionDate = document.getElementById("single_cal4").value;
@@ -421,12 +401,12 @@
         let chqNo = document.getElementById("chq-no");
         let carrier = document.getElementById("carrier");
         let description = document.getElementById("description");
-        let voucherNo = `V-AMT-${generateRandomAlphanumericCode(6)}`
+        let voucherNo = `V-ADJ-${generateRandomAlphanumericCode(6)}`
         let sm = {
           voucher_no: voucherNo,
           transaction_date: transactionDate,
           transfer_amount: parseInt(amount.value),
-          source_account: accounts[parseInt(source.value)],
+          source_account: stakeholders[parseInt(source.value)],
           destination_account: accounts[parseInt(destination.value)],
           cheque_no: chqNo.value,
           carrier_info: carrier.value,
@@ -456,12 +436,6 @@
         else if (amount.value === '') {
           Swal.fire({
             title: "Amount must be greater than 0",
-            icon: "error"
-          });
-          return
-        } else if (amount.value > currentBalance) {
-          Swal.fire({
-            title: `Amount exceeds max limit(&#2547; ${currentBalance})`,
             icon: "error"
           });
           return
@@ -503,7 +477,7 @@
       }
 
       //submit the form
-      document.getElementById("amountTransferForm").addEventListener("submit", event => {
+      document.getElementById("adjustmentForm").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
         //check empty list

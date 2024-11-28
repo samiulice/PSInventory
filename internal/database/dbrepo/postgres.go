@@ -36,7 +36,7 @@ func (p *postgresDBRepo) GetDashBoardData() (interface{}, error) {
 		TotalSupplier int `json:"total_supplier"`
 		TotalPurchase int `json:"total_purchase"`
 		TotalSale     int `json:"total_sale"`
-		TotalExpense     int `json:"total_expense"`
+		TotalExpense  int `json:"total_expense"`
 	}
 	err := p.DB.QueryRowContext(ctx, query).Scan(&data.TotalEmployee, &data.TotalSupplier, &data.TotalCustomer, &data.TotalPurchase, &data.TotalSale, &data.TotalExpense)
 	if err != nil {
@@ -2074,6 +2074,36 @@ func (p *postgresDBRepo) GetExpenseList() ([]*models.ExpenseType, error) {
 		expList = append(expList, &exp)
 	}
 	return expList, nil
+}
+
+// GeActiveStakeHolderList retrieves stakeholders list from the database
+func (p *postgresDBRepo) GeActiveStakeHolderList() ([]*models.StakeHolder, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var stkList []*models.StakeHolder
+
+	query := `
+		SELECT 
+			id, account_type, account_code, account_name
+		FROM
+			public.company_stakeholders
+		WHERE 
+			account_status = true
+		ORDER BY updated_at ASC
+	`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return stkList, fmt.Errorf("DBERROR: GeActiveStakeHolderList: Unable to retrieve data101: %w", err)
+	}
+	for rows.Next() {
+		var stk models.StakeHolder
+		err = rows.Scan(&stk.ID, &stk.AccountType, &stk.AccountCode, &stk.AccountName)
+		if err != nil {
+			return stkList, fmt.Errorf("DBERROR: GeActiveStakeHolderList: Unable to scan row: %w", err)
+		}
+		stkList = append(stkList, &stk)
+	}
+	return stkList, nil
 }
 
 // UpdateProductItemStatusByProductSerialNumber updates the status of the product unit in product_serial_numbers Table

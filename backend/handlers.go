@@ -1421,6 +1421,32 @@ func (app *application) CompleteExpensesProcess(w http.ResponseWriter, r *http.R
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// GetAdjustmentPageDetails scarp data for adjustment page
+func (app *application) GetAdjustmentPageDetails(w http.ResponseWriter, r *http.Request) {
+
+	var resp struct {
+		Error       bool                  `json:"error"`
+		Message     string                `json:"message"`
+		StakeHolders []*models.StakeHolder `json:"stakeholders"`
+		Accounts    []*models.HeadAccount `json:"head_accounts"`
+	}
+
+	accounts, err := app.DB.GetAvailableHeadAccountsByType("CASH & BANK ACCOUNTS")
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAdjustmentPageDetails => %w", err))
+		return
+	}
+	stk, err := app.DB.GeActiveStakeHolderList()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: GetAdjustmentPageDetails => %w", err))
+		return
+	}
+	resp.Message = "Data fetched successfully"
+	resp.StakeHolders = stk
+	resp.Accounts = accounts
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
 // ClaimWarrantyBySerialID handles claiming warranty process for a specific product item with serial ID
 func (app *application) ClaimWarrantyBySerialID(w http.ResponseWriter, r *http.Request) {
 	var payload struct {

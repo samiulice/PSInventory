@@ -50,6 +50,7 @@ type DatabaseRepo interface {
 	GetAllProductsByCategoryID(cat_id int) ([]*models.Product, error)
 	GetAvailableProductsDetails() ([]*models.Product, error)
 	GetExpenseList()([]*models.ExpenseType, error)
+	GeActiveStakeHolderList() ([]*models.StakeHolder, error)
 
 	GetInStockProductListByPurchaseIDAndProductID(purchaseID, productID int) (*models.Product, error)
 	GetSoldProductListBySalesIDAndProductID(SalesID, productID int) (*models.Product, error)
