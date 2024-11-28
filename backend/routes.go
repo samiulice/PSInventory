@@ -95,7 +95,7 @@ func (app *application) routes() http.Handler {
 		mux.Post("/accounts/expenses/complete-submission", app.CompleteExpensesProcess)
 		//Amount Receivable
 		mux.Post("/accounts/adjustment/get-page-details", app.GetAdjustmentPageDetails)
-		// mux.Post("/accounts/adjustment/complete-submission", app.CompleteAdjustmentProcess)
+		mux.Post("/accounts/adjustment/complete-submission", app.CompleteAdjustmentProcess)
 
 		mux.NotFound(app.PathNotFound)
 		//.......................Inventory Reports.......................

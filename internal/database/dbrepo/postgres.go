@@ -3655,15 +3655,27 @@ func (p *postgresDBRepo) CompleteAdjustmentProcess(summary []*models.Adjustment)
 		//set current_balance -= received_amount
 		stmt := `
 			UPDATE public.company_stakeholders
-			SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
+			SET total_investment = total_investment + $1, updated_at = CURRENT_TIMESTAMP
 			WHERE id = $2`
 
 		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, sum.SourceAccount.ID)
 		if err != nil {
 			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable to update current_balance in company_stakeholders table: %w", err)
+			return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable to update total_investment in company_stakeholders table: %w", err)
 		}
 		//update Destination account
+		//set current_balance += received_amount
+		var current_balance int
+		stmt = `
+			UPDATE public.head_accounts
+			SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = 1`
+
+		err = tx.QueryRowContext(ctx, stmt, sum.TransferAmount).Scan(&current_balance)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteAdjustmentProcess => Unable to update current_balance in head_accounts table: %w", err)
+		}
 		//set current_balance += received_amount
 		stmt = `
 			UPDATE public.head_accounts
@@ -3678,8 +3690,8 @@ func (p *postgresDBRepo) CompleteAdjustmentProcess(summary []*models.Adjustment)
 
 		//insert to financial transactions
 		stmt = `
-			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
-			VALUES('Cash Adjustment', 'stakeholders', $1, 'head_accounts', $2, $3, TO_DATE($4,'MM/DD/YYYY'), $5, $6)
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
+			VALUES('Cash Adjustment', 'company_stakeholders', $1, 'head_accounts', $2, $3,  TO_DATE($4,'MM/DD/YYYY'), $5, $6, $7, $8,$9)
 		`
 		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.TransferAmount, sum.TransactionDate, sum.VoucherNo, sum.Description)
 		if err != nil {
