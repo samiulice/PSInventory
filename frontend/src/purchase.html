@@ -100,7 +100,7 @@
                     <li><a href="amount-receivable.html">Amount Receivable</a></li>
                     <li><a href="amount-payable.html">Amount Payable</a></li>
                     <li><a href="expenses.html">Expenses</a></li>
-                    <li><a href="adjustment.html">Adjustment</a></li>
+                    <li><a href="fund-acquisition.html">Fund Acquisition</a></li>
                     <li><a href="#bank-reconciliation.html">Bank Reconciliation</a></li>
                     <li><a href="#transaction-posting.html">Transaction Posting</a></li>
                   </ul>
@@ -120,8 +120,8 @@
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
                         <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
                         <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
-                        <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
-                        <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
+                        <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
+                        <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
                     </li>
                   </ul>
                 </li>
@@ -171,7 +171,7 @@
         </div>
       </div>
 
-      
+
 
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
@@ -191,7 +191,15 @@
             <div class="col-md-5 col-sm-12 col-xs-12">
               <div class="x_panel bg-gw">
                 <div class="x_title">
-                  <h2>Purchase Details</h2>
+                  <div class="col-md-6 col-sm-6 col-xs-6">
+                    <h2>Purchase Details</h2>
+                  </div>
+                  <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                    <button type="button" class="btn btn-xs btn-primary" id="createBrandBtn"><i
+                        class="fa fa-plus-square">&nbsp;&nbsp;</i>Add
+                      Brand
+                    </button>
+                  </div>
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -218,8 +226,9 @@
                           class="form-control-feedback left glyphicon glyphicon-user" aria-hidden="true"></span>
                       </div>
                       <div class="col-md-2 col-sm-3 col-xs-3">
-                        <a class="btn btn-round btn-xs btn-primary input-addon-btn" id="createSupplierBtn">
-                          <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add</a>
+                        <button type="button" class="btn btn-xs btn-primary input-addon-btn" id="createSupplierBtn">
+                          <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add
+                        </button>
                       </div>
                     </div>
 
@@ -235,9 +244,9 @@
                           aria-hidden="true"></i>
                       </div>
                       <div class="col-md-2 col-sm-3 col-xs-3">
-                        <a class="btn btn-round btn-xs btn-primary input-addon-btn" id="createCategoryBtn">
+                        <button type="button" class="btn btn-xs btn-primary input-addon-btn" id="createCategoryBtn">
                           <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add
-                        </a>
+                        </button>
                       </div>
                     </div>
 
@@ -253,9 +262,9 @@
                           aria-hidden="true"></i>
                       </div>
                       <div class="col-md-2 col-sm-3 col-xs-3">
-                        <a class="btn btn-round btn-xs btn-primary input-addon-btn" id="createProductBtn">
+                        <button type="button" class="btn btn-xs btn-primary input-addon-btn" id="createProductBtn">
                           <i class="fa fa-plus-square">&nbsp;&nbsp;</i>Add
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -434,7 +443,7 @@
                       <a class="btn btn-round btn-xs btn-dark d-none" id="genRandomCodesBtn">
                         <span class="glyphicon glyphicon-random"></span>&nbsp;&nbsp;Random Serial No.
                       </a>
-                      <a class="btn btn-round btn-xs btn-primary d-none" id="printRandomCodesBtn">
+                      <a class="btn btn-round btn-xs btn-primary d-none" id="printRandomCodesBtn" onclick="printSN()">
                         <span class="glyphicon glyphicon-print"></span>&nbsp;&nbsp;Print Serial Tags.
                       </a>
                     </div>
@@ -511,7 +520,7 @@
 
     <script>
 
-      let products, suppliers, headAccounts, categories, brands;
+      let products = [], suppliers = [], headAccounts = [], categories = [], brands = [], purchase_details = [], InvoiceData, company;
 
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
@@ -523,6 +532,7 @@
         let category = document.getElementById("category");
         // TODO: Get the a list of product category id , name and populate category div 
         let createCategoryBtn = document.getElementById("createCategoryBtn");
+        let createBrandBtn = document.getElementById("createBrandBtn");
         // TODO: Onclick ==> show a popup form to register new category
         //for a successful registraion, autofill the the "category" field by current category id and name
 
@@ -571,12 +581,25 @@
                               <h4 class="text-danger">${data.message}</h4>
                               `
             } else {
-              brands = data.brands
-              categories = data.categories
-              headAccounts = data.head_accounts
-              products = data.products
-              suppliers = data.suppliers
-              console.log(suppliers)
+              if (data.brands) {
+                brands = data.brands
+              }
+              if (data.brands) {
+                brands = data.brands
+              }
+              if (data.categories) {
+                categories = data.categories
+              }
+              if (data.head_accounts) {
+                headAccounts = data.head_accounts
+              }
+              if (data.products) {
+                products = data.products
+              }
+              if (data.suppliers) {
+                suppliers = data.suppliers
+              }
+
               updateSupplierDiv()
               updateCategoryDiv()
               updateAccountsDiv()
@@ -606,6 +629,10 @@
               //show popup form for adding new product category
               createCategoryBtn.addEventListener("click", e => {
                 addNewCategory("purchase", categories);
+              });
+              //show popup form for adding new product type
+              createBrandBtn.addEventListener("click", e => {
+                addNewBrand("purchase", brands);
               });
               //show popup form for adding new product type
               createProductBtn.addEventListener("click", e => {
@@ -650,7 +677,7 @@
                   let v = document.getElementById(id).value;
                   productCodes.push(v);
                 }
-                let purchase_details = {
+                purchase_details = {
                   purchase_date: single_cal4.value,
                   supplier_info: suppliers[parseInt(supplier.value)],
                   product_info: products[parseInt(product.value)],
@@ -677,6 +704,7 @@
                   },
                   body: JSON.stringify(purchase_details),
                 }
+                printRandomCodesBtn.classList.remove("d-none");
                 console.log("Purchase Payload: ", purchase_details)
                 fetch('http://localhost:4321/api/inventory/restock-product', requestOptions)
                   .then(response => response.json())
@@ -685,10 +713,11 @@
                     if (data.error === true) {
                       showErrorMessage(data.message)
                     } else {
-
                       document.getElementById('purchase-invoice-print-btn').classList.remove('d-none')
-                      renderPurchaseInvoice(data.result,3)
                       showSuccessMessage(data.message);
+                      company = data.company_profile;
+                      InvoiceData = data.result;
+                      printSalesInvoice()
                     }
                     //refresh the UI
                     // setTimeout(() => {
@@ -768,8 +797,343 @@
         }
         document.getElementById("quantity").disabled = true;
         genRandomCodesBtn.classList.add("d-none");
-        printRandomCodesBtn.classList.remove("d-none");
         resetQuantityBtn.classList.remove("d-none");
+      }
+
+      function printSalesInvoice() {
+        //product list table
+        let tBody = ""
+        let company_info = ""
+        let pLn = InvoiceData.selected_items.length
+        for (let i = 0; i < pLn; i++) {
+          const items = InvoiceData.selected_items[i]
+          let sn = ""
+          items.serial_numbers.forEach((s, j) => {
+            if (j % 2 === 1) {
+              sn += `#${s}<br>`
+
+            } else {
+              sn += `#${s}&nbsp;&nbsp;&nbsp;&nbsp;`
+            }
+          })
+          tBody += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>
+              ${items.product_name}<br>
+              <span class="product-deatils">
+                <b>Category: </b>${items.category_name} &nbsp;&nbsp;
+                <b>Brand: </b>${items.brand_name} &nbsp;&nbsp;
+                <b> Warranty: </b> ${items.warranty} <br>
+                ${sn}
+              </span>
+          </td>
+          <td style="text-align:center">${items.quantity}</td>
+          <td style="text-align:right">${Math.round(items.sub_total / items.quantity)}</td>
+          <td style="text-align:right">${items.sub_total}</td>
+        </tr>`
+        }
+        //company
+        console.log("Company:", company)
+        let addr = ""
+        if (company.area != "") {
+          addr += company.area + ","
+        }
+        company_info = ` 
+          <div class="company-info">
+              <p class="company-name">${company.name}</p>
+              <p class="company-slogan">${company.slogan} </p>
+              <p>Address: ${addr + company.upazila + ", " + company.district}<br>
+              <p>Mobile: ${company.mobile}<br>
+                  <span class="basic" style="float: inline-end; margin-top: 5px; font-weight: bold;">Date: ${getShortDate()}</span>
+              </p>
+          </div>`
+
+        const content = `
+        
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Sales Invoice</title>
+            <style>
+                /* General Styling */
+                * {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-family: IBMPlexSans-Regular;
+                }
+
+                body {
+                    font-family: Arial, sans-serif;
+                    color: #333;
+                    background-color: #ffffff;
+                    padding: 5px;
+                }
+
+                /* A4 Page Setup */
+                .invoice-container {
+                    margin: auto;
+                    padding: 10px;
+                    background-color: #fff;
+                }
+
+                /* Header Styling */
+                .header {
+                    background-color: #10455f;
+                    color: white;
+                    padding: 10px;
+                    /* Reduced padding */
+                    text-align: center;
+                    border-radius: 5px;
+                    margin-bottom: 5px;
+                    /* Reduced margin */
+                }
+
+                .header h1 {
+                    font-family: 'Georgia', serif;
+                    font-size: 24px;
+                    /* Reduced font size */
+                    font-weight: 700;
+                    margin: 0;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+
+                /* Info Section */
+                .info-section {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 0px;
+                    padding: 5px;
+                    background-color: #F7F9FB;
+                    border-bottom: 2px solid #1E3A5F;
+                }
+
+                .info-section div {
+                    width: 45%;
+                }
+
+                /* Customer Info and Company Info Styling */
+                .customer-info h2 {
+                    font-family: IBMPlexSans-Regular;
+                    font-size: 20px;
+                    color: #1E3A5F;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
+
+                .customer-info p {
+                    font-size: 14px;
+                    color: #000000;
+                    line-height: 2;
+                }
+
+                .basic {
+                    font-family: IBMPlexSans-Regular;
+                    letter-spacing: 0.5px;
+                    padding-left: 2px;
+                    padding-right: 2px;
+                    border-bottom: 1px dotted #000000;
+                }
+
+                .invoice {
+                    font-family: IBMPlexSans-Bold;
+                    float: left;
+                    letter-spacing: 0.5px;
+                }
+
+                .customer-info .date {
+                    font-family: IBMPlexSans-Bold;
+                    float: right;
+                    letter-spacing: 0.5px;
+                }
+
+                .company-info p {
+                    font-family: IBMPlexSans-Regular;
+                    font-size: 14px;
+                    color: #000000;
+                    line-height: 1.5;
+                }
+
+                .company-info {
+                    text-align: right;
+                }
+
+                /* Company Info Enhanced Styling */
+                .company-info .company-name {
+                    font-family: IBMPlexSans-Regular;
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #1E3A5F;
+                }
+
+                .company-info .company-slogan {
+                    font-style: italic;
+                    color: #092635;
+                    font-size: 12px;
+                }
+
+                /* Table Styling */
+                .items-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                    font-size: 12px;
+                    color: #000000;
+                }
+
+                .product-deatils {
+                    font-size: 10px;
+                    line-height: 1.25em;
+                }
+
+                .items-table th,
+                .items-table td {
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    text-align: left;
+                }
+
+                .items-table th {
+                    background-color: #10455f;
+                    color: white;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    word-spacing: 2px;
+                }
+
+                /* Totals and Payment Info */
+                .totals-section {
+                    font-family: IBMPlexSans-Regular;
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 10px;
+                    gap: 10px;
+                    font-size: 12px;
+                    color: #ffffff;
+                }
+
+                .totals,
+                .payment-info {
+                    flex: 1;
+                    padding: 10px;
+                    background-color: #ffffff;
+                    border-radius: 5px;
+                    border: 1px solid #ddd;
+                }
+
+                .totals .total-row,
+                .payment-info .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 5px 0;
+                    color: #444;
+                }
+
+                .totals .total-label,
+                .payment-info .info-label {
+                    color: #1f1f1f;
+                }
+
+                /* Remarks Section */
+                .remarks {
+                    font-size: 14px;
+                    color: #4b4949;
+                    background-color: #F7F9FB;
+                    padding: 10px;
+                    border-left: 3px solid #4C91B3;
+                    margin-top: 10px;
+                }
+            </style>
+        </head>
+
+        <body>
+          <div class="invoice-container" id="invoice-content">
+              <!-- Header Title with Solid Background Color and Updated Font Style -->
+              <div class="header">
+                  <h1>Sales Invoice</h1>
+              </div>
+
+              <!-- Info Section with Customer and Company Info Side by Side -->
+              <div class="info-section">
+                  <!-- Customer Info -->
+                  <div class="customer-info">
+                      <h2>Bill To</h2>
+                      <p>Name: <span class="basic" style="margin-left: 20px;">${InvoiceData.customer_info.account_name}</span><br>
+                          Mobile: <span class="basic" style="margin-left: 18px;">${InvoiceData.customer_info.mobile}<br></span>
+                          Address: <span class="basic" style="margin-left: 8px;">${InvoiceData.customer_info.upazila + ", " || ""}${InvoiceData.customer_info.district || ""}<br></span>
+                          Invoice: <span class="basic" style="margin-left: 15px; font-weight: bold;">${InvoiceData.memo_no}</span>
+                      </p>
+                  </div>
+
+                  <!-- Company Info -->
+                  ${company_info}
+              </div>
+
+              <!-- Items Table -->
+              <table class="items-table">
+                  <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>Description</th>
+                          <th>Quantity</th>
+                          <th>Unit Price</th>
+                          <th>Total Price</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    ${tBody}
+                      <!-- rows will be add using JS DOM -->
+                  </tbody>
+              </table>
+
+              <!-- Totals and Payment Info Section with Consistent Spacing -->
+              <div class="totals-section">
+
+                  <!-- Payment Info Section -->
+                  <div class="payment-info">
+                      <div class="info-row"><span class="info-label">Payment Method</span><span>${InvoiceData.chalan_no === "" ? "Cash Received" : "Bank Payment"}</span></div>
+                      <div class="info-row"><span class="info-label">Cheque No.</span><span>${InvoiceData.chalan_no || ""}</span></div>
+                      <div class="info-row"><span class="info-label">Due</span><span>${InvoiceData.total_amount - InvoiceData.paid_amount}</span></div>
+                  </div>
+                  <!-- Totals Section -->
+                  <div class="totals">
+                      <div class="total-row"><span class="total-label">Subtotal</span><span>${InvoiceData.bill_amount}</span></div>
+                      <div class="total-row"><span class="total-label">Discount</span><span>${InvoiceData.bill_amount - InvoiceData.total_amount}</span></div>
+                      <div class="total-row"><strong>Total Amount</strong><span><strong>${InvoiceData.total_amount}</strong></span></div>
+                  </div>
+              </div>
+
+              <!-- Remarks Section -->
+              <div class="remarks">
+                  <p>
+                    <strong>Remarks:</strong><br>
+                    ${InvoiceData.total_amount - InvoiceData.paid_amount > 0 ? "Please make the due payment within 30 days to avoid late fees." : ""}<br>
+                    Warranty excludes damage misuse, removing or scarting products stickers, consumables and unauthorized handling</li>
+                    <ul>
+                  </p>
+              </div>
+          </div>
+        </body>
+        </html>`;
+
+        // Create an iframe to load the content
+        const iframe = document.createElement('iframe');
+        document.body.appendChild(iframe);
+        iframe.style.display = 'none';
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(content);
+        doc.close();
+
+        // Wait for content to load and then print
+        iframe.onload = () => {
+          iframe.contentWindow.print();
+          document.body.removeChild(iframe);
+        };
       }
 
     </script>

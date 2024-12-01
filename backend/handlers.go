@@ -71,6 +71,23 @@ func (app *application) AddNewStakeHolder(w http.ResponseWriter, r *http.Request
 	}
 
 	//insert to company_stakeholders
+	n, err := app.DB.LastIndex("company_stakeholders")
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	pre, err := app.GenerateRandomAlphanumericCode(4)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	if stk.AccountType == "Owner" {
+		stk.AccountCode = "SH-" + pre + strconv.FormatInt(n, 10)
+	} else if stk.AccountType == "Investor" {
+		stk.AccountCode = "IN-" + pre + strconv.FormatInt(n, 10)
+	}
+	stk.AccountStatus = true
+
 	_, err = app.DB.AddNewStakeHolder(stk)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR: AddNewStakeHolder => %w", err))
@@ -123,12 +140,17 @@ func (app *application) AddEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Sanitize blank info
-	if employee.AccountCode == "" {
-		n, err := app.DB.CountRows("employees")
-		if err == nil {
-			employee.AccountCode = "em-" + fmt.Sprintf("%06d", n+1)
-		}
+	n, err := app.DB.LastIndex("employees")
+	if err != nil {
+		app.badRequest(w, err)
+		return
 	}
+	pre, err := app.GenerateRandomAlphanumericCode(4)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	employee.AccountCode = "E-" + pre + strconv.FormatInt(n, 10)
 	employee.AccountStatus = true
 	_, err = app.DB.AddEmployee(employee)
 
@@ -160,10 +182,18 @@ func (app *application) AddCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Sanitize blank info
 	n, err := app.DB.LastIndex("customers")
-	if err == nil {
-		customer.AccountCode = "cus-" + fmt.Sprintf("%06d", n+1)
+	if err != nil {
+		app.badRequest(w, err)
+		return
 	}
+	pre, err := app.GenerateRandomAlphanumericCode(4)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	customer.AccountCode = "C-" + pre + strconv.FormatInt(n, 10)
 	customer.AccountStatus = true
 	id, err := app.DB.AddCustomer(customer)
 
@@ -272,7 +302,12 @@ func (app *application) AddSupplier(w http.ResponseWriter, r *http.Request) {
 		app.badRequest(w, err)
 		return
 	}
-	supplier.AccountCode = "S-" + fmt.Sprintf("%06d", n+1)
+	pre, err := app.GenerateRandomAlphanumericCode(4)
+	if err != nil {
+		app.badRequest(w, err)
+		return
+	}
+	supplier.AccountCode = "S-" + pre + strconv.FormatInt(n, 10)
 	supplier.AccountStatus = true
 	id, err := app.DB.AddSupplier(supplier)
 
@@ -477,12 +512,12 @@ func (app *application) AddProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//sanitize blank variables
-	code, err := app.DB.CountRows("products")
+	code, err := app.DB.LastIndex("products")
 	if err != nil {
 		app.badRequest(w, err)
 		return
 	}
-	product.ProductCode = fmt.Sprintf("i-%06d", code)
+	product.ProductCode = fmt.Sprintf("i-%06d", code+1)
 	product.ProductStatus = true
 
 	id, err := app.DB.AddProduct(product)
@@ -1421,8 +1456,8 @@ func (app *application) CompleteExpensesProcess(w http.ResponseWriter, r *http.R
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-// GetAdjustmentPageDetails scarp data for adjustment page
-func (app *application) GetAdjustmentPageDetails(w http.ResponseWriter, r *http.Request) {
+// GetFundAcquisitionPageDetails scarp data for fund acquisition page
+func (app *application) GetFundAcquisitionPageDetails(w http.ResponseWriter, r *http.Request) {
 
 	var resp struct {
 		Error        bool                  `json:"error"`
@@ -1453,8 +1488,8 @@ func (app *application) GetAdjustmentPageDetails(w http.ResponseWriter, r *http.
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-func (app *application) CompleteAdjustmentProcess(w http.ResponseWriter, r *http.Request) {
-	var Summary []*models.Adjustment
+func (app *application) CompleteFundAcquisitionProcess(w http.ResponseWriter, r *http.Request) {
+	var Summary []*models.FundAcquisition
 
 	var resp struct {
 		Error   bool   `json:"error,omitempty"`
@@ -1468,7 +1503,7 @@ func (app *application) CompleteAdjustmentProcess(w http.ResponseWriter, r *http
 		app.writeJSON(w, http.StatusAccepted, resp)
 		return
 	}
-	err = app.DB.CompleteAdjustmentProcess(Summary)
+	err = app.DB.CompleteFundAcquisitionProcess(Summary)
 	if err != nil {
 		resp.Error = true
 		resp.Message = "Unable to complete amount transfer process: " + err.Error()
@@ -1477,7 +1512,7 @@ func (app *application) CompleteAdjustmentProcess(w http.ResponseWriter, r *http
 	}
 	//complete the process
 	resp.Error = false
-	resp.Message = "Cash adjustment successful"
+	resp.Message = "Fund Acquisition successful"
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
@@ -1956,6 +1991,60 @@ func (app *application) GetTopSheetReport(w http.ResponseWriter, r *http.Request
 	resp.Error = false
 	resp.Message = "Data fetched successfully"
 	resp.Report = topSheetData
+	resp.CompanyProfile = cp
+
+	fmt.Println(resp)
+	app.writeJSON(w, http.StatusOK, resp)
+}
+func (app *application) GetBalanceSheetReport(w http.ResponseWriter, r *http.Request) {
+	balanceSheet, err := app.DB.GetBalanceSheetReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetTopSheetReport: %w", err))
+		return
+	}
+
+	cp, err := app.DB.GetCompanyProfile()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetCompanyProfile: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error          bool                  `json:"error"`
+		Message        string                `json:"message"`
+		Report         models.BalanceSheet   `json:"report"`
+		CompanyProfile models.CompanyProfile `json:"company_profile"`
+	}
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = balanceSheet
+	resp.CompanyProfile = cp
+
+	fmt.Println(resp)
+	app.writeJSON(w, http.StatusOK, resp)
+}
+func (app *application) GetTrialBalanceReport(w http.ResponseWriter, r *http.Request) {
+	trialBalanceSheet, err := app.DB.GetTrialBalanceReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetTopSheetReport: %w", err))
+		return
+	}
+
+	cp, err := app.DB.GetCompanyProfile()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetCompanyProfile: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error          bool                  `json:"error"`
+		Message        string                `json:"message"`
+		Report         models.TrialBalance   `json:"report"`
+		CompanyProfile models.CompanyProfile `json:"company_profile"`
+	}
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = trialBalanceSheet
 	resp.CompanyProfile = cp
 
 	fmt.Println(resp)

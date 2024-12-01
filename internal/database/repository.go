@@ -98,7 +98,7 @@ type DatabaseRepo interface {
 	//Expenses
 	CompleteExpensesTransactions(summary []*models.Expense) error
 	//Cash-Adjustment
-	CompleteAdjustmentProcess(summary []*models.Adjustment) error
+	CompleteFundAcquisitionProcess(summary []*models.FundAcquisition) error
 	//Inventory Reports
 	GetAllEmployeesList() ([]*models.Employee, error)
 	GetAllSuppliersList() ([]*models.Supplier, error)
@@ -119,8 +119,9 @@ type DatabaseRepo interface {
 	GetExpensesHistoryReport() ([]*models.Transaction, error)
 	GetIncomeStatementData(startDate,endDate string) (models.IncomeStatement, error)
 	GetTopSheetReport() ([]*models.TopSheet, error)
+	GetBalanceSheetReport() (models.BalanceSheet, error)
+	GetTrialBalanceReport() (models.TrialBalance, error)
 	//Helper functions
-	CountRows(tableName string) (int, error)
 	LastIndex(tableName string) (int64, error)
 	GetCompanyProfile() (models.CompanyProfile, error)
 }

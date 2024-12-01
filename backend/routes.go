@@ -94,8 +94,8 @@ func (app *application) routes() http.Handler {
 		mux.Post("/accounts/expenses/get-page-details", app.GetExpensesPageDetails)
 		mux.Post("/accounts/expenses/complete-submission", app.CompleteExpensesProcess)
 		//Amount Receivable
-		mux.Post("/accounts/adjustment/get-page-details", app.GetAdjustmentPageDetails)
-		mux.Post("/accounts/adjustment/complete-submission", app.CompleteAdjustmentProcess)
+		mux.Post("/accounts/fund-acquisition/get-page-details", app.GetFundAcquisitionPageDetails)
+		mux.Post("/accounts/fund-acquisition/complete-submission", app.CompleteFundAcquisitionProcess)
 
 		mux.NotFound(app.PathNotFound)
 		//.......................Inventory Reports.......................
@@ -107,14 +107,6 @@ func (app *application) routes() http.Handler {
 		mux.Post("/reports/inventory/stock-alert-report", app.GetLowStockProductReport)
 		mux.Post("/reports/inventory/purchase-history", app.GetPurchaseHistoryReport)
 		mux.Post("/reports/inventory/sales-history", app.GetSalesHistoryReport)
-		// Category List
-		// Product List
-		// Service List
-		// Stock Report
-		// Item History Report
-		// Purchase History
-		// Sales History
-		// Service History
 
 		//.......................Accounts Reports.......................
 		mux.Post("/reports/accounts/transactions-report", app.GetTransactionsReport)
@@ -124,6 +116,8 @@ func (app *application) routes() http.Handler {
 		mux.Post("/reports/accounts/income-statement", app.GetIncomeStatementReport)
 		mux.Post("/reports/accounts/customer-due-report", app.GetCustomerDueReport)
 		mux.Post("/reports/accounts/top-sheet-report", app.GetTopSheetReport)
+		mux.Post("/reports/accounts/trial-balance", app.GetTrialBalanceReport)
+		mux.Post("/reports/accounts/balance-sheet", app.GetBalanceSheetReport)
 
 	})
 	return mux

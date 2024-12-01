@@ -1,15 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <button type="button" onclick="printIncomeStatement()">Print Income Statement</button>
-    <script>
-        function printIncomeStatement() {
-        let content = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office"
           xmlns:x="urn:schemas-microsoft-com:office:excel"
           xmlns="http://www.w3.org/TR/REC-html40">
@@ -1061,23 +1050,6 @@
           </body>
 
           </html>
-          `
-  
-        // Create an iframe to load the content
-        const iframe = document.createElement('iframe');
-        document.body.appendChild(iframe);
-        iframe.style.display = 'none';
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write(content);
-        doc.close();
-  
-        // Wait for content to load and then print
-        iframe.onload = () => {
-          iframe.contentWindow.print();
-          document.body.removeChild(iframe);
-        };
-      }
   
     
     </script>

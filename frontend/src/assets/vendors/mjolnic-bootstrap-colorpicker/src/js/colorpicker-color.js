@@ -161,7 +161,7 @@ Color.prototype = {
     "springgreen": "#00ff7f",
     "steelblue": "#4682b4",
     "tan": "#d2b48c",
-    "teal": "#008080",
+    "teal": "#265166",
     "thistle": "#d8bfd8",
     "tomato": "#ff6347",
     "turquoise": "#40e0d0",

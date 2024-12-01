@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Adjustment</title>
+  <title>Fund Acquisition</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -100,7 +100,7 @@
                     <li><a href="amount-receivable.html">Amount Receivable</a></li>
                     <li><a href="amount-payable.html">Amount Payable</a></li>
                     <li><a href="expenses.html">Expenses</a></li>
-                    <li><a href="adjustment.html">Adjustment</a></li>
+                    <li><a href="fund-acquisition.html">Fund Acquisition</a></li>
                     <li><a href="#bank-reconciliation.html">Bank Reconciliation</a></li>
                     <li><a href="#transaction-posting.html">Transaction Posting</a></li>
                   </ul>
@@ -120,8 +120,8 @@
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
                         <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
                         <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
-                        <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
-                        <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
+                        <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
+                        <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
                     </li>
                   </ul>
                 </li>
@@ -175,7 +175,7 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x"><label>Adjustment</label></h2>
+        <h2 class="text-center text-warning fa-2x"><label>Fund Acquisition</label></h2>
         <!-- Page content here -->
         <!-- ReceiveCollection Details Section  -->
         <div class="x_panel bg-gw" id="form-content">
@@ -269,7 +269,7 @@
 
           </div>
         </div>
-        <form action="#" id="adjustmentForm">
+        <form action="#" id="fund-acquisition-Form">
           <!-- /page content -->
           <!-- Received section -->
           <!-- Table row -->
@@ -356,7 +356,7 @@
         const requestOptions = {
           method: 'post'
         }
-        fetch('http://localhost:4321/api/accounts/adjustment/get-page-details', requestOptions)
+        fetch('http://localhost:4321/api/accounts/fund-acquisition/get-page-details', requestOptions)
           .then(response => response.json())
           .then(data => {
             console.log(data)
@@ -446,7 +446,7 @@
         document.getElementById("tBody").innerHTML += `
           <tr id="${voucherNo}">
             <td>${voucherNo}</td>
-            <td>${accounts[parseInt(source.value)].account_name}</td>
+            <td>${stakeholders[parseInt(source.value)].account_name}</td>
             <td>${accounts[parseInt(destination.value)].account_name}</td> 
             <td>${amount.value}</td>
             <td>${chqNo.value}</td>
@@ -477,7 +477,7 @@
       }
 
       //submit the form
-      document.getElementById("adjustmentForm").addEventListener("submit", event => {
+      document.getElementById("fund-acquisition-Form").addEventListener("submit", event => {
         event.preventDefault();
         event.stopPropagation();
         //check empty list
@@ -499,7 +499,7 @@
           body: JSON.stringify(transaction_summary),
         }
         console.log(transaction_summary)
-        fetch('http://localhost:4321/api/accounts/adjustment/complete-submission', requestOptions)
+        fetch('http://localhost:4321/api/accounts/fund-acquisition/complete-submission', requestOptions)
           .then(response => response.json())
           .then(data => {
             console.log("resp : ", data)
@@ -561,11 +561,11 @@
               text-align: center;
               margin-bottom: 20px;
               padding: 10px;
-              border-bottom: 2px solid #008080;
+              border-bottom: 2px solid #265166;
             }
             .header h1 {
               font-size: 28px;
-              color: #008080;
+              color: #265166;
               font-weight: bold;
               margin: 0;
               text-transform: uppercase;
@@ -594,7 +594,7 @@
             }
             .caption-section .caption {
               font-weight: bold;
-              color: #008080;
+              color: #265166;
             }
             .caption-section .print-date {
               font-style: italic;
@@ -614,7 +614,7 @@
               border: 0.1em solid rgba(0, 0, 0, 0.25);
             }
             th {
-              background-color: #008080;
+              background-color: #265166;
               color: white;
             }
             tr:nth-child(even) {
@@ -656,7 +656,7 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">Cash Adjustment</div>
+              <div class="caption">Fund Acquisition</div>
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>

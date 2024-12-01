@@ -61,7 +61,7 @@
     }
 
     .datatable-buttons th {
-      background-color: #008080;
+      background-color: #265166;
       /* Teal header */
       color: white;
       font-weight: 400;
@@ -148,7 +148,7 @@
                     <li><a href="amount-receivable.html">Amount Receivable</a></li>
                     <li><a href="amount-payable.html">Amount Payable</a></li>
                     <li><a href="expenses.html">Expenses</a></li>
-                    <li><a href="adjustment.html">Adjustment</a></li>
+                    <li><a href="fund-acquisition.html">Fund Acquisition</a></li>
                     <li><a href="#bank-reconciliation.html">Bank Reconciliation</a></li>
                     <li><a href="#transaction-posting.html">Transaction Posting</a></li>
                   </ul>
@@ -168,8 +168,8 @@
                         <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
                         <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
                         <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
-                        <li class="sub_menu"><a href="#trial-balance.html">Trial Balance</a></li>
-                        <li class="sub_menu"><a href="#balance-sheet.html">Balance Sheet</a></li>
+                        <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
+                        <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
                     </li>
                   </ul>
                 </li>
@@ -538,7 +538,7 @@
                   accountCode = accounts[acc_id].account_code;
                   // Update the Ledger Book title
                   document.getElementById("ledger-book-title").innerHTML = `
-                            <label style="color:#008080; font-size: 18px;">
+                            <label style="color:#265166; font-size: 18px;">
                                 Ledger Book of ${accountName}-${accountCode}
                             </label>`;
                 }
@@ -621,7 +621,7 @@
               text-align: center;
               margin-bottom: 10px;
               padding: 10px;
-              border-bottom: 2px solid #008080;
+              border-bottom: 2px solid #265166;
             }
             .header .current-date{
               text-align: left;
@@ -631,7 +631,7 @@
             }
             .header h1 {
               font-size: 28px;
-              color: #008080;
+              color: #265166;
               font-weight: bold;
               margin: 0;
               text-transform: uppercase;
@@ -661,7 +661,7 @@
             .caption-section .caption {
                 font-size: 15px;
               font-weight: bold;
-              color: #008080;
+              color: #265166;
             }
             .caption-section .print-date {
               font-style: italic;
@@ -680,7 +680,7 @@
               border: 0.1em solid rgba(0, 0, 0, 0.25);
             }
             th {
-              background-color: #008080;
+              background-color: #265166;
               color: white;
             }
             tr:nth-child(even) {

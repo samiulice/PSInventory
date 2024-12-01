@@ -3,249 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Income Statement</title>
-    
+    <title>Barcode Table</title>
+    <style>
+        /* A4 page styling for printing */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            td {
+                width: 33.33%; /* Three barcodes per row */
+                height: 30mm; /* Adjust to match your sticker height */
+                text-align: center;
+                padding: 10px; /* Add spacing inside the cells */
+                border: 1px dashed #ccc; /* Optional for debugging layout */
+                vertical-align: middle; /* Center content vertically */
+            }
+        }
+
+        /* Default styles for display */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            width: 33.33%; /* Three barcodes per row */
+            height: 30mm; /* Sticker height */
+            text-align: center;
+            padding: 10px;
+            border: 1px dashed #ccc; /* Optional for layout visualization */
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
-   <button onclick="generatePDF()">Generate PDF</button>
-   <script>
-    function generatePDF() {
-      let n = reportData.length;
-      let tBody = '';
-      total_stock_qty = 0;
-      total_purchase_qty = 0;
-      total_purchase_price = 0;
-      total_sale_qty = 0;
-      total_sale_price = 0;
+    <h1>Barcode Table</h1>
+    <table id="barcodeTable"></table>
+    <button onclick="printPage()">Print Barcodes</button>
 
-      if (n > 0) {
-        const p = reportData[0];
-        let purchase_rate = "-", sale_rate = "-";
-        if (p.quantity_purchased != 0) {
-          let prate = p.purchase_cost / p.quantity_purchased;
-          purchase_rate = `${prate.toFixed(2)}`
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.0/JsBarcode.all.min.js"></script>
+    <script>
+        // List of UUIDs
+        const uuids = [
+            "f47ac10b-58cc-4372",
+            "550e8400-e29b-41d4",
+            "123e4567-e89b-12d3",
+            "9f8c6abc-345d-4f2f",
+            "1b671a64-40d5-491e",
+            "ae2b1fca-515c-4a98",
+            "16fd2706-8baf-433b",
+            "3fa85f64-5717-4562",
+            "d85e5f4d-bd7b-4679",
+            "9b2ea164-0c96-4af4"
+        ];
+
+        function generateBarcodes() {
+            const table = document.getElementById("barcodeTable");
+            let row;
+
+            uuids.forEach((uuid, index) => {
+                // Create a new row every 3 barcodes
+                if (index % 3 === 0) {
+                    row = document.createElement("tr");
+                    table.appendChild(row);
+                }
+
+                // Create a cell for each barcode
+                const cell = document.createElement("td");
+
+                // Create a unique SVG element for each barcode
+                const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                barcodeSvg.id = `barcode-${index}`;
+                cell.appendChild(barcodeSvg);
+
+                // Add the cell to the current row
+                row.appendChild(cell);
+
+                // Generate the barcode
+                JsBarcode(barcodeSvg, uuid, {
+                    format: "CODE128",
+                    lineColor: "#000",
+                    width: 1, // Adjust barcode width
+                    height: 20, // Adjust barcode height
+                    displayValue: true // Display the UUID below the barcode
+                });
+            });
         }
-        if (p.quantity_sold != 0) {
-          let rate = p.sold_price / p.quantity_sold;
-          sale_rate = `${rate.toFixed(2)}`
+
+        // Generate barcodes on page load
+        generateBarcodes();
+
+        function printPage() {
+            window.print();
         }
-        total_stock_qty += p.quantity_in_stock;
-        total_purchase_qty += p.quantity_purchased;
-        total_purchase_price += p.purchase_cost;
-        total_sale_qty += p.quantity_sold;
-        total_sale_price += p.sold_price;
-        tBody += `
-          <tr>
-            <th colspan=9 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${p.category_id}</th>
-          </tr>
-          <tr>
-            <td>${p.product_code || "-"}</td>
-            <td style="text-align: left;">${p.product_name || "-"}</td>
-            <td>${p.quantity_in_stock}</td>
-            <td>${p.quantity_purchased}</td>
-            <td>${purchase_rate}</td>
-            <td>${p.purchase_cost}</td>
-            <td>${p.quantity_sold}</td>
-            <td>${sale_rate}</td>
-            <td>${p.sold_price}</td>
-          </tr>
-          `
-        for (let i = 1; i < n; i++) {
-          if (reportData[i - 1].category_id !== reportData[i].category_id) {
-            tBody += `<tr><th colspan=9 style="background-color:rgba(9, 121, 105,0.1); color:black;text-align: left;">${reportData[i].category_id}</th></tr>`
-          }
-          const p = reportData[i];
-          let purchase_rate = "-", sale_rate = "-";
-          if (p.quantity_purchased != 0) {
-            let prate = p.purchase_cost / p.quantity_purchased;
-            purchase_rate = `${prate.toFixed(2)}`
-          }
-          if (p.quantity_sold != 0) {
-            let rate = p.sold_price / p.quantity_sold;
-            sale_rate = `${rate.toFixed(2)}`
-          }
-          total_stock_qty += p.quantity_in_stock;
-          total_purchase_qty += p.quantity_purchased;
-          total_purchase_price += p.purchase_cost;
-          total_sale_qty += p.quantity_sold;
-          total_sale_price += p.sold_price;
-          tBody += `
-            <tr>
-              <td>${p.product_code || "-"}</td>
-              <td style="text-align: left;">${p.product_name || "-"}</td>
-              <td>${p.quantity_in_stock}</td>
-              <td>${p.quantity_purchased}</td>
-              <td>${purchase_rate}</td>
-              <td>${p.purchase_cost}</td>
-              <td>${p.quantity_sold}</td>
-              <td>${sale_rate}</td>
-              <td>${p.sold_price}</td>
-            </tr>
-          `;
-        }
-        tBody += `
-          <tr>
-            <th style="text-align:left" colspan=2>Total</th>
-            <th style="text-align:right">${total_stock_qty}</th>
-            <th style="text-align:right">${total_purchase_qty}</th>
-            <th colspan=2>${total_purchase_price}</th>
-            <th style="text-align:right">${total_sale_qty}</th>
-            <th style="text-align:right" colspan=2>${total_sale_price}</th>
-          </tr>
-          `
-      } else {
-        tBody = `
-          <tr><td colspan="9" style="text-align:center;">No data available</td></tr>`;
-      }
-
-      const content = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <title>Company Report</title>
-          <link rel="stylesheet" type="text/css" href="styles.css">
-          <style>
-              /* Header styling */
-            .header {
-              text-align: center;
-              margin-bottom: 20px;
-              padding: 10px;
-              border-bottom: 2px solid #008080;
-            }
-            .header h1 {
-              font-size: 28px;
-              color: #008080;
-              font-weight: bold;
-              margin: 0;
-              text-transform: uppercase;
-            }
-            .header h2 {
-              font-size: 16px;
-              color: #444;
-              margin: 5px 0 15px 0;
-              font-style: italic;
-              font-weight: normal;
-            }
-            .header p {
-              margin: 3px 0;
-              font-size: 14px;
-              color: #666;
-            }
-            
-            /* table caption and printing date section */
-            .caption-section {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              font-size: 18px;
-              color: #444;
-              padding-top: 10px;
-            }
-            .caption-section .caption {
-              font-weight: bold;
-              color: #008080;
-            }
-            .caption-section .print-date {
-              font-style: italic;
-              color: #666;
-            }
-
-            /* Table styling */
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              font-family: Arial, sans-serif;
-            }
-            th, td {
-              padding: 5px;
-              font-size: 10px;
-              text-align: right;
-              border: 0.1em solid rgba(0, 0, 0, 0.25);
-            }
-            th {
-              background-color: #008080;
-              color: white;
-              text-align: center;
-            }            
-
-            /* Footer styling */
-            .footer {
-              position: fixed;
-              bottom: 0;
-              width: 100%;
-              text-align: center;
-              font-size: 12px;
-              color: #666;
-              padding: 10px 0;
-            }
-            .footer .page-number:after {
-              content: counter(page);
-            }
-          </style>
-        </head>
-        <body>
-          <!-- Header Section -->
-          <div class="header">
-            ${reportData.company ? `
-              <h1>${reportData.company.name || ""}</h1>
-              <h2>${reportData.company.slogan || ""}</h2>
-              <p>${reportData.company.address || ""}</p>
-              <p>Mobile: ${reportData.company.mobile || ""} | Email: ${reportData.company.email || ""}</p>
-            ` : `
-              <h1>ProjuktiSheba Inventory</h1>
-              <h2>Track Smarter, Stock Better</h2>
-              <p>Teri Bazar, Netrakona Shadar, Netrakona, Mymensingh</p>
-              <p>Mobile: +8801742135093 | Email: psi@projuktisheba.com</p>
-            `}
-            
-            <!-- Line with Caption and Print Date -->
-            <div class="caption-section">
-              <div class="caption">Stock Report</div>
-              <div class="print-date">Printed on: ${getShortDate()}</div>
-            </div>
-          </div>
-
-          <!-- Table Section -->
-          <table>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Stock</th>
-                <th>Purchase Qty</th>
-                <th>Purchase Rate</th>
-                <th>Total Purchase Cost</th>
-                <th>Sale Qty</th>
-                <th>Sale Rate</th>
-                <th>Total Sale Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${tBody}
-            </tbody>
-          </table>
-        </body>
-        </html>
-      `;
-
-      // Create an iframe to load the content
-      const iframe = document.createElement('iframe');
-      document.body.appendChild(iframe);
-      iframe.style.display = 'none';
-      const doc = iframe.contentDocument || iframe.contentWindow.document;
-      doc.open();
-      doc.write(content);
-      doc.close();
-
-      // Wait for content to load and then print
-      iframe.onload = () => {
-        iframe.contentWindow.print();
-        document.body.removeChild(iframe);
-      };
-    }
-
-  
-   </script>
+    </script>
 </body>
 </html>

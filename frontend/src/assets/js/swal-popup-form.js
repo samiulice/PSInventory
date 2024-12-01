@@ -1,5 +1,5 @@
 //addNewBrand show a popup form and then make an api call to insert brand data to the database table
-function addNewBrand(page, brand) {
+function addNewBrand(page, brands) {
   Swal.fire({
     title: 'Add New Brand',
     width: 600,
@@ -106,11 +106,8 @@ function addNewBrand(page, brand) {
             showErrorMessage(data.message)
           } else {
             showSuccessMessage(data.message);
-            brand.push(data.result)
             if (page === "purchase") {
-              document.getElementById("brand").innerHTML = '';
-              document.getElementById("brand").innerHTML = `<option value="${brand.length - 1}" selected>${data.result.name}</option>`;;
-              document.getElementById("brand").disabled = true;
+              brands.push(data.result)
             }
           }
         });
@@ -128,6 +125,10 @@ function addNewProduct(page, brands, categories, products) {
       brandList += `<option value="${b.id}">${b.name}</option>`;
     })
     brandList += '</select>';
+  } else {
+    brandList += `<select id="brand" class="form-control form-select has-feedback-left" required>
+                    <option value="" selected disabled>Please add brand first</option>
+                  </select>`
   }
   if (categories) {
     categoryList += `<select id="category" class="form-control form-select has-feedback-left" required>
@@ -401,9 +402,9 @@ function addNewCategory(page, categories) {
           if (data.error === true) {
             showErrorMessage(data.message)
           } else {
-            categories.push(data.result);
             showSuccessMessage(data.message);
             if (page === "purchase") {
+              categories.push(data.result);
               document.getElementById("category").innerHTML = '';
               document.getElementById("category").innerHTML = `<option value="${categories.length-1}" selected>${data.result.name}</option>`;;
               document.getElementById("category").disabled = true;
@@ -422,13 +423,6 @@ function addNewCustomer(page, customers) {
       <div class="x_panel">
           <div class="x_content">
               <form id="add-customer" class="needs-validation" novalidate>
-                  <!-- Account code -->
-                  <div class="col-4 form-group has-feedback">
-                      <input type="text" class="form-control has-feedback-left" id="account_code" name="account_code"
-                          placeholder="Account Code(Autofill: Random)" autocomplete="off">
-                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-info-sign" aria-hidden="true"></span>
-                  </div>
-
                   <!-- Account Name -->
                   <div class="col-4 form-group has-feedback">
                       <input type="text" class="form-control has-feedback-left" id="account_name" name="account_name"
@@ -558,7 +552,6 @@ function addNewCustomer(page, customers) {
 
         if (isValid) {
           resolve({
-            account_code: form.account_code.value,
             account_name: form.account_name.value,
             contact_person: form.contact_person.value,
             mobile: form.mobile.value,
@@ -606,7 +599,6 @@ function addNewCustomer(page, customers) {
       dis = parseInt(data.discount, 10);
       opBalance = parseInt(data.opening_balance, 10);
       let customer = {
-        account_code: data.account_code,
         account_name: data.account_name,
         contact_person: data.contact_person,
         mobile: data.mobile,
@@ -658,13 +650,6 @@ function addNewEmployee(page, employees) {
               <div class="x_panel">
                   <div class="x_content">
                       <form id="add-employee" class="needs-validation" novalidate>
-                          <!-- Account code -->
-                          <div class="col-4 form-group has-feedback">
-                              <input type="text" class="form-control has-feedback-left" id="account_code" name="account_code"
-                                  placeholder="Account Code(Autofill: Random)" autocomplete="off">
-                              <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-info-sign" aria-hidden="true"></span>
-                          </div>
-  
                           <!-- Account Name -->
                           <div class="col-4 form-group has-feedback">
                               <input type="text" class="form-control has-feedback-left" id="account_name" name="account_name"
@@ -794,7 +779,6 @@ function addNewEmployee(page, employees) {
 
         if (isValid) {
           resolve({
-            account_code: form.account_code.value,
             account_name: form.account_name.value,
             contact_person: form.contact_person.value,
             mobile: form.mobile.value,
@@ -842,7 +826,6 @@ function addNewEmployee(page, employees) {
       salary = parseInt(data.monthly_salary, 10);
       opBalance = parseInt(data.opening_balance, 10);
       let employee = {
-        account_code: data.account_code,
         account_name: data.account_name,
         contact_person: data.contact_person,
         mobile: data.mobile,
@@ -890,13 +873,6 @@ function addNewSupplier(page, suppliers) {
       <div class="x_panel">
           <div class="x_content">
               <form id="add-supplier" class="needs-validation" novalidate>
-                  <!-- Account code -->
-                  <div class="col-4 form-group has-feedback">
-                      <input type="text" class="form-control has-feedback-left" id="account_code" name="account_code"
-                          placeholder="Account Code(Autofill: Random)" autocomplete="off">
-                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-info-sign" aria-hidden="true"></span>
-                  </div>
-
                   <!-- Account Name -->
                   <div class="col-4 form-group has-feedback">
                       <input type="text" class="form-control has-feedback-left" id="account_name" name="account_name"
@@ -1020,7 +996,6 @@ function addNewSupplier(page, suppliers) {
 
         if (isValid) {
           resolve({
-            account_code: form.account_code.value,
             account_name: form.account_name.value,
             contact_person: form.contact_person.value,
             mobile: form.mobile.value,
@@ -1066,7 +1041,6 @@ function addNewSupplier(page, suppliers) {
       const data = result.value;
       dis = parseInt(data.discount, 10);
       let supplier = {
-        account_code: data.account_code,
         account_name: data.account_name,
         contact_person: data.contact_person,
         mobile: data.mobile,
@@ -1092,9 +1066,9 @@ function addNewSupplier(page, suppliers) {
           if (data.error === true) {
             showErrorMessage(data.message)
           } else {
-            suppliers.push(data.result)
             showSuccessMessage(data.message);
             if (page === "purchase") {
+              suppliers.push(data.result);
               document.getElementById("supplier").innerHTML = '';
               document.getElementById("supplier").innerHTML = `<option value="${suppliers.length-1}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
               document.getElementById("supplier").disabled = true;
