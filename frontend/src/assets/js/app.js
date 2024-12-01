@@ -579,7 +579,7 @@ function updateChildList(parent, child, mapName) {
     firstLabel = "Select District";
   } else if (mapName === 'districtToUpazila') {
     lists = districtToUpazila[selectedValue];
-    firstLabel = "Select District";
+    firstLabel = "Select Upazila";
   }
 
   const option = document.createElement("option");

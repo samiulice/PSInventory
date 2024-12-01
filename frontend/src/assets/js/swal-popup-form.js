@@ -156,10 +156,12 @@ function addNewProduct(page, brands, categories, products) {
                         <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                     </div>
                     <div class="col-6 form-group has-feedback">` + categoryList +
-    `<span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-list" aria-hidden="true"></span>
+                    `<div class="invalid-feedback d-none text-danger">Please select category name.</div>
+                      <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-list" aria-hidden="true"></span>
                     </div>
                     <div class="col-6 form-group has-feedback">` + brandList +
-    `<span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-tags" aria-hidden="true"></span>
+                    `<div class="invalid-feedback d-none text-danger">Please select brand name.</div>
+                    <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-tags" aria-hidden="true"></span>
                     </div>
                     <!-- Sale Discount -->
                     <div class="col-4 form-group has-feedback">
@@ -1096,7 +1098,7 @@ function addNewStakeHolder() {
                   <div class="col-4 form-group has-feedback">
                       <select id="account_type" class="form-control form-select has-feedback-left" required>
                           <option value="" selected disabled>Select Type</option>
-                          <option value="Owner">Onwer</option>
+                          <option value="Owner">Owner</option>
                           <option value="Investor">Investor</option>
                       </select>
                       <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)"
