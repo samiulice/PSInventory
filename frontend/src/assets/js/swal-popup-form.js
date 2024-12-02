@@ -628,8 +628,8 @@ function addNewCustomer(page, customers) {
             showErrorMessage(data.message)
           } else {
             showSuccessMessage(data.message);
-            customers.push(data.result)
             if (page === "sale") {
+              customers.push(data.result)
               document.getElementById("customer").innerHTML = '';
               document.getElementById("customer").innerHTML = `<option value="${customers.length-1}" selected>${data.result.account_name} (${data.result.account_code})</option>`;;
               document.getElementById("customer").disabled = true;
