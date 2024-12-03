@@ -263,6 +263,7 @@ type Purchase struct {
 	MaxRetailPrice    int         `json:"max_retail_price"`
 	PurchaseRate      int         `json:"purchase_rate"`
 	WarrantyPeriod    int         `json:"warranty"`
+	ShippingCost      int         `json:"shipping_cost"`
 	BillAmount        int         `json:"bill_amount"`
 	Discount          int         `json:"discount"`
 	TotalAmount       int         `json:"total_amount"`
@@ -525,19 +526,19 @@ type TopSheet struct {
 	UpdatedAt             time.Time `json:"updated_at"`
 }
 type TrialBalance struct {
-	CapitalInvestment       int       `json:"capital_investment"`
-	CashBankAccounts        int       `json:"cash_bank_accounts"`
-	CurrentAssets           int       `json:"current_assets"`
-	CurrentLiabilities      int       `json:"current_liabilities"`
+	CapitalInvestment          int       `json:"capital_investment"`
+	CashBankAccounts           int       `json:"cash_bank_accounts"`
+	CurrentAssets              int       `json:"current_assets"`
+	CurrentLiabilities         int       `json:"current_liabilities"`
 	CustomerAccountsReceivable int       `json:"customer_accounts_receivable"`
-	SupplierAccountsPayable int       `json:"supplier_accounts_payable"`
-	EmployeeAccountsPayable      int       `json:"employee_accounts_payable"`
-	ExpenseAccounts         int       `json:"expense_accounts"`
-	FixedAssets             int       `json:"fixed_assets"`
-	LoanAccounts            int       `json:"loan_accounts"`
-	RevenueAccounts         int       `json:"revenue_accounts"`
-	CreatedAt               time.Time `json:"created_at"`
-	UpdatedAt               time.Time `json:"updated_at"`
+	SupplierAccountsPayable    int       `json:"supplier_accounts_payable"`
+	EmployeeAccountsPayable    int       `json:"employee_accounts_payable"`
+	ExpenseAccounts            int       `json:"expense_accounts"`
+	FixedAssets                int       `json:"fixed_assets"`
+	LoanAccounts               int       `json:"loan_accounts"`
+	RevenueAccounts            int       `json:"revenue_accounts"`
+	CreatedAt                  time.Time `json:"created_at"`
+	UpdatedAt                  time.Time `json:"updated_at"`
 }
 type BalanceSheet struct {
 	CashBankAccounts           int       `json:"cash_bank_accounts"`
