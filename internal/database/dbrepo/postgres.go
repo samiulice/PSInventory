@@ -2625,7 +2625,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 			SET quantity_sold = quantity_sold + $1, sold_price = sold_price + $2, sold_discount = sold_discount + $3
 			WHERE id = $4;
 		  `
-		_, err = tx.ExecContext(ctx, query, items.Quantity, items.SubTotal, items.SubTotal*sale.Discount, items.ProductID)
+		_, err = tx.ExecContext(ctx, query, items.Quantity, items.SubTotal, items.SubTotal*sale.Discount/100, items.ProductID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("SQLErrorSaleProductsToCustomer(Update products table): For id %d --%w", i, err)
@@ -2795,6 +2795,8 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	if err != nil {
 		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to begin transaction %w", err)
 	}
+	totalPurchasePrice := 0
+	totalDiscount := 0
 	//step:1 iterate over the SelectedItemsID slice and update the associated row(id) , set status="in stock", updated_at = time.Now()
 	for _, id := range SelectedItemsID {
 		var productItemID, mrp, purchaseRate int
@@ -2802,25 +2804,28 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 			UPDATE 
 				public.product_serial_numbers
 			SET
-				status='in stock', updated_at= CURRENT_TIMESTAMP
+				status='in stock', updated_at = CURRENT_TIMESTAMP
 			WHERE
-				id = $2
+				id = $1
 			RETURNING product_id, max_retail_price, purchase_rate		
 		`
-		err := tx.QueryRowContext(ctx, query, time.Now(), id).Scan(&productItemID, &mrp, &purchaseRate)
+		err := tx.QueryRowContext(ctx, query, id).Scan(&productItemID, &mrp, &purchaseRate)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in product_serial_numbers table SQL %w", err)
 		}
+		totalPurchasePrice += purchaseRate
+		//update products info
+		discount := int(math.Round(float64(mrp) * float64(SalesHistory.Discount/100.0)))
+		totalDiscount += discount
+		soldPrice := mrp - discount
 		query = `
 			UPDATE 
 				public.products
-			SET
-				quantity_sold = quantity_sold - 1, sold_price = sold_price - $1
-			WHERE
-				id = $2		
+			SET quantity_sold = quantity_sold - 1, sold_price = sold_price - $1, sold_discount = sold_discount - $2
+			WHERE id = $3;		
 		`
-		_, err = tx.ExecContext(ctx, query, int(mrp-mrp*SalesHistory.Discount/100), productItemID)
+		_, err = tx.ExecContext(ctx, query, soldPrice, discount, productItemID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in products table SQL %w", err)
@@ -2854,10 +2859,19 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		return fmt.Errorf("DBERROR:=>SaleReturnDB: Number of affected row is not equal to 1:  %w", err)
 	}
 
+	//Retrieve customer due_amount(if available) in customers table
+	query = `
+		SELECT due_amount FROM public.customers WHERE id = $1
+	`
+	var customerDue int
+	err = tx.QueryRowContext(ctx, query, SalesHistory.CustomerID).Scan(&customerDue)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("SQLErrorSaleReturnDB(retrieve customer due amount): %w", err)
+	}
 	due := 0
-	discount := (SalesHistory.BillAmount - SalesHistory.TotalAmount) * ReturnAmount / SalesHistory.TotalAmount
-	if ReturnAmount >= SalesHistory.TotalAmount-SalesHistory.PaidAmount {
-		due = SalesHistory.TotalAmount - SalesHistory.PaidAmount
+	if ReturnAmount > customerDue {
+		due = customerDue
 	} else {
 		due = ReturnAmount
 	}
@@ -2880,10 +2894,32 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		SET current_balance = current_balance - $1, amount_receivable =  amount_receivable - $2, offered_discount = offered_discount - $3
 		WHERE id = $4 returning current_balance
 	`
-	err = tx.QueryRowContext(ctx, query, ReturnAmount, due, discount, SalesHistory.AccountID).Scan(&current_balance)
+	err = tx.QueryRowContext(ctx, query, ReturnAmount-due, due, totalDiscount, SalesHistory.AccountID).Scan(&current_balance)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleReturnDB(Update head_accounts info):" + err.Error())
+	}
+	//update revenue account
+	query = `
+		UPDATE Public.head_accounts
+		SET current_balance = current_balance - $1
+		WHERE id = 5;
+	`
+	_, err = tx.ExecContext(ctx, query, ReturnAmount-totalPurchasePrice)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleReturnDB(Update REVENUE ACCOUNTS info):" + err.Error())
+	}
+	//update current assets
+	query = `
+		UPDATE Public.head_accounts
+		SET current_balance = current_balance + $1
+		WHERE id = 6;
+	`
+	_, err = tx.ExecContext(ctx, query, totalPurchasePrice)
+	if err != nil {
+		tx.Rollback()
+		return errors.New("SQLErrorSaleProductsToCustomer(Update CURRENT ASSETS info):" + err.Error())
 	}
 	//Insert Financial transaction for sale return amount
 	var financial_transactions_id int
@@ -2907,19 +2943,16 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	}
 
 	//Insert Financial transaction for sale return Repayment
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,current_balance,created_at,updated_at)
-	VALUES ('Sale Return','head_accounts',$1, 'customers', $2, $3, $4, $5, $6, $7) RETURNING transaction_id
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,current_balance)
+		VALUES ('Sale Return','head_accounts',$1, 'customers', $2, $3, CURRENT_TIMESTAMP, $4, $5) RETURNING transaction_id
 	`
 	description = "cash return to customer due to returning product"
 	err = tx.QueryRowContext(ctx, query,
 		&SalesHistory.AccountID,
 		&SalesHistory.CustomerID,
 		&ReturnAmount,
-		time.Now(),
 		&description,
 		&current_balance,
-		time.Now(),
-		time.Now(),
 	).Scan(&financial_transactions_id)
 	if err != nil {
 		tx.Rollback()
