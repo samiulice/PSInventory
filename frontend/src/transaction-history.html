@@ -381,11 +381,10 @@
                 className: "received-amount",
                 width: "10%",
                 render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase Return" || row.transaction_type === "Sale" || row.transaction_type === "Receive & Collection") {
+                  if (["Purchase","Receive & Collection", "Refund", "Sale Return", "Fund Acquisition"].includes(row.transaction_type)) {
                     return row.amount;
-                  } else {
-                    return "-";
                   }
+                  return "-";
                 }
               },
               {
@@ -393,11 +392,10 @@
                 className: "paid-amount",
                 width: "10%",
                 render: function (data, type, row) {
-                  if (row.transaction_type === "Purchase" || row.transaction_type === "Sale Return" || row.transaction_type === "Payment" || row.transaction_type === "Expense") {
+                  if (["Purchase Return",  "Sale", "Payment", "Expense"].includes(row.transaction_type)) {
                     return row.amount;
-                  } else {
-                    return "-";
                   }
+                  return "-";
                 }
               },
               { data: "current_balance", title: "Balance", className: "chq-no", width: "10%" },

@@ -388,7 +388,7 @@
                 className: "received-amount",
                 width: "10%",
                 render: function (data, type, row) {
-                  if (["Purchase Return", "Sale", "Receive & Collection"].includes(row.transaction_type)) {
+                  if (["Purchase","Receive & Collection", "Refund", "Sale Return", "Fund Acquisition"].includes(row.transaction_type)) {
                     return row.amount;
                   }
                   return "-";
@@ -399,7 +399,7 @@
                 className: "paid-amount",
                 width: "10%",
                 render: function (data, type, row) {
-                  if (["Purchase", "Sale Return", "Payment", "Expense"].includes(row.transaction_type)) {
+                  if (["Purchase Return",  "Sale", "Payment", "Expense"].includes(row.transaction_type)) {
                     return row.amount;
                   }
                   return "-";

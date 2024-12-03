@@ -512,7 +512,7 @@
 
   <script>
 
-    let customers, categories, brands, headAccounts, products, billAmount = 0, totalAmount = 0, gross_profit = 0, InvoiceData, company, selected_products = [], sold_products = [];
+    let customers = [], categories = [], brands = [], headAccounts = [], products = [], billAmount = 0, totalAmount = 0, gross_profit = 0, InvoiceData, company, selected_products = [], sold_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -544,10 +544,19 @@
             updateCustomerDiv(data.customers)
             updateCategoryDiv(data.categories)
             updateAccountsDiv(data.head_accounts)
-            customers = data.customers;
-            categories = data.categories;
+            if(data.customers){
+              customers = data.customers;
+            }
+            if(data.categories){
+              categories = data.categories;
+            }
+            if(data.brands){
             brands = data.brands;
-            headAccounts = data.head_accounts;
+            }
+            if(data.head_accounts){
+              headAccounts = data.head_accounts;
+            }
+            
             //update product list based on selected category
             category.addEventListener("change", e => {
               product.innerHTML = '<option value="" selected disabled>Select Product</option>';

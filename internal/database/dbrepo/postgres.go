@@ -2390,18 +2390,17 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 			total_purchases,
 			total_payments, 
 			purchases_discount,
-			initial_stock_value,
-			updated_at
+			initial_stock_value
 		) 
 		VALUES (
-			 TO_DATE($1, 'MM/DD/YYYY'), $2, $3, $4, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)+$5, $6
+			 TO_DATE($1, 'MM/DD/YYYY'), $2, $3, $4, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)+$5
 		)
 		ON CONFLICT (sheet_date) 
 		DO UPDATE SET 
 			total_purchases = public.top_sheet.total_purchases + EXCLUDED.total_purchases,
 			total_payments = public.top_sheet.total_payments + EXCLUDED.total_payments,
 			purchases_discount = public.top_sheet.purchases_discount + EXCLUDED.purchases_discount,
-			initial_stock_value = public.top_sheet.initial_stock_value + $7,
+			initial_stock_value = EXCLUDED.initial_stock_value,
 			updated_at = CURRENT_TIMESTAMP;
 	`
 	_, err = tx.ExecContext(ctx, query,
@@ -2409,8 +2408,6 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		&purchase.BillAmount,
 		&purchase.PaidAmount,
 		&purchase_discount,
-		&purchase.TotalAmount,
-		time.Now(),
 		&purchase.TotalAmount,
 	)
 	if err != nil {
@@ -2654,13 +2651,14 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 	}
 
 	due := sale.TotalAmount - sale.PaidAmount
+	discount := sale.BillAmount - sale.TotalAmount
 	//Tx-5: Update total_amount, due_amount(if available) in customers table
 	query = `
 		UPDATE Public.customers
-		SET total_amount = total_amount + $1, due_amount = due_amount + $2, total_discount = $3
+		SET total_amount = total_amount + $1, due_amount = due_amount + $2, total_discount = total_discount + $3
 		WHERE id = $4
 	`
-	_, err = tx.ExecContext(ctx, query, sale.TotalAmount, due, sale.BillAmount-sale.TotalAmount, sale.CustomerInfo.ID)
+	_, err = tx.ExecContext(ctx, query, sale.TotalAmount, due, discount, sale.CustomerInfo.ID)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update customers):" + err.Error())
@@ -2705,7 +2703,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		SET current_balance = current_balance + $1
 		WHERE id = 5;
 	`
-	_, err = tx.ExecContext(ctx, query, sale.BillAmount-totalPurchase)
+	_, err = tx.ExecContext(ctx, query, sale.BillAmount-totalPurchase-discount)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update REVENUE ACCOUNTS info):" + err.Error())
@@ -2799,17 +2797,17 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	}
 	//step:1 iterate over the SelectedItemsID slice and update the associated row(id) , set status="in stock", updated_at = time.Now()
 	for _, id := range SelectedItemsID {
-		var productItemID, mrp int
+		var productItemID, mrp, purchaseRate int
 		query := `
 			UPDATE 
 				public.product_serial_numbers
 			SET
-				status='in stock', updated_at=$1
+				status='in stock', updated_at= CURRENT_TIMESTAMP
 			WHERE
 				id = $2
-			RETURNING product_id, max_retail_price		
+			RETURNING product_id, max_retail_price, purchase_rate		
 		`
-		err := tx.QueryRowContext(ctx, query, time.Now(), id).Scan(&productItemID, &mrp)
+		err := tx.QueryRowContext(ctx, query, time.Now(), id).Scan(&productItemID, &mrp, &purchaseRate)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE in product_serial_numbers table SQL %w", err)
@@ -3211,13 +3209,24 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		var current_balance int
 		stmt := `
 			UPDATE public.head_accounts
-			SET current_balance = current_balance + $1, amount_receivable = amount_receivable - $2, updated_at = $3
-			WHERE id = $4 RETURNING current_balance;
+			SET current_balance = current_balance + $1, amount_receivable = amount_receivable - $2, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $3 RETURNING current_balance;
 		`
-		err = tx.QueryRowContext(ctx, stmt, sum.ReceivedAmount, sum.ReceivedAmount, time.Now(), sum.DestinationAccount.ID).Scan(&current_balance)
+		err = tx.QueryRowContext(ctx, stmt, sum.ReceivedAmount, sum.ReceivedAmount, sum.DestinationAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to update current_balance in head_accounts table: %w", err)
+		}
+		//Update due_amount in customers table
+		stmt = `
+			UPDATE Public.customers
+			SET due_amount = due_amount - $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2
+		`
+		_, err = tx.ExecContext(ctx, stmt, sum.ReceivedAmount, sum.SourceAccount.ID)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to update due_amount in customers table: %w", err)
 		}
 
 		//insert to financial transactions
@@ -3234,19 +3243,19 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		//Tx: update top_sheet data if the sheet_date for entry for current date already exist,
 		//Otherwise insert a new row  in the top_sheet table
 		query := `
-		INSERT INTO public.top_sheet (
-			sheet_date, 
-			total_received_payments, 
-			initial_stock_value
-		) 
-		VALUES (
-			 TO_DATE($1, 'MM/DD/YYYY'), $2, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)
-		)
-		ON CONFLICT (sheet_date) 
-		DO UPDATE SET 
-			total_received_payments = public.top_sheet.total_received_payments + EXCLUDED.total_received_payments,
-			updated_at = CURRENT_TIMESTAMP;
-	`
+			INSERT INTO public.top_sheet (
+				sheet_date, 
+				total_received_payments, 
+				initial_stock_value
+			) 
+			VALUES (
+				TO_DATE($1, 'MM/DD/YYYY'), $2, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)
+			)
+			ON CONFLICT (sheet_date) 
+			DO UPDATE SET 
+				total_received_payments = public.top_sheet.total_received_payments + EXCLUDED.total_received_payments,
+				updated_at = CURRENT_TIMESTAMP;
+		`
 		_, err = tx.ExecContext(ctx, query,
 			&sum.ReceivedDate,
 			&sum.ReceivedAmount,
@@ -3259,10 +3268,10 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 		//set due_amount -= received_amount
 		stmt = `
 			UPDATE public.customers
-			SET due_amount = due_amount - $1, updated_at = $2
-			WHERE id = $3`
+			SET due_amount = due_amount - $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.ReceivedAmount, time.Now(), sum.SourceAccount.ID)
+		_, err = tx.ExecContext(ctx, stmt, sum.ReceivedAmount, sum.SourceAccount.ID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to update due_amount in customers table: %w", err)
@@ -4168,7 +4177,7 @@ func (p *postgresDBRepo) GetCashBankStatement() ([]*models.Transaction, error) {
 	query := `
 		SELECT transaction_id, voucher_no, transaction_type, source_type, source_id, destination_type, destination_id, amount, current_balance, transaction_date, description
 		FROM public.financial_transactions 
-		WHERE transaction_type IN('Refund','Repayment','Receive & Collection', 'Payment', 'Cash Transfer', 'Expense', 'Cash Adjustment')
+		WHERE transaction_type IN('Refund','Repayment','Receive & Collection', 'Payment', 'Fund Acquisition', 'Cash Transfer', 'Expense', 'Cash Adjustment')
 		ORDER BY transaction_id DESC
 	`
 	rows, err := p.DB.QueryContext(ctx, query)
@@ -4564,7 +4573,12 @@ func (p *postgresDBRepo) GetBalanceSheetReport() (models.BalanceSheet, error) {
 		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve CASH & BANK ACCOUNTS balance: %w", err)
 	}
 	balanceSheet.CashBankAccounts = val
-
+	// REVENUE ACCOUNTS
+	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'REVENUE ACCOUNTS'").Scan(&val)
+	if err != nil {
+		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve REVENUE ACCOUNTS balance: %w", err)
+	}
+	balanceSheet.CashBankAccounts -= val
 	// Inventory Products
 	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(initial_stock_value, 0) FROM top_sheet ORDER BY id DESC LIMIT 1").Scan(&val)
 	if err != nil {
