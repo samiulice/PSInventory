@@ -246,6 +246,33 @@ type ProductMetadata struct {
 	UpdatedAt              time.Time `json:"updated_at"`
 }
 
+type PurchasedProduct struct {
+	Product        Product  `json:"product_info"`
+	ProductSerialNo  []string `json:"products_serial_no"`
+	Quantity       int      `json:"quantity"`
+	MaxRetailPrice int      `json:"max_retail_price"`
+	PurchaseRate   int      `json:"purchase_rate"`
+	ShippingCost   int      `json:"shipping_cost"`
+	WarrantyPeriod int      `json:"warranty"`
+}
+
+type PurchasePayload struct{
+	ID                int         `json:"id"`
+	PurchaseDate      string      `json:"purchase_date"`
+	Supplier          Supplier    `json:"supplier_info"`
+	HeadAccount       HeadAccount `json:"head_account_info"`
+	ChalanNO          string      `json:"chalan_no"`
+	MemoNo            string      `json:"memo_no"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
+	Note              string      `json:"note"`
+	BillAmount        int         `json:"bill_amount"`
+	Discount          int         `json:"discount"`
+	TotalAmount       int         `json:"total_amount"`
+	PaidAmount        int         `json:"paid_amount"`
+	PurchasedProduct PurchasedProduct `json:"purchased_product"`
+	CreatedAt         time.Time   `json:"created_at"`
+	UpdatedAt         time.Time   `json:"updated_at"`
+}
+
 // Purchase is the type for purchase info
 type Purchase struct {
 	ID                int         `json:"id"`

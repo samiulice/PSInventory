@@ -276,15 +276,6 @@
                       aria-hidden="true">
                     </i>
                   </div>
-                  <!-- Shipping Cost -->
-                  <div class="col-md-3 col-sm-3 col-xs-6">
-                    <label for="warranty">Shipping Cost * :</label>
-                    <input type="number" class="form-control has-feedback-left" id="shipping-cost" name="shipping-cost"
-                      placeholder="In TK" required>
-                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-truck form-control-feedback left"
-                      aria-hidden="true">
-                    </i>
-                  </div>
                   <!-- Paid Amount -->
                   <div class="col-md-3 col-sm-3 col-xs-6">
                     <label for="paidAmount">Paid Amount * :</label>
@@ -322,104 +313,95 @@
                 </div>
               </div>
             </div>
-
-            <!-- Product Code Section -->
-            <div class="x_panel bg-gw">
-              <div class="x_title">
-                <div class="row">
-                  <div class="col-md-4 col-sm-6 col-xs-6">
-                    <h2>Products Serial No.</h2>
-                  </div>
-                  <div class="pull-right">
-                    <button type="button" class="btn btn-round btn-xs btn-dark d-none" id="genRandomCodesBtn">
-                      <i class="fa fa-random">&nbsp;&nbsp;</i>Random Serial No.
-                    </button>
-                    <button type="button" class="btn btn-round btn-xs btn-primary d-none" id="printRandomCodesBtn"
-                      onclick="printSN()">
-                      <i class="fa fa-print">&nbsp;&nbsp;</i>Print Serial Tags.
-                    </button>
-                  </div>
-                  <div class="pull-right">
-                    <button type="button" class="btn btn-round btn-xs btn-danger d-none" id="resetQuantityBtn">
-                      <i class="fa fa-refresh">&nbsp;&nbsp;</i>reset
-                    </button>
-                  </div>
-                  <div class="pull-right">
-                    <button type="button" class="btn btn-xs btn-primary" id="addItems">
-                      <i class="fa fa-check">&nbsp;&nbsp;</i>Save
-                    </button>
-                  </div>
+          </form>
+          <!-- Product Code Section -->
+          <div class="x_panel bg-gw">
+            <div class="x_title">
+              <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-6">
+                  <h2>Products Serial No.</h2>
                 </div>
-                <div class="clearfix"></div>
+                <div class="pull-right">
+                  <button type="button" class="btn btn-round btn-xs btn-dark d-none" id="genRandomCodesBtn">
+                    <i class="fa fa-random">&nbsp;&nbsp;</i>Random Serial No.
+                  </button>
+                  <button type="button" class="btn btn-round btn-xs btn-primary d-none" id="printRandomCodesBtn"
+                    onclick="printSN()">
+                    <i class="fa fa-print">&nbsp;&nbsp;</i>Print Serial Tags.
+                  </button>
+                </div>
+                <div class="pull-right">
+                  <button type="button" class="btn btn-round btn-xs btn-danger d-none" id="resetQuantityBtn">
+                    <i class="fa fa-refresh">&nbsp;&nbsp;</i>reset
+                  </button>
+                </div>
+                <div class="pull-right">
+                  <button type="button" class="btn btn-xs btn-primary d-none" id="addItemsBtn"
+                    onclick="addItemsToList()">
+                    <i class="fa fa-check">&nbsp;&nbsp;</i>Save
+                  </button>
+                </div>
               </div>
-              <div class="x_content">
-                <div class="row">
-                  <!-- Category Info -->
-                  <div class="col-md-6 col-sm-6 col-xs-6 form-group has-feedback">
-                    <label for="category">Product Category * :</label>
-                    <select id="category" class="form-control form-select has-feedback-left" required>
-                      <option value="" selected disabled>Select Category</option>
-                      <!--Updated by JS DOM -->
-                    </select>
-                    <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
-                      aria-hidden="true"></i>
-                  </div>
-
-                  <!-- Product Info -->
-
-                  <div class="col-md-6 col-sm-6 col-xs-6 form-group has-feedback">
-                    <label for="product">Product Name * :</label>
-                    <select id="product" class="form-control form-select has-feedback-left" required>
-                      <option value="" selected disabled>Select Product</option>
-                      <!--Updated by JS DOM -->
-                    </select>
-                    <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
-                      aria-hidden="true"></i>
-                  </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="row">
+                <!-- Category Info -->
+                <div class="col-md-5 col-sm-5 col-xs-5 form-group has-feedback">
+                  <label for="category">Product Category * :</label>
+                  <select id="category" class="form-control form-select has-feedback-left" required>
+                    <option value="" selected disabled>Select Category</option>
+                    <!--Updated by JS DOM -->
+                  </select>
+                  <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
+                    aria-hidden="true"></i>
                 </div>
-                <div class="row">
-                  <div class="col-md-3 col-sm-3 col-xs-12 has-feedback">
-                    <label for="purchaseRate">Purchase Rate * :</label>
-                    <input type="number" class="form-control has-feedback-left" id="purchaseRate" name="purchaseRate"
-                      placeholder="TK" required>
-                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                      aria-hidden="true">
-                    </i>
-                  </div>
-                  <div class="col-md-3 col-sm-3 col-xs-12 has-feedback">
-                    <label for="quantity">Quantity(max 100) * :</label>
-                    <input type="number" min="1" max="100" class="form-control has-feedback-left" id="quantity"
-                      name="quantity" required>
-                    <i style="color: #000000;" class="fa fa-cubes form-control-feedback left" aria-hidden="true">
-                    </i>
-                  </div>
-                  <div class="col-md-3 col-sm-3 col-xs-12 has-feedback">
-                    <label for="mrp">M.R.P. * :</label>
-                    <input type="number" class="form-control has-feedback-left" id="mRP" name="mRP" placeholder="TK"
-                      required>
-                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
-                      aria-hidden="true">
-                    </i>
-                  </div>
 
-                  <div class="col-md-3 col-sm-3 col-xs-12 has-feedback">
-                    <label for="warranty">Warranty * :</label>
-                    <input type="number" class="form-control has-feedback-left" id="warranty" name="warranty"
-                      placeholder="e.g 365days" required>
-                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-cogs form-control-feedback left"
-                      aria-hidden="true">
-                    </i>
-                  </div>
+                <!-- Product Info -->
+                <div class="col-md-5 col-sm-5 col-xs-5 form-group has-feedback">
+                  <label for="product">Product Name * :</label>
+                  <select id="product" class="form-control form-select has-feedback-left" required>
+                    <option value="" selected disabled>Select Product</option>
+                    <!--Updated by JS DOM -->
+                  </select>
+                  <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
+                    aria-hidden="true"></i>
                 </div>
-                <div class="clearfix"><br></div>
-                <!-- products serials no. input fields -->
-                <div id="productsSerialNo">
-                  <div class="row text-center text-danger">Enter Product Quantity</div>
-                  <!-- More field will be added by DOM JS if needed  -->
+              </div>
+              <div class="row">
+                <div class="col-md-2 col-sm-3 col-xs-10">
+                  <label for="purchaseRate">Purchase Rate * :</label>
+                  <input type="number" class="form-control" id="purchaseRate" name="purchaseRate" placeholder="TK"
+                    required>
                 </div>
+                <div class="col-md-2 col-sm-3 col-xs-10">
+                  <label for="quantity">Quantity(max 100) * :</label>
+                  <input type="number" min="1" max="100" class="form-control" id="quantity" name="quantity" required>
+                </div>
+                <div class="col-md-2 col-sm-3 col-xs-10">
+                  <label for="mrp">M.R.P. * :</label>
+                  <input type="number" class="form-control" id="mRP" name="mRP" placeholder="TK" required>
+                </div>
+                <!-- Shipping Cost -->
+                <div class="col-md-2 col-sm-3 col-xs-10">
+                  <label for="shipping-cost">Shipping Cost * :</label>
+                  <input type="number" class="form-control" id="shipping-cost" name="shipping-cost"
+                    placeholder="In TK" required>
+                </div>
+                <div class="col-md-2 col-sm-3 col-xs-10">
+                  <label for="warranty">Warranty * :</label>
+                  <input type="number" class="form-control" id="warranty" name="warranty" placeholder="e.g 365days"
+                    required>
+                </div>
+              </div>
+              <div class="clearfix"><br></div>
+              <!-- products serials no. input fields -->
+              <div id="productsSerialNo">
+                <div class="row text-center text-danger">Enter Product Quantity</div>
+                <!-- More field will be added by DOM JS if needed  -->
               </div>
             </div>
-          </form>
+          </div>
         </div>
         <!-- /page content -->
       </div>
@@ -476,7 +458,7 @@
 
     <script>
 
-      let products = [], suppliers = [], headAccounts = [], categories = [], brands = [], purchase_details = [], InvoiceData, company;
+      let products = [], suppliers = [], headAccounts = [], categories = [], brands = [], purchased_product = [], purchase_details = [], InvoiceData, company;
 
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
@@ -491,6 +473,7 @@
         let productsSerialNo = document.getElementById("productsSerialNo");
         let quantity = document.getElementById("quantity");
         let resetQuantityBtn = document.getElementById("resetQuantityBtn");
+        let addItemsBtn = document.getElementById("addItemsBtn");
         let exceedQuantityLimit = document.getElementById("err-exceed-quantity-limit");
         let account = document.getElementById("account");
         let purchaseRate = document.getElementById("purchaseRate");
@@ -592,6 +575,7 @@
                   q = 100;
                 }
                 updateProductSerialDiv(q);
+                addItemsBtn.classList.remove("d-none");
               });
               genRandomCodesBtn.addEventListener("click", e => {
                 insertRandomSerial(parseInt(quantity.value));
@@ -603,19 +587,17 @@
                 genRandomCodesBtn.classList.add("d-none");
                 printRandomCodesBtn.classList.add("d-none");
                 resetQuantityBtn.classList.add("d-none");
+                addItemsBtn.classList.add("d-none");
+                purchaseRate.value = "";
+                mRP.value = "";
+                warranty.value = "";
+                shippingCost.value = "";
               })
               //submit data to backend
               form.addEventListener('submit', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                //Getting productsCodes
-                let q = parseInt(quantity.value)
-                let productCodes = []; //reset length to 0
-                for (let i = 0; i < q; i++) {
-                  let id = "serialNo-" + i;
-                  let v = document.getElementById(id).value;
-                  productCodes.push(v);
-                }
+
                 purchase_details = {
                   purchase_date: single_cal4.value,
                   supplier_info: suppliers[parseInt(supplier.value)],
@@ -623,20 +605,13 @@
                   chalan_no: chalan_no.value,
                   memo_no: memo_no.value,
                   note: note.value,
-                  shipping_cost: parseInt(shippingCost.value),
                   bill_amount: parseInt(billAmount.value),
                   discount: parseInt(discount.value),
                   paid_amount: parseInt(paidAmount.value),
-                  product_info: products[parseInt(product.value)],
-                  quantity_purchased: q,
-                  products_serial_no: productCodes,
-                  max_retail_price: parseInt(mRP.value),
-                  purchase_rate: parseInt(purchaseRate.value),
-                  warranty: parseInt(warranty.value),
-
+                  purchased_product_info: purchased_product
                 }
                 submitBtn.classList.add("d-none");
-                const requestOptions = {
+                 const requestOptions = {
                   method: 'post',
                   headers: {
                     'Accept': 'application/json',
@@ -740,6 +715,91 @@
         resetQuantityBtn.classList.remove("d-none");
       }
 
+      function addItemsToList() {
+        let q = parseInt(quantity.value)
+        if (q <= 0) {
+          Swal.fire({
+            icon: "error",
+            title: `Quantity must be grater than 0`,
+            showConfirmButton: true,
+          });
+        }
+        let productCodes = []; //reset length to 0
+        for (let i = 0; i < q; i++) {
+          let id = "serialNo-" + i;
+          let v = document.getElementById(id).value;
+          if (v.trim() === "") {
+            Swal.fire({
+              icon: "error",
+              title: `Enter Serial Number At ${i + 1}`,
+              showConfirmButton: true,
+            });
+            return;
+          }
+          productCodes.push(v);
+        }
+        if (purchaseRate.value.trim() === "") {
+          Swal.fire({
+            icon: "error",
+            title: `Enter Purchase Rate Value`,
+            showConfirmButton: true,
+          });
+          return;
+        }
+        if (mRP.value.trim() === "") {
+          Swal.fire({
+            icon: "error",
+            title: `Enter MRP Value`,
+            showConfirmButton: true,
+          });
+          return;
+        }
+        if (document.getElementById("shipping-cost").value.trim() === "") {
+          Swal.fire({
+            icon: "error",
+            title: `Enter Shipping Cost Value`,
+            showConfirmButton: true,
+          });
+          return;
+        }
+        if (warranty.value.trim() === "") {
+          Swal.fire({
+            icon: "error",
+            title: `Enter Warranty Value`,
+            showConfirmButton: true,
+          });
+          return;
+        }
+        
+        product_items = {
+          product_info: products[parseInt(product.value)],
+          quantity: q,
+          products_serial_no: productCodes,
+          max_retail_price: parseInt(mRP.value),
+          purchase_rate: parseInt(purchaseRate.value),
+          shipping_cost: parseInt(document.getElementById("shipping-cost").value),
+          warranty: parseInt(warranty.value),
+        }
+        purchased_product.push(product_items);
+        productsSerialNo.innerHTML = '<div class="row text-center text-danger">Product added, Enter new product items</div>';
+        quantity.value = "";
+        quantity.disabled = false;
+        mRP.value = "";
+        purchaseRate.value = "";
+        genRandomCodesBtn.classList.add("d-none");
+        category.value = ""
+        category.disabled = false;
+        product.value = ""
+        product.disabled = false;
+        printRandomCodesBtn.classList.add("d-none");
+        resetQuantityBtn.classList.add("d-none");
+        addItemsBtn.classList.add("d-none");
+        purchaseRate.value = "";
+        mRP.value = "";
+        warranty.value = "";
+        document.getElementById("shipping-cost").value = "";
+        console.log(purchased_product)
+      }
       function printSalesInvoice() {
         //product list table
         let tBody = ""
@@ -1075,6 +1135,10 @@
           document.body.removeChild(iframe);
         };
       }
+
+    </script>
+
+    <script>
 
     </script>
 
