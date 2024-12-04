@@ -177,12 +177,6 @@
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
         <h2 class="text-center text-warning fa-2x"><label>PURCHASE</label></h2>
-        <div class="row text-right">
-          <div class="col-md-12 col-sm-12 col-xs-12">
-            <a href="javascript:void(0);" id="purchase-invoice-print-btn" style="width: 200px;"
-              onclick="generatePDF('purchase-form-content', 3)" class="btn btn-danger d-none">Print Invoice</a>
-          </div>
-        </div>
         <div id="purchase-form-content">
 
           <!-- Page content here -->
@@ -262,8 +256,17 @@
                   <!-- Bill Amount -->
                   <div class="col-md-3 col-sm-3 col-xs-6">
                     <label for="billAmount">Bill Amount * :</label>
-                    <input type="number" class="form-control has-feedback-left" id="billAmount"
-                      placeholder="Bill Amount" required>
+                    <input type="number" min="0" class="form-control has-feedback-left" id="billAmount"
+                      placeholder="Bill Amount" required disabled>
+                    <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
+                      aria-hidden="true">
+                    </i>
+                  </div>
+                  <!-- Total Shipment Cost -->
+                  <div class="col-md-3 col-sm-3 col-xs-6">
+                    <label for="totalShippingCost">Total Shipment Cost * :</label>
+                    <input type="number" min="0" class="form-control has-feedback-left" id="totalShippingCost"
+                      placeholder="Shipment Cost" required disabled>
                     <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                       aria-hidden="true">
                     </i>
@@ -271,7 +274,7 @@
                   <!-- Discount Amount -->
                   <div class="col-md-3 col-sm-3 col-xs-6">
                     <label for="discount">Discount :</label>
-                    <input type="number" class="form-control has-feedback-left" id="discount" placeholder="In TK">
+                    <input type="number" min="0" class="form-control has-feedback-left" id="discount" placeholder="In TK">
                     <i style="color: rgba(0, 0, 0, 1);" class="fa fa-gift form-control-feedback left"
                       aria-hidden="true">
                     </i>
@@ -279,7 +282,7 @@
                   <!-- Paid Amount -->
                   <div class="col-md-3 col-sm-3 col-xs-6">
                     <label for="paidAmount">Paid Amount * :</label>
-                    <input type="number" class="form-control has-feedback-left" id="paidAmount"
+                    <input type="number" min="0" class="form-control has-feedback-left" id="paidAmount"
                       placeholder="Paid Amount" required>
                     <i style="color: rgba(0, 0, 0, 1);" class="fa fa-money form-control-feedback left"
                       aria-hidden="true">
@@ -288,7 +291,7 @@
                 </div>
 
                 <div class="row form-group has-feedback">
-                  <!-- Bill Amount -->
+                  <!-- Chalan No. -->
                   <div class="col-md-6 col-sm-6 col-xs-6">
                     <label for="chalan_no">Chalan No :</label>
                     <input type="text" class="form-control has-feedback-left" id="chalan_no" placeholder="Chalan No">
@@ -296,7 +299,7 @@
                       aria-hidden="true">
                     </i>
                   </div>
-                  <!-- Discount Amount -->
+                  <!-- Note -->
                   <div class="col-md-6 col-sm-6 col-xs-6">
                     <label for="note">Note :</label>
                     <input type="text" class="form-control has-feedback-left" id="note" placeholder="Note">
@@ -309,11 +312,37 @@
                   <!-- Submit Button -->
                   <div class="col-md-12 col-sm-12 col-xs-12 text-center">
                     <button type="submit" id="submitBtn" class="btn btn-danger">Complete Purchase</button>
+                    <button type="button" id="purchase-invoice-print-btn"
+                      onclick="generatePDF('purchase-form-content', 3)" class="btn btn-dark d-none">Print
+                      Invoice</button>
                   </div>
                 </div>
               </div>
             </div>
           </form>
+          <!-- Product preview section -->
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <caption><b style="font-size: 20px;">Product Summary</b></caption>
+              <table class="table table-striped table-bordered">
+                <thead style="background-color: rgba(4, 209, 209, 0.1);">
+                  <tr>
+                    <th>No.</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Brand</th>
+                    <th>Quantity</th>
+                    <th>Shipping Cost</th>
+                    <th>Purchase Rate</th>
+                    <th>SubTotal</th>
+                  </tr>
+                </thead>
+                <tbody id="product-summary-tBody">
+                  <!-- DOM JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
           <!-- Product Code Section -->
           <div class="x_panel bg-gw">
             <div class="x_title">
@@ -371,7 +400,7 @@
               <div class="row">
                 <div class="col-md-2 col-sm-3 col-xs-10">
                   <label for="purchaseRate">Purchase Rate * :</label>
-                  <input type="number" class="form-control" id="purchaseRate" name="purchaseRate" placeholder="TK"
+                  <input type="number" class="form-control" min="0" id="purchaseRate" name="purchaseRate" placeholder="TK"
                     required>
                 </div>
                 <div class="col-md-2 col-sm-3 col-xs-10">
@@ -380,17 +409,17 @@
                 </div>
                 <div class="col-md-2 col-sm-3 col-xs-10">
                   <label for="mrp">M.R.P. * :</label>
-                  <input type="number" class="form-control" id="mRP" name="mRP" placeholder="TK" required>
+                  <input type="number" class="form-control" min="0" id="mRP" name="mRP" placeholder="TK" required>
                 </div>
                 <!-- Shipping Cost -->
                 <div class="col-md-2 col-sm-3 col-xs-10">
                   <label for="shipping-cost">Shipping Cost * :</label>
-                  <input type="number" class="form-control" id="shipping-cost" name="shipping-cost"
-                    placeholder="In TK" required>
+                  <input type="number" class="form-control" min="0" id="shipping-cost" name="shipping-cost" placeholder="In TK"
+                    required>
                 </div>
                 <div class="col-md-2 col-sm-3 col-xs-10">
                   <label for="warranty">Warranty * :</label>
-                  <input type="number" class="form-control" id="warranty" name="warranty" placeholder="e.g 365days"
+                  <input type="number" class="form-control" min="0" id="warranty" name="warranty" placeholder="e.g 365days"
                     required>
                 </div>
               </div>
@@ -458,7 +487,7 @@
 
     <script>
 
-      let products = [], suppliers = [], headAccounts = [], categories = [], brands = [], purchased_product = [], purchase_details = [], InvoiceData, company;
+      let products = [], suppliers = [], headAccounts = [], categories = [], brands = [], purchased_product = [], purchase_details = [], InvoiceData, company, total_shipping_cost = 0;
 
       window.addEventListener("DOMContentLoaded", () => {
         let supplier = document.getElementById("supplier");
@@ -481,6 +510,7 @@
         let warranty = document.getElementById("warranty");
         let shippingCost = document.getElementById("shipping-cost");
         let billAmount = document.getElementById("billAmount");
+        let totalShippingCost = document.getElementById("totalShippingCost");
         let discount = document.getElementById("discount");
         let totalAmount = document.getElementById("totalAmount");
         let paidAmount = document.getElementById("paidAmount");
@@ -515,8 +545,9 @@
               if (data.head_accounts) {
                 headAccounts = data.head_accounts
               }
-              if (data.products) {
+              if (data.products) {                
                 products = data.products
+                console.log(products)
               }
               if (data.suppliers) {
                 suppliers = data.suppliers
@@ -597,7 +628,14 @@
               form.addEventListener('submit', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-
+                if (purchased_product.length === 0) {
+                  Swal.fire({
+                    icon: "error",
+                    title: `Add products first`,
+                    showConfirmButton: true,
+                  });
+                  return;
+                }
                 purchase_details = {
                   purchase_date: single_cal4.value,
                   supplier_info: suppliers[parseInt(supplier.value)],
@@ -607,11 +645,12 @@
                   note: note.value,
                   bill_amount: parseInt(billAmount.value),
                   discount: parseInt(discount.value),
+                  total_amount: parseInt(billAmount.value) - parseInt(discount.value),
                   paid_amount: parseInt(paidAmount.value),
                   purchased_product_info: purchased_product
                 }
                 submitBtn.classList.add("d-none");
-                 const requestOptions = {
+                const requestOptions = {
                   method: 'post',
                   headers: {
                     'Accept': 'application/json',
@@ -723,6 +762,7 @@
             title: `Quantity must be grater than 0`,
             showConfirmButton: true,
           });
+          return;
         }
         let productCodes = []; //reset length to 0
         for (let i = 0; i < q; i++) {
@@ -770,7 +810,7 @@
           });
           return;
         }
-        
+
         product_items = {
           product_info: products[parseInt(product.value)],
           quantity: q,
@@ -781,6 +821,16 @@
           warranty: parseInt(warranty.value),
         }
         purchased_product.push(product_items);
+        if (billAmount.value.trim() === "") {
+          billAmount.value = product_items.quantity * product_items.purchase_rate
+        } else {
+          billAmount.value = parseInt(billAmount.value) + product_items.quantity * product_items.purchase_rate
+        }
+        if (totalShippingCost.value.trim() === "") {
+          totalShippingCost.value = product_items.shipping_cost
+        } else {
+          totalShippingCost.value = parseInt(totalShippingCost.value) + product_items.shipping_cost
+        }
         productsSerialNo.innerHTML = '<div class="row text-center text-danger">Product added, Enter new product items</div>';
         quantity.value = "";
         quantity.disabled = false;
@@ -798,6 +848,20 @@
         mRP.value = "";
         warranty.value = "";
         document.getElementById("shipping-cost").value = "";
+        
+        //add new row to summary table
+        document.getElementById("product-summary-tBody").innerHTML += `
+        <tr>
+          <th>${purchased_product.length}</th>
+          <th>${product_items.product_info.product_name}</th>
+          <th>${product_items.product_info.category.name}</th>
+          <th>${product_items.product_info.brand.name}</th>
+          <th>${product_items.quantity}</th>
+          <th>${product_items.shipping_cost}</th>
+          <th>${product_items.purchase_rate}</th>
+          <th>${product_items.purchase_rate * product_items.quantity}</th>
+        </tr>
+        `
         console.log(purchased_product)
       }
       function printSalesInvoice() {

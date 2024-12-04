@@ -101,7 +101,7 @@ type StakeHolder struct {
 	ContactPerson string `json:"contact_person"`
 	// Gender                string         `json:"gender"`
 	// DateOfBith            time.Time      `json:"date_of_birth"`
-	// Experties        string         `json:"exparties"`
+	// Experties        string         `json:"expertise"`
 	Division        string    `json:"division"`
 	District        string    `json:"district"`
 	Upazila         string    `json:"upazila"`
@@ -245,7 +245,7 @@ type ProductMetadata struct {
 	CreatedAt              time.Time `json:"created_at"`
 	UpdatedAt              time.Time `json:"updated_at"`
 }
-
+// Purchase Payload
 type PurchasedProduct struct {
 	Product        Product  `json:"product_info"`
 	ProductSerialNo  []string `json:"products_serial_no"`
@@ -262,18 +262,18 @@ type PurchasePayload struct{
 	Supplier          Supplier    `json:"supplier_info"`
 	HeadAccount       HeadAccount `json:"head_account_info"`
 	ChalanNO          string      `json:"chalan_no"`
-	MemoNo            string      `json:"memo_no"` //MM-P-randomAlphanumeriac(6)CurrentIndexOfPurchaseHistoryDB
+	MemoNo            string      `json:"memo_no"` //MM-P-randomAlphanumeric(6)CurrentIndexOfPurchaseHistoryDB
 	Note              string      `json:"note"`
 	BillAmount        int         `json:"bill_amount"`
 	Discount          int         `json:"discount"`
 	TotalAmount       int         `json:"total_amount"`
 	PaidAmount        int         `json:"paid_amount"`
-	PurchasedProduct PurchasedProduct `json:"purchased_product"`
+	PurchasedProduct []PurchasedProduct `json:"purchased_product_info"`
 	CreatedAt         time.Time   `json:"created_at"`
 	UpdatedAt         time.Time   `json:"updated_at"`
 }
 
-// Purchase is the type for purchase info
+// Purchase is the type for purchase info(deprecated)
 type Purchase struct {
 	ID                int         `json:"id"`
 	PurchaseDate      string      `json:"purchase_date"`

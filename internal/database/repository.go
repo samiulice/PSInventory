@@ -82,7 +82,7 @@ type DatabaseRepo interface {
 	//Memo
 	GetMemoListBySupplierID(supplierID int) ([]*models.Purchase, error)
 	GetMemoListByCustomerID(customerID int) ([]*models.Sale, error)
-	RestockProduct(purchase *models.Purchase) error
+	RestockProduct(purchase *models.PurchasePayload) error
 
 	//accounts
 	//Receive & Collection

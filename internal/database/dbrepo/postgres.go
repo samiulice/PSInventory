@@ -2242,7 +2242,7 @@ func (p *postgresDBRepo) GetMemoListByCustomerID(customerID int) ([]*models.Sale
 }
 
 // RestockProduct update product quantity, store purchase history and product serial numbers
-func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
+func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	tx, err := p.DB.BeginTx(ctx, nil)
@@ -2250,82 +2250,107 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		return err
 	}
 
-	total_purchase_price := purchase.BillAmount-purchase.Discount
-	//Tx-1: Increase quantity_purchased and purchase_cost in products table
-	query := `
+	//store total Purchase price and shipping cost
+	var totalPurchasePrice, totalShippingCost, totalDiscount int
+
+	// loop over the purchased_product array from the Purchase payload
+	for i, pr := range purchase.PurchasedProduct {
+		//update costs
+		sub_total := pr.Quantity*pr.PurchaseRate
+		discountPerProductType := int(math.Round(float64(purchase.Discount*sub_total)/float64(purchase.BillAmount)))
+		discountPerUnit := discountPerProductType/pr.Quantity
+		totalPurchasePrice += sub_total
+		totalShippingCost += pr.ShippingCost
+		totalDiscount += discountPerProductType
+
+		//Tx-1: Insert data into purchase history table
+		var purchase_id int
+		query := `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,bill_amount,discount,shipping_cost,total_amount,paid_amount)
+		VALUES (TO_DATE($1, 'MM/DD/YYYY'), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
+		`
+		row := tx.QueryRowContext(ctx, query,
+			purchase.PurchaseDate,
+			purchase.Supplier.ID,
+			pr.Product.ID,
+			purchase.HeadAccount.ID,
+			purchase.ChalanNO,
+			purchase.MemoNo,
+			purchase.Note,
+			pr.Quantity,
+			sub_total,
+			discountPerProductType,
+			pr.ShippingCost,
+			sub_total - discountPerProductType,
+			purchase.PaidAmount,
+		)
+		if err = row.Scan(&purchase_id); err != nil {
+			tx.Rollback()
+			return fmt.Errorf("SQLErrorRestockProduct(Insert purchase_history) traceID#%d: %w", i, err)
+		}
+
+		//Tx-2: Insert product serial numbers and associated information to product serial_numbers table
+		values := []string{}
+		for _, serial_number := range pr.ProductSerialNo {
+			values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,%d,%d)", serial_number, pr.Product.ID, purchase_id,discountPerUnit, pr.MaxRetailPrice, pr.PurchaseRate, pr.WarrantyPeriod, int(math.Round(float64(pr.ShippingCost)/float64(pr.Quantity)))))
+		}
+		query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,purchase_discount,max_retail_price,purchase_rate,warranty_period, shipping_cost) VALUES " + strings.Join(values, ",") + ";"
+		// Execute the query
+		_, err = tx.ExecContext(ctx, query)
+		if err != nil {
+			tx.Rollback()
+			return errors.New("SQLErrorRestockProduct(Product Serial Number):" + err.Error())
+		}
+
+		//Tx-3: Increase quantity_purchased, purchase_cost and purchase_discount in products table
+		query = `
 		UPDATE public.products
-        SET quantity_purchased = quantity_purchased + $1, purchase_cost = purchase_cost+$2, purchase_discount = purchase_discount+$3, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $4;`
+		SET quantity_purchased = quantity_purchased + $1, purchase_cost = purchase_cost+$2, purchase_discount = purchase_discount+$3, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $4;`
 
-	// Execute the query with parameters
-	_, err = tx.ExecContext(ctx, query, purchase.QuantityPurchased, total_purchase_price, purchase.Discount, purchase.Product.ID)
-	if err != nil {
-		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Update Quantity): " + err.Error())
+		// Execute the query with parameters
+		_, err = tx.ExecContext(ctx, query, pr.Quantity, sub_total, discountPerProductType, pr.Product.ID)
+		if err != nil {
+			tx.Rollback()
+			return errors.New("SQLErrorRestockProduct(Update products table): " + err.Error())
+		}
 	}
 
-	//Tx-2: Insert data into purchase history table
-	var purchase_id int
+	//update total amount field
+	purchase.TotalAmount = totalPurchasePrice
+	purchase.Discount = totalDiscount
 
-	query = `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,bill_amount,discount,shipping_cost,total_amount,paid_amount)
-	VALUES (TO_DATE($1, 'MM/DD/YYYY'), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
-	`
-	row := tx.QueryRowContext(ctx, query,
-		&purchase.PurchaseDate,
-		purchase.Supplier.ID,
-		purchase.Product.ID,
-		purchase.HeadAccount.ID,
-		purchase.ChalanNO,
-		purchase.MemoNo,
-		purchase.Note,
-		purchase.QuantityPurchased,
-		purchase.BillAmount,
-		purchase.Discount,
-		purchase.ShippingCost,
-		total_purchase_price,
-		purchase.PaidAmount,
-		time.Now(),
-		time.Now(),
-	)
-	if err = row.Scan(&purchase_id); err != nil {
-		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Insert purchase_history):" + err.Error())
-	}
-
-	//Tx-3: Insert data into financial_transactions table for purchase from supplier
+	//Tx-4: Insert data into financial_transactions table for purchase from supplier
 	var financial_transactions_id int
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,voucher_no,created_at,updated_at)
-	VALUES ('Purchase','suppliers',$1, 'head_accounts', $2, COALESCE((SELECT current_balance FROM Public.head_accounts WHERE id=$3), 0), $4, TO_DATE($5, 'MM/DD/YYYY'), $6, $7, $8, $9) RETURNING transaction_id
+	query := `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,voucher_no)
+	VALUES ('Purchase','suppliers',$1, 'head_accounts', $2, COALESCE((SELECT current_balance FROM Public.head_accounts WHERE id=$3), 0), $4, TO_DATE($5, 'MM/DD/YYYY'), $6, $7) RETURNING transaction_id
 	`
-	purchaseDescription := "cash payment / Bank Transfer"
-	row = tx.QueryRowContext(ctx, query,
+	purchaseDescription := "Purchasing products for supplier"
+	row := tx.QueryRowContext(ctx, query,
 		&purchase.Supplier.ID,
 		&purchase.HeadAccount.ID,
 		&purchase.HeadAccount.ID,
-		&total_purchase_price                                                                                   ,
+		&purchase.TotalAmount,
 		&purchase.PurchaseDate,
 		&purchaseDescription,
 		&purchase.MemoNo,
-		time.Now(),
-		time.Now(),
 	)
 	if err = row.Scan(&financial_transactions_id); err != nil {
 		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Insert financial_transactions):" + err.Error())
+		return errors.New("SQLErrorRestockProduct(Insert financial_transactions for purchase from supplier):" + err.Error())
 	}
-	//Tx-4 :Update head_accounts table : Decrease current_balance, increase amount_payable(total_supplier_due), increase earned_discount
+	//Tx-5 :Update Cash-bank in head_accounts table : Decrease current_balance, increase amount_payable(total_supplier_due), increase earned_discount
 	var current_balance int
 	query = `
 		UPDATE Public.head_accounts
 		SET current_balance = current_balance - $1, amount_payable =  amount_payable + $2, earned_discount = earned_discount + $3, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $4 returning current_balance
 	`
-	err = tx.QueryRowContext(ctx, query, purchase.PaidAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.BillAmount-purchase.TotalAmount, purchase.HeadAccount.ID).Scan(&current_balance)
+	err = tx.QueryRowContext(ctx, query, purchase.PaidAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.Discount, purchase.HeadAccount.ID).Scan(&current_balance)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Update head_accounts info):" + err.Error())
 	}
-	//Update current_assets
+	//Tx-6 :Update current_assets : Increase current assets
 	query = `
 		UPDATE Public.head_accounts
 		SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
@@ -2334,11 +2359,11 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 	_, err = tx.ExecContext(ctx, query, purchase.TotalAmount)
 	if err != nil {
 		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Update head_accounts info):" + err.Error())
+		return errors.New("SQLErrorRestockProduct(Update current_balance of current_assets):" + err.Error())
 	}
-	//Tx-5: Insert data into financial_transactions table for payment to suppliers
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,voucher_no,created_at,updated_at)
-			VALUES ('Payment','head_accounts',$1, 'suppliers', $2, $3, $4,  TO_DATE($5, 'MM/DD/YYYY'), $6, $7, $8, $9) RETURNING transaction_id
+	//Tx-7: Insert data into financial_transactions table for payment to suppliers
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,voucher_no)
+			VALUES ('Payment','head_accounts',$1, 'suppliers', $2, $3, $4,  TO_DATE($5, 'MM/DD/YYYY'), $6, $7) RETURNING transaction_id
 			`
 	purchaseDescription = "Payment to supplier in product purchase"
 	row = tx.QueryRowContext(ctx, query,
@@ -2349,15 +2374,13 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		&purchase.PurchaseDate,
 		&purchaseDescription,
 		&purchase.MemoNo,
-		time.Now(),
-		time.Now(),
 	)
 	if err = row.Scan(&financial_transactions_id); err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Insert financial_transactions for payment to supplier):" + err.Error())
 	}
 
-	//Tx-6: Update increase total_amount and due_amount(if available) in suppliers table
+	//Tx-8: Update increase total_amount and due_amount(if available) in suppliers table
 	query = `
 			UPDATE Public.suppliers
 			SET total_amount = total_amount + $1, due_amount = due_amount - $2, total_discount = total_discount + $3, updated_at = CURRENT_TIMESTAMP
@@ -2369,23 +2392,8 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		return errors.New("SQLErrorRestockProduct(Update suppliers):" + err.Error())
 	}
 
-	//Tx-7: Insert data into product_serial_numbers to register new products
-	values := []string{}
-	for _, serial_number := range purchase.ProductsSerialNo {
-		values = append(values, fmt.Sprintf("('%s',%d,%d,0,%d,%d,%d)", serial_number, purchase.Product.ID, purchase_id, purchase.MaxRetailPrice, purchase.PurchaseRate, purchase.WarrantyPeriod))
-	}
-
-	query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,sales_history_id,max_retail_price,purchase_rate,warranty_period) VALUES " + strings.Join(values, ",") + ";"
-	// Execute the query
-	_, err = tx.ExecContext(ctx, query)
-	if err != nil {
-		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Product Serial Number):" + err.Error())
-	}
-
-	//Tx-8: Insert into or update (if the sheet_date for purchase_date already exist) top_sheet table
+	//Tx-9: Insert into or update (if the sheet_date for purchase_date already exist) top_sheet table
 	//(sheet_date, total_purchases, total_payments, purchases_discount, updated_at)
-	purchase_discount := purchase.BillAmount - purchase.TotalAmount
 	query = `
 		INSERT INTO public.top_sheet (
 			sheet_date, 
@@ -2409,7 +2417,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.Purchase) error {
 		&purchase.PurchaseDate,
 		&purchase.BillAmount,
 		&purchase.PaidAmount,
-		&purchase_discount,
+		&totalDiscount,
 		&purchase.TotalAmount,
 	)
 	if err != nil {

@@ -166,7 +166,7 @@ function addNewProduct(page, brands, categories, products) {
                     <!-- Sale Discount -->
                     <div class="col-4 form-group has-feedback">
                         <input type="number" class="form-control has-feedback-left" id="stock_alert_level" name="stock_alert_level"
-                            placeholder="Stock Alert Level" min="0" max="100" autocomplete="off">
+                            placeholder="Stock Alert Level" value="0" min="0" max="100" autocomplete="off">
                         <div class="invalid-feedback d-none text-danger">Enter value between 0 to 100.</div>
                         <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-gift" aria-hidden="true"></span>
                     </div>
@@ -280,17 +280,16 @@ function addNewProduct(page, brands, categories, products) {
             showSuccessMessage(data.message);
             products.push(data.result)
             if (page === "purchase") {
-              categories.forEach((i, item) => {
-                if (item.id = product.category_id) {
-                  document.getElementById("category").innerHTML = '';
-                  document.getElementById("category").innerHTML = `<option value="${i}" selected>${categoryName}</option>`;
+              let flag = true
+              categories.forEach((item, i) => {
+                if (item.id === product.category_id) {
+                  document.getElementById("category").innerHTML += `<option value="${i}" selected>${categoryName}</option>`;
                   document.getElementById("category").disabled = true;
-
+                  document.getElementById("product").innerHTML += `<option value="${products.length-1}" selected>${data.result.product_name}</option>`;
+                  document.getElementById("product").disabled = true;
                 }
               })
-              document.getElementById("product").innerHTML = '';
-              document.getElementById("product").innerHTML = `<option value="${products.length-1}" selected>${data.result.product_name}</option>`;
-              document.getElementById("product").disabled = true;
+              
             }
           }
         });

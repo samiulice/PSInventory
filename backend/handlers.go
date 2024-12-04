@@ -889,7 +889,7 @@ func (app *application) ReturnProductsToSupplier(w http.ResponseWriter, r *http.
 
 // RestockProduct add new purchased product to database
 func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
-	var purchase_details models.Purchase
+	var purchase_details models.PurchasePayload
 	err := app.readJSON(w, r, &purchase_details)
 	if err != nil {
 		app.badRequest(w, err)
@@ -902,7 +902,7 @@ func (app *application) RestockProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	var resp = JSONResponse{
 		Error:   false,
-		Message: "restock product Succesfully",
+		Message: "restock product Successfully",
 		Result:  purchase_details,
 	}
 	app.writeJSON(w, http.StatusOK, resp)
