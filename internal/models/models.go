@@ -241,36 +241,41 @@ type ProductMetadata struct {
 	WarrantyHistoryIDs     string    `json:"warranty_history_ids"`
 	MaxRetailPrice         int       `json:"max_retail_price"` //max_retail_price = total_amount+profit/quantity_purchased
 	PurchaseRate           int       `json:"purchase_rate"`    //purchase_rate = total_amount/quantity_purchased
-	SaleRate               int       `json:"sale_rate"`
+	PurchaseDiscount       int       `json:"purchase_discount"`
+	ShippingCostPerUnit       int       `json:"shipping_cost_per_unit"`
+	SoldDiscount           int       `json:"sold_discount"`
 	CreatedAt              time.Time `json:"created_at"`
 	UpdatedAt              time.Time `json:"updated_at"`
 }
+
 // Purchase Payload
 type PurchasedProduct struct {
-	Product        Product  `json:"product_info"`
-	ProductSerialNo  []string `json:"products_serial_no"`
-	Quantity       int      `json:"quantity"`
-	MaxRetailPrice int      `json:"max_retail_price"`
-	PurchaseRate   int      `json:"purchase_rate"`
-	ShippingCost   int      `json:"shipping_cost"`
-	WarrantyPeriod int      `json:"warranty"`
+	Product         Product  `json:"product_info"`
+	ProductSerialNo []string `json:"products_serial_no"`
+	Quantity        int      `json:"quantity"`
+	MaxRetailPrice  int      `json:"max_retail_price"`
+	PurchaseRate    int      `json:"purchase_rate"`
+	ShippingCost    int      `json:"shipping_cost"`
+	WarrantyPeriod  int      `json:"warranty"`
+	DiscountPerItem int      `json:"discount"`
 }
 
-type PurchasePayload struct{
-	ID                int         `json:"id"`
-	PurchaseDate      string      `json:"purchase_date"`
-	Supplier          Supplier    `json:"supplier_info"`
-	HeadAccount       HeadAccount `json:"head_account_info"`
-	ChalanNO          string      `json:"chalan_no"`
-	MemoNo            string      `json:"memo_no"` //MM-P-randomAlphanumeric(6)CurrentIndexOfPurchaseHistoryDB
-	Note              string      `json:"note"`
-	BillAmount        int         `json:"bill_amount"`
-	Discount          int         `json:"discount"`
-	TotalAmount       int         `json:"total_amount"`
-	PaidAmount        int         `json:"paid_amount"`
-	PurchasedProduct []PurchasedProduct `json:"purchased_product_info"`
-	CreatedAt         time.Time   `json:"created_at"`
-	UpdatedAt         time.Time   `json:"updated_at"`
+type PurchasePayload struct {
+	ID                  int                `json:"id"`
+	PurchaseDate        string             `json:"purchase_date"`
+	Supplier            Supplier           `json:"supplier_info"`
+	HeadAccount         HeadAccount        `json:"head_account_info"`
+	ChalanNO            string             `json:"chalan_no"`
+	MemoNo              string             `json:"memo_no"` //MM-P-randomAlphanumeric(6)CurrentIndexOfPurchaseHistoryDB
+	Note                string             `json:"note"`
+	BillAmount          int                `json:"bill_amount"`
+	TotalEarnedDiscount int                `json:"earned_discount"`
+	TotalShippingCost   int                `json:"total_shipping_cost""`
+	TotalAmount         int                `json:"total_amount"`
+	PaidAmount          int                `json:"paid_amount"`
+	PurchasedProduct    []PurchasedProduct `json:"purchased_product_info"`
+	CreatedAt           time.Time          `json:"created_at"`
+	UpdatedAt           time.Time          `json:"updated_at"`
 }
 
 // Purchase is the type for purchase info(deprecated)
@@ -569,6 +574,7 @@ type TrialBalance struct {
 }
 type BalanceSheet struct {
 	CashBankAccounts           int       `json:"cash_bank_accounts"`
+	ExpenseAccounts            int       `json:"expense_accounts"`
 	CurrentAssets              int       `json:"current_assets"`
 	CustomerAccountsReceivable int       `json:"customer_accounts_receivable"`
 	SupplierAccountsReceivable int       `json:"supplier_accounts_receivable"`
@@ -576,6 +582,7 @@ type BalanceSheet struct {
 	SupplierAccountsPayable    int       `json:"supplier_accounts_payable"`
 	CapitalInvestment          int       `json:"capital_investment"`
 	LoanAccounts               int       `json:"loan_accounts"`
+	RetainedEarnings           int       `json:"retained_earnings"`
 	CreatedAt                  time.Time `json:"created_at"`
 	UpdatedAt                  time.Time `json:"updated_at"`
 }

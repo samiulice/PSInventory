@@ -634,6 +634,7 @@ func (app *application) FetchProductItemsByProductID(w http.ResponseWriter, r *h
 	productItems, err := app.DB.GetInStockProductItemsListByProductID(payload.ProductID)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ErrorPurchaseHistory:: %v", err))
+		return
 	}
 
 	var resp struct {

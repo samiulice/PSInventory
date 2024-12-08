@@ -467,14 +467,11 @@
                         <td> ${formatDate(product_data.purchase_history[id].purchase_date, "date", "-")} </td>
                         <td class="text-center">
                           <div class="row">
-                              <button id="showBtn-${id}" onclick="toggleBtn('${id}')" class="btn btn-round btn-xs btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample-${id}" aria-expanded="false" aria-controls="collapseExample-${id}">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;Show
-                              </button>
                               <button id="toggleCheckBoxBtn-${id}" class="btn btn-round btn-success btn-xs" type="button" onclick="toggleAllCheckBox(${id})">
                                 <i class="fa fa-check"></i>&nbsp;&nbsp;Select All
                               </button>
                             </div>
-                          <div class="collapse" id="collapseExample-${id}">
+                          <div  id="collapseExample-${id}">
                             <div id="pro-metadata-${id}">
                               ${metadata}
                             </div>

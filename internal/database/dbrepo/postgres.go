@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -54,16 +53,14 @@ func (p *postgresDBRepo) AddHeadAccount(ha models.HeadAccount) (int, error) {
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.head_accounts (account_code,account_name,account_status,current_balance,created_at,updated_at) 
-				VALUES($1, $2, $3, $4, $5, $6) RETURNING id
+	stmt := `INSERT INTO public.head_accounts (account_code,account_name,account_status,current_balance) 
+				VALUES($1, $2, $3, $4) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		ha.AccountCode,
 		ha.AccountName,
 		ha.AccountStatus,
 		ha.CurrentBalance,
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -185,8 +182,8 @@ func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder) (int, error) 
 	var id int
 
 	stmt := `
-		INSERT INTO public.company_stakeholders (account_type,account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,joining_date,created_at,updated_at) 
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id
+		INSERT INTO public.company_stakeholders (account_type,account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status) 
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		stk.AccountType,
@@ -200,9 +197,6 @@ func (p *postgresDBRepo) AddNewStakeHolder(stk models.StakeHolder) (int, error) 
 		stk.Mobile,
 		stk.Email,
 		stk.AccountStatus,
-		time.Now(),
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -219,8 +213,8 @@ func (p *postgresDBRepo) AddEmployee(employee models.Employee) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var id int
-	stmt := `INSERT INTO public.employees (account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,monthly_salary,opening_balance,joining_date,created_at,updated_at) 
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id
+	stmt := `INSERT INTO public.employees (account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,monthly_salary,opening_balance) 
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		employee.AccountCode,
@@ -235,9 +229,6 @@ func (p *postgresDBRepo) AddEmployee(employee models.Employee) (int, error) {
 		employee.AccountStatus,
 		employee.MonthlySalary,
 		employee.OpeningBalance,
-		time.Now(),
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -424,8 +415,8 @@ func (p *postgresDBRepo) AddCustomer(customer models.Customer) (int, error) {
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.customers (account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,discount,opening_balance,joining_date,created_at,updated_at) 
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id
+	stmt := `INSERT INTO public.customers (account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,discount,opening_balance) 
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		customer.AccountCode,
@@ -440,9 +431,6 @@ func (p *postgresDBRepo) AddCustomer(customer models.Customer) (int, error) {
 		customer.AccountStatus,
 		customer.Discount,
 		customer.OpeningBalance,
-		time.Now(),
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -836,8 +824,8 @@ func (p *postgresDBRepo) AddSupplier(supplier models.Supplier) (int, error) {
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.suppliers (account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,discount,joining_date,created_at,updated_at) 
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id
+	stmt := `INSERT INTO public.suppliers (account_code,account_name,contact_person,division,district,upazila,area,mobile,email,account_status,discount) 
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		supplier.AccountCode,
@@ -851,9 +839,6 @@ func (p *postgresDBRepo) AddSupplier(supplier models.Supplier) (int, error) {
 		supplier.Email,
 		supplier.AccountStatus,
 		supplier.Discount,
-		time.Now(),
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -1130,13 +1115,11 @@ func (p *postgresDBRepo) AddCategory(c models.Category) (int, error) {
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.categories (name,created_at,updated_at) 
-				VALUES($1, $2, $3) RETURNING id
+	stmt := `INSERT INTO public.categories (name) 
+				VALUES($1) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		c.Name,
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -1226,8 +1209,8 @@ func (p *postgresDBRepo) AddProduct(i models.Product) (int, error) {
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.products (product_code, product_name, product_description, product_status, quantity_purchased, quantity_sold, category_id, brand_id, stock_alert_level, created_at, updated_at) 
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
+	stmt := `INSERT INTO public.products (product_code, product_name, product_description, product_status, quantity_purchased, quantity_sold, category_id, brand_id, stock_alert_level) 
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		i.ProductCode,
@@ -1239,8 +1222,6 @@ func (p *postgresDBRepo) AddProduct(i models.Product) (int, error) {
 		i.CategoryID,
 		i.BrandID,
 		i.StockAlertLevel,
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -1551,7 +1532,7 @@ func (p *postgresDBRepo) GetInStockProductItemsListByProductID(productID int) (*
 	//get metadata from product_serial_numbers
 	query := `
 			SELECT
-				id, serial_number, product_id, purchase_history_id, status, warranty_period, max_retail_price, purchase_rate, created_at, updated_at
+				id, serial_number, product_id, purchase_history_id, status, warranty_period, max_retail_price, purchase_rate, purchase_discount,shipping_cost, created_at, updated_at
 			FROM
 				public.product_serial_numbers
 			WHERE
@@ -1573,6 +1554,8 @@ func (p *postgresDBRepo) GetInStockProductItemsListByProductID(productID int) (*
 			&pm.WarrantyPeriod,
 			&pm.MaxRetailPrice,
 			&pm.PurchaseRate,
+			&pm.PurchaseDiscount,
+			&pm.ShippingCostPerUnit,
 			&pm.CreatedAt,
 			&pm.UpdatedAt,
 		)
@@ -1581,8 +1564,6 @@ func (p *postgresDBRepo) GetInStockProductItemsListByProductID(productID int) (*
 		}
 		metadata = append(metadata, &pm)
 	}
-
-	log.Println(metadata)
 	//get product info
 	pr, err := p.GetProductByID(productID)
 	if err != nil {
@@ -2121,8 +2102,8 @@ func (p *postgresDBRepo) AddToPurchaseHistory(purchase *models.Purchase) (int, e
 	defer cancel()
 	var id int
 
-	stmt := `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount,created_at,updated_at)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
+	stmt := `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,bill_amount,discount,total_amount,paid_amount)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
 	`
 	err := p.DB.QueryRowContext(ctx, stmt,
 		purchase.PurchaseDate,
@@ -2136,8 +2117,6 @@ func (p *postgresDBRepo) AddToPurchaseHistory(purchase *models.Purchase) (int, e
 		purchase.Discount,
 		purchase.TotalAmount,
 		purchase.PaidAmount,
-		time.Now(),
-		time.Now(),
 	).Scan(&id)
 
 	if err != nil {
@@ -2250,24 +2229,18 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 		return err
 	}
 
-	//store total Purchase price and shipping cost
-	var totalPurchasePrice, totalShippingCost, totalDiscount int
-
 	// loop over the purchased_product array from the Purchase payload
 	for i, pr := range purchase.PurchasedProduct {
-		//update costs
-		sub_total := pr.Quantity*pr.PurchaseRate
-		discountPerProductType := int(math.Round(float64(purchase.Discount*sub_total)/float64(purchase.BillAmount)))
-		discountPerUnit := discountPerProductType/pr.Quantity
-		totalPurchasePrice += sub_total
-		totalShippingCost += pr.ShippingCost
-		totalDiscount += discountPerProductType
 
 		//Tx-1: Insert data into purchase history table
 		var purchase_id int
-		query := `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,bill_amount,discount,shipping_cost,total_amount,paid_amount)
+		query := `INSERT INTO public.purchase_history (purchase_date,supplier_id,product_id,account_id,chalan_no,memo_no,note,quantity_purchased,
+		bill_amount,discount,shipping_cost,total_amount,paid_amount)
 		VALUES (TO_DATE($1, 'MM/DD/YYYY'), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id
 		`
+		billAmount := pr.PurchaseRate * pr.Quantity
+		totalDiscount := pr.DiscountPerItem * pr.Quantity
+		totalAmount := billAmount - totalDiscount
 		row := tx.QueryRowContext(ctx, query,
 			purchase.PurchaseDate,
 			purchase.Supplier.ID,
@@ -2277,10 +2250,10 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 			purchase.MemoNo,
 			purchase.Note,
 			pr.Quantity,
-			sub_total,
-			discountPerProductType,
+			billAmount,
+			totalDiscount,
 			pr.ShippingCost,
-			sub_total - discountPerProductType,
+			totalAmount,
 			purchase.PaidAmount,
 		)
 		if err = row.Scan(&purchase_id); err != nil {
@@ -2291,7 +2264,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 		//Tx-2: Insert product serial numbers and associated information to product serial_numbers table
 		values := []string{}
 		for _, serial_number := range pr.ProductSerialNo {
-			values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,%d,%d)", serial_number, pr.Product.ID, purchase_id,discountPerUnit, pr.MaxRetailPrice, pr.PurchaseRate, pr.WarrantyPeriod, int(math.Round(float64(pr.ShippingCost)/float64(pr.Quantity)))))
+			values = append(values, fmt.Sprintf("('%s',%d,%d,%d,%d,%d,%d,%d)", serial_number, pr.Product.ID, purchase_id, pr.DiscountPerItem, pr.MaxRetailPrice, pr.PurchaseRate, pr.WarrantyPeriod, int(math.Round(float64(pr.ShippingCost)/float64(pr.Quantity)))))
 		}
 		query = "INSERT INTO public.product_serial_numbers (serial_number,product_id,purchase_history_id,purchase_discount,max_retail_price,purchase_rate,warranty_period, shipping_cost) VALUES " + strings.Join(values, ",") + ";"
 		// Execute the query
@@ -2308,16 +2281,12 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 		WHERE id = $4;`
 
 		// Execute the query with parameters
-		_, err = tx.ExecContext(ctx, query, pr.Quantity, sub_total, discountPerProductType, pr.Product.ID)
+		_, err = tx.ExecContext(ctx, query, pr.Quantity, totalAmount, totalDiscount, pr.Product.ID)
 		if err != nil {
 			tx.Rollback()
 			return errors.New("SQLErrorRestockProduct(Update products table): " + err.Error())
 		}
 	}
-
-	//update total amount field
-	purchase.TotalAmount = totalPurchasePrice
-	purchase.Discount = totalDiscount
 
 	//Tx-4: Insert data into financial_transactions table for purchase from supplier
 	var financial_transactions_id int
@@ -2345,7 +2314,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 		SET current_balance = current_balance - $1, amount_payable =  amount_payable + $2, earned_discount = earned_discount + $3, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $4 returning current_balance
 	`
-	err = tx.QueryRowContext(ctx, query, purchase.PaidAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.Discount, purchase.HeadAccount.ID).Scan(&current_balance)
+	err = tx.QueryRowContext(ctx, query, purchase.PaidAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.TotalEarnedDiscount, purchase.HeadAccount.ID).Scan(&current_balance)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Update head_accounts info):" + err.Error())
@@ -2377,33 +2346,84 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 	)
 	if err = row.Scan(&financial_transactions_id); err != nil {
 		tx.Rollback()
-		return errors.New("SQLErrorRestockProduct(Insert financial_transactions for payment to supplier):" + err.Error())
+		return fmt.Errorf("SQLErrorRestockProduct(Insert financial_transactions for payment to supplier): %w", err)
 	}
 
-	//Tx-8: Update increase total_amount and due_amount(if available) in suppliers table
+	//Tx-8: update table for shipping cost > 0 which is actually an expense
+	if purchase.TotalShippingCost > 0 {
+		//Tx-8.1: Update expense account
+		query = `
+			UPDATE Public.head_accounts
+			SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = 2`
+
+		_, err = tx.ExecContext(ctx, query, purchase.TotalShippingCost)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("SQLErrorRestockProduct(Update current_balance of Expense Accounts): %w", err)
+		}
+
+		//Tx-8.2: Update cash-bank account
+		query = `
+			UPDATE Public.head_accounts
+			SET current_balance = current_balance - $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = 1 RETURNING current_balance`
+
+		err = tx.QueryRowContext(ctx, query, purchase.TotalShippingCost).Scan(&current_balance)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("SQLErrorRestockProduct(Update current_balance of cash-bank Accounts): %w", err)
+		}
+
+		//Tx-8.3: insert to financial transactions for shipping cost as expense
+		query = `
+			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
+			VALUES('Expense', 'head_accounts', 1, 'expenses', 2, $1, TO_DATE($2, 'MM/DD/YYYY'), $3, $4, $5, $6, $7)
+		`
+		_, err = tx.ExecContext(ctx, query, purchase.TotalShippingCost, purchase.PurchaseDate, purchase.MemoNo, "Shipping charge of purchased product from suppliers", "", purchase.ChalanNO, current_balance)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("SQLErrorRestockProduct(Unable Insert into financial_transaction table): %w", err)
+		}
+
+		//Tx-8.4: insert to expense_history table for shipping cost
+		query = `
+			INSERT INTO public.expense_history(expense_type, voucher_no, account, expense_date, expense_amount, description, carrier, cheque_no)
+			VALUES(9, $1, 1, TO_DATE($2, 'MM/DD/YYY'), $3, $4, $5, $6)
+		`
+		_, err = tx.ExecContext(ctx, query, purchase.MemoNo, purchase.PurchaseDate, purchase.TotalShippingCost, "Shipping charge of purchased product from suppliers", "", purchase.ChalanNO)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("SQLErrorRestockProduct(Unable Insert into expense_history table): %w", err)
+		}
+	}
+
+	//Tx-9: Update increase total_amount and due_amount(if available) in suppliers table
 	query = `
 			UPDATE Public.suppliers
 			SET total_amount = total_amount + $1, due_amount = due_amount - $2, total_discount = total_discount + $3, updated_at = CURRENT_TIMESTAMP
 			WHERE id = $4
 		`
-	_, err = tx.ExecContext(ctx, query, purchase.TotalAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.BillAmount-purchase.TotalAmount, purchase.Supplier.ID)
+	_, err = tx.ExecContext(ctx, query, purchase.TotalAmount, purchase.TotalAmount-purchase.PaidAmount, purchase.TotalEarnedDiscount, purchase.Supplier.ID)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorRestockProduct(Update suppliers):" + err.Error())
 	}
 
-	//Tx-9: Insert into or update (if the sheet_date for purchase_date already exist) top_sheet table
-	//(sheet_date, total_purchases, total_payments, purchases_discount, updated_at)
+	//Tx-10: Insert into or update (if the sheet_date for purchase_date already exist) top_sheet table
+	//(sheet_date, total_purchases, total_payments, purchases_discount, initial_stock_value, delivery_and_shipping_cost, updated_at)
 	query = `
 		INSERT INTO public.top_sheet (
 			sheet_date, 
 			total_purchases,
 			total_payments, 
 			purchases_discount,
-			initial_stock_value
+			initial_stock_value,
+			delivery_and_shipping_cost,
+			total_expenses
 		) 
 		VALUES (
-			 TO_DATE($1, 'MM/DD/YYYY'), $2, $3, $4, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)+$5
+			 TO_DATE($1, 'MM/DD/YYYY'), $2, $3, $4, COALESCE((SELECT initial_stock_value FROM public.top_sheet ORDER BY sheet_date DESC LIMIT 1),0)+$5, $6, $7
 		)
 		ON CONFLICT (sheet_date) 
 		DO UPDATE SET 
@@ -2411,14 +2431,18 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 			total_payments = public.top_sheet.total_payments + EXCLUDED.total_payments,
 			purchases_discount = public.top_sheet.purchases_discount + EXCLUDED.purchases_discount,
 			initial_stock_value = EXCLUDED.initial_stock_value,
+			delivery_and_shipping_cost = public.top_sheet.delivery_and_shipping_cost + EXCLUDED.delivery_and_shipping_cost,
+			total_expenses = public.top_sheet.total_expenses + EXCLUDED.total_expenses,
 			updated_at = CURRENT_TIMESTAMP;
 	`
 	_, err = tx.ExecContext(ctx, query,
 		&purchase.PurchaseDate,
 		&purchase.BillAmount,
 		&purchase.PaidAmount,
-		&totalDiscount,
+		&purchase.TotalEarnedDiscount,
 		&purchase.TotalAmount,
+		&purchase.TotalShippingCost,
+		&purchase.TotalShippingCost,
 	)
 	if err != nil {
 		tx.Rollback()
@@ -2436,7 +2460,7 @@ func (p *postgresDBRepo) RestockProduct(purchase *models.PurchasePayload) error 
 func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Purchase, JobID string, transactionDate string, ProductUnitsID []int, TotalUnits int, TotalPrices int) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	var id, discount int
+	var id, totalPurchasePrice, totalDiscount int
 	tx, err := p.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return id, fmt.Errorf("failed to start transaction: %w", err)
@@ -2444,28 +2468,31 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	// Prepare the SQL update query
 	q1 := `
 		UPDATE public.product_serial_numbers
-		SET status = 'purchase returned' 
-		WHERE id = $1 returning product_id, purchase_rate`
+		SET status = 'purchase returned', updated_at = CURRENT_TIMESTAMP
+		WHERE id = $1 returning product_id, purchase_rate, purchase_discount`
 	q2 := `UPDATE public.products SET quantity_purchased = quantity_purchased -1, purchase_cost = purchase_cost-$1, purchase_discount = purchase_discount-$2, updated_at = CURRENT_TIMESTAMP WHERE id = $3`
 
 	// Execute updates within the transaction
 	for _, unitsID := range ProductUnitsID {
-		var productItemID, purchase_rate int
-		err := tx.QueryRowContext(ctx, q1, unitsID).Scan(&productItemID, &purchase_rate)
+		var productItemID, purchase_rate, discountPerUnit int
+		err := tx.QueryRowContext(ctx, q1, unitsID).Scan(&productItemID, &purchase_rate, &discountPerUnit)
 		if err != nil {
 			tx.Rollback() // Rollback on error
 			return id, fmt.Errorf("failed to update record in product_serial_numbers table with id %d: %w", unitsID, err)
 		}
 
+		//update total prices and total discounts
+		totalPurchasePrice += purchase_rate
+		totalDiscount += discountPerUnit
+
 		//update product amount in products table
-		_, err = tx.ExecContext(ctx, q2, purchase_rate, purchase_rate*PurchaseHistory.Discount/100, productItemID)
+		_, err = tx.ExecContext(ctx, q2, purchase_rate-discountPerUnit, discountPerUnit, productItemID)
 		if err != nil {
 			tx.Rollback() // Rollback on error
 			return id, fmt.Errorf("failed to update record in products table with id %d: %w", unitsID, err)
 		}
 	}
 
-	discount = int(math.Round(float64(TotalPrices) * float64(PurchaseHistory.Discount) / 100.0))
 	//TODO: retrieve supplier due
 	var due int
 	err = tx.QueryRowContext(ctx, "SELECT ABS(due_amount) FROM public.suppliers WHERE id = $1", PurchaseHistory.Supplier.ID).Scan(&due)
@@ -2473,13 +2500,15 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 		tx.Rollback()
 		return id, fmt.Errorf("SQLErrorReturnProductUnitsToSupplier(retrieve supplier due): %w", err)
 	}
+
+	totalPrice := totalPurchasePrice - totalDiscount
 	decreaseAmountPayable := 0
 	IncreaseCurrentBalance := 0
-	if TotalPrices > due {
+	if totalPrice > due {
 		decreaseAmountPayable = due
-		IncreaseCurrentBalance = TotalPrices - decreaseAmountPayable
+		IncreaseCurrentBalance = totalPrice - decreaseAmountPayable
 	} else {
-		decreaseAmountPayable = TotalPrices
+		decreaseAmountPayable = totalPrice
 	}
 
 	fmt.Println("inc: ", IncreaseCurrentBalance, "Des: ", decreaseAmountPayable)
@@ -2489,7 +2518,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 		SET total_amount = total_amount - $1, due_amount = due_amount + $2,total_discount = total_discount - $3, updated_at = CURRENT_TIMESTAMP 
 		WHERE id = $4
 	`
-	_, err = tx.ExecContext(ctx, query, TotalPrices, decreaseAmountPayable, discount, PurchaseHistory.Supplier.ID)
+	_, err = tx.ExecContext(ctx, query, totalPrice, decreaseAmountPayable, totalDiscount, PurchaseHistory.Supplier.ID)
 	if err != nil {
 		tx.Rollback()
 		return id, fmt.Errorf("SQLErrorReturnProductUnitsToSupplier(Update suppliers): %w", err)
@@ -2504,7 +2533,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	err = tx.QueryRowContext(ctx, query,
 		&PurchaseHistory.Supplier.ID,
 		&PurchaseHistory.HeadAccount.ID,
-		&TotalPrices,
+		&totalPrice,
 		&description,
 		&PurchaseHistory.HeadAccount.ID,
 	).Scan(&financial_transactions_id)
@@ -2519,7 +2548,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 		SET current_balance = current_balance + $1, amount_payable =  amount_payable - $2, earned_discount = earned_discount - $3,  updated_at = CURRENT_TIMESTAMP 
 		WHERE id = $4 returning current_balance
 	`
-	err = tx.QueryRowContext(ctx, query, IncreaseCurrentBalance, decreaseAmountPayable, discount, PurchaseHistory.HeadAccount.ID).Scan(&current_balance)
+	err = tx.QueryRowContext(ctx, query, IncreaseCurrentBalance, decreaseAmountPayable, totalDiscount, PurchaseHistory.HeadAccount.ID).Scan(&current_balance)
 	if err != nil {
 		tx.Rollback()
 		return 0, errors.New("SQLErrorReturnProductUnitsToSupplier(Update head_accounts info):" + err.Error())
@@ -2530,7 +2559,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 		SET current_balance = current_balance - $1, updated_at = CURRENT_TIMESTAMP
 		WHERE id = 6;
 	`
-	_, err = tx.ExecContext(ctx, query, TotalPrices)
+	_, err = tx.ExecContext(ctx, query, totalPrice)
 	if err != nil {
 		tx.Rollback()
 		return id, errors.New("SQLErrorReturnProductUnitsToSupplier(Update current_assets):" + err.Error())
@@ -2543,7 +2572,7 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	err = tx.QueryRowContext(ctx, query,
 		&PurchaseHistory.Supplier.ID,
 		&PurchaseHistory.HeadAccount.ID,
-		&TotalPrices,
+		&totalPrice,
 		&description,
 		&PurchaseHistory.HeadAccount.ID,
 	).Scan(&financial_transactions_id)
@@ -2573,8 +2602,8 @@ func (p *postgresDBRepo) ReturnProductUnitsToSupplier(PurchaseHistory models.Pur
 	`
 	_, err = tx.ExecContext(ctx, query,
 		&TotalPrices,
-		(-1)*discount,
-		&TotalPrices,
+		(-1)*totalDiscount,
+		&totalPrice,
 	)
 	if err != nil {
 		tx.Rollback()
@@ -2625,8 +2654,10 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 	}
 
 	totalQuantity := 0
+	totalSoldDiscount := 0
 	totalPrice := 0
 	totalPurchase := 0
+	totalPurchasedDiscount := 0
 	//loop over the SelectedProduct array
 	for i, items := range sale.ProductItems {
 		//Tx-2: Update product quantity
@@ -2635,7 +2666,9 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 			SET quantity_sold = quantity_sold + $1, sold_price = sold_price + $2, sold_discount = sold_discount + $3
 			WHERE id = $4;
 		  `
-		_, err = tx.ExecContext(ctx, query, items.Quantity, items.SubTotal, items.SubTotal*sale.Discount/100, items.ProductID)
+		currentSoldPrice := items.Quantity * items.MRP
+		discountPerProductType := currentSoldPrice * sale.Discount / sale.BillAmount
+		_, err = tx.ExecContext(ctx, query, items.Quantity, currentSoldPrice, discountPerProductType, items.ProductID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("SQLErrorSaleProductsToCustomer(Update products table): For id %d --%w", i, err)
@@ -2646,29 +2679,30 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		for _, serialNumber := range items.SerialNumbers {
 			query = `
 				UPDATE public.product_serial_numbers
-				SET status = 'sold', sales_history_id = $1 , sold_rate = $2
-				WHERE serial_number = $3 RETURNING purchase_rate
+				SET status = 'sold', sales_history_id = $1, sold_discount = $2
+				WHERE serial_number = $3 RETURNING purchase_rate, purchase_discount
 			`
-			var purchaseRate int
-			err := tx.QueryRowContext(ctx, query, sale_id, items.SubTotal/items.Quantity, serialNumber).Scan(&purchaseRate)
+			var purchaseRate, purchaseDiscount int
+			err := tx.QueryRowContext(ctx, query, sale_id, discountPerProductType/items.Quantity, serialNumber).Scan(&purchaseRate, &purchaseDiscount)
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("SQLErrorSaleProductsToCustomer(Update Product status And status):#serial-%s --%w", serialNumber, err)
 			}
 			totalPurchase += purchaseRate
+			totalPurchasedDiscount += purchaseDiscount
+			totalSoldDiscount += discountPerProductType / items.Quantity
 		}
 		//
 	}
 
 	due := sale.TotalAmount - sale.PaidAmount
-	discount := sale.BillAmount - sale.TotalAmount
 	//Tx-5: Update total_amount, due_amount(if available) in customers table
 	query = `
 		UPDATE Public.customers
 		SET total_amount = total_amount + $1, due_amount = due_amount + $2, total_discount = total_discount + $3
 		WHERE id = $4
 	`
-	_, err = tx.ExecContext(ctx, query, sale.TotalAmount, due, discount, sale.CustomerInfo.ID)
+	_, err = tx.ExecContext(ctx, query, sale.TotalAmount, due, totalSoldDiscount, sale.CustomerInfo.ID)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update customers):" + err.Error())
@@ -2676,8 +2710,8 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 
 	//Tx-7: store financial_transactions for sale
 	var financial_transactions_id int
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,voucher_no,created_at,updated_at)
-	VALUES ('Sale','customers',$1, 'head_accounts', $2, COALESCE((SELECT current_balance FROM Public.head_accounts WHERE id=$3), 0), $4, TO_DATE($5,'MM/DD/YYYY'), $6, $7, $8, $9) RETURNING transaction_id
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,current_balance,amount,transaction_date,description,voucher_no)
+	VALUES ('Sale','customers',$1, 'head_accounts', $2, COALESCE((SELECT current_balance FROM Public.head_accounts WHERE id=$3), 0), $4, TO_DATE($5,'MM/DD/YYYY'), $6, $7) RETURNING transaction_id
 	`
 	description := "Cash Sale / Bank Transfer"
 	row = tx.QueryRowContext(ctx, query,
@@ -2688,8 +2722,6 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		&sale.SaleDate,
 		&description,
 		&sale.MemoNo,
-		time.Now(),
-		time.Now(),
 	)
 	if err = row.Scan(&financial_transactions_id); err != nil {
 		tx.Rollback()
@@ -2703,7 +2735,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		SET current_balance = current_balance + $1, amount_receivable =  amount_receivable + $2, offered_discount = offered_discount + $3
 		WHERE id = $4 RETURNING current_balance;
 	`
-	err = tx.QueryRowContext(ctx, query, sale.PaidAmount, sale.TotalAmount-sale.PaidAmount, sale.BillAmount-sale.TotalAmount, sale.HeadAccountInfo.ID).Scan(&current_balance)
+	err = tx.QueryRowContext(ctx, query, sale.PaidAmount, due, totalSoldDiscount, sale.HeadAccountInfo.ID).Scan(&current_balance)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update head_accounts info):" + err.Error())
@@ -2713,7 +2745,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		SET current_balance = current_balance + $1
 		WHERE id = 5;
 	`
-	_, err = tx.ExecContext(ctx, query, sale.BillAmount-totalPurchase-discount)
+	_, err = tx.ExecContext(ctx, query, sale.BillAmount-totalPurchase-totalSoldDiscount)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update REVENUE ACCOUNTS info):" + err.Error())
@@ -2723,7 +2755,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		SET current_balance = current_balance - $1
 		WHERE id = 6;
 	`
-	_, err = tx.ExecContext(ctx, query, totalPurchase)
+	_, err = tx.ExecContext(ctx, query, totalPurchase-totalPurchasedDiscount)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update CURRENT ASSETS info):" + err.Error())
@@ -2751,7 +2783,6 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 	}
 	//Tx-9: update top_sheet data if the sheet_date for sales date already exist,
 	//Otherwise insert a new row  in the top_sheet table
-	sale_discount := sale.BillAmount - sale.TotalAmount
 	query = `
 		INSERT INTO public.top_sheet (
 			sheet_date, 
@@ -2778,9 +2809,9 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		&sale.SaleDate,
 		&sale.BillAmount,
 		&sale.PaidAmount,
-		&sale_discount,
+		&totalSoldDiscount,
 		&sale.GrossProfit,
-		&totalPurchase,
+		totalPurchase-totalPurchasedDiscount,
 	)
 	if err != nil {
 		tx.Rollback()
@@ -2857,10 +2888,10 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 		returnItemsID += "-" + strconv.Itoa(SelectedItemsID[i])
 	}
 	query := `
-		INSERT INTO public.sales_return_history(sale_return_date,customer_id ,sales_history_id ,memo_no,returned_product_ids,total_returned_count,total_returned_amount, created_at, updated_at)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		INSERT INTO public.sales_return_history(sale_return_date,customer_id ,sales_history_id ,memo_no,returned_product_ids,total_returned_count,total_returned_amount)
+		VALUES($1, $2, $3, $4, $5, $6, $7)
 	`
-	result, err := tx.ExecContext(ctx, query, SaleReturnDate, SalesHistory.CustomerID, SalesHistory.ID, MemoNo, returnItemsID, ReturnItemsCount, ReturnAmount, time.Now(), time.Now())
+	result, err := tx.ExecContext(ctx, query, SaleReturnDate, SalesHistory.CustomerID, SalesHistory.ID, MemoNo, returnItemsID, ReturnItemsCount, ReturnAmount)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR:=>SaleReturnDB: Unable to execute UPDATE SQL %w", err)
@@ -2933,19 +2964,16 @@ func (p *postgresDBRepo) SaleReturnDB(SalesHistory *models.Sale, SelectedItemsID
 	}
 	//Insert Financial transaction for sale return amount
 	var financial_transactions_id int
-	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,transaction_date,description,current_balance,created_at,updated_at)
-	VALUES ('Sale Return','head_accounts',$1, 'customers', $2, $3, $4, $5, $6, $7, $8) RETURNING transaction_id
+	query = `INSERT INTO public.financial_transactions (transaction_type,source_type,source_id,destination_type,destination_id,amount,description,current_balance)
+	VALUES ('Sale Return','head_accounts',$1, 'customers', $2, $3, $4, $5) RETURNING transaction_id
 	`
 	description := "sales return from customer"
 	err = tx.QueryRowContext(ctx, query,
 		&SalesHistory.AccountID,
 		&SalesHistory.CustomerID,
 		&ReturnAmount,
-		time.Now(),
 		&description,
 		&current_balance,
-		time.Now(),
-		time.Now(),
 	).Scan(&financial_transactions_id)
 	if err != nil {
 		tx.Rollback()
@@ -3038,14 +3066,12 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(memoPrefix string, serialID int, se
 	if err != nil {
 		return id, fmt.Errorf("DBERROR: AddNewWarrantyClaim => Begin Tx => %w", err)
 	}
-	// Get the current time
-	currentTime := time.Now()
 
 	// 	step-1: insert new row at warranty_history table with data from product_serial_number and status = warranty claim, product_serial_id = current_serial_id
-	query := `INSERT INTO public.warranty_history(memo_no, product_serial_id, previous_serial_number, contact_number, request_date, reported_problem, received_by, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
+	query := `INSERT INTO public.warranty_history(memo_no, product_serial_id, previous_serial_number, contact_number, reported_problem, received_by)
+		VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
-	err = tx.QueryRowContext(ctx, query, memoPrefix, serialID, serialNumber, contactNumber, currentTime.Format("01/02/2006"), reportedProblem, receivedBy, currentTime, currentTime).Scan(&id)
+	err = tx.QueryRowContext(ctx, query, memoPrefix, serialID, serialNumber, contactNumber, reportedProblem, receivedBy).Scan(&id)
 
 	if err != nil {
 		tx.Rollback()
@@ -3059,12 +3085,12 @@ func (p *postgresDBRepo) AddNewWarrantyClaim(memoPrefix string, serialID int, se
 			latest_warranty_id = $1,
 			warranty_status = 'in progress',
 			warranty_history_ids = warranty_history_ids || $2, 
-			updated_at = $3
+			updated_at = CURRENT_TIMESTAMP
 		WHERE 
-			id = $4
+			id = $3
 	`
 	// Execute the query, passing the correct values in the right order
-	result, err := p.DB.ExecContext(ctx, query, id, strconv.Itoa(id), currentTime, serialID)
+	result, err := p.DB.ExecContext(ctx, query, id, strconv.Itoa(id), serialID)
 	if err != nil {
 		tx.Rollback()
 		return id, fmt.Errorf("DBERROR: AddNewWarrantyClaim => Update_product_serial_numbers: %w", err)
@@ -3109,11 +3135,11 @@ func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSeria
 		UPDATE 
 			public.warranty_history
 		SET 
-			new_serial_number = $1, status = 'checked out', checkout_date = $2, comment= $3, updated_at = $4
+			new_serial_number = $1, status = 'checked out', checkout_date = $2, comment= $3, updated_at = CURRENT_TIMESTAMP
 		WHERE 
-			id = $5;		
+			id = $4;		
 	`
-	result, err := tx.ExecContext(ctx, query, newSerialNumber, arrivalDate, comment, time.Now(), warrantyHistoryID)
+	result, err := tx.ExecContext(ctx, query, newSerialNumber, arrivalDate, comment, warrantyHistoryID)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to update warranty_history Table => %w", err)
@@ -3132,11 +3158,11 @@ func (p *postgresDBRepo) CheckoutWarrantyProduct(warrantyHistoryID, productSeria
 		UPDATE 
 			public.product_serial_numbers
 		SET 
-			serial_number = $1, warranty_status = 'delivery ready', updated_at = $2
+			serial_number = $1, warranty_status = 'delivery ready', updated_at = CURRENT_TIMESTAMP
 		WHERE 
-			id = $3;		
+			id = $2;		
 	`
-	result, err = tx.ExecContext(ctx, query, newSerialNumber, time.Now(), productSerialID)
+	result, err = tx.ExecContext(ctx, query, newSerialNumber, productSerialID)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: CheckoutWarrantyProduct: Unable to update product_serial_numbers Table => %w", err)
@@ -3180,12 +3206,11 @@ func (p *postgresDBRepo) DeliveryWarrantyProduct(warrantyHistoryID, productSeria
 		UPDATE 
 			public.warranty_history
 		SET 
-			status = 'delivered', delivery_date = $1, delivered_by= $2, updated_at = $3
+			status = 'delivered', delivery_date = CURRENT_TIMESTAMP, delivered_by= $1, updated_at = CURRENT_TIMESTAMP
 		WHERE 
-			id = $4;		
+			id = $2;		
 	`
-	curentDate := time.Now()
-	result, err := tx.ExecContext(ctx, query, curentDate.Format("01/02/2006"), deliveredBy, curentDate, warrantyHistoryID)
+	result, err := tx.ExecContext(ctx, query, deliveredBy, warrantyHistoryID)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: DeliveryWarrantyProduct: Unable to update warranty_history Table => %w", err)
@@ -3205,11 +3230,11 @@ func (p *postgresDBRepo) DeliveryWarrantyProduct(warrantyHistoryID, productSeria
 		UPDATE 
 			public.product_serial_numbers
 		SET 
-			warranty_status = 'no issue', updated_at = $1
+			warranty_status = 'no issue', updated_at = CURRENT_TIMESTAMP
 		WHERE 
-			id = $2;		
+			id = $1;		
 	`
-	result, err = tx.ExecContext(ctx, query, time.Now(), productSerialID)
+	result, err = tx.ExecContext(ctx, query, productSerialID)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("DBERROR: DeliveryWarrantyProduct: Unable to update product_serial_numbers Table => %w", err)
@@ -3307,18 +3332,6 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 			tx.Rollback()
 			return errors.New("CompleteReceiveCollection(Insert or Update top_sheet):" + err.Error())
 		}
-		//update customer account
-		//set due_amount -= received_amount
-		stmt = `
-			UPDATE public.customers
-			SET due_amount = due_amount - $1, updated_at = CURRENT_TIMESTAMP
-			WHERE id = $2`
-
-		_, err = tx.ExecContext(ctx, stmt, sum.ReceivedAmount, sum.SourceAccount.ID)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteReceiveCollectionTransactions => Unable to update due_amount in customers table: %w", err)
-		}
 	}
 
 	//commit transaction
@@ -3329,6 +3342,7 @@ func (p *postgresDBRepo) CompleteReceiveCollectionTransactions(summary []*models
 	}
 	return nil
 }
+
 func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -3349,28 +3363,22 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 		//set current_balance += received_amount
 		stmt := `
 			UPDATE Public.head_accounts
-			SET current_balance = current_balance - $1, amount_payable =  amount_payable - $2, updated_at = $3
-			WHERE id = $4 returning current_balance`
+			SET current_balance = current_balance - $1, amount_payable =  amount_payable - $2, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $3 returning current_balance`
 
 		var current_balance int
-		err = tx.QueryRowContext(ctx, stmt, sum.PaidAmount, sum.PaidAmount, time.Now(), sum.SourceAccount.ID).Scan(&current_balance)
+		err = tx.QueryRowContext(ctx, stmt, sum.PaidAmount, sum.PaidAmount, sum.SourceAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to update current_balance in head_accounts table: %w", err)
 		}
 
-		//convert receivedDate into go supported date
-		txDate, err := time.Parse("01/02/2006", sum.PaymentDate)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable parse time in go supported format: %w", err)
-		}
 		//insert to financial transactions
 		stmt = `
 			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description,carrier,cheque_no, current_balance)
-			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, $4, $5, $6, $7, $8, $9)
+			VALUES('Payment', 'head_accounts', $1, 'suppliers', $2, $3, TO_DATE($4, 'MM/DD/YYYY'), $5, $6, $7, $8, $9)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, txDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.PaidAmount, sum.PaymentDate, sum.VoucherNo, sum.Description, sum.Carrier, sum.ChequeNo, current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3404,10 +3412,10 @@ func (p *postgresDBRepo) CompletePaymentTransactions(summary []*models.Payment) 
 		//set due_mount -= received_amount
 		stmt = `
 			UPDATE public.suppliers
-			SET due_amount = due_amount + $1, updated_at = $2
-			WHERE id = $3`
+			SET due_amount = due_amount + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, time.Now(), sum.DestinationAccount.ID)
+		_, err = tx.ExecContext(ctx, stmt, sum.PaidAmount, sum.DestinationAccount.ID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompletePaymentTransactions => Unable to update due_amount in suppliers table: %w", err)
@@ -3438,10 +3446,10 @@ func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.Am
 		//set current_balance -= received_amount
 		stmt := `
 			UPDATE public.head_accounts
-			SET current_balance = current_balance - $1, updated_at = $2
-			WHERE id = $3`
+			SET current_balance = current_balance - $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, time.Now(), sum.SourceAccount.ID)
+		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, sum.SourceAccount.ID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable to update current_balance in source_account table: %w", err)
@@ -3450,27 +3458,21 @@ func (p *postgresDBRepo) CompleteAmountTransferTransactions(summary []*models.Am
 		//set current_balance -= received_amount
 		stmt = `
 			UPDATE public.head_accounts
-			SET current_balance = current_balance + $1, updated_at = $2
-			WHERE id = $3`
+			SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2`
 
-		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, time.Now(), sum.DestinationAccount.ID)
+		_, err = tx.ExecContext(ctx, stmt, sum.TransferAmount, sum.DestinationAccount.ID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable to update current_balance in destination_account table: %w", err)
 		}
 
-		//convert receivedDate into go supported date
-		txDate, err := time.Parse("01/02/2006", sum.TransactionDate)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable parse time in go supported format: %w", err)
-		}
 		//insert to financial transactions
 		stmt = `
 			INSERT INTO public.financial_transactions(transaction_type, source_type, source_id, destination_type, destination_id, amount, transaction_date, voucher_no, description)
-			VALUES('Cash Payment', 'head_accounts', $1, 'head_accounts', $2, $3, $4, $5, $6)
+			VALUES('Cash Payment', 'head_accounts', $1, 'head_accounts', $2, $3, TO_DATE($4, 'MM/DD/YYYY'), $5, $6)
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.TransferAmount, txDate, sum.VoucherNo, sum.Description)
+		_, err = tx.ExecContext(ctx, stmt, sum.SourceAccount.ID, sum.DestinationAccount.ID, sum.TransferAmount, sum.TransactionDate, sum.VoucherNo, sum.Description)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountTransferTransactions => Unable Insert into financial_transaction table: %w", err)
@@ -3504,7 +3506,7 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 			SET due_amount = due_amount - $1, updated_at = CURRENT_TIMESTAMP
 			WHERE id = $2
 		`, sum.AccountType)
-		fmt.Println("account id : ", sum.AccountID)
+
 		_, err = tx.ExecContext(ctx, stmt, sum.PayableAmount, sum.AccountID)
 		if err != nil {
 			tx.Rollback()
@@ -3513,13 +3515,13 @@ func (p *postgresDBRepo) CompleteAmountPayableTransactions(summary []*models.Amo
 		var current_balance int
 		stmt = `
 			UPDATE public.head_accounts
-			SET amount_payable = amount_payable + $1, updated_at = $2
-			WHERE id = $3 RETURNING current_balance`
+			SET amount_payable = amount_payable + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2 RETURNING current_balance`
 
 		if sum.HeadAccount.ID == 0 {
 			sum.HeadAccount.ID = 1
 		}
-		err = tx.QueryRowContext(ctx, stmt, sum.PayableAmount, time.Now(), sum.HeadAccount.ID).Scan(&current_balance)
+		err = tx.QueryRowContext(ctx, stmt, sum.PayableAmount, sum.HeadAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountPayableTransactions => Unable to update due_amount in head_accounts table: %w", err)
@@ -3561,10 +3563,10 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 		//update head_accounts
 		stmt := `
 			UPDATE public.` + sum.AccountType + `
-			SET due_amount = due_amount + $1, updated_at = $2
-			WHERE id = $3
+			SET due_amount = due_amount + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2
 		`
-		_, err = tx.ExecContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.AccountID)
+		_, err = tx.ExecContext(ctx, stmt, sum.ReceivableAmount, sum.AccountID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update due_amount in %s table: %w", sum.AccountType, err)
@@ -3572,12 +3574,12 @@ func (p *postgresDBRepo) CompleteAmountReceivableTransactions(summary []*models.
 		var current_balance int
 		stmt = `
 			UPDATE public.head_accounts
-			SET amount_receivable = amount_receivable + $1, updated_at = $2
-			WHERE id = $3 RETURNING current_balance`
+			SET amount_receivable = amount_receivable + $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2 RETURNING current_balance`
 		if sum.HeadAccount.ID == 0 {
 			sum.HeadAccount.ID = 1
 		}
-		err = tx.QueryRowContext(ctx, stmt, sum.ReceivableAmount, time.Now(), sum.HeadAccount.ID).Scan(&current_balance)
+		err = tx.QueryRowContext(ctx, stmt, sum.ReceivableAmount, sum.HeadAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteAmountReceivableTransactions => Unable to update head_accounts table: %w", err)
@@ -3619,8 +3621,8 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 		var current_balance int
 		stmt := `
 			UPDATE public.head_accounts
-			SET current_balance = current_balance - $1, updated_at = $2
-			WHERE id = $3 RETURNING current_balance`
+			SET current_balance = current_balance - $1, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $2 RETURNING current_balance`
 
 		err = tx.QueryRowContext(ctx, stmt, sum.ExpenseAmount, time.Now(), sum.SourceAccount.ID).Scan(&current_balance)
 		if err != nil {
@@ -3660,7 +3662,7 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 			"maintenance_and_repairs",
 			"office_supplies",
 			"insurance",
-			"delivery_and_freight_charges",
+			"delivery_and_shipping_cost",
 			"depreciation",
 			"taxes_and_licenses",
 			"inventory_costs",
@@ -4154,6 +4156,7 @@ func (p *postgresDBRepo) GetCustomerDueHistoryReport() ([]*models.Sale, error) {
 	}
 	return sales, nil
 }
+
 func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -4412,7 +4415,7 @@ func (p *postgresDBRepo) GetIncomeStatementData(startDate, endDate string) (mode
 				SUM(COALESCE(maintenance_and_repairs, 0)) AS sum_maintenance_and_repairs,
 				SUM(COALESCE(office_supplies, 0)) AS sum_office_supplies,
 				SUM(COALESCE(insurance, 0)) AS sum_insurance,
-				SUM(COALESCE(delivery_and_freight_charges, 0)) AS sum_delivery_and_freight_charges,
+				SUM(COALESCE(delivery_and_shipping_cost, 0)) AS sum_delivery_and_shipping_cost,
 				SUM(COALESCE(depreciation, 0)) AS sum_depreciation,
 				SUM(COALESCE(taxes_and_licenses, 0)) AS sum_taxes_and_licenses,
 				SUM(COALESCE(inventory_costs, 0)) AS sum_inventory_costs,
@@ -4526,17 +4529,6 @@ func (p *postgresDBRepo) GetTrialBalanceReport() (models.TrialBalance, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var trialBalanceSheet models.TrialBalance
-	// CapitalInvestment       int       `json:"capital_investment"`
-	// CashBankAccounts        int       `json:"cash_bank_accounts"`
-	// CurrentAssets           int       `json:"current_assets"`
-	// CurrentLiabilities      int       `json:"current_liabilities"`
-	// CustomerAccountsReceivable int       `json:"customer_accounts_payable"`
-	// SupplierAccountsPayable int       `json:"supplier_accounts_payable"`
-	// EmployeeAccountsPayable      int       `json:"employee_accounts_payable"`
-	// ExpenseAccounts         int       `json:"expense_accounts"`
-	// FixedAssets             int       `json:"fixed_assets"`
-	// LoanAccounts            int       `json:"loan_accounts"`
-	// RevenueAccounts         int       `json:"revenue_accounts"`
 
 	var val int
 	// CapitalInvestment
@@ -4604,24 +4596,21 @@ func (p *postgresDBRepo) GetTrialBalanceReport() (models.TrialBalance, error) {
 
 	return trialBalanceSheet, nil
 }
+
 func (p *postgresDBRepo) GetBalanceSheetReport() (models.BalanceSheet, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var balanceSheet models.BalanceSheet
 
 	var val int
+	//Assets
 	// Cash & Bank
 	err := p.DB.QueryRowContext(ctx, "SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'CASH & BANK ACCOUNTS'").Scan(&val)
 	if err != nil {
 		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve CASH & BANK ACCOUNTS balance: %w", err)
 	}
 	balanceSheet.CashBankAccounts = val
-	// REVENUE ACCOUNTS
-	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'REVENUE ACCOUNTS'").Scan(&val)
-	if err != nil {
-		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve REVENUE ACCOUNTS balance: %w", err)
-	}
-	balanceSheet.CashBankAccounts -= val
+
 	// Inventory Products
 	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(initial_stock_value, 0) FROM top_sheet ORDER BY id DESC LIMIT 1").Scan(&val)
 	if err != nil {
@@ -4643,20 +4632,13 @@ func (p *postgresDBRepo) GetBalanceSheetReport() (models.BalanceSheet, error) {
 	}
 	balanceSheet.CustomerAccountsReceivable = val
 
-	// Capital Investment
-	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'CAPITAL ACCOUNTS'").Scan(&val)
-	if err != nil {
-		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve current liabilities: %w", err)
-	}
-	balanceSheet.CapitalInvestment = val
-
-	// Capital Investment
+	//Liabilities
+	// Loan Accounts
 	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'LOAN ACCOUNTS'").Scan(&val)
 	if err != nil {
 		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve current liabilities: %w", err)
 	}
 	balanceSheet.LoanAccounts = val
-
 	// Account Payable(supplier)
 	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(SUM(due_amount), 0) FROM suppliers WHERE due_amount < 0").Scan(&val)
 	if err != nil {
@@ -4670,6 +4652,20 @@ func (p *postgresDBRepo) GetBalanceSheetReport() (models.BalanceSheet, error) {
 		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve Customers account payable: %w", err)
 	}
 	balanceSheet.CustomerAccountsPayable = val
+
+	//Owner's Equity
+	// Capital Investment
+	err = p.DB.QueryRowContext(ctx, "SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'CAPITAL ACCOUNTS'").Scan(&val)
+	if err != nil {
+		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve CAPITAL ACCOUNTS: %w", err)
+	}
+	balanceSheet.CapitalInvestment = val
+	// Retained Earnings ACCOUNTS
+	err = p.DB.QueryRowContext(ctx, "SELECT ((SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'REVENUE ACCOUNTS') - (SELECT COALESCE(SUM(current_balance), 0) FROM head_accounts WHERE account_type = 'EXPENSE ACCOUNTS'))").Scan(&val)
+	if err != nil {
+		return balanceSheet, fmt.Errorf("DBERROR: GetBalanceSheetReport => unable to retrieve EXPENSE ACCOUNTS balance: %w", err)
+	}
+	balanceSheet.RetainedEarnings = val
 
 	return balanceSheet, nil
 }
