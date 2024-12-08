@@ -228,6 +228,7 @@
                       <th>Brand:</th>
                       <th>Available Qty:</th>
                       <th>MRP:</th>
+                      <th>Discount:</th>
                       <th>Add Quantity:</th>
                     </tr>
                   </thead>
@@ -237,6 +238,7 @@
                       <td id="view-item-brand"></td>
                       <td id="view-item-available-quantity"></td>
                       <td id="view-item-mrp"></td>
+                      <td id="view-item-discount"></td>
                       <td id="view-item-add-quantity"></td>
                     </tr>
                   </tbody>
@@ -282,7 +284,7 @@
             <div class="x_panel bg-gw">
               <div class="x_title">
                 <div class="title_left">
-                  <div class="col-md-3 col-sm-3 col-xs-3">
+                  <div class="col-md-4 col-sm-4 col-xs-3">
                     <h2>Sale Details</h2>
                   </div>
                 </div>
@@ -643,45 +645,46 @@
       
       if (productMetadata && productMetadata.length > 0) {
         qty = productMetadata.length;
+        //update quantity section
         document.getElementById("view-item-available-quantity").innerText = qty;
+        //update mrp section
+        document.getElementById("view-item-mrp").innerHTML = `${productMetadata[0].max_retail_price} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="btn btn-xs btn-info" onclick="toggleTextVisibility(this, ${productMetadata[0].purchase_rate+productMetadata[0].shipping_cost_per_unit-productMetadata[0].purchase_discount})">See</label>`;
+        //update add button section
+        //status = true indicates multiple items, and false means single item that retrieve by serial number
+        if(status){
+          document.getElementById("view-item-add-quantity").innerHTML = `
+            <div class="input-group" style="width:70%;">
+              <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
+              <span class="input-group-btn">
+                <button class="btn btn-default btn-default" type="button" id="add-items-btn" onclick="markItemsAsSelected(${items.id}, 0)"><i
+                    class="fa fa-plus">
+                  </i>&nbsp;</button>
+              </span>
+            </div>
+            `
+        }else {
+          document.getElementById("view-item-add-quantity").innerHTML = `
+            <div class="input-group">
+              <b>${products.product_metadata[0].serial_number}</b>
+              <span class="input-group-btn">
+                <button class="btn btn-default btn-default" type="button" id="add-items-btn" onclick="markSingleItemAsSelected(${items.id})"><i
+                    class="fa fa-arrow-right">
+                  </i>&nbsp;</button>
+              </span>
+            </div>
+            `
+        }
+        //
+        document.getElementById("view-item-discount").innerHTML = `
+          <input type="number" name="sale-discount-per-item" id="sale-discount-per-item" class="form-control" min="0" max="${productMetadata[0].max_retail_price+productMetadata[0].purchase_discount-productMetadata[0].purchase_rate-productMetadata[0].shipping_cost_per_unit}">
+        `
       } else {
-        document.getElementById("view-item-available-quantity").innerHTML = `<span class="lable">Out of Stock</span>`;
+        document.getElementById("view-item-available-quantity").innerHTML = `<span class="bg-red" style="color: rgb(255, 255, 255); padding: 3px; border-radius: 2px;">Out of Stock</span>`;
       }
       // <td id="view-item-brand"></td>
                       // <td id="view-item-available-quantity"></td>
                       // <td id="view-item-mrp"></td>
                       // <td id="view-item-add-quantity"></td>
-      let quantity_section = "";
-      let discount_section = "";
-      let mrp_section = "";
-      let item_unit_input_section = "";
-      
-      if (qty > 0) {
-        quantity_section = `<span class="badge bg-green">${qty}</span>`;
-        mrp_section = `${productMetadata[0].max_retail_price} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="btn btn-xs btn-info" onclick="toggleTextVisibility(this, ${productMetadata[0].purchase_rate})">See</label>`;
-        discount_section = `${productMetadata[0].purchase_discount}`;
-      } else {
-        quantity_section = '<span class="badge bg-red">Out of stock</span>';
-      }
-      if (status) {
-        if (qty > 0) {
-          item_unit_input_section =
-            `<tr style="transform:translate(0,5px);">
-              <td class="text-right text-primary"><b>Add Items:</b></td>
-              <td class="text-left" style="transform:translate(0,-5px)">
-                <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
-              </td>
-              <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markItemsAsSelected(${items.id}, 0)">Add Items</a></td>
-            </tr>`
-        }
-      } else {
-        item_unit_input_section =
-          `<tr style="transform:translate(0,5px);">
-          <td class="text-primary"><b>Add Item:</b></td>
-          <td class="text-primary"><b>${products.product_metadata[0].serial_number}</b></td>
-          <td class="text-left"><a class="btn btn-dark btn-xs btn-round" id="add-items-btn" onclick="markSingleItemAsSelected(${items.id})">Add Item</a></td>
-        </tr>`
-      }
     }
 
     // removeProduct removes a product by product_id
@@ -737,6 +740,15 @@
 
     //markSingleItemAsSelected add multiple items to the selected items section
     function markItemsAsSelected(id, quantity) {
+      //check sale-discount-per-item field
+      
+      if(document.getElementById("sale-discount-per-item").value.trim() ===""){
+        Swal.fire({
+            title: "Enter Discount given per item",
+            icon: "error"
+          });
+          return
+      } 
       //remove if this item already exist
       deleteFromSelectItems(id);
       if (quantity === 0) {
@@ -775,6 +787,17 @@
 
     //markSingleItemAsSelected add current item to the selected items section
     function markSingleItemAsSelected(id) {
+      //check sale-discount-per-item field
+      let discountPerItem = parseInt(document.getElementById("sale-discount-per-item").value.trim())
+      if(discountPerItem === ""){
+        Swal.fire({
+            title: "Enter Discount given for this item",
+            icon: "error"
+          });
+          return
+      } else {
+        document.getElementById("discount").value = parseInt(document.getElementById("discount").value) + discountPerItem
+      }
       //check id already exist or not
       let elem = document.getElementById("selected-product-serial-" + id);
       if (elem) {
