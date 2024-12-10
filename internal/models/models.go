@@ -270,7 +270,7 @@ type PurchasePayload struct {
 	Note                string             `json:"note"`
 	BillAmount          int                `json:"bill_amount"`
 	TotalEarnedDiscount int                `json:"earned_discount"`
-	TotalShippingCost   int                `json:"total_shipping_cost""`
+	TotalShippingCost   int                `json:"total_shipping_cost"`
 	TotalAmount         int                `json:"total_amount"`
 	PaidAmount          int                `json:"paid_amount"`
 	PurchasedProduct    []PurchasedProduct `json:"purchased_product_info"`

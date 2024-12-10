@@ -919,11 +919,11 @@ func (app *application) SaleProductsToCustomer(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer:Unable to read JSON => %w", err))
 		return
 	}
-	err = app.DB.SaleProductsToCustomer(&salesInfo)
-	if err != nil {
-		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
-		return
-	}
+	// err = app.DB.SaleProductsToCustomer(&salesInfo)
+	// if err != nil {
+	// 	app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
+	// 	return
+	// }
 	cp, err := app.DB.GetCompanyProfile()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))

@@ -178,108 +178,109 @@
         <h2 class="text-center text-warning fa-2x"><label>SALE</label></h2>
         <div id="sale-page-content">
           <!-- Page content here -->
-          <form action="#" id="sale-form">
-            <!-- View items Section  -->
-            <div class="x_panel bg-gw">
-              <div class="x_title">
-                <div class="col-md-6 col-sm-6 col-xs-12">
-                  <h2>Search Product</h2>
-                </div>
-                <div class="clearfix"></div>
-              </div>
-              <div class="x_content">
-                <!-- Category Info -->
-                <div class="col-md-4 col-sm-4 col-xs-4 form-group has-feedback">
-                  <select id="category" class="form-control form-select has-feedback-left" required>
-                    <option value="" selected disabled>Select Category</option>
-                    <!--Updated by JS DOM -->
-                  </select>
-                  <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
-                    aria-hidden="true"></i>
-                </div>
-                <!-- Product Info -->
-                <div class="col-md-4 col-sm-4 col-xs-4 form-group has-feedback">
-                  <select id="product" class="form-control form-select has-feedback-left" required>
-                    <option value="" selected disabled>Select Product</option>
-                    <!--Updated by JS DOM -->
-                  </select>
-                  <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
-                    aria-hidden="true"></i>
-                </div>
-                <!-- Search Product By Serial Number -->
-                <div class="col-md-4 col-sm-4 col-xs-4 form-group pull-right top_search">
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="search-by-serial-number"
-                      placeholder="Search item by serial number">
-                    <span class="input-group-btn">
-                      <button class="btn btn-default btn-default" type="button" onclick="searchBySerial()"><i
-                          class="fa fa-arrow-right">
-                        </i>&nbsp;</button>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="x_content">
-                <!-- Table row -->
-                <table class="table table-striped table-bordered">
-                  <thead style="background-color: rgba(4, 209, 209, 0.1);">
-                    <tr>
-                      <th>Code:</th>
-                      <th>Brand:</th>
-                      <th>Available Qty:</th>
-                      <th>MRP:</th>
-                      <th>Discount:</th>
-                      <th>Add Quantity:</th>
-                    </tr>
-                  </thead>
-                  <tbody id="view-items-info-container">
-                    <tr>
-                      <td id="view-item-code"></td>
-                      <td id="view-item-brand"></td>
-                      <td id="view-item-available-quantity"></td>
-                      <td id="view-item-mrp"></td>
-                      <td id="view-item-discount"></td>
-                      <td id="view-item-add-quantity"></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <!-- Selected items Section  -->
-            <div class="x_panel bg-gw">
-              <div class="x_title">
-                <div class="title_left">
-                  <div class="col-md-8 col-sm-6 col-xs-6">
-                    <h2>Selected Products</h2>
-                  </div>
-                </div>
-                <div class="clearfix"></div>
-              </div>
-              <div class="x_content" id="selected-items-info">
-                <!-- Table row -->
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th class="text-center">ID</th>
-                      <th class="text-center">Product Name</th>
-                      <th class="text-center">Category</th>
-                      <th class="text-center">Brand</th>
-                      <th class="text-center">Qty</th>
-                      <th class="text-center">Serial #</th>
-                      <th class="text-center">MRP</th>
-                      <th class="text-center">Total Amount</th>
-                      <th class="text-center">Remove</th>
-                    </tr>
-                  </thead>
-                  <tbody id="selected-items-info-container">
-                    <!-- DOM JS -->
-                  </tbody>
-                  <div class="clearfix"></div>
-                </table>
 
-                <!-- /.col -->
+          <!-- View items Section  -->
+          <div class="x_panel bg-gw">
+            <div class="x_title">
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <h2>Search Product</h2>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <!-- Category Info -->
+              <div class="col-md-4 col-sm-4 col-xs-4 form-group has-feedback">
+                <select id="category" class="form-control form-select has-feedback-left" required>
+                  <option value="" selected disabled>Select Category</option>
+                  <!--Updated by JS DOM -->
+                </select>
+                <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-tags"
+                  aria-hidden="true"></i>
+              </div>
+              <!-- Product Info -->
+              <div class="col-md-4 col-sm-4 col-xs-4 form-group has-feedback">
+                <select id="product" class="form-control form-select has-feedback-left" required>
+                  <option value="" selected disabled>Select Product</option>
+                  <!--Updated by JS DOM -->
+                </select>
+                <i style="color: rgba(0, 0, 0, 1);" class="form-control-feedback left fa fa-th-list"
+                  aria-hidden="true"></i>
+              </div>
+              <!-- Search Product By Serial Number -->
+              <div class="col-md-4 col-sm-4 col-xs-4 form-group pull-right top_search">
+                <div class="input-group">
+                  <input type="text" class="form-control" id="search-by-serial-number"
+                    placeholder="Search item by serial number">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default btn-default" type="button" onclick="searchBySerial()"><i
+                        class="fa fa-arrow-right">
+                      </i>&nbsp;</button>
+                  </span>
+                </div>
               </div>
             </div>
+            <div class="x_content">
+              <!-- Table row -->
+              <table class="table table-striped table-bordered">
+                <thead style="background-color: rgba(4, 209, 209, 0.1);">
+                  <tr>
+                    <th>Code:</th>
+                    <th>Brand:</th>
+                    <th>Available Qty:</th>
+                    <th>MRP:</th>
+                    <th>Discount:</th>
+                    <th>Add Quantity:</th>
+                  </tr>
+                </thead>
+                <tbody id="view-items-info-container">
+                  <tr>
+                    <td id="view-item-code"></td>
+                    <td id="view-item-brand"></td>
+                    <td id="view-item-available-quantity"></td>
+                    <td id="view-item-mrp"></td>
+                    <td id="view-item-discount"></td>
+                    <td id="view-item-add-quantity"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Selected items Section  -->
+          <div class="x_panel bg-gw">
+            <div class="x_title">
+              <div class="title_left">
+                <div class="col-md-8 col-sm-6 col-xs-6">
+                  <h2>Selected Products</h2>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content" id="selected-items-info">
+              <!-- Table row -->
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">Product Name</th>
+                    <th class="text-center">Category</th>
+                    <th class="text-center">Brand</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-center">Serial #</th>
+                    <th class="text-center">MRP</th>
+                    <th class="text-center">Total Amount</th>
+                    <th class="text-center">Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="selected-items-info-container">
+                  <!-- DOM JS -->
+                </tbody>
+                <div class="clearfix"></div>
+              </table>
+
+              <!-- /.col -->
+            </div>
+          </div>
+          <form action="#" id="sale-form">
             <!-- Payment Details  -->
             <div class="x_panel bg-gw">
               <div class="x_title">
@@ -452,7 +453,7 @@
 
   <script>
 
-    let customers = [], categories = [], brands = [], headAccounts = [], products = [], billAmount = 0, totalAmount = 0, gross_profit = 0, InvoiceData, company, selected_products = [], sold_products = [];
+    let customers = [], categories = [], brands = [], headAccounts = [], products = [], billAmount = 0, totalAmount = 0, totalDiscount = 0, gross_profit = 0, InvoiceData, company, selected_products = [], sold_products = [];
 
     window.addEventListener("DOMContentLoaded", () => {
       let category = document.getElementById("category");
@@ -554,9 +555,9 @@
                 sale_date: document.getElementById("single_cal4").value,
                 chalan_no: document.getElementById("chalan_no").value,
                 note: document.getElementById("note").value,
-                bill_amount: parseInt(document.getElementById("bill-amount").value),
-                discount: parseInt(document.getElementById("discount").value),
-                total_amount: parseInt(document.getElementById("total-amount").value),
+                bill_amount: billAmount,
+                total_amount: totalAmount,
+                discount: totalDiscount,
                 paid_amount: parseInt(document.getElementById("paid-amount").value),
                 gross_profit: parseInt(document.getElementById("gross_profit-amount").innerText),
               }
@@ -587,8 +588,7 @@
           }
         })
     }) //End of Window.addEventListener
-    /////////////////////////////////////////////
-    /////////////////////////////////////////////
+
     //updateCategoryDiv updates category selection options with the fetched data 
     function updateCategoryDiv(categories) {
       if (categories) {
@@ -642,16 +642,16 @@
       let qty = 0;
       document.getElementById("view-item-code").innerText = items.product_code;
       document.getElementById("view-item-brand").innerText = items.brand.name;
-      
+
       if (productMetadata && productMetadata.length > 0) {
         qty = productMetadata.length;
         //update quantity section
         document.getElementById("view-item-available-quantity").innerText = qty;
         //update mrp section
-        document.getElementById("view-item-mrp").innerHTML = `${productMetadata[0].max_retail_price} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="btn btn-xs btn-info" onclick="toggleTextVisibility(this, ${productMetadata[0].purchase_rate+productMetadata[0].shipping_cost_per_unit-productMetadata[0].purchase_discount})">See</label>`;
+        document.getElementById("view-item-mrp").innerHTML = `${productMetadata[0].max_retail_price} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="btn btn-xs btn-info" onclick="toggleTextVisibility(this, ${productMetadata[0].purchase_rate + productMetadata[0].shipping_cost_per_unit - productMetadata[0].purchase_discount})">See</label>`;
         //update add button section
         //status = true indicates multiple items, and false means single item that retrieve by serial number
-        if(status){
+        if (status) {
           document.getElementById("view-item-add-quantity").innerHTML = `
             <div class="input-group" style="width:70%;">
               <input type="number" name="add-quantity" id="add-quantity" class="form-control" min="1" value="1" max="${qty}">
@@ -662,7 +662,7 @@
               </span>
             </div>
             `
-        }else {
+        } else {
           document.getElementById("view-item-add-quantity").innerHTML = `
             <div class="input-group">
               <b>${products.product_metadata[0].serial_number}</b>
@@ -672,19 +672,15 @@
                   </i>&nbsp;</button>
               </span>
             </div>
-            `
+          `
         }
         //
         document.getElementById("view-item-discount").innerHTML = `
-          <input type="number" name="sale-discount-per-item" id="sale-discount-per-item" class="form-control" min="0" max="${productMetadata[0].max_retail_price+productMetadata[0].purchase_discount-productMetadata[0].purchase_rate-productMetadata[0].shipping_cost_per_unit}">
+          <input type="number" name="sale-discount-per-item" id="sale-discount-per-item" class="form-control" min="0" max="${productMetadata[0].max_retail_price + productMetadata[0].purchase_discount - productMetadata[0].purchase_rate - productMetadata[0].shipping_cost_per_unit}">
         `
       } else {
         document.getElementById("view-item-available-quantity").innerHTML = `<span class="bg-red" style="color: rgb(255, 255, 255); padding: 3px; border-radius: 2px;">Out of Stock</span>`;
       }
-      // <td id="view-item-brand"></td>
-                      // <td id="view-item-available-quantity"></td>
-                      // <td id="view-item-mrp"></td>
-                      // <td id="view-item-add-quantity"></td>
     }
 
     // removeProduct removes a product by product_id
@@ -731,6 +727,8 @@
       let item = document.getElementById("selected-product-" + id);
       if (parentDiv && item) {
         billAmount -= parseInt(document.getElementById('selected-product-price-' + id).innerText);
+        totalDiscount -= parseInt(document.getElementById('selected-product-discount-' + id).value);
+        totalAmount = billAmount - totalDiscount;
         gross_profit -= parseInt(document.getElementById('selected-product-gross_profit-' + id).value);
         updateBillAmount();
         parentDiv.removeChild(item);
@@ -740,15 +738,14 @@
 
     //markSingleItemAsSelected add multiple items to the selected items section
     function markItemsAsSelected(id, quantity) {
-      //check sale-discount-per-item field
-      
-      if(document.getElementById("sale-discount-per-item").value.trim() ===""){
+      //check sale-discount-per-item field  
+      if (document.getElementById("sale-discount-per-item").value.trim() === "") {
         Swal.fire({
-            title: "Enter Discount given per item",
-            icon: "error"
-          });
-          return
-      } 
+          title: "Enter Discount given per item",
+          icon: "error"
+        });
+        return
+      }
       //remove if this item already exist
       deleteFromSelectItems(id);
       if (quantity === 0) {
@@ -756,31 +753,35 @@
       }
       pm = products.product_metadata[0];
       let serial = ""
-      let sub_total = 0, sub_gross_profit = 0;
+      let sub_total = 0, sub_discount = 0, sub_gross_profit = 0;
       for (let i = 0; i < quantity; i++) {
         //insert serial number
         insertSerialNumber(id, products.product_metadata[i].serial_number)
-        sub_gross_profit += products.product_metadata[i].max_retail_price - products.product_metadata[i].purchase_rate
+        sub_discount += parseInt(document.getElementById('sale-discount-per-item').value)
+        sub_gross_profit += products.product_metadata[i].max_retail_price - products.product_metadata[i].purchase_rate - parseInt(document.getElementById('sale-discount-per-item').value)
         sub_total += products.product_metadata[i].max_retail_price;
         // const element = products.product_metadata[i].serial_number;  
         serial += `<span class="serial-number">${products.product_metadata[i].serial_number}</span></br>`;
       }
       document.getElementById("selected-items-info-container").innerHTML += `
-      <tr id="selected-product-${id}">
-        <th class="text-center">${products.id}</th>
-        <th class="text-center">${products.product_name}<span class="d-none" id="product-warranty-${products.id}">${products.product_metadata[0].warranty}</span></th>
-        <th class="text-center">${products.category.name}</th>
-        <th class="text-center">${products.brand.name}</th>
-        <th class="text-center" id="selected-product-qty-${id}">${quantity}</th>
-        <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
-        <th class="text-center">${pm.max_retail_price}</th>
-        <th class="text-center" id="selected-product-price-${id}">${sub_total}</th>
-        <input type="hidden" id="selected-product-gross_profit-${id}" value="${sub_gross_profit}">
-        <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
-      </tr>
-    `;
+        <tr id="selected-product-${id}">
+          <th class="text-center">${products.id}</th>
+          <th class="text-center">${products.product_name}<span class="d-none" id="product-warranty-${products.id}">${products.product_metadata[0].warranty}</span></th>
+          <th class="text-center">${products.category.name}</th>
+          <th class="text-center">${products.brand.name}</th>
+          <th class="text-center" id="selected-product-qty-${id}">${quantity}</th>
+          <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
+          <th class="text-center">${pm.max_retail_price}</th>
+          <th class="text-center" id="selected-product-price-${id}">${sub_total}</th>
+          <input type="hidden" id="selected-product-discount-${id}" value="${sub_discount}">
+          <input type="hidden" id="selected-product-gross_profit-${id}" value="${sub_gross_profit}">
+          <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
+        </tr>
+      `;
       //increase bill amount
       billAmount += sub_total;
+      totalDiscount += sub_discount;
+      totalAmount = billAmount - totalDiscount
       gross_profit += sub_gross_profit;
       updateBillAmount();
     }
@@ -789,14 +790,12 @@
     function markSingleItemAsSelected(id) {
       //check sale-discount-per-item field
       let discountPerItem = parseInt(document.getElementById("sale-discount-per-item").value.trim())
-      if(discountPerItem === ""){
+      if (discountPerItem === "") {
         Swal.fire({
-            title: "Enter Discount given for this item",
-            icon: "error"
-          });
-          return
-      } else {
-        document.getElementById("discount").value = parseInt(document.getElementById("discount").value) + discountPerItem
+          title: "Enter Discount given for this item",
+          icon: "error"
+        });
+        return
       }
       //check id already exist or not
       let elem = document.getElementById("selected-product-serial-" + id);
@@ -804,6 +803,7 @@
         if (!elem.innerHTML.includes(`${products.product_metadata[0].serial_number}`)) {
           elem.innerHTML += `<span class="serial-number">${products.product_metadata[0].serial_number}</span> <br>`;
           document.getElementById("selected-product-price-" + id).innerText = parseInt(document.getElementById("selected-product-price-" + id).innerText) + products.product_metadata[0].max_retail_price;
+          document.getElementById("selected-product-discount-" + id).value = parseInt(document.getElementById("selected-product-discount-" + id).value) + parseInt(document.getElementById("sale-discount-per-item").value);
           document.getElementById("selected-product-gross_profit-" + id).value = parseInt(document.getElementById("selected-product-gross_profit-" + id).value) + products.product_metadata[0].max_retail_price - products.product_metadata[0].purchase_rate;
           document.getElementById("selected-product-qty-" + id).innerText = parseInt(document.getElementById("selected-product-qty-" + id).innerText) + 1;
 
@@ -811,7 +811,9 @@
           insertSerialNumber(id, products.product_metadata[0].serial_number)
           //increase bill amount
           billAmount += products.product_metadata[0].max_retail_price;
-          gross_profit += products.product_metadata[0].max_retail_price - products.product_metadata[0].purchase_rate;
+          totalDiscount += parseInt(document.getElementById("sale-discount-per-item").value);
+          totalAmount = billAmount - totalDiscount
+          gross_profit += products.product_metadata[0].max_retail_price - products.product_metadata[0].purchase_rate - parseInt(document.getElementById("sale-discount-per-item").value);
           updateBillAmount();
         }
       } else {
@@ -823,43 +825,13 @@
     function updateBillAmount() {
       document.getElementById("gross_profit-amount").innerText = gross_profit;
       document.getElementById("bill-amount").value = billAmount;
+      document.getElementById("discount").value = totalDiscount;
       document.getElementById("total-amount").value = billAmount - parseInt(document.getElementById("discount").value);
       totalAmount = parseInt(document.getElementById("total-amount").value);
 
       //update max input of paid-amount field
       document.getElementById("paid-amount").max = `${totalAmount}`;
     }
-
-    //update total amount when discount is changed
-    document.getElementById("discount").addEventListener('change', e => {
-      let d = document.getElementById("discount");
-      if (d.value === "" || Number(d.value) === 0) {
-        document.getElementById("total-amount").value = billAmount;
-        document.getElementById("paid-amount").max = billAmount;
-      } else {
-        document.getElementById("total-amount").value = billAmount - parseInt(d.value);
-        totalAmount = parseInt(document.getElementById("total-amount").value);
-        //update max input of paid-amount field
-        document.getElementById("paid-amount").max = `${totalAmount}`;
-      }
-    })
-
-    //uprate discount when total amount is changed
-    document.getElementById("total-amount").addEventListener('change', e => {
-      let t = document.getElementById('total-amount');
-      if (t.value === "" || Number(t.value) === 0) {
-        document.getElementById("discount").value = billAmount
-        document.getElementById("paid-amount").max = 0
-      } else {
-        let discount = billAmount - parseInt(t.value);
-        document.getElementById("discount").value = discount;
-        totalAmount = parseInt(t.value);
-        //update max input of paid-amount field
-        document.getElementById("paid-amount").max = `${totalAmount}`;
-      }
-
-
-    })
 
     //searchBySerial()
     function searchBySerial() {
@@ -922,6 +894,7 @@
           quantity: parseInt(row.cells[4].innerText),
           serial_numbers: sn,
           mrp: parseInt(row.cells[6].innerText),
+          total_amount: parseInt(document.getElementById("selected-product-price-" + row.cells[0].innerText).innerText),
           warranty: parseInt(document.getElementById('product-warranty-' + row.cells[0].innerText).innerText),
         }
         selectedProducts.push(item)
