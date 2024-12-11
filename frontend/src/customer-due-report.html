@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>PSINVENTORY</title>
+  <title>Customer Due Report</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -164,8 +164,8 @@
                         <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
                         <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
                         <li class="sub_menu"><a href="income-statement.html">Income Statement</a></li>
-                        <li class="sub_menu"><a href="#customer-due-report.html">Customer Due Report</a></li>
-                        <li class="sub_menu"><a href="#supplier-due-report.html">Supplier Due Report</a></li>
+                        <li class="sub_menu"><a href="customer-due-report.html">Customer Due Report</a></li>
+                        <li class="sub_menu"><a href="supplier-due-report.html">Supplier Due Report</a></li>
                         <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
                         <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
                         <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
@@ -222,12 +222,12 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">List of Customers</h2>
+        <h2 class="text-center text-warning fa-2x text-bold">Customer Due Report</h2>
         <!-- Page content here -->
         <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
           <!-- start project list -->
           <div class="bg-white">
-            <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+            <table id="customer-due-report" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
               cellspacing="0" width="100%">
               <!-- Will be updated by JS DOM -->
             </table>
@@ -333,20 +333,23 @@
       console.log('init_DataTables');
 
       var handleDataTableButtons = function () {
-        if ($(".datatable-buttons").length) {
-          var table = $(".datatable-buttons").DataTable({
+        if ($("#customer-due-report").length) {
+          // Destroy DataTable if it already exists to reinitialize it
+          if ($.fn.DataTable.isDataTable("#customer-due-report")) {
+            $("#customer-due-report").DataTable().clear().destroy();
+          }
+          var table = $("#customer-due-report").DataTable({
             dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
             // processing: true, // Show processing indicator
             serverSide: false, // Disable server-side processing for client-side only
             pageLength: 10, // Default page size
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
-              { data: "account_code", title: "Account Code", className: "account-code" },
-              { data: "account_name", title: "Account Name", className: "account-name" },
-              { data: "mobile", title: "Mobile", className: "contact-number" },
-              { data: "account_status", title: "Account Status", className: "account-status" },
-              { data: "due_amount", title: "Balance", className: "opening-balance" },
-              { data: "date", title: "Date", className: "date" },
+              { data: "account_code", title: "Account Code", className: "account-code", width:"10%"},
+              { data: "account_name", title: "Account Name", className: "account-name", width:"20%"},
+              { data: "mobile", title: "Mobile", className: "contact-number", width:"10%"},
+              { data: "account_status", title: "Status", className: "account-status", width:"5%"},
+              { data: "due_amount", title: "Due Amount", className: "due-amount", width:"10%"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -357,7 +360,7 @@
                 // Generate a custom file name dynamically
                 const today = new Date();
                 const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
-                return `Due_Report_Customer_${formattedDate}`;
+                return `Customer_${formattedDate}`;
               },
             },
               {
@@ -373,24 +376,25 @@
             // autoWidth: true, // Automatically adjust column width to container
             scrollX: false,   // Disable horizontal scroll
             order: [[0, 'asc']],
+            autoWidth:false,
             ajax: function (data, callback, settings) {
               // Fetch all data once and let DataTables handle searching/pagination on client side
               const requestOptions = {
                 method: 'post'
               }
-              fetch('http://localhost:4321/api/mis/view-all-customers', requestOptions)
+              fetch('http://localhost:4321/api/reports/accounts/customer-due-report', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
                   console.log(responseData)
-                  reportData = responseData.customers;
+                  reportData = responseData.report;
                   //Format date in the received data
-                  responseData.customers.forEach(cst => {
+                  reportData.forEach(cst => {
                     cst.account_status = cst.account_status ? `<b style="text-align:center;">Active</b>` : "Inactive";
                     cst.joining_date = formatDate(cst.joining_date, "date", "-");
                   });
                   // Wrap the data in the expected format
                   const returnData = {
-                    data: responseData.customers // Wrap data in { data: ... } for DataTables
+                    data: reportData // Wrap data in { data: ... } for DataTables
                   };
                   callback(returnData);
                 })
@@ -430,7 +434,6 @@
               <td>${c.mobile}</td>
               <td>${c.account_status}</td>
               <td>${c.due_amount || "0"}</td>
-              <td>${formatDate(c.joining_date, "date", "-")}</td>
             </tr>`;
         }
       } else {
@@ -551,7 +554,6 @@
                 <th>Mobile</th>
                 <th>Status</th>
                 <th>Due Amount</th>
-                <th>Joining Date</th>
               </tr>
             </thead>
             <tbody>

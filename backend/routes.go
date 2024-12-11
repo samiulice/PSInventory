@@ -115,6 +115,7 @@ func (app *application) routes() http.Handler {
 		mux.Post("/reports/accounts/expenses-report", app.GetExpensesReport)
 		mux.Post("/reports/accounts/income-statement", app.GetIncomeStatementReport)
 		mux.Post("/reports/accounts/customer-due-report", app.GetCustomerDueReport)
+		mux.Post("/reports/accounts/supplier-due-report", app.GetSupplierDueReport)
 		mux.Post("/reports/accounts/top-sheet-report", app.GetTopSheetReport)
 		mux.Post("/reports/accounts/trial-balance", app.GetTrialBalanceReport)
 		mux.Post("/reports/accounts/balance-sheet", app.GetBalanceSheetReport)

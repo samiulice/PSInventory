@@ -112,7 +112,8 @@ type DatabaseRepo interface {
 	GetSalesHistoryReport() ([]*models.Sale, error)
 
 	//Accounts report
-	GetCustomerDueHistoryReport() ([]*models.Sale, error)
+	GetCustomerDueHistoryReport() ([]*models.Customer, error)
+	GetSupplierDueHistoryReport() ([]*models.Supplier, error)
 	GetTransactionsHistoryReport() ([]*models.Transaction, error)
 	GetCashBankStatement() ([]*models.Transaction, error)
 	GetLedgerBookDetails(account_type string, account_id int) ([]*models.Transaction, error)

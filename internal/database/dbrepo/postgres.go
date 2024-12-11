@@ -4116,44 +4116,91 @@ func (p *postgresDBRepo) GetSalesHistoryReport() ([]*models.Sale, error) {
 }
 
 // .......................Accounts Reports.......................
-func (p *postgresDBRepo) GetCustomerDueHistoryReport() ([]*models.Sale, error) {
+func (p *postgresDBRepo) GetCustomerDueHistoryReport() ([]*models.Customer, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	var sales []*models.Sale
+	var customers []*models.Customer
 
 	query := `
-		SELECT sl.sale_date, sl.customer_id, sl.memo_no, sl.bill_amount, sl.total_amount, sl.paid_amount, c.id, c.account_code, c.account_name, c.due_amount, c.mobile
-		FROM public.sales_history as sl
-		INNER JOIN public.customers as c ON (sl.customer_id = c.id)
-		WHERE sl.total_amount > sl.paid_amount
+		SELECT 
+			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, due_amount, updated_at
+		FROM
+			public.customers
+		WHERE
+			due_amount != 0
 	`
 	rows, err := p.DB.QueryContext(ctx, query)
 	if err != nil {
-		return sales, fmt.Errorf("DBERROR: GetCustomerDueHistoryReport => %w", err)
+		return customers, fmt.Errorf("DBERROR: GetCustomerDueHistoryReport => %w", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var sale models.Sale
+		var c models.Customer
 		err = rows.Scan(
-			&sale.SaleDate,
-			&sale.CustomerID,
-			&sale.MemoNo,
-			&sale.BillAmount,
-			&sale.TotalAmount,
-			&sale.PaidAmount,
-			&sale.Customer.ID,
-			&sale.Customer.AccountCode,
-			&sale.Customer.AccountName,
-			&sale.Customer.DueAmount,
-			&sale.Customer.Mobile,
+			&c.ID,
+			&c.AccountCode,
+			&c.AccountName,
+			&c.ContactPerson,
+			&c.Division,
+			&c.District,
+			&c.Upazila,
+			&c.Area,
+			&c.Mobile,
+			&c.Email,
+			&c.AccountStatus,
+			&c.DueAmount,
+			&c.UpdatedAt,
 		)
 		if err != nil {
-			return sales, fmt.Errorf("DBERROR: GetCustomerDueHistoryReport => %w", err)
+			return customers, fmt.Errorf("DBERROR: GetCustomerDueHistoryReport => %w", err)
 		}
-		sales = append(sales, &sale)
+		customers = append(customers, &c)
 	}
-	return sales, nil
+	return customers, nil
+}
+func (p *postgresDBRepo) GetSupplierDueHistoryReport() ([]*models.Supplier, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var suppliers []*models.Supplier
+
+	query := `
+		SELECT 
+			id, account_code, account_name, contact_person, division, district, upazila, area, mobile, email, account_status, due_amount, updated_at
+		FROM
+			public.suppliers
+		WHERE
+			due_amount != 0
+	`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		return suppliers, fmt.Errorf("DBERROR: GetSupplierDueHistoryReport => %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s models.Supplier
+		err = rows.Scan(
+			&s.ID,
+			&s.AccountCode,
+			&s.AccountName,
+			&s.ContactPerson,
+			&s.Division,
+			&s.District,
+			&s.Upazila,
+			&s.Area,
+			&s.Mobile,
+			&s.Email,
+			&s.AccountStatus,
+			&s.DueAmount,
+			&s.UpdatedAt,
+		)
+		if err != nil {
+			return suppliers, fmt.Errorf("DBERROR: GetSupplierDueHistoryReport => %w", err)
+		}
+		suppliers = append(suppliers, &s)
+	}
+	return suppliers, nil
 }
 
 func (p *postgresDBRepo) GetTransactionsHistoryReport() ([]*models.Transaction, error) {

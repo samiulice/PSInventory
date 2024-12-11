@@ -919,11 +919,11 @@ func (app *application) SaleProductsToCustomer(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer:Unable to read JSON => %w", err))
 		return
 	}
-	// err = app.DB.SaleProductsToCustomer(&salesInfo)
-	// if err != nil {
-	// 	app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
-	// 	return
-	// }
+	err = app.DB.SaleProductsToCustomer(&salesInfo)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
+		return
+	}
 	cp, err := app.DB.GetCompanyProfile()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
@@ -1822,7 +1822,7 @@ func (app *application) GetSalesHistoryReport(w http.ResponseWriter, r *http.Req
 
 // .....................Accounts Handlers......................
 func (app *application) GetCustomerDueReport(w http.ResponseWriter, r *http.Request) {
-	sales, err := app.DB.GetCustomerDueHistoryReport()
+	customers, err := app.DB.GetCustomerDueHistoryReport()
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR:GetCustomerDueReport: %w", err))
 		return
@@ -1831,12 +1831,31 @@ func (app *application) GetCustomerDueReport(w http.ResponseWriter, r *http.Requ
 	var resp struct {
 		Error   bool           `json:"error"`
 		Message string         `json:"message"`
-		Report  []*models.Sale `json:"report"`
+		Report  []*models.Customer `json:"report"`
 	}
 
 	resp.Error = false
 	resp.Message = "Data fetched successfully"
-	resp.Report = sales
+	resp.Report = customers
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+func (app *application) GetSupplierDueReport(w http.ResponseWriter, r *http.Request) {
+	suppliers, err := app.DB.GetSupplierDueHistoryReport()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR:GetSupplierDueReport: %w", err))
+		return
+	}
+
+	var resp struct {
+		Error   bool           `json:"error"`
+		Message string         `json:"message"`
+		Report  []*models.Supplier `json:"report"`
+	}
+
+	resp.Error = false
+	resp.Message = "Data fetched successfully"
+	resp.Report = suppliers
 
 	app.writeJSON(w, http.StatusOK, resp)
 }

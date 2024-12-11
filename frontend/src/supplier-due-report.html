@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>PSINVENTORY</title>
+  <title>Supplier Due Report</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -39,10 +39,6 @@
   <link rel="stylesheet" href="assets/sweetalert2/sweetalert2.min.css">
 
   <style>
-    * {
-      overflow-x: hidden;
-    }
-
     h2 {
       overflow: hidden;
     }
@@ -182,7 +178,6 @@
                     <li class="sub_menu"><a href="category-list.html">Category List</a></li>
                     <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
                     <li class="sub_menu"><a href="product-list.html">Product List</a></li>
-
                     <li class="sub_menu"><a href="service-list.html">Service List</a></li>
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
                     <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
@@ -227,23 +222,31 @@
       <!-- page content -->
       <div id="page-content" class="right_col" role="main">
         <!-- Content Title -->
-        <h2 class="text-center text-warning fa-2x text-bold">List of Products</h2>
+        <h2 class="text-center text-warning fa-2x text-bold">Supplier Due Report</h2>
         <!-- Page content here -->
-        <div class="x_panel bg-gw">
-          <div class="x_content">
-            <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-              <!-- start project list -->
-              <div class="bg-white">
-                <table id="" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
-                  cellspacing="0" width="100%">
-                  <!-- Will be updated by JS DOM -->
-                </table>
+        <div id="row datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+          <!-- start project list -->
+          <div class="bg-white">
+            <table id="supplier-due-report" class="table table-striped table-bordered dt-responsive nowrap datatable-buttons"
+              cellspacing="0" width="100%">
+              <!-- Will be updated by JS DOM -->
+            </table>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div id="paginator_info" class="dataTables_info" id="datatable_info" role="status" aria-live="polite">
+                <!-- will be updated using js DOM -->
               </div>
-              
+            </div>
+            <div class="col-9">
+              <nav aria-label="Page navigation example">
+                <ul id="paginate_nav" class="pagination">
+                  <!-- will be populated by Javascript DOM -->
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
-        <!-- /top tiles -->
       </div>
       <!-- /page content -->
     </div>
@@ -330,21 +333,23 @@
       console.log('init_DataTables');
 
       var handleDataTableButtons = function () {
-        if ($(".datatable-buttons").length) {
-          var table = $(".datatable-buttons").DataTable({
+        if ($("#supplier-due-report").length) {
+          // Destroy DataTable if it already exists to reinitialize it
+          if ($.fn.DataTable.isDataTable("#supplier-due-report")) {
+            $("#supplier-due-report").DataTable().clear().destroy();
+          }
+          var table = $("#supplier-due-report").DataTable({
             dom: '<"row"<"col-md-5 col-sm-6"l><"col-md-7 text-right col-sm-6"Bf>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
             // processing: true, // Show processing indicator
             serverSide: false, // Disable server-side processing for client-side only
             pageLength: 10, // Default page size
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Add -1 for 'All' option
             columns: [
-              { data: "product_code", title: "ID", className: "product-code" },
-              { data: "product_name", title: "Name", className: "product-name" },
-              { data: "product_status", title: "Status", className: "product-status" },
-              { data: "category_id", title: "Category", className: "category-name" },
-              { data: "brand_id", title: "Brand", className: "brand-name" },
-              { data: "created_at", title: "First Release", className: "created-at" },
-              { data: "updated_at", title: "Last Update", className: "updated-at" },
+              { data: "account_code", title: "Account Code", className: "account-code", width:"10%"},
+              { data: "account_name", title: "Account Name", className: "account-name", width:"20%"},
+              { data: "mobile", title: "Mobile", className: "contact-number", width:"10%"},
+              { data: "account_status", title: "Status", className: "account-status", width:"5%"},
+              { data: "due_amount", title: "Due Amount", className: "due-amount", width:"10%"},
             ],
             buttons: [
               { extend: "copy", className: "btn-sm" },
@@ -355,7 +360,7 @@
                 // Generate a custom file name dynamically
                 const today = new Date();
                 const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
-                return `Product_List_${formattedDate}`;
+                return `Supplier_${formattedDate}`;
               },
             },
               {
@@ -371,29 +376,27 @@
             // autoWidth: true, // Automatically adjust column width to container
             scrollX: false,   // Disable horizontal scroll
             order: [[0, 'asc']],
-            language: {
-              "emptyTable": "No data available" // Custom message when there is no data
-            },
+            autoWidth:false,
             ajax: function (data, callback, settings) {
               // Fetch all data once and let DataTables handle searching/pagination on client side
               const requestOptions = {
-                method: 'post',
+                method: 'post'
               }
-              fetch('http://localhost:4321/api/reports/inventory/product-list', requestOptions)
+              fetch('http://localhost:4321/api/reports/accounts/supplier-due-report', requestOptions)
                 .then(response => response.json())
                 .then(function (responseData) {
-                  reportData = responseData.products || [];
-                  if (reportData.length > 0) {
-                    //Format date in the received data
-                    reportData.forEach(pr => {
-                      pr.category_id = pr.category.name;
-                      pr.brand_id = pr.brand.name;
-                      pr.product_status = pr.product_status == true ? "Active" : "Inactive";
-                      pr.created_at = formatDate(pr.created_at, "date", "-");
-                      pr.updated_at = formatDate(pr.updated_at, "date", "-");
-                    });
-                  }
-                  callback({ data: reportData })
+                  console.log(responseData)
+                  reportData = responseData.report;
+                  //Format date in the received data
+                  reportData.forEach(cst => {
+                    cst.account_status = cst.account_status ? `<b style="text-align:center;">Active</b>` : "Inactive";
+                    cst.joining_date = formatDate(cst.joining_date, "date", "-");
+                  });
+                  // Wrap the data in the expected format
+                  const returnData = {
+                    data: reportData // Wrap data in { data: ... } for DataTables
+                  };
+                  callback(returnData);
                 })
                 .catch(function (error) {
                   console.error('Error fetching data:', error);
@@ -416,30 +419,29 @@
       TableManageButtons.init();
 
     };
+
     function customPrintFunction() {
       let n = reportData.length;
       let tBody = '';
 
       if (n > 0) {
         for (let i = 0; i < n; i++) {
-          const p = reportData[i];
+          const c = reportData[i];
           tBody += `
             <tr>
-              <td>${p.product_code || "-"}</td>
-              <td>${p.product_name || "-"}</td>
-              <td>${p.product_status || "-"}</td>
-              <td>${p.category_id || "-"}</td>
-              <td>${p.brand_id || "-"}</td>
-              <td>${formatDate(p.created_at, "date", "-") || "-"}</td>
-              <td>${formatDate(p.updated_at, "date", "-") || "-"}</td>
-            </tr>
-          `;
+              <td>${c.account_code}</td>
+              <td>${c.account_name}</td>
+              <td>${c.mobile}</td>
+              <td>${c.account_status}</td>
+              <td>${c.due_amount || "0"}</td>
+            </tr>`;
         }
       } else {
         tBody = `
-          <tr><td colspan="7" style="text-align:center;">No data available</td></tr>`;
+          <tr><td colspan=6 style="text-align:center;">No data available</td></tr>`;
       }
 
+      const currentDate = new Date().toLocaleDateString();
       const content = `
         <!DOCTYPE html>
         <html lang="en">
@@ -448,12 +450,18 @@
           <title>Company Report</title>
           <link rel="stylesheet" type="text/css" href="styles.css">
           <style>
-              /* Header styling */
+            /* Header styling */
             .header {
               text-align: center;
               margin-bottom: 20px;
               padding: 10px;
               border-bottom: 2px solid #265166;
+            }
+            .header .current-date{
+              text-align: left;
+              font-size:10px;
+              font-weight:600;
+              color:#2F4F4F;
             }
             .header h1 {
               font-size: 28px;
@@ -474,15 +482,15 @@
               font-size: 14px;
               color: #666;
             }
-            
             /* table caption and printing date section */
             .caption-section {
               display: flex;
               justify-content: space-between;
               align-items: center;
-              font-size: 18px;
+              font-size: 14px;
               color: #444;
               padding-top: 10px;
+              padding-bottom:0px;
             }
             .caption-section .caption {
               font-weight: bold;
@@ -492,7 +500,6 @@
               font-style: italic;
               color: #666;
             }
-
             /* Table styling */
             table {
               width: 100%;
@@ -515,20 +522,6 @@
             tr:nth-child(odd) {
               background-color: #ffffff;
             }
-
-            /* Footer styling */
-            .footer {
-              position: fixed;
-              bottom: 0;
-              width: 100%;
-              text-align: center;
-              font-size: 12px;
-              color: #666;
-              padding: 10px 0;
-            }
-            .footer .page-number:after {
-              content: counter(page);
-            }
           </style>
         </head>
         <body>
@@ -548,22 +541,19 @@
             
             <!-- Line with Caption and Print Date -->
             <div class="caption-section">
-              <div class="caption">List of Products</div>
+              <div class="caption">suppliers due report</div>
               <div class="print-date">Printed on: ${getShortDate()}</div>
             </div>
           </div>
-
           <!-- Table Section -->
           <table>
             <thead>
               <tr>
                 <th>Code</th>
                 <th>Name</th>
+                <th>Mobile</th>
                 <th>Status</th>
-                <th>Category</th>
-                <th>Brand</th>
-                <th>First Release</th>
-                <th>Last Update</th>
+                <th>Due Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -571,8 +561,7 @@
             </tbody>
           </table>
         </body>
-        </html>
-      `;
+        </html>`;
 
       // Create an iframe to load the content
       const iframe = document.createElement('iframe');
@@ -591,7 +580,6 @@
     }
 
   </script>
-
 
 
 </body>
