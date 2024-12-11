@@ -894,7 +894,8 @@
           quantity: parseInt(row.cells[4].innerText),
           serial_numbers: sn,
           mrp: parseInt(row.cells[6].innerText),
-          total_amount: parseInt(document.getElementById("selected-product-price-" + row.cells[0].innerText).innerText),
+          sub_discount: parseInt(document.getElementById("selected-product-discount-" + row.cells[0].innerText).value),
+          sub_total: parseInt(document.getElementById("selected-product-price-" + row.cells[0].innerText).innerText),
           warranty: parseInt(document.getElementById('product-warranty-' + row.cells[0].innerText).innerText),
         }
         selectedProducts.push(item)

@@ -208,6 +208,7 @@ type ProductShortInfo struct {
 	Warranty      int      `json:"warranty"`
 	Quantity      int      `json:"quantity"`
 	MRP           int      `json:"mrp"`
+	SubDiscount int `json:"sub_discount"`
 	SubTotal      int      `json:"sub_total"`
 }
 

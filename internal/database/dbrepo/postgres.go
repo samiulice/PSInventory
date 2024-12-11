@@ -2666,9 +2666,8 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 			SET quantity_sold = quantity_sold + $1, sold_price = sold_price + $2, sold_discount = sold_discount + $3
 			WHERE id = $4;
 		  `
-		currentSoldPrice := items.Quantity * items.MRP
-		discountPerProductType := currentSoldPrice * sale.Discount / sale.BillAmount
-		_, err = tx.ExecContext(ctx, query, items.Quantity, currentSoldPrice, discountPerProductType, items.ProductID)
+		currentSoldPrice := items.SubTotal
+		_, err = tx.ExecContext(ctx, query, items.Quantity, currentSoldPrice, items.SubDiscount, items.ProductID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("SQLErrorSaleProductsToCustomer(Update products table): For id %d --%w", i, err)
@@ -2683,14 +2682,14 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 				WHERE serial_number = $3 RETURNING purchase_rate, purchase_discount
 			`
 			var purchaseRate, purchaseDiscount int
-			err := tx.QueryRowContext(ctx, query, sale_id, discountPerProductType/items.Quantity, serialNumber).Scan(&purchaseRate, &purchaseDiscount)
+			err := tx.QueryRowContext(ctx, query, sale_id, int(items.SubDiscount/items.Quantity), serialNumber).Scan(&purchaseRate, &purchaseDiscount)
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("SQLErrorSaleProductsToCustomer(Update Product status And status):#serial-%s --%w", serialNumber, err)
 			}
 			totalPurchase += purchaseRate
 			totalPurchasedDiscount += purchaseDiscount
-			totalSoldDiscount += discountPerProductType / items.Quantity
+			totalSoldDiscount += items.SubDiscount / items.Quantity
 		}
 		//
 	}
