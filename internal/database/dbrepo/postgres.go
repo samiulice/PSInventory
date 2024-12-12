@@ -2666,8 +2666,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 			SET quantity_sold = quantity_sold + $1, sold_price = sold_price + $2, sold_discount = sold_discount + $3
 			WHERE id = $4;
 		  `
-		currentSoldPrice := items.SubTotal
-		_, err = tx.ExecContext(ctx, query, items.Quantity, currentSoldPrice, items.SubDiscount, items.ProductID)
+		_, err = tx.ExecContext(ctx, query, items.Quantity, items.SubTotal, items.SubDiscount, items.ProductID)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("SQLErrorSaleProductsToCustomer(Update products table): For id %d --%w", i, err)
@@ -2731,7 +2730,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 	var current_balance int
 	query = `
 		UPDATE Public.head_accounts
-		SET current_balance = current_balance + $1, amount_receivable =  amount_receivable + $2, offered_discount = offered_discount + $3
+		SET current_balance = current_balance + $1, amount_receivable =  amount_receivable + $2, offered_discount = offered_discount + $3, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $4 RETURNING current_balance;
 	`
 	err = tx.QueryRowContext(ctx, query, sale.PaidAmount, due, totalSoldDiscount, sale.HeadAccountInfo.ID).Scan(&current_balance)
@@ -2739,19 +2738,21 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update head_accounts info):" + err.Error())
 	}
+	//Update REVENUE ACCOUNTS
 	query = `
 		UPDATE Public.head_accounts
-		SET current_balance = current_balance + $1
+		SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP
 		WHERE id = 5;
 	`
-	_, err = tx.ExecContext(ctx, query, sale.BillAmount-totalPurchase-totalSoldDiscount)
+	_, err = tx.ExecContext(ctx, query, sale.TotalAmount-totalPurchase+totalPurchasedDiscount)
 	if err != nil {
 		tx.Rollback()
 		return errors.New("SQLErrorSaleProductsToCustomer(Update REVENUE ACCOUNTS info):" + err.Error())
 	}
+	//Update CURRENT ASSETS ACCOUNTS
 	query = `
 		UPDATE Public.head_accounts
-		SET current_balance = current_balance - $1
+		SET current_balance = current_balance - $1, updated_at = CURRENT_TIMESTAMP
 		WHERE id = 6;
 	`
 	_, err = tx.ExecContext(ctx, query, totalPurchase-totalPurchasedDiscount)
@@ -2804,6 +2805,7 @@ func (p *postgresDBRepo) SaleProductsToCustomer(sale *models.SalesInvoice) error
 			updated_at = CURRENT_TIMESTAMP;
 	`
 
+	sale.GrossProfit = sale.TotalAmount - totalPurchase + totalPurchasedDiscount
 	_, err = tx.ExecContext(ctx, query,
 		&sale.SaleDate,
 		&sale.BillAmount,
@@ -3623,7 +3625,7 @@ func (p *postgresDBRepo) CompleteExpensesTransactions(summary []*models.Expense)
 			SET current_balance = current_balance - $1, updated_at = CURRENT_TIMESTAMP
 			WHERE id = $2 RETURNING current_balance`
 
-		err = tx.QueryRowContext(ctx, stmt, sum.ExpenseAmount, time.Now(), sum.SourceAccount.ID).Scan(&current_balance)
+		err = tx.QueryRowContext(ctx, stmt, sum.ExpenseAmount, sum.SourceAccount.ID).Scan(&current_balance)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("DBERROR: CompleteExpensesTransactions => Unable to update current_balance in head_accounts table: %w", err)

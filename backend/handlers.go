@@ -919,6 +919,20 @@ func (app *application) SaleProductsToCustomer(w http.ResponseWriter, r *http.Re
 		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer:Unable to read JSON => %w", err))
 		return
 	}
+	//get last index of sales_history table
+	l, err := app.DB.LastIndex("sales_history")
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
+		return
+	}
+	//generate unique memo no
+	memoNo, err := app.GenerateRandomAlphanumericCode(6)
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))
+		return
+	}
+	salesInfo.MemoNo = "MMSL"+memoNo + strconv.FormatInt(l, 10)
+	
 	err = app.DB.SaleProductsToCustomer(&salesInfo)
 	if err != nil {
 		app.badRequest(w, fmt.Errorf("ERROR: SaleProductsToCustomer => %w", err))

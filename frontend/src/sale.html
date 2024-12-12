@@ -105,48 +105,38 @@
                     <li><a href="#transaction-posting.html">Transaction Posting</a></li>
                   </ul>
                 </li>
-                <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-file-text"></i>Accounts Reports <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li>
-                      <a>Account Reports<span class="fa fa-chevron-down"></span></a>
-                      <ul class="nav child_menu">
-                        <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
-                        <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
-                        <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                        <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
-                        <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
-                        <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
-                        <li class="sub_menu"><a href="income-statement.html">Income Statement</a></li>
-                        <li class="sub_menu"><a href="customer-due-report.html">Customer Due Report</a></li>
-                        <li class="sub_menu"><a href="supplier-due-report.html">Supplier Due Report</a></li>
-                        <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
-                        <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
-                        <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
-                    </li>
+                    <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
+                    <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
+                    <!-- <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li> -->
+                    <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
+                    <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
+                    <!-- <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li> -->
+                    <li class="sub_menu"><a href="income-statement.html">Income Statement</a></li>
+                    <li class="sub_menu"><a href="customer-due-report.html">Customer Due Report</a></li>
+                    <li class="sub_menu"><a href="supplier-due-report.html">Supplier Due Report</a></li>
+                    <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
+                    <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
+                    <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
                   </ul>
                 </li>
-                <li>
-                  <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-file-text"></i>Inventory Reports <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li class="sub_menu"><a href="category-list.html">Category List</a></li>
                     <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
                     <li class="sub_menu"><a href="product-list.html">Product List</a></li>
-                    <li class="sub_menu"><a href="service-list.html">Service List</a></li>
+                    <!-- <li class="sub_menu"><a href="service-list.html">Service List</a></li> -->
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
                     <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
-                    <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
+                    <!-- <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li> -->
                     <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
                     <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
-                    <li class="sub_menu"><a href="service-history.html">Service History</a></li>
+                    <!-- <li class="sub_menu"><a href="service-history.html">Service History</a></li> -->
+                  </ul>
                 </li>
               </ul>
-              </li>
-              </li>
-              </ul>
-              </li>
-              </ul>
             </div>
-
           </div>
           <!-- /sidebar menu -->
 
@@ -389,8 +379,8 @@
                 <div class="row form-group text-center">
 
                   <button type="submit" id="submitBtn" class="btn btn-danger">Complete Sale</button>
-                  <button class="d-none btn btn-warning" type="button" id="invoiceBtn"
-                    onclick="printSalesInvoice()">Print Invoice</button>
+                  <button class="btn btn-warning" type="button" id="invoiceBtn" onclick="printSalesInvoice()">Print
+                    Invoice</button>
 
                 </div>
               </div>
@@ -540,8 +530,6 @@
                   }
                 }) //End of fetch statement
             })
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //submit data to backend
             document.getElementById("sale-form").addEventListener('submit', function (event) {
               event.preventDefault();
@@ -772,7 +760,7 @@
           <th class="text-center" id="selected-product-qty-${id}">${quantity}</th>
           <th class="text-center" id="selected-product-serial-${id}">` + serial + `</th>
           <th class="text-center">${pm.max_retail_price}</th>
-          <th class="text-center" id="selected-product-price-${id}">${sub_total}</th>
+          <th class="text-center" id="selected-product-price-${id}">${sub_total - sub_discount}</th>
           <input type="hidden" id="selected-product-discount-${id}" value="${sub_discount}">
           <input type="hidden" id="selected-product-gross_profit-${id}" value="${sub_gross_profit}">
           <th class="text-center" id="product-remove-btn-${id}"><button type="button" class="btn btn-xs btn-danger btn-round" onclick=deleteFromSelectItems(${id})><i class="fa fa-minus"></i></button></th>
@@ -906,6 +894,117 @@
     }
 
     function printSalesInvoice() {
+      // DEBUG
+      if (!InvoiceData) {
+        InvoiceData =
+        {
+            "customer_info": {
+                "id": 3,
+                "account_code": "c-000003",
+                "account_name": "Samiul Islam",
+                "contact_person": "",
+                "division": "Mymensingh",
+                "district": "Netrakona",
+                "upazila": "Moahanganj",
+                "area": "Markaj Road",
+                "mobile": "01797331020",
+                "due_amount": 0,
+                "email": "",
+                "whatsapp_account": "",
+                "account_status": false,
+                "discount": 0,
+                "opening_balance": 0,
+                "joining_date": "0001-01-01T00:00:00Z",
+                "created_at": "0001-01-01T00:00:00Z",
+                "updated_at": "0001-01-01T00:00:00Z"
+            },
+            "head_account_info": {
+                "id": 1,
+                "account_code": "001",
+                "account_name": "CASH",
+                "account_type": "CASH & BANK ACCOUNTS",
+                "account_status": true,
+                "current_balance": 556250,
+                "created_at": "2024-12-06T18:14:40.87Z",
+                "updated_at": "2024-12-06T18:56:24.774Z"
+            },
+            "selected_items": [
+                {
+                    "product_id": 1,
+                    "product_name": "Core i5 10th Gen",
+                    "category_name": "Processor",
+                    "brand_name": "Intel",
+                    "serial_numbers": [
+                        "78c0cd74-a8af-4d66-93c2-c3b04c3cf277"
+                    ],
+                    "warranty": 1095,
+                    "quantity": 1,
+                    "mrp": 15000,
+                    "sub_discount": 500,
+                    "sub_total": 14500
+                },
+                {
+                    "product_id": 2,
+                    "product_name": "MSI B560 Pro-E",
+                    "category_name": "Motherboard",
+                    "brand_name": "MSI",
+                    "serial_numbers": [
+                        "7256a17c-b58f-48e1-9fac-640a86adfb90"
+                    ],
+                    "warranty": 730,
+                    "quantity": 1,
+                    "mrp": 7500,
+                    "sub_discount": 300,
+                    "sub_total": 7200
+                },
+                {
+                    "product_id": 3,
+                    "product_name": "Corsair Vengeance LPX 8GB 3200MHz DDR4 Desktop RAM",
+                    "category_name": "RAM",
+                    "brand_name": "Corsair",
+                    "serial_numbers": [
+                        "b528a61b-ebc9-458a-b6ad-6de4e521cd23",
+                        "a3df33e5-d5fd-48ca-ac7a-c12b7adcda09",
+                        "73cae4f1-7979-44f9-b820-985daf50817b",
+                        "4633f7f3-e209-46cf-9ee9-86cae8058428"
+                    ],
+                    "warranty": 730,
+                    "quantity": 4,
+                    "mrp": 2500,
+                    "sub_discount": 400,
+                    "sub_total": 9600
+                }
+            ],
+            "sale_date": "12/13/2024",
+            "chalan_no": "",
+            "memo_no": "MMSLtUGhZt0",
+            "note": "",
+            "bill_amount": 32500,
+            "discount": 1200,
+            "total_amount": 31300,
+            "paid_amount": 30000,
+            "gross_profit": 11800
+        };
+        company = {
+          "id": 1,
+          "name": "Projukti Sheba Inventory",
+          "description": "An ultimate solution to manage your business",
+          "slogan": "Track Smarter, Stock Better",
+          "mobile": "+8801742135093",
+          "whatsapp": "",
+          "tel": "",
+          "email": "+8801742135093",
+          "division": "Mymensingh",
+          "district": "Netrakona",
+          "upazila": "Netrakona Shada",
+          "area": "Teri Bazar",
+          "postal_code": "",
+          "logo_link": "",
+          "opening_date": "2024-12-06T18:14:40.874179Z",
+          "created_at": "2024-12-06T18:14:40.874179Z",
+          "updated_at": "2024-12-06T18:14:40.874179Z"
+        }
+      }
       //product list table
       let tBody = ""
       let company_info = ""
@@ -934,8 +1033,8 @@
               </span>
           </td>
           <td style="text-align:center">${items.quantity}</td>
-          <td style="text-align:right">${Math.round(items.sub_total / items.quantity)}</td>
-          <td style="text-align:right">${items.sub_total}</td>
+          <td style="text-align:right">${items.mrp}</td>
+          <td style="text-align:right">${items.quantity * items.mrp}</td>
         </tr>`
       }
       //company
@@ -955,276 +1054,316 @@
           </div>`
 
       const content = `
-        
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <title>Sales Invoice</title>
-            <style>
-                /* General Styling */
-                * {
-                    box-sizing: border-box;
-                    margin: 0;
-                    padding: 0;
-                    font-family: IBMPlexSans-Regular;
-                }
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>Sales Invoice</title>
+        <style>
+            /* General Styling */
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                font-family: IBMPlexSans-Regular;
+            }
 
-                body {
-                    font-family: Arial, sans-serif;
-                    color: #333;
-                    background-color: #ffffff;
-                    padding: 5px;
-                }
+            body {
+                font-family: Arial, sans-serif;
+                color: #333;
+                background-color: #ffffff;
+                padding: 5px;
+            }
 
-                /* A4 Page Setup */
-                .invoice-container {
-                    margin: auto;
-                    padding: 10px;
-                    background-color: #fff;
-                }
+            /* A4 Page Setup */
+            .invoice-container {
+                margin: auto;
+                padding: 10px;
+                background-color: #fff;
+            }
 
-                /* Header Styling */
-                .header {
-                    background-color: #10455f;
-                    color: white;
-                    padding: 10px;
-                    /* Reduced padding */
-                    text-align: center;
-                    border-radius: 5px;
-                    margin-bottom: 5px;
-                    /* Reduced margin */
-                }
+            /* Header Styling */
+            .header {
+                background-color: #10455f;
+                color: white;
+                padding: 10px;
+                text-align: center;
+                border-radius: 5px;
+                margin-bottom: 5px;
+            }
 
-                .header h1 {
-                    font-family: 'Georgia', serif;
-                    font-size: 24px;
-                    /* Reduced font size */
-                    font-weight: 700;
-                    margin: 0;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                }
+            .header h1 {
+                font-family: 'Georgia', serif;
+                font-size: 24px;
+                font-weight: 700;
+                margin: 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
 
-                /* Info Section */
-                .info-section {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 0px;
-                    padding: 5px;
-                    background-color: #F7F9FB;
-                    border-bottom: 2px solid #1E3A5F;
-                }
+            /* Info Section */
+            .info-section {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 0px;
+                padding: 5px;
+                background-color: #F7F9FB;
+                border-bottom: 2px solid #1E3A5F;
+            }
 
-                .info-section div {
-                    width: 45%;
-                }
+            .info-section div {
+                width: 45%;
+            }
 
-                /* Customer Info and Company Info Styling */
-                .customer-info h2 {
-                    font-family: IBMPlexSans-Regular;
-                    font-size: 20px;
-                    color: #1E3A5F;
-                    font-weight: bold;
-                    margin-bottom: 10px;
-                }
+            /* Customer Info and Company Info Styling */
+            .customer-info h2 {
+                font-family: IBMPlexSans-Regular;
+                font-size: 20px;
+                color: #1E3A5F;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
 
-                .customer-info p {
-                    font-size: 14px;
-                    color: #000000;
-                    line-height: 2;
-                }
+            .customer-info p {
+                font-size: 14px;
+                color: #000000;
+                line-height: 2;
+            }
 
-                .basic {
-                    font-family: IBMPlexSans-Regular;
-                    letter-spacing: 0.5px;
-                    padding-left: 2px;
-                    padding-right: 2px;
-                    border-bottom: 1px dotted #000000;
-                }
+            .basic {
+                font-family: IBMPlexSans-Regular;
+                letter-spacing: 0.5px;
+                padding-left: 2px;
+                padding-right: 2px;
+                border-bottom: 1px dotted #000000;
+            }
 
-                .invoice {
-                    font-family: IBMPlexSans-Bold;
-                    float: left;
-                    letter-spacing: 0.5px;
-                }
+            .invoice {
+                font-family: IBMPlexSans-Bold;
+                float: left;
+                letter-spacing: 0.5px;
+            }
 
-                .customer-info .date {
-                    font-family: IBMPlexSans-Bold;
-                    float: right;
-                    letter-spacing: 0.5px;
-                }
+            .customer-info .date {
+                font-family: IBMPlexSans-Bold;
+                float: right;
+                letter-spacing: 0.5px;
+            }
 
-                .company-info p {
-                    font-family: IBMPlexSans-Regular;
-                    font-size: 14px;
-                    color: #000000;
-                    line-height: 1.5;
-                }
+            .company-info p {
+                font-family: IBMPlexSans-Regular;
+                font-size: 14px;
+                color: #000000;
+                line-height: 1.5;
+            }
 
-                .company-info {
-                    text-align: right;
-                }
+            .company-info {
+                text-align: right;
+            }
 
-                /* Company Info Enhanced Styling */
-                .company-info .company-name {
-                    font-family: IBMPlexSans-Regular;
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #1E3A5F;
-                }
+            /* Company Info Enhanced Styling */
+            .company-info .company-name {
+                font-family: IBMPlexSans-Regular;
+                font-size: 24px;
+                font-weight: bold;
+                color: #1E3A5F;
+            }
 
-                .company-info .company-slogan {
-                    font-style: italic;
-                    color: #092635;
-                    font-size: 12px;
-                }
+            .company-info .company-slogan {
+                font-style: italic;
+                color: #092635;
+                font-size: 12px;
+            }
 
-                /* Table Styling */
-                .items-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 10px;
-                    font-size: 12px;
-                    color: #000000;
-                }
+            /* Table Styling */
+            .items-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+                font-size: 12px;
+                color: #000000;
+            }
 
-                .product-deatils {
-                    font-size: 10px;
-                    line-height: 1.25em;
-                }
+            .product-deatils {
+                font-size: 10px;
+                line-height: 1.25em;
+            }
 
-                .items-table th,
-                .items-table td {
-                    padding: 8px;
-                    border: 1px solid #ddd;
-                    text-align: left;
-                }
+            .items-table th,
+            .items-table td {
+                padding: 8px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
 
-                .items-table th {
-                    background-color: #10455f;
-                    color: white;
-                    font-weight: bold;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    word-spacing: 2px;
-                }
+            .items-table th {
+                background-color: #10455f;
+                color: white;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                word-spacing: 2px;
+            }
 
-                /* Totals and Payment Info */
-                .totals-section {
-                    font-family: IBMPlexSans-Regular;
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 10px;
-                    gap: 10px;
-                    font-size: 12px;
-                    color: #ffffff;
-                }
+            /* Totals and Payment Info */
+            .totals-section {
+                font-family: IBMPlexSans-Regular;
+                display: flex;
+                justify-content: space-between;
+                margin-top: 10px;
+                gap: 10px;
+                font-size: 12px;
+                color: #ffffff;
+            }
 
-                .totals,
-                .payment-info {
-                    flex: 1;
-                    padding: 10px;
-                    background-color: #ffffff;
-                    border-radius: 5px;
-                    border: 1px solid #ddd;
-                }
+            .totals,
+            .payment-info {
+                flex: 1;
+                padding: 10px;
+                background-color: #ffffff;
+                border-radius: 5px;
+                border: 1px solid #ddd;
+            }
 
-                .totals .total-row,
-                .payment-info .info-row {
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 5px 0;
-                    color: #444;
-                }
+            .totals .total-row,
+            .payment-info .info-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 5px 0;
+                color: #444;
+            }
 
-                .totals .total-label,
-                .payment-info .info-label {
-                    color: #1f1f1f;
-                }
+            .totals .total-label,
+            .payment-info .info-label {
+                color: #1f1f1f;
+            }
 
-                /* Remarks Section */
-                .remarks {
-                    font-size: 14px;
-                    color: #4b4949;
-                    background-color: #F7F9FB;
-                    padding: 10px;
-                    border-left: 3px solid #4C91B3;
-                    margin-top: 10px;
-                }
-            </style>
-        </head>
+            /* Signature Section */
+            .signature-section {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 20px;
+                padding: 10px;
+                border-top: 2px dashed #ccc;
+            }
 
-        <body>
-          <div class="invoice-container" id="invoice-content">
-              <!-- Header Title with Solid Background Color and Updated Font Style -->
-              <div class="header">
-                  <h1>Sales Invoice</h1>
-              </div>
+            .signature-box {
+                width: 45%;
+                text-align: center;
+            }
 
-              <!-- Info Section with Customer and Company Info Side by Side -->
-              <div class="info-section">
-                  <!-- Customer Info -->
-                  <div class="customer-info">
-                      <h2>Bill To</h2>
-                      <p>Name: <span class="basic" style="margin-left: 20px;">${InvoiceData.customer_info.account_name}</span><br>
-                          Mobile: <span class="basic" style="margin-left: 18px;">${InvoiceData.customer_info.mobile}<br></span>
-                          Address: <span class="basic" style="margin-left: 8px;">${InvoiceData.customer_info.upazila + ", " || ""}${InvoiceData.customer_info.district || ""}<br></span>
-                          Invoice: <span class="basic" style="margin-left: 15px; font-weight: bold;">${InvoiceData.memo_no}</span>
-                      </p>
-                  </div>
+            .signature-box h3 {
+                font-size: 14px;
+                color: #1E3A5F;
+                margin-bottom: 40px;
+            }
 
-                  <!-- Company Info -->
-                  ${company_info}
-              </div>
+            .signature-line {
+                border-top: 1px solid #000;
+                margin: 0 auto;
+                width: 80%;
+            }
 
-              <!-- Items Table -->
-              <table class="items-table">
-                  <thead>
-                      <tr>
-                          <th>ID</th>
-                          <th>Description</th>
-                          <th>Quantity</th>
-                          <th>Unit Price</th>
-                          <th>Total Price</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                    ${tBody}
-                      <!-- rows will be add using JS DOM -->
-                  </tbody>
-              </table>
+            /* Remarks Section */
+            .remarks {
+                font-size: 14px;
+                color: #4b4949;
+                background-color: #F7F9FB;
+                padding: 10px;
+                border-left: 3px solid #4C91B3;
+                margin-top: 10px;
+            }
+        </style>
+      </head>
 
-              <!-- Totals and Payment Info Section with Consistent Spacing -->
-              <div class="totals-section">
+      <body>
+        <div class="invoice-container" id="invoice-content">
+            <!-- Header Title with Solid Background Color and Updated Font Style -->
+            <div class="header">
+                <h1>Sales Invoice</h1>
+            </div>
 
-                  <!-- Payment Info Section -->
-                  <div class="payment-info">
-                      <div class="info-row"><span class="info-label">Payment Method</span><span>${InvoiceData.chalan_no === "" ? "Cash Received" : "Bank Payment"}</span></div>
-                      <div class="info-row"><span class="info-label">Cheque No.</span><span>${InvoiceData.chalan_no || ""}</span></div>
-                      <div class="info-row"><span class="info-label">Due</span><span>${InvoiceData.total_amount - InvoiceData.paid_amount}</span></div>
-                  </div>
-                  <!-- Totals Section -->
-                  <div class="totals">
-                      <div class="total-row"><span class="total-label">Subtotal</span><span>${InvoiceData.bill_amount}</span></div>
-                      <div class="total-row"><span class="total-label">Discount</span><span>${InvoiceData.bill_amount - InvoiceData.total_amount}</span></div>
-                      <div class="total-row"><strong>Total Amount</strong><span><strong>${InvoiceData.total_amount}</strong></span></div>
-                  </div>
-              </div>
+            <!-- Info Section with Customer and Company Info Side by Side -->
+            <div class="info-section">
+                <!-- Customer Info -->
+                <div class="customer-info">
+                    <h2>Bill To</h2>
+                    <p>Name: <span class="basic" style="margin-left: 20px;">${InvoiceData.customer_info.account_name}</span><br>
+                        Mobile: <span class="basic" style="margin-left: 18px;">${InvoiceData.customer_info.mobile}<br></span>
+                        Address: <span class="basic" style="margin-left: 8px;">${InvoiceData.customer_info.upazila + ", " || ""}${InvoiceData.customer_info.district || ""}<br></span>
+                        Invoice: <span class="basic" style="margin-left: 15px; font-weight: bold;">${InvoiceData.memo_no}</span>
+                    </p>
+                </div>
 
-              <!-- Remarks Section -->
-              <div class="remarks">
-                  <p>
-                    <strong>Remarks:</strong><br>
-                    ${InvoiceData.total_amount - InvoiceData.paid_amount > 0 ? "Please make the due payment within 30 days to avoid late fees." : ""}<br>
-                    Warranty excludes damage misuse, removing or scarting products stickers, consumables and unauthorized handling</li>
-                    <ul>
-                  </p>
-              </div>
-          </div>
-        </body>
-        </html>`;
+                <!-- Logo Section -->
+                <div class="logo-section" style="width: 20%; display: flex; align-items: center;">
+                    <img src="assets/images/logo.jpg" alt="Company Logo" style="max-width: 100%; max-height: 100px; object-fit: contain; padding-top:0">
+                </div>
+                <!-- Company Info -->
+                ${company_info}
+            </div>
 
+            <!-- Items Table -->
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  ${tBody}
+                    <!-- rows will be add using JS DOM -->
+                </tbody>
+            </table>
+
+            <!-- Totals and Payment Info Section with Consistent Spacing -->
+            <div class="totals-section">
+
+                <!-- Payment Info Section -->
+                <div class="payment-info">
+                    <div class="info-row"><span class="info-label">Payment Method</span><span>${InvoiceData.chalan_no === "" ? "Cash Received" : "Bank Payment"}</span></div>
+                    <div class="info-row"><span class="info-label">Cheque No.</span><span>${InvoiceData.chalan_no || ""}</span></div>
+                    <div class="info-row"><span class="info-label">Due</span><span>${InvoiceData.total_amount - InvoiceData.paid_amount}</span></div>
+                </div>
+                <!-- Totals Section -->
+                <div class="totals">
+                    <div class="total-row"><span class="total-label">Subtotal</span><span>${InvoiceData.bill_amount}</span></div>
+                    <div class="total-row"><span class="total-label">Discount</span><span>${InvoiceData.bill_amount - InvoiceData.total_amount}</span></div>
+                    <div class="total-row"><strong>Total Amount</strong><span><strong>${InvoiceData.total_amount}</strong></span></div>
+                </div>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="signature-section">
+                <div class="signature-box">
+                    <h4>Customer Signature</h4>
+                    <div class="signature-line"></div>
+                </div>
+                <div class="signature-box">
+                    <h4>Authorized Signature</h4>
+                    <div class="signature-line"></div>
+                </div>
+            </div>
+
+            <!-- Remarks Section -->
+            <div class="remarks">
+                <p>
+                  <strong>Remarks:</strong><br>
+                  ${InvoiceData.total_amount - InvoiceData.paid_amount > 0 ? "Please make the due payment within 30 days to avoid late fees." : ""}<br>
+                  Warranty excludes damage misuse, removing or scarting products stickers, consumables and unauthorized handling.
+                </p>
+            </div>
+        </div>
+      </body>
+      </html>
+
+
+      `
       // Create an iframe to load the content
       const iframe = document.createElement('iframe');
       document.body.appendChild(iframe);

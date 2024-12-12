@@ -1,54 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barcode Table</title>
     <style>
-        /* A4 page styling for printing */
-        @media print {
+         @media print {
             body {
                 margin: 0;
                 padding: 0;
+                width: 210mm; /* A4 width */
+                height: 297mm; /* A4 height */
             }
             table {
                 width: 100%;
                 border-collapse: collapse;
             }
-            td {
-                width: 33.33%; /* Three barcodes per row */
-                height: 30mm; /* Adjust to match your sticker height */
-                text-align: center;
-                padding: 10px; /* Add spacing inside the cells */
-                border: 1px dashed #ccc; /* Optional for debugging layout */
-                vertical-align: middle; /* Center content vertically */
-            }
         }
-
-        /* Default styles for display */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        td {
-            width: 33.33%; /* Three barcodes per row */
-            height: 30mm; /* Sticker height */
+        .content {
+            width: 200mm; /* A4 width */
+            height: 290mm; /* A4 height */
+            background-color: #fff;
+            padding: 5px;
             text-align: center;
-            padding: 10px;
-            border: 1px dashed #ccc; /* Optional for layout visualization */
-            vertical-align: middle;
-        }
-    </style>
-</head>
-<body>
-    <h1>Barcode Table</h1>
-    <table id="barcodeTable"></table>
-    <button onclick="printPage()">Print Barcodes</button>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.0/JsBarcode.all.min.js"></script>
+        }
+        table td{
+            width: 65mm;
+            margin: 2mm;
+        }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.3/JsBarcode.all.min.js"></script>
+</head>
+
+<body>
+
+    <div class="content">
+        <table id="barcode-table">
+            <tr>
+                <td>
+                    <svg id="barcode"></svg>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <script>
         // List of UUIDs
         const uuids = [
+            "MMSLtUGhZt0123456",
             "f47ac10b-58cc-4372",
             "550e8400-e29b-41d4",
             "123e4567-e89b-12d3",
@@ -61,45 +60,27 @@
             "9b2ea164-0c96-4af4"
         ];
 
-        function generateBarcodes() {
-            const table = document.getElementById("barcodeTable");
-            let row;
+            let barcodeTable = document.getElementById("barcode-table");
+            //clear all the content from barcode table
+            barcodeTable.innerHTML = ""
+            let len = uuids.length;
+            for (let i = 0; i < len; i = i+3) { // Add 5 rows
+                let row = document.createElement("tr"); // Create a new row
 
-            uuids.forEach((uuid, index) => {
-                // Create a new row every 3 barcodes
-                if (index % 3 === 0) {
-                    row = document.createElement("tr");
-                    table.appendChild(row);
+                for (let j = 0; j < 3; j++) { // Add 3 cells per row
+                    const cell = document.createElement("td"); // Create a new cell
+                    cell.innerHTML = `
+                        <svg id="barcode-${uuids[i+j] ? uuids[i+j]:'none'}"></svg>
+                    `; // Set content
+                    row.appendChild(cell); // Append cell to the row
                 }
 
-                // Create a cell for each barcode
-                const cell = document.createElement("td");
-
-                // Create a unique SVG element for each barcode
-                const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                barcodeSvg.id = `barcode-${index}`;
-                cell.appendChild(barcodeSvg);
-
-                // Add the cell to the current row
-                row.appendChild(cell);
-
-                // Generate the barcode
-                JsBarcode(barcodeSvg, uuid, {
-                    format: "CODE128",
-                    lineColor: "#000",
-                    width: 1, // Adjust barcode width
-                    height: 20, // Adjust barcode height
-                    displayValue: true // Display the UUID below the barcode
-                });
-            });
-        }
-
-        // Generate barcodes on page load
-        generateBarcodes();
-
-        function printPage() {
-            window.print();
-        }
+                barcodeTable.appendChild(row); // Append row to the table body
+            }
+        uuids.forEach((sn,i) =>{
+            JsBarcode("#barcode-"+sn, sn);
+        })
     </script>
 </body>
+
 </html>

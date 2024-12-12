@@ -5,7 +5,6 @@ go 1.21
 toolchain go1.22.5
 
 require (
-	github.com/bwmarrin/go-alone v0.0.0-20190806015146-742bb55d1631
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/wailsapp/wails/v2 v2.9.1

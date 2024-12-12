@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>PSINVENTORY</title>
+  <title>Brand List</title>
 
   <!-- Bootstrap -->
   <link href="assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -156,51 +156,40 @@
                     <li><a href="#transaction-posting.html">Transaction Posting</a></li>
                   </ul>
                 </li>
-                <li><a><i class="fa fa-file-text"></i>Reports <span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-file-text"></i>Accounts Reports <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li>
-                      <a>Account Reports<span class="fa fa-chevron-down"></span></a>
-                      <ul class="nav child_menu">
-                        <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
-                        <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
-                        <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li>
-                        <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
-                        <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
-                        <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li>
-                        <li class="sub_menu"><a href="income-statement.html">Income Statement</a></li>
-                        <li class="sub_menu"><a href="customer-due-report.html">Customer Due Report</a></li>
-                        <li class="sub_menu"><a href="supplier-due-report.html">Supplier Due Report</a></li>
-                        <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
-                        <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
-                        <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
-                    </li>
+                    <li class="sub_menu"><a href="transaction-history.html">Transaction History</a></li>
+                    <li class="sub_menu"><a href="cash-bank-statement.html">Cash & Bank Statement</a></li>
+                    <!-- <li class="sub_menu"><a href="#ladger-book-summary.html">Ledger Book(SUMMARY)</a></li> -->
+                    <li class="sub_menu"><a href="ledger-book-details.html">Ledger Book(DETAILS)</a></li>
+                    <li class="sub_menu"><a href="expense-history.html">Expenses History</a></li>
+                    <!-- <li class="sub_menu"><a href="#gross-profit-report.html">Gross Profit Report</a></li> -->
+                    <li class="sub_menu"><a href="income-statement.html">Income Statement</a></li>
+                    <li class="sub_menu"><a href="customer-due-report.html">Customer Due Report</a></li>
+                    <li class="sub_menu"><a href="supplier-due-report.html">Supplier Due Report</a></li>
+                    <li class="sub_menu"><a href="top-sheet.html">TOP Sheet</a></li>
+                    <li class="sub_menu"><a href="trial-balance.html">Trial Balance</a></li>
+                    <li class="sub_menu"><a href="balance-sheet.html">Balance Sheet</a></li>
                   </ul>
                 </li>
-                <li>
-                  <a>Inventory Reports<span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-file-text"></i>Inventory Reports <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
                     <li class="sub_menu"><a href="category-list.html">Category List</a></li>
                     <li class="sub_menu"><a href="brand-list.html">Brand List</a></li>
                     <li class="sub_menu"><a href="product-list.html">Product List</a></li>
-                    <li class="sub_menu"><a href="service-list.html">Service List</a></li>
+                    <!-- <li class="sub_menu"><a href="service-list.html">Service List</a></li> -->
                     <li class="sub_menu"><a href="stock-report.html">Stock Report</a></li>
                     <li class="sub_menu"><a href="stock-alert-report.html">Stock Alert Report</a></li>
-                    <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li>
+                    <!-- <li class="sub_menu"><a href="item-history-report.html">Item History Report</a></li> -->
                     <li class="sub_menu"><a href="purchase-history.html">Purchase History</a></li>
                     <li class="sub_menu"><a href="sales-history.html">Sales History</a></li>
-                    <li class="sub_menu"><a href="service-history.html">Service History</a></li>
+                    <!-- <li class="sub_menu"><a href="service-history.html">Service History</a></li> -->
+                  </ul>
                 </li>
               </ul>
-              </li>
-              </li>
-              </ul>
-              </li>
-              </ul>
             </div>
-
           </div>
           <!-- /sidebar menu -->
-
 
           <!-- /menu footer buttons -->
           <div class="sidebar-footer hidden-small">
@@ -238,7 +227,7 @@
                   <!-- Will be updated by JS DOM -->
                 </table>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -346,15 +335,15 @@
             buttons: [
               { extend: "copy", className: "btn-sm" },
               {
-              extend: "csv",
-              className: "btn-sm",
-              filename: function () {
-                // Generate a custom file name dynamically
-                const today = new Date();
-                const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
-                return `Brand_List_${formattedDate}`;
+                extend: "csv",
+                className: "btn-sm",
+                filename: function () {
+                  // Generate a custom file name dynamically
+                  const today = new Date();
+                  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD format
+                  return `Brand_List_${formattedDate}`;
+                },
               },
-            },
               {
                 extend: "print",
                 className: "btn-sm",
@@ -387,9 +376,9 @@
                       b.status = b.status == 'true' ? "Active" : "Inactive"
                       b.created_at = formatDate(b.created_at, "date", "-");
                       b.updated_at = formatDate(b.updated_at, "date", "-");
-                    });  
+                    });
                   }
-                  callback({data: reportData});
+                  callback({ data: reportData });
                 })
                 .catch(function (error) {
                   console.error('Error fetching data:', error);

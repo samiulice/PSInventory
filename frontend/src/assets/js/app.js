@@ -152,7 +152,7 @@ function DateRangePicker_Cal(id) {
   };
 
   var optionSet1 = {
-    startDate: moment(),
+    startDate: moment('01/01/2012', 'MM/DD/YYYY'),
     endDate: moment(),
     minDate: '01/01/2012',
     maxDate: moment(),
@@ -190,7 +190,7 @@ function DateRangePicker_Cal(id) {
       firstDay: 1
     }
   };
-  $('#' + id + ' span').html(moment().format('MMM D, YYYY') + ' - ' + moment().format('MMM D, YYYY'));
+  $('#' + id + ' span').html(moment('01/01/2012', 'MM/DD/YYYY').format('MMM D, YYYY') + ' - ' + moment().format('MMM D, YYYY'));
 
   $('#' + id).daterangepicker(optionSet1, cb);
 
