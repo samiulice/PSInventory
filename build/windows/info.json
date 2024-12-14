@@ -5,10 +5,10 @@
 	"info": {
 		"0000": {
 			"ProductVersion": "{{.Info.ProductVersion}}",
-			"CompanyName": "{{.Info.CompanyName}}",
+			"CompanyName": "Projukti Sheba",
 			"FileDescription": "{{.Info.ProductName}}",
 			"LegalCopyright": "{{.Info.Copyright}}",
-			"ProductName": "{{.Info.ProductName}}",
+			"ProductName": "PSInventory",
 			"Comments": "{{.Info.Comments}}"
 		}
 	}

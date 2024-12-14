@@ -37,9 +37,9 @@ func main() {
 	err = wails.Run(&options.App{
 		Title: "PSInventory",
 		// Frameless: true, // Removes the default title bar
-		// WindowStartState:  options.Maximised, //maximum width
-		Width:  1366,
-		Height: 768,
+		WindowStartState: options.Maximised, //maximum width
+		// Width:  1366,
+		// Height: 768,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

@@ -19,6 +19,7 @@ Unicode true
 ####
 ## The following information is taken from the ProjectInfo file, but they can be overwritten here.
 ####
+!define ARG_WAILS_AMD64_BINARY "PSInventory.exe"
 ## !define INFO_PROJECTNAME    "MyProject" # Default "{{.Name}}"
 ## !define INFO_COMPANYNAME    "MyCompany" # Default "{{.Info.CompanyName}}"
 ## !define INFO_PRODUCTNAME    "MyProduct" # Default "{{.Info.ProductName}}"
@@ -32,11 +33,12 @@ Unicode true
 ####
 ## Include the wails tools
 ####
-!include "wails_tools.nsh"
+!include "C:\Users\USELESS\go\pkg\mod\github.com\wailsapp\wails\v2@v2.9.1\pkg\buildassets\build\windows\installer\wails_tools.nsh"
+
 
 # The version information for this two must consist of 4 parts
-VIProductVersion "${INFO_PRODUCTVERSION}.0"
-VIFileVersion    "${INFO_PRODUCTVERSION}.0"
+VIProductVersion "1.0.0.0"
+VIFileVersion    "1.0.0.0"
 
 VIAddVersionKey "CompanyName"     "${INFO_COMPANYNAME}"
 VIAddVersionKey "FileDescription" "${INFO_PRODUCTNAME} Installer"
@@ -82,17 +84,10 @@ FunctionEnd
 Section
     !insertmacro wails.setShellContext
 
-    !insertmacro wails.webview2runtime
-
     SetOutPath $INSTDIR
-
-    !insertmacro wails.files
 
     CreateShortcut "$SMPROGRAMS\${INFO_PRODUCTNAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
     CreateShortCut "$DESKTOP\${INFO_PRODUCTNAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
-
-    !insertmacro wails.associateFiles
-    !insertmacro wails.associateCustomProtocols
 
     !insertmacro wails.writeUninstaller
 SectionEnd
@@ -106,9 +101,6 @@ Section "uninstall"
 
     Delete "$SMPROGRAMS\${INFO_PRODUCTNAME}.lnk"
     Delete "$DESKTOP\${INFO_PRODUCTNAME}.lnk"
-
-    !insertmacro wails.unassociateFiles
-    !insertmacro wails.unassociateCustomProtocols
 
     !insertmacro wails.deleteUninstaller
 SectionEnd

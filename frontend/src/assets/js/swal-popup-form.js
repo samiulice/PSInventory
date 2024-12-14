@@ -163,11 +163,11 @@ function addNewProduct(page, brands, categories, products) {
                     `<div class="invalid-feedback d-none text-danger">Please select brand name.</div>
                     <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon glyphicon-tags" aria-hidden="true"></span>
                     </div>
-                    <!-- Sale Discount -->
+                    <!-- Stock Alert Level -->
                     <div class="col-4 form-group has-feedback">
                         <input type="number" class="form-control has-feedback-left" id="stock_alert_level" name="stock_alert_level"
-                            placeholder="Stock Alert Level" value="0" min="0" max="100" autocomplete="off">
-                        <div class="invalid-feedback d-none text-danger">Enter value between 0 to 100.</div>
+                            placeholder="Stock Alert Level" value="0" min="0" autocomplete="off">
+                        <div class="invalid-feedback d-none text-danger">Min Stock level must in between 0 to 100.</div>
                         <span style="color: rgba(0, 0, 0, 1); transform:translate(-40%,-10%)" class="form-control-feedback left glyphicon  glyphicon-gift" aria-hidden="true"></span>
                     </div>
                     <div class="form-group">
