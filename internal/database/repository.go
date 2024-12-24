@@ -125,4 +125,7 @@ type DatabaseRepo interface {
 	//Helper functions
 	LastIndex(tableName string) (int64, error)
 	GetCompanyProfile() (models.CompanyProfile, error)
+
+	ImportDatabase()error
+	ExportDatabase()error
 }

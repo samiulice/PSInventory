@@ -48,6 +48,15 @@ const (
 	USRegex = `^\+?1?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$`
 )
 
+const (
+	DBHost="localhost"
+	DBPort="5432"
+	DBName="psinventory"
+	DBUser="postgres"
+	DBPassword="psi@2024"
+	DBBackupLocation = "./"
+)
+
 // Brand is the type for Brand
 type Brand struct {
 	ID        int       `json:"id"`

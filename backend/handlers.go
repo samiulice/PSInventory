@@ -17,7 +17,20 @@ type JSONResponse struct {
 	Message string      `json:"message,omitempty"`
 	Result  interface{} `json:"result,omitempty"`
 }
-
+func(app *application)ExportDB(w http.ResponseWriter, r *http.Request){
+	var resp struct{
+		Error   bool        `json:"error,omitempty"`
+		Message string      `json:"message,omitempty"`
+	}
+	err :=app.DB.ExportDatabase()
+	if err != nil {
+		app.badRequest(w, fmt.Errorf("unable to update local files, %w", err))
+		return
+	}
+	resp.Error = false
+	resp.Message = "Database dumped successfully"
+	app.writeJSON(w,http.StatusOK, resp)
+}
 func (app *application) PathNotFound(w http.ResponseWriter, r *http.Request) {
 	// Serve the custom 404 HTML page
 	http.ServeFile(w, r, "frontend/src/404.html")

@@ -20,6 +20,7 @@ func (app *application) routes() http.Handler {
 	//Secure routes
 	mux.Route("/api", func(mux chi.Router) {
 		// mux.Use(app.AuthAdmin)
+		mux.Post("/export-db", app.ExportDB)
 		mux.Post("/get-dash-board-data", app.FetchDashBoardData)
 		mux.Post("/admin/add-stake-holder", app.AddNewStakeHolder)
 		mux.Post("/company-profile", app.FetchCompanyProfile)

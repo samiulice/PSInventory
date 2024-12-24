@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -4763,4 +4765,91 @@ func (p *postgresDBRepo) GetCompanyProfile() (models.CompanyProfile, error) {
 		&companyInfo.UpdatedAt,
 	)
 	return companyInfo, err
+}
+
+func (p *postgresDBRepo) ImportDatabase() error {
+	// Set the environment variable for the new password
+	os.Setenv("PGPASSWORD", models.DBPassword)
+
+	// Check if the target database exists, and create it if necessary
+	createDBCmd := exec.Command(
+		"C:\\Program Files\\PostgreSQL\\16\\bin\\psql",
+		"-h", models.DBHost,
+		"-p", models.DBPort,
+		"-U", models.DBUser,
+		"-c", fmt.Sprintf("CREATE DATABASE %s;", models.DBName),
+	)
+	createDBCmd.Stdout = os.Stdout
+	createDBCmd.Stderr = os.Stderr
+	fmt.Println("Checking/Creating target database...")
+	if err := createDBCmd.Run(); err != nil {
+		fmt.Println("Target database may already exist or could not be created.")
+	}
+
+	// Prepare the pg_restore command
+	cmd := exec.Command(
+		"C:\\Program Files\\PostgreSQL\\16\\bin\\pg_restore",
+		"-h", models.DBHost,
+		"-p", models.DBPort,
+		"-U", models.DBUser,
+		"-d", models.DBName, // New database name
+		"-c",                    // Clean the database before restoring
+		models.DBBackupLocation, // Backup file to restore from
+	)
+
+	// Set the output for the command
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	fmt.Println("Starting database restore...")
+	// Run the command
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("restore failed: %w", err)
+	}
+
+	fmt.Println("Database restore completed successfully.")
+	return nil
+}
+func (p *postgresDBRepo) ExportDatabase() error {
+	// Temporary file for storing the dump
+	tempFile := models.DBBackupLocation + ".tmp"
+
+	// Set the environment variable for the password
+	os.Setenv("PGPASSWORD", models.DBPassword)
+
+	// Prepare the pg_dump command
+	cmd := exec.Command(
+		"C:\\Program Files\\PostgreSQL\\16\\bin\\pg_dump",
+		"-h", models.DBHost,
+		"-p", models.DBPort,
+		"-U", models.DBUser,
+		"-F", "c", // Custom format
+		"-f", tempFile, // Temporary output file
+		models.DBName, // Database name
+	)
+
+	// Set the output for the command
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	fmt.Println("Starting database dump...")
+	// Run the command
+	err := cmd.Run()
+	if err != nil {
+		// Delete the temporary file if an error occurs
+		_ = os.Remove(tempFile)
+		return fmt.Errorf("dump failed: %w", err)
+	}
+
+	// Rename the temporary file to the final backup file name
+	err = os.Rename(tempFile, models.DBBackupLocation)
+	if err != nil {
+		// Cleanup the temporary file if renaming fails
+		_ = os.Remove(tempFile)
+		return fmt.Errorf("failed to finalize backup file: %w", err)
+	}
+
+	fmt.Println("Database dump completed successfully.")
+	return nil
 }
